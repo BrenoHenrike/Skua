@@ -1,0 +1,88 @@
+﻿<Window
+    x:Class="Skua.WPF.Lib.CustomWindow"
+    xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+    xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+    xmlns:local="clr-namespace:Skua.WPF.Lib"
+    xmlns:materialdesign="http://materialdesigninxaml.net/winfx/xaml/themes"
+    xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+    Width="800"
+    Height="450"
+    WindowStyle="None"
+    mc:Ignorable="d">
+    <Window.Resources>
+        <Style TargetType="Window">
+            <Setter Property="WindowChrome.WindowChrome">
+                <Setter.Value>
+                    <WindowChrome
+                        CaptionHeight="28"
+                        CornerRadius="10"
+                        GlassFrameThickness="4"
+                        ResizeBorderThickness="4" />
+                </Setter.Value>
+            </Setter>
+            <Setter Property="Template">
+                <Setter.Value>
+                    <ControlTemplate TargetType="Window">
+                        <DockPanel>
+                            <!--  Title bar  -->
+                            <materialdesign:ColorZone
+                                Height="32"
+                                DockPanel.Dock="Top"
+                                Mode="Standard">
+                                <Grid>
+                                    <Grid.ColumnDefinitions>
+                                        <ColumnDefinition Width="auto" />
+                                        <ColumnDefinition Width="*" />
+                                        <ColumnDefinition Width="auto" />
+                                    </Grid.ColumnDefinitions>
+                                    <!--  Icon  -->
+                                    <Button
+                                        Height="32"
+                                        materialdesign:ButtonAssist.CornerRadius="0"
+                                        Content="{materialdesign:PackIcon Kind=AboutCircle,
+                                                                          Size=30}" />
+
+                                    <!--  Title  -->
+                                    <Viewbox
+                                        Grid.Column="1"
+                                        Margin="15,0,0,0"
+                                        HorizontalAlignment="Left">
+                                        <TextBlock Text="{TemplateBinding Title}" />
+                                    </Viewbox>
+
+                                    <!--  System Buttons  -->
+                                    <StackPanel
+                                        Grid.Column="2"
+                                        VerticalAlignment="Top"
+                                        Orientation="Horizontal">
+                                        <Button
+                                            x:Name="btnMinimize"
+                                            Height="28"
+                                            materialdesign:ButtonAssist.CornerRadius="0 0 0 5"
+                                            Content="{materialdesign:PackIcon Kind=WindowMinimize}"
+                                            WindowChrome.IsHitTestVisibleInChrome="True" />
+                                        <Button
+                                            x:Name="btnMaximize"
+                                            Height="28"
+                                            materialdesign:ButtonAssist.CornerRadius="0"
+                                            Content="{materialdesign:PackIcon Kind=WindowMaximize}"
+                                            WindowChrome.IsHitTestVisibleInChrome="True" />
+                                        <Button
+                                            x:Name="btnClose"
+                                            Height="28"
+                                            materialdesign:ButtonAssist.CornerRadius="0"
+                                            Content="{materialdesign:PackIcon Kind=WindowClose}"
+                                            WindowChrome.IsHitTestVisibleInChrome="True" />
+                                    </StackPanel>
+                                </Grid>
+                            </materialdesign:ColorZone>
+                            <ContentPresenter Content="{TemplateBinding Content}" />
+
+                        </DockPanel>
+                    </ControlTemplate>
+                </Setter.Value>
+            </Setter>
+        </Style>
+    </Window.Resources>
+</Window>
