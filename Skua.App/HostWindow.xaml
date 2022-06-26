@@ -4,11 +4,16 @@
     xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
     xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
     xmlns:local="clr-namespace:Skua.App"
+    xmlns:materialDesign="http://materialdesigninxaml.net/winfx/xaml/themes"
     xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+    xmlns:views="clr-namespace:Skua.App.Views"
+    xmlns:vms="clr-namespace:Skua.Core.ViewModels;assembly=Skua.Core"
     xmlns:wpf="clr-namespace:Skua.WPF;assembly=Skua.WPF"
-    Title="HostWindow"
+    Title="{Binding SelectedItem.Title}"
     Width="800"
     Height="450"
+    HideWindow="True"
+    Style="{StaticResource CustomWindow}"
     mc:Ignorable="d">
-    <Grid />
+    <ContentPresenter Content="{Binding}" />
 </wpf:CustomWindow>

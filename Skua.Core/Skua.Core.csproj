@@ -9,10 +9,11 @@
 
   <ItemGroup>
     <PackageReference Include="Caseless.Fody" Version="1.9.1" />
+    <PackageReference Include="CliWrap" Version="3.4.4" />
     <PackageReference Include="CoreHook" Version="1.0.4" />
     <PackageReference Include="Microsoft.Toolkit.Mvvm" Version="7.1.2" />
     <PackageReference Include="Newtonsoft.Json" Version="13.0.1" />
-    <PackageReference Include="PostSharp" Version="6.10.9" />
+    <PackageReference Include="Westwind.Scripting" Version="1.1.5" />
   </ItemGroup>
 
   <ItemGroup>
@@ -20,5 +21,9 @@
     <ProjectReference Include="..\Skua.Core.Models\Skua.Core.Models.csproj" />
     <ProjectReference Include="..\Skua.Core.Utils\Skua.Core.Utils.csproj" />
   </ItemGroup>
+
+    <ItemGroup>
+        <ProjectReference Include="..\Skua.Core.Generators\Skua.Core.Generators.csproj" OutputItemType="Analyzer" ReferenceOutputAssembly="false" />
+    </ItemGroup>
 
 </Project>

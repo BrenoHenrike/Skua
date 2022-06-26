@@ -1,11 +1,19 @@
 ﻿using Skua.Core.Interfaces;
 
 namespace Skua.Core.Scripts;
-public class ScriptSend : ScriptableObject, IScriptSend
+public class ScriptSend : IScriptSend
 {
+    private readonly Lazy<IFlashUtil> _lazyFlash;
+    private IFlashUtil Flash => _lazyFlash.Value;
+
+    public ScriptSend(Lazy<IFlashUtil> flash)
+    {
+        _lazyFlash = flash;
+    }
+
     public void Packet(string packet, string type = "String")
     {
-        Bot.Flash.CallGameFunction($"sfc.send{type}", packet);
+        Flash.CallGameFunction($"sfc.send{type}", packet);
     }
 
     public Task PacketSpam(string packet, string type, int delay, CancellationToken token)
@@ -22,7 +30,7 @@ public class ScriptSend : ScriptableObject, IScriptSend
 
     public void ClientPacket(string packet, string type = "str")
     {
-        Bot.Flash.Call("sendClientPacket", packet, type);
+        Flash.Call("sendClientPacket", packet, type);
     }
 
     public Task ClientPacketSpam(string packet, string type, int delay, CancellationToken token)
@@ -39,7 +47,7 @@ public class ScriptSend : ScriptableObject, IScriptSend
 
     public void Whisper(string name, string message)
     {
-        Bot.Flash.CallGameFunction("sfc.sendString", $"%xt%zm%whisper%1%{message}%{name}%");
+        Flash.CallGameFunction("sfc.sendString", $"%xt%zm%whisper%1%{message}%{name}%");
     }
 
     public void ClientServer(string message, string sentBy = "Skua")
@@ -79,6 +87,6 @@ public class ScriptSend : ScriptableObject, IScriptSend
 
     private void SendMSGPacket(string message, string sentBy, string messageType)
     {
-        Bot.Flash.Call("sendClientPacket", $"%xt%chatm%0%{messageType}~{message}%{sentBy}%", "str");
+        Flash.Call("sendClientPacket", $"%xt%chatm%0%{messageType}~{message}%{sentBy}%", "str");
     }
 }

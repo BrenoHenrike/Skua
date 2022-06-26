@@ -3,22 +3,24 @@ using System.Diagnostics;
 using Skua.Core.Interfaces;
 using Skua.Core.Models.Items;
 using Skua.Core.Utils;
+using Skua.Core.GameProxy;
 
 namespace Skua.Core.Scripts;
 public class ScriptInterface : IScriptInterface
 {
     private CancellationTokenSource? ScriptInterfaceCTS;
     private readonly Thread ScriptInterfaceThread;
-    private bool shouldExit;
-
-    public bool ShouldExit => shouldExit;
-    public bool IsWorldLoaded => !Flash.IsNull("world");
+    private const int _timerDelay = 20;
+    private readonly TimeLimiter _limit = new();
+    private readonly ILogService _logger;
 
     public IScriptManager ScriptManager { get; }
     public IFlashUtil Flash { get; }
     public IScriptBoost Boosts { get; }
     public IScriptBotStats Stats { get; }
     public IScriptCombat Combat { get; }
+    public IScriptKill Kill { get; }
+    public IScriptHunt Hunt { get; }
     public IScriptDrop Drops { get; }
     public IScriptEvent Events { get; }
     public IScriptFaction Reputation { get; }
@@ -38,13 +40,47 @@ public class ScriptInterface : IScriptInterface
     public IScriptWait Wait { get; }
     public IScriptServers Servers { get; }
     public IScriptHandlers Handlers { get; }
+    public ICaptureProxy GameProxy { get; }
+    public Random Random { get; set; } = new Random();
 
-    public ScriptInterface(IScriptManager manager, IFlashUtil flash, IScriptHandlers handlers, IScriptServers server, IScriptBoost boosts, IScriptBotStats stats, IScriptCombat combat, IScriptDrop drops, IScriptEvent events, IScriptFaction rep, IScriptHouseInv house, IScriptInventory inventory, IScriptTempInv tempInv, IScriptBank bank, IScriptLite lite, IScriptOption options, IScriptMap map, IScriptMonster monsters, IScriptPlayer player, IScriptQuest quests, IScriptSend send, IScriptShop shops, IScriptSkill skills, IScriptWait wait)
+    public ScriptInterface(
+        ILogService logger,
+        IScriptManager manager,
+        IFlashUtil flash,
+        IScriptHandlers handlers,
+        IScriptServers server,
+        IScriptBoost boosts,
+        IScriptBotStats stats,
+        IScriptCombat combat,
+        IScriptDrop drops,
+        IScriptEvent events,
+        IScriptFaction rep,
+        IScriptHouseInv house,
+        IScriptInventory inventory,
+        IScriptTempInv tempInv,
+        IScriptBank bank,
+        IScriptLite lite,
+        IScriptOption options,
+        IScriptMap map,
+        IScriptMonster monsters,
+        IScriptPlayer player,
+        IScriptQuest quests,
+        IScriptSend send,
+        IScriptShop shops,
+        IScriptSkill skills,
+        IScriptWait wait,
+        IScriptKill kill,
+        IScriptHunt hunt,
+        ICaptureProxy gameProxy)
     {
+        _logger = logger;
         ScriptManager = manager;
         Boosts = boosts;
         Stats = stats;
         Combat = combat;
+        Kill = kill;
+        Hunt = hunt;
+        GameProxy = gameProxy;
         Drops = drops;
         Events = events;
         Reputation = rep;
@@ -68,7 +104,7 @@ public class ScriptInterface : IScriptInterface
 
         Flash.FlashCall += HandleFlashCall;
 
-        Schedule(0, async b => await b.Servers.GetServers());
+        Task.Run(async () => await Servers.GetServers());
 
         ScriptInterfaceThread = new(() =>
         {
@@ -78,7 +114,8 @@ public class ScriptInterface : IScriptInterface
             ScriptInterfaceCTS = null;
         })
         {
-            Name = "ScriptInterface"
+            Name = "ScriptInterface",
+            IsBackground = true
         };
     }
 
@@ -94,7 +131,7 @@ public class ScriptInterface : IScriptInterface
 
     public void Log(string message)
     {
-        // TODO Logger
+        _logger.ScriptLog(message);
     }
 
     public void Sleep(int ms)
@@ -108,8 +145,6 @@ public class ScriptInterface : IScriptInterface
             ScriptInterfaceThread.Start();
     }
 
-    private const int _timerDelay = 20;
-    private TimeLimiter _limit = new();
     private void ScriptTimer(CancellationToken token)
     {
         bool catching = false;
@@ -124,7 +159,7 @@ public class ScriptInterface : IScriptInterface
             {
                 sw.Restart();
 
-                if (IsWorldLoaded && Player.Playing)
+                if (Flash.IsWorldLoaded && Player.Playing)
                 {
                     Servers.LastIP = Player.ServerIP ?? Servers.LastIP;
 
@@ -137,7 +172,7 @@ public class ScriptInterface : IScriptInterface
                         catching = true;
                     }
 
-                    _limit.LimitedRun("opts", 300, () =>
+                    _limit.LimitedRun("opts", 250, () =>
                     {
                         if (Options.Magnetise)
                             Flash.Call("magnetise");
@@ -151,7 +186,12 @@ public class ScriptInterface : IScriptInterface
                             Flash.Call("skipCutscenes");
                         if (Options.LagKiller)
                             Flash.Call("killLag", true);
-                        Player.WalkSpeed = Options.WalkSpeed;
+                        if (Options.WalkSpeed != 8)
+                            Player.WalkSpeed = Options.WalkSpeed;
+                        if (!Lite.UntargetSelf)
+                            Lite.UntargetSelf = true;
+                        if (!Lite.UntargetDead)
+                            Lite.UntargetDead = true;
                     });
                 }
 
@@ -217,7 +257,7 @@ public class ScriptInterface : IScriptInterface
     /// </summary>
     private void RunScriptHandlers()
     {
-        if (Handlers.CurrentHandlers.Count <= 0)
+        if (!Handlers.CurrentHandlers.Any())
             return;
         List<IHandler> rem = new();
         foreach (IHandler handler in Handlers.CurrentHandlers)
@@ -230,13 +270,12 @@ public class ScriptInterface : IScriptInterface
         }
         Handlers.Remove(rem);
     }
-
     private void HandleFlashCall(string name, object[] args)
     {
         switch (name)
         {
-            case "requestLoadGame":
-                Flash.Call("loadClient", Array.Empty<object>());
+            case "loaded":
+                Initialize();
                 break;
             case "debug":
                 Debug.WriteLine(args[0]);
@@ -256,9 +295,9 @@ public class ScriptInterface : IScriptInterface
                                 Events.OnRunToArea(zone);
                             break;
                         case "moveToArea":
-                            if (Options.CustomName != null)
+                            if (!string.IsNullOrEmpty(Options.CustomName))
                                 Options.CustomName = Options.CustomName;
-                            if (Options.CustomGuild != null)
+                            if (!string.IsNullOrEmpty(Options.CustomGuild))
                                 Options.CustomGuild = Options.CustomGuild;
                             Events.OnMapChanged(Convert.ToString(data.strMapName));
                             Map.FilePath = Convert.ToString(data.strMapFileName);
@@ -308,8 +347,6 @@ public class ScriptInterface : IScriptInterface
                             string items = Convert.ToString(data["items"]);
                             InventoryItem drop = JsonConvert.DeserializeObject<Dictionary<string, InventoryItem>>(items)!.First().Value;
                             Events.OnItemDropped(drop);
-                            if (Drops.CurrentDropInfos.All(d => d.ID != drop.ID))
-                                Drops.CurrentDropInfos.Add(drop);
                             break;
                         case "addItems":
                             string addItems = Convert.ToString(data["items"]);
@@ -360,6 +397,9 @@ public class ScriptInterface : IScriptInterface
                             if (Player.Username == (string)data[2] && data[3] == "afk:true")
                                 Events.OnPlayerAFK();
                             break;
+                        case "loginResponse":
+
+                            break;
                     }
                 }
                 Events.OnExtensionPacket(packet);
@@ -380,6 +420,7 @@ public class ScriptInterface : IScriptInterface
                         break;
                     case "cmd":
                         if (parts.Length >= 5 && parts[4] == "logout")
+                            Events.OnLogout();
                             OnLogout();
                         break;
                 }
@@ -393,7 +434,7 @@ public class ScriptInterface : IScriptInterface
     private void OnLogout()
     {
         Bank.Loaded = false;
-        Drops.CurrentDropInfos.Clear();
+        Drops.Stop();
         if (!Options.AutoRelogin || _waitForLogin)
             return;
 
@@ -425,6 +466,7 @@ public class ScriptInterface : IScriptInterface
                 if (startScript)
                     await ScriptManager.StartScriptAsync();
                 Log($"Relogin was {(relogged ? "successful" : "cancelled or unsuccessful")}.");
+                Drops.Start();
                 _reloginCTS.Dispose();
                 _reloginCTS = null;
                 _reloginTask = null;

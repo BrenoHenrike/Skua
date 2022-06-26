@@ -9,26 +9,71 @@ using System.Collections.Generic;
 using System.Linq;
 using Skua.Core.Interfaces;
 using Skua.Core.Flash;
+using System.IO;
+using System.Windows.Forms;
+using System.Diagnostics;
 
 namespace Skua.App.Flash;
 
 public class FlashUtil : IFlashUtil
 {
-    internal static AxShockwaveFlash Flash { get; set; }
+    public static AxShockwaveFlash? Flash;
 
     public event FlashCallHandler? FlashCall;
     public event FlashErrorHandler? FlashError;
+    public event FlashChangedHandler? FlashChanged;
 
-    public string? Call(string function, params object[] args)
+    public void InitializeFlash()
+    {
+        if (!EoLHook.IsHooked)
+            EoLHook.Hook();
+
+        Flash?.Dispose();
+
+        AxShockwaveFlash flash = new();
+        flash.BeginInit();
+        flash.Name = "flash";
+        flash.Dock = DockStyle.Fill;
+        flash.TabIndex = 0;
+        flash.FlashCall += CallHandler;
+        FlashChanged?.Invoke(flash);
+        flash.EndInit();
+        Flash = flash;
+        FlashChanged?.Invoke(flash);
+        // TODO swf from setting manager
+        byte[] swf = File.ReadAllBytes("rbot.swf");
+        using (MemoryStream stream = new())
+        using (BinaryWriter writer = new(stream))
+        {
+            writer.Write(8 + swf.Length);
+            writer.Write(1432769894);
+            writer.Write(swf.Length);
+            writer.Write(swf);
+            writer.Seek(0, SeekOrigin.Begin);
+            flash.OcxState = new AxHost.State(stream, 1, false, null);
+        }
+
+        EoLHook.Unhook();
+    }
+
+    private void CallHandler(object sender, _IShockwaveFlashEvents_FlashCallEvent e)
+    {
+        XElement el = XElement.Parse(e.request);
+        string name = el.Attribute("name")!.Value;
+        object[] args = el.Elements().Select(x => FromFlashXml(x)).ToArray();
+        OnFlashCall(name, args);
+    }
+
+    public string Call(string function, params object[] args)
     {
         return Call<string>(function, args);
     }
 
-    public T? Call<T>(string function, params object[] args)
+    public T Call<T>(string function, params object[] args)
     {
         try
         {
-            object? o = Call(function, typeof(T), args);
+            object o = Call(function, typeof(T), args);
             if (o is not null)
                 return (T)o;
             return default;
@@ -39,7 +84,7 @@ public class FlashUtil : IFlashUtil
         }
     }
 
-    public object? Call(string function, Type type, params object[] args)
+    public object Call(string function, Type type, params object[] args)
     {
         try
         {
@@ -51,7 +96,7 @@ public class FlashUtil : IFlashUtil
                 req.Append("</arguments>");
             }
             req.Append("</invoke>");
-            string result = Flash.CallFunction(req.ToString());
+            string result = Flash?.CallFunction(req.ToString())!;
             XElement el = XElement.Parse(result);
             return el is null || el.FirstNode is null ? default : Convert.ChangeType(el.FirstNode.ToString(), type);
         }
@@ -77,7 +122,7 @@ public class FlashUtil : IFlashUtil
                 return $"<number>{o}</number>";
             case ExpandoObject _:
                 StringBuilder sb = new StringBuilder().Append("<object>");
-                foreach (KeyValuePair<string, object> kvp in o as IDictionary<string, object>)
+                foreach (KeyValuePair<string, object> kvp in (o as IDictionary<string, object>)!)
                     sb.Append($"<property id=\"{kvp.Key}\">{ToFlashXml(kvp.Value)}</property>");
                 return sb.Append("</object>").ToString();
             default:
@@ -85,7 +130,7 @@ public class FlashUtil : IFlashUtil
                 {
                     StringBuilder _sb = new StringBuilder().Append("<array>");
                     int k = 0;
-                    foreach (object el in o as Array)
+                    foreach (object el in (o as Array)!)
                         _sb.Append($"<property id=\"{k++}\">{ToFlashXml(el)}</property>");
                     return _sb.Append("</array>").ToString();
                 }
@@ -104,12 +149,12 @@ public class FlashUtil : IFlashUtil
             case "false":
                 return false;
             case "null":
-                return null;
+                return null!;
             case "array":
                 return el.Elements().Select(e => FromFlashXml(e)).ToArray();
             case "object":
                 dynamic d = new ExpandoObject();
-                el.Elements().ForEach(e => d[e.Attribute("id").Value] = FromFlashXml(e.Elements().First()));
+                el.Elements().ForEach(e => d[e.Attribute("id")!.Value] = FromFlashXml(e.Elements().First()));
                 return d;
             default:
                 return el.Value;

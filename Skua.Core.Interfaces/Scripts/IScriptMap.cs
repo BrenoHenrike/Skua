@@ -45,15 +45,15 @@ public interface IScriptMap
     /// <summary>
     /// Gets a list of player names in the currently loaded map.
     /// </summary>
-    List<string> PlayerNames { get; }
+    List<string>? PlayerNames { get; }
     /// <summary>
     /// Gets a list of all players in the current map.
     /// </summary>
-    List<PlayerInfo> Players { get; }
+    List<PlayerInfo>? Players { get; }
     /// <summary>
     /// Gets a list of all players in the current cell.
     /// </summary>
-    List<PlayerInfo> CellPlayers { get; }
+    List<PlayerInfo>? CellPlayers { get; }
     /// <summary>
     /// Reloads the current map.
     /// </summary>

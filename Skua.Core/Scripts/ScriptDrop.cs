@@ -4,8 +4,60 @@ using Skua.Core.Utils;
 
 namespace Skua.Core.Scripts;
 
-public class ScriptDrop : ScriptableObject, IScriptDrop
+public class ScriptDrop : IScriptDrop, IDisposable
 {
+    private readonly Lazy<IScriptSend> _lazySend;
+    private readonly Lazy<IScriptWait> _lazyWait;
+    private readonly Lazy<IScriptMap> _lazyMap;
+    private readonly Lazy<IScriptOption> _lazyOptions;
+    private readonly Lazy<IScriptPlayer> _lazyPlayer;
+    private readonly Lazy<IScriptManager> _lazyManager;
+    private readonly Lazy<IFlashUtil> _lazyFlash;
+    private IScriptSend Send => _lazySend.Value;
+    private IScriptWait Wait => _lazyWait.Value;
+    private IScriptMap Map => _lazyMap.Value;
+    private IScriptOption Options => _lazyOptions.Value;
+    private IScriptPlayer Player => _lazyPlayer.Value;
+    private IScriptManager Manager => _lazyManager.Value;
+    private IFlashUtil Flash => _lazyFlash.Value;
+    public ScriptDrop(
+        Lazy<IFlashUtil> flash,
+        Lazy<IScriptSend> send,
+        Lazy<IScriptMap> map,
+        Lazy<IScriptWait> wait,
+        Lazy<IScriptOption> options,
+        Lazy<IScriptPlayer> player,
+        Lazy<IScriptManager> manager)
+    {
+        _lazySend = send;
+        _lazyWait = wait;
+        _lazyMap = map;
+        _lazyOptions = options;
+        _lazyPlayer = player;
+        _lazyFlash = flash;
+        _lazyManager = manager;
+
+        AppGameEvents.ItemDropped += AddDrop;
+        AppGameEvents.Logout += ClearDrops;
+        Manager.ApplicationShutDown += DisposeOnShutDown;
+        void DisposeOnShutDown(bool b)
+        {
+            Dispose();
+            Manager.ApplicationShutDown -= DisposeOnShutDown;
+        }
+    }
+
+    private void ClearDrops()
+    {
+        _currentDropInfos.Clear();
+    }
+
+    private void AddDrop(ItemBase item, bool addedToInv, int quantityNow)
+    {
+        if (CurrentDropInfos.All(d => d.ID != item.ID))
+            _currentDropInfos.Add(item);
+    }
+
     private CancellationTokenSource? DropsCTS;
     private Thread? DropsThread;
     private readonly List<string> _addName = new();
@@ -21,17 +73,18 @@ public class ScriptDrop : ScriptableObject, IScriptDrop
     public List<int> ToPickupIDs { get; } = new();
     public bool RejectElse { get; set; }
     public bool Enabled => DropsThread?.IsAlive ?? false;
-    public List<InventoryItem> CurrentDropInfos { get; private set; } = new();
-    public List<string> CurrentDrops => CurrentDropInfos.Select(x => x.Name.Trim()).ToList();
+    internal SynchronizedList<ItemBase> _currentDropInfos { get; set; } = new();
+    public IEnumerable<ItemBase> CurrentDropInfos => _currentDropInfos.Items;
+    public IEnumerable<string> CurrentDrops => CurrentDropInfos.Select(x => x.Name.Trim()).ToList();
 
     public void Pickup(string name)
     {
         if (!CurrentDrops.Contains(name, StringComparer.OrdinalIgnoreCase))
             return;
 
-        InventoryItem drop = CurrentDropInfos.Find(d => d.Name == name)!;
-        Bot.Send.Packet($"%xt%zm%getDrop%{Bot.Map.RoomID}%{drop.ID}%");
-        CurrentDropInfos.Remove(drop);
+        ItemBase drop = _currentDropInfos.Find(d => d.Name == name)!;
+        Send.Packet($"%xt%zm%getDrop%{Map.RoomID}%{drop.ID}%");
+        _currentDropInfos.Remove(drop);
     }
 
     public void Pickup(int id)
@@ -39,8 +92,8 @@ public class ScriptDrop : ScriptableObject, IScriptDrop
         if (!CurrentDropInfos.Contains(i => i.ID == id))
             return;
 
-        Bot.Send.Packet($"%xt%zm%getDrop%{Bot.Map.RoomID}%{id}%");
-        CurrentDropInfos.Remove(CurrentDropInfos.SingleOrDefault(d => d.ID == id)!);
+        Send.Packet($"%xt%zm%getDrop%{Map.RoomID}%{id}%");
+        _currentDropInfos.Remove(CurrentDropInfos.SingleOrDefault(d => d.ID == id)!);
     }
 
     public void Pickup(params string[] names)
@@ -48,8 +101,8 @@ public class ScriptDrop : ScriptableObject, IScriptDrop
         for(int i = 0; i < names.Length; i++)
         {
             Pickup(names[i]);
-            if (Bot.Options.SafeTimings)
-                Bot.Wait.ForPickup(names[i]);
+            if (Options.SafeTimings)
+                Wait.ForPickup(names[i]);
         }
     }
 
@@ -58,8 +111,8 @@ public class ScriptDrop : ScriptableObject, IScriptDrop
         for(int i = 0; i < ids.Length; i++)
         {
             Pickup(ids[i]);
-            if (Bot.Options.SafeTimings)
-                Bot.Wait.ForPickup(ids[i]);
+            if (Options.SafeTimings)
+                Wait.ForPickup(ids[i]);
         }
     }
 
@@ -70,53 +123,53 @@ public class ScriptDrop : ScriptableObject, IScriptDrop
 
     public void PickupAll(bool skipWait = false)
     {
-        CurrentDropInfos.ToList().ForEach(d => Pickup(d.Name));
-        CurrentDropInfos.Clear();
-        if (Bot.Options.SafeTimings && !skipWait)
-            Bot.Wait.ForPickup("*");
+        _currentDropInfos.ForEach(d => Pickup(d.Name));
+        _currentDropInfos.Clear();
+        if (Options.SafeTimings && !skipWait)
+            Wait.ForPickup("*");
     }
 
     public void RejectExcept(params string[] names)
     {
-        if (Bot.Options.AcceptACDrops)
+        if (Options.AcceptACDrops)
             PickupACItems();
-        Bot.Flash.Call("rejectExcept", names.Join(',').ToLower());
-        if (Bot.Options.SafeTimings)
-            Bot.Wait.ForPickup("*");
+        Flash.Call("rejectExcept", names.Join(',').ToLower());
+        if (Options.SafeTimings)
+            Wait.ForPickup("*");
     }
 
     public void RejectExcept(params int[] ids)
     {
-        if (Bot.Options.AcceptACDrops)
+        if (Options.AcceptACDrops)
             PickupACItems();
-        var items = CurrentDropInfos.Where(d => ids.Contains(d.ID)).Select(d => d.Name);
-        Bot.Flash.Call("rejectExcept", items.Join(',').ToLower());
-        if (Bot.Options.SafeTimings)
-            Bot.Wait.ForPickup("*");
+        IEnumerable<string> items = CurrentDropInfos.Where(d => ids.Contains(d.ID)).Select(d => d.Name);
+        Flash.Call("rejectExcept", items.Join(',').ToLower());
+        if (Options.SafeTimings)
+            Wait.ForPickup("*");
     }
 
     public void RejectExceptFast(params string[] names)
     {
-        if (Bot.Options.AcceptACDrops)
+        if (Options.AcceptACDrops)
             PickupACItems();
-        Bot.Flash.Call("rejectExcept", names.Join(',').ToLower());
+        Flash.Call("rejectExcept", names.Join(',').ToLower());
     }
 
     public void RejectExceptFast(params int[] ids)
     {
-        if (Bot.Options.AcceptACDrops)
+        if (Options.AcceptACDrops)
             PickupACItems();
-        var items = CurrentDropInfos.Where(d => ids.Contains(d.ID)).Select(d => d.Name);
-        Bot.Flash.Call("rejectExcept", items.Join(',').ToLower());
+        IEnumerable<string> items = CurrentDropInfos.Where(d => ids.Contains(d.ID)).Select(d => d.Name);
+        Flash.Call("rejectExcept", items.Join(',').ToLower());
     }
 
     public void RejectAll(bool skipWait = false)
     {
-        if (Bot.Options.AcceptACDrops)
+        if (Options.AcceptACDrops)
             PickupACItems();
-        Bot.Flash.Call("rejectExcept", "");
-        if (Bot.Options.SafeTimings && !skipWait)
-            Bot.Wait.ForPickup("*");
+        Flash.Call("rejectExcept", "");
+        if (Options.SafeTimings && !skipWait)
+            Wait.ForPickup("*");
     }
 
     public void Start()
@@ -141,7 +194,7 @@ public class ScriptDrop : ScriptableObject, IScriptDrop
     {
         DropsStopped?.Invoke();
         DropsCTS?.Cancel();
-        Bot.Wait.ForTrue(() => !Enabled, 20);
+        Wait.ForTrue(() => !Enabled, 20);
     }
 
     public void Add(params string[] names)
@@ -204,9 +257,9 @@ public class ScriptDrop : ScriptableObject, IScriptDrop
                 lock (_remID)
                     _remID.Clear();
             }
-            if(Bot.Player.Playing)
+            if(Player.Playing)
             {
-                if (Bot.Options.AcceptACDrops)
+                if (Options.AcceptACDrops)
                     PickupACItems();
                 if(ToPickupIDs.Count > 0)
                 {
@@ -224,5 +277,12 @@ public class ScriptDrop : ScriptableObject, IScriptDrop
             if (!token.IsCancellationRequested)
                 Thread.Sleep(Interval);
         }
+    }
+
+    public void Dispose()
+    {
+        GC.SuppressFinalize(this);
+        AppGameEvents.ItemDropped -= AddDrop;
+        AppGameEvents.Logout -= ClearDrops;
     }
 }

@@ -7,7 +7,7 @@ public class AdvancedSkillCommand
     public List<UseRule[]> UseRules { get; set; } = new();
     private int _Index = 0;
 
-    public int GetNextSkill(IScriptInterface bot)
+    public int GetNextSkill()
     {
         int skill = Skills[_Index];
         _Index++;
@@ -17,23 +17,23 @@ public class AdvancedSkillCommand
         return skill;
     }
 
-    public bool? ShouldUse(IScriptInterface bot)
+    public bool? ShouldUse(IScriptPlayer player)
     {
         if (UseRules[_Index][0].None)
             return true;
         bool shouldUse = true;
         foreach (UseRule useRule in UseRules[_Index])
         {
-            if (!bot.Player.Alive)
+            if (!player.Alive)
                 return false;
 
             switch (useRule.Rule)
             {
                 case true:
-                    shouldUse = HealthUseRule(bot, useRule.Greater, useRule.Value);
+                    shouldUse = HealthUseRule(player, useRule.Greater, useRule.Value);
                     break;
                 case false:
-                    shouldUse = ManaUseRule(bot, useRule.Greater, useRule.Value);
+                    shouldUse = ManaUseRule(player, useRule.Greater, useRule.Value);
                     break;
                 case null:
                     Thread.Sleep(useRule.Value);
@@ -48,17 +48,17 @@ public class AdvancedSkillCommand
         return shouldUse;
     }
 
-    private bool HealthUseRule(IScriptInterface bot, bool greater, int health)
+    private bool HealthUseRule(IScriptPlayer player, bool greater, int health)
     {
-        if (bot.Player.Health == 0 || bot.Player.MaxHealth == 0)
+        if (player.Health == 0 || player.MaxHealth == 0)
             return false;
-        int ratio = (int)(bot.Player.Health / (double)bot.Player.MaxHealth * 100.0);
+        int ratio = (int)(player.Health / (double)player.MaxHealth * 100.0);
         return greater ? ratio >= health : ratio <= health;
     }
 
-    private bool ManaUseRule(IScriptInterface bot, bool greater, int mana)
+    private bool ManaUseRule(IScriptPlayer player, bool greater, int mana)
     {
-        return greater ? bot.Player.Mana >= mana : bot.Player.Mana <= mana;
+        return greater ? player.Mana >= mana : player.Mana <= mana;
     }
 
     public void Reset()

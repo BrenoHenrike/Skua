@@ -8,6 +8,8 @@ namespace Skua.Core.Models.Items;
 [JsonConverter(typeof(StringEnumConverter))]
 public enum ItemCategory
 {
+
+    Unknown,
     Sword,
     Axe,
     Dagger,
@@ -41,6 +43,5 @@ public enum ItemCategory
     WallItem,
     [EnumMember(Value = "Floor Item")]
     FloorItem,
-    Enhancement,
-    Unknown
+    Enhancement
 }

@@ -23,7 +23,7 @@ public interface IScriptQuest
     /// <summary>
     /// Dictionary with <see cref="Quest"/> objects of all the game quests.
     /// </summary>
-    Dictionary<int, Quest> Cached { get; set; }
+    List<QuestData> Cached { get; set; }
     /// <summary>
     /// List of IDs of the current registered quests to complete automatically.
     /// </summary>

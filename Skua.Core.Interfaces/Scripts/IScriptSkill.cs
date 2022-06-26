@@ -13,7 +13,7 @@ public interface IScriptSkill
     /// </summary>
     ISkillProvider? OverrideProvider { get; set; }
     /// <summary>
-    /// The timeout in multiples of <see cref="SkillInterval"/> milliseconds before skipping the current unavailable skill when using <see cref="SkillMode.WaitForCooldown"/>.
+    /// The timeout in multiples of <see cref="SkillInterval"/> milliseconds before skipping the current unavailable skill when using <see cref="SkillUseMode.WaitForCooldown"/>.
     /// </summary>
     int SkillTimeout { get; set; }
     /// <summary>
@@ -27,15 +27,15 @@ public interface IScriptSkill
     /// <summary>
     /// The way the bot will use skils:
     /// <list type="bullet">
-    /// <item><see cref="SkillMode.WaitForCooldown"/>
+    /// <item><see cref="SkillUseMode.WaitForCooldown"/>
     /// <description>If not set to skip, will wait for the skill to be available and then use it.</description>
     /// </item>
-    /// <item><see cref="SkillMode.UseIfAvailable"/>
+    /// <item><see cref="SkillUseMode.UseIfAvailable"/>
     /// <description>Whenever a skill is available it will use the skill, if not will skip it.</description>
     /// </item>
     /// </list>
     /// </summary>
-    SkillMode SkillUseMode { get; set; }
+    SkillUseMode SkillUseMode { get; set; }
 
     /// <summary>
     /// Checks if the skill with specified <paramref name="index"/> has cooled down.
@@ -52,8 +52,8 @@ public interface IScriptSkill
     /// Loads the skills from the specified <paramref name="skills"/> string.
     /// </summary>
     /// <param name="skills">String of the skills</param>
-    /// <param name="skillTimeout">Timeout in multiples of <see cref="SkillInterval"/> milliseconds before skipping the current unavailable skill when using <see cref="SkillMode.WaitForCooldown"/>.</param>
-    void LoadAdvanced(string skills, int skillTimeout = -1, SkillMode skillMode = SkillMode.UseIfAvailable);
+    /// <param name="skillTimeout">Timeout in multiples of <see cref="SkillInterval"/> milliseconds before skipping the current unavailable skill when using <see cref="SkillUseMode.WaitForCooldown"/>.</param>
+    void LoadAdvanced(string skills, int skillTimeout = -1, SkillUseMode skillMode = SkillUseMode.UseIfAvailable);
     /// <summary>
     /// Loads the skills of the specified <paramref name="className"/> from AdvancedSkills.txt.
     /// </summary>
@@ -98,8 +98,8 @@ public interface IScriptSkill
     /// Loads the skills from the specified <paramref name="skills"/> string and starts the skill thread.
     /// </summary>
     /// <param name="skills">String of the skills</param>
-    /// <param name="skillTimeout">Timeout in multiples of <see cref="SkillInterval"/> milliseconds before skipping the current unavailable skill when using <see cref="SkillMode.WaitForCooldown"/>.</param>
-    void StartAdvanced(string skills, int skillTimeout = -1, SkillMode skillMode = SkillMode.UseIfAvailable)
+    /// <param name="skillTimeout">Timeout in multiples of <see cref="SkillInterval"/> milliseconds before skipping the current unavailable skill when using <see cref="SkillUseMode.WaitForCooldown"/>.</param>
+    void StartAdvanced(string skills, int skillTimeout = -1, SkillUseMode skillMode = SkillUseMode.UseIfAvailable)
     {
         LoadAdvanced(skills, skillTimeout, skillMode);
         Start();

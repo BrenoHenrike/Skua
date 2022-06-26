@@ -20,67 +20,69 @@
         <Setter Property="Template">
             <Setter.Value>
                 <ControlTemplate TargetType="local:CustomWindow">
-                    <materialdesign:Card>
-                        <DockPanel>
-                            <!--  Title bar  -->
-                            <materialdesign:ColorZone Height="32" DockPanel.Dock="Top">
-                                <Grid>
-                                    <Grid.ColumnDefinitions>
-                                        <ColumnDefinition Width="auto" />
-                                        <ColumnDefinition Width="*" />
-                                        <ColumnDefinition Width="auto" />
-                                    </Grid.ColumnDefinitions>
+                    <Border BorderBrush="DimGray" BorderThickness="1">
+                        <materialdesign:Card UniformCornerRadius="0">
+                            <DockPanel>
+                                <!--  Title bar  -->
+                                <materialdesign:ColorZone Height="32" DockPanel.Dock="Top">
+                                    <Grid>
+                                        <Grid.ColumnDefinitions>
+                                            <ColumnDefinition Width="auto" />
+                                            <ColumnDefinition Width="*" />
+                                            <ColumnDefinition Width="auto" />
+                                        </Grid.ColumnDefinitions>
 
-                                    <!--  Icon  -->
-                                    <Button
-                                        Height="32"
-                                        materialdesign:ButtonAssist.CornerRadius="0"
-                                        Content="{materialdesign:PackIcon Kind=Information,
-                                                                          Size=30}"
-                                        Style="{StaticResource MaterialDesignIconButton}" />
-
-                                    <!--  Title  -->
-                                    <Viewbox
-                                        Grid.Column="1"
-                                        Margin="15,0,0,0"
-                                        HorizontalAlignment="Left">
-                                        <TextBlock Text="{TemplateBinding Title}" />
-                                    </Viewbox>
-
-                                    <!--  System Buttons  -->
-                                    <StackPanel
-                                        Grid.Column="2"
-                                        Height="28"
-                                        VerticalAlignment="Top"
-                                        Orientation="Horizontal">
-                                        <!--  Minimize  -->
+                                        <!--  Icon  -->
                                         <Button
-                                            x:Name="btnMinimize"
-                                            materialdesign:ButtonAssist.CornerRadius="0 0 0 10"
-                                            Content="{materialdesign:PackIcon Kind=WindowMinimize}"
-                                            Style="{StaticResource MaterialDesignFlatButton}"
-                                            WindowChrome.IsHitTestVisibleInChrome="True" />
-                                        <!--  Maximize  -->
-                                        <Button
-                                            x:Name="btnMaximize"
+                                            Height="32"
                                             materialdesign:ButtonAssist.CornerRadius="0"
-                                            Content="{materialdesign:PackIcon Kind=WindowMaximize}"
-                                            Style="{StaticResource MaterialDesignFlatButton}"
-                                            WindowChrome.IsHitTestVisibleInChrome="True" />
-                                        <!--  Close  -->
-                                        <Button
-                                            x:Name="btnClose"
-                                            materialdesign:ButtonAssist.CornerRadius="0"
-                                            Content="{materialdesign:PackIcon Kind=WindowClose}"
-                                            Style="{StaticResource MaterialDesignFlatButton}"
-                                            WindowChrome.IsHitTestVisibleInChrome="True" />
-                                    </StackPanel>
-                                </Grid>
-                            </materialdesign:ColorZone>
-                            <!--  Content Presenter  -->
-                            <ContentPresenter Content="{TemplateBinding Content}" />
-                        </DockPanel>
-                    </materialdesign:Card>
+                                            Content="{materialdesign:PackIcon Kind=Information,
+                                                                              Size=30}"
+                                            Style="{StaticResource MaterialDesignIconButton}" />
+
+                                        <!--  Title  -->
+                                        <Viewbox
+                                            Grid.Column="1"
+                                            Margin="15,0,0,0"
+                                            HorizontalAlignment="Left">
+                                            <TextBlock Text="{TemplateBinding Title}" />
+                                        </Viewbox>
+
+                                        <!--  System Buttons  -->
+                                        <StackPanel
+                                            Grid.Column="2"
+                                            Height="28"
+                                            VerticalAlignment="Top"
+                                            Orientation="Horizontal">
+                                            <!--  Minimize  -->
+                                            <Button
+                                                x:Name="btnMinimize"
+                                                materialdesign:ButtonAssist.CornerRadius="0 0 0 10"
+                                                Content="{materialdesign:PackIcon Kind=WindowMinimize}"
+                                                Style="{StaticResource MaterialDesignFlatButton}"
+                                                WindowChrome.IsHitTestVisibleInChrome="True" />
+                                            <!--  Maximize  -->
+                                            <Button
+                                                x:Name="btnMaximize"
+                                                materialdesign:ButtonAssist.CornerRadius="0"
+                                                Content="{materialdesign:PackIcon Kind=WindowMaximize}"
+                                                Style="{StaticResource MaterialDesignFlatButton}"
+                                                WindowChrome.IsHitTestVisibleInChrome="True" />
+                                            <!--  Close  -->
+                                            <Button
+                                                x:Name="btnClose"
+                                                materialdesign:ButtonAssist.CornerRadius="0"
+                                                Content="{materialdesign:PackIcon Kind=WindowClose}"
+                                                Style="{StaticResource MaterialDesignFlatButton}"
+                                                WindowChrome.IsHitTestVisibleInChrome="True" />
+                                        </StackPanel>
+                                    </Grid>
+                                </materialdesign:ColorZone>
+                                <!--  Content Presenter  -->
+                                <ContentPresenter Content="{TemplateBinding Content}" />
+                            </DockPanel>
+                        </materialdesign:Card>
+                    </Border>
                 </ControlTemplate>
             </Setter.Value>
         </Setter>

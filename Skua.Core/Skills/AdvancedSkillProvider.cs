@@ -1,22 +1,23 @@
 ﻿using Skua.Core.Interfaces;
-using Skua.Core.Models.Skills;
 using Skua.Core.Utils;
 
 namespace Skua.Core.Skills;
 
 public class AdvancedSkillProvider : ISkillProvider
 {
-    public AdvancedSkillProvider(IScriptInterface bot)
+    private readonly IScriptPlayer Player;
+    private readonly IScriptCombat Combat;
+    public AdvancedSkillProvider(IScriptPlayer player, IScriptCombat combat)
     {
-        Bot = bot;
+        Player = player;
+        Combat = combat;
     }
     public AdvancedSkillCommand Root { get; set; } = new AdvancedSkillCommand();
     public bool ResetOnTarget { get; set; } = false;
-    public IScriptInterface Bot { get; }
 
     public int GetNextSkill()
     {
-        return Root.GetNextSkill(Bot);
+        return Root.GetNextSkill();
     }
 
     public void Load(string skills)
@@ -61,23 +62,23 @@ public class AdvancedSkillProvider : ISkillProvider
 
     public void Save(string file)
     {
-        // TODO Save as json
+        // TODO Save?
     }
 
     public void OnTargetReset()
     {
-        if (ResetOnTarget && !Bot.Player.HasTarget)
+        if (ResetOnTarget && !Player.HasTarget)
             Root.Reset();
     }
     public bool? ShouldUseSkill()
     {
-        return Root.ShouldUse(Bot);
+        return Root.ShouldUse(Player);
     }
 
     public void Stop()
     {
-        Bot.Combat.CancelAutoAttack();
-        Bot.Combat.CancelTarget();
+        Combat.CancelAutoAttack();
+        Combat.CancelTarget();
         Root.Reset();
     }
 }

@@ -4,7 +4,7 @@ public interface IScriptHandlers
     /// <summary>
     /// A list holding currently registered handlers.
     /// </summary>
-    List<IHandler> CurrentHandlers { get; }
+    IEnumerable<IHandler> CurrentHandlers { get; }
 
     /// <summary>
     /// Register an <paramref name="function"/> to be executed every time the specified number of <paramref name="ticks"/> has passed. A tick is 20ms.
@@ -49,26 +49,21 @@ public interface IScriptHandlers
     /// </summary>
     /// <param name="name">Name of the handler to remove.</param>
     /// <returns><see langword="true"/> if the handler was removed.</returns>
-    bool Remove(string name)
-    {
-        return CurrentHandlers.RemoveAll(h => h.Name == name) > 0;
-    }
+    bool Remove(string name);
     /// <summary>
     /// Removes the specified handler.
     /// </summary>
     /// <param name="handler">Handler to remove.</param>
     /// <returns><see langword="true"/> if the handler was removed.</returns>
-    bool Remove(IHandler handler)
-    {
-        return CurrentHandlers.Remove(handler);
-    }
+    bool Remove(IHandler handler);
     /// <summary>
     /// Removes all the specified handlers.
     /// </summary>
     /// <param name="handlers">Handlers to remove</param>
     /// <returns><see langword="true"/> if all the handlers where removed.</returns>
-    bool Remove(List<IHandler> handlers)
-    {
-        return CurrentHandlers.RemoveAll(h => handlers.Contains(h)) == handlers.Count;
-    }
+    bool Remove(List<IHandler> handlers);
+    /// <summary>
+    /// Clear the list of handlers.
+    /// </summary>
+    void Clear();
 }

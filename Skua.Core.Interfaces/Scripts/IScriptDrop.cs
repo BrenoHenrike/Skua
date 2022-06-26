@@ -2,7 +2,6 @@
 using Skua.Core.Utils;
 
 namespace Skua.Core.Interfaces;
-
 public interface IScriptDrop
 {
     event Action? DropsStarted;
@@ -11,11 +10,11 @@ public interface IScriptDrop
     /// <summary>
     /// Get a list of drops available in the drop stack (even if they aren't in the screen).
     /// </summary>
-    List<InventoryItem> CurrentDropInfos { get; }
+    IEnumerable<ItemBase> CurrentDropInfos { get; }
     /// <summary>
     /// Get a list of item names available on the drop stack (even if they aren't in the screen).
     /// </summary>
-    List<string> CurrentDrops { get; }
+    IEnumerable<string> CurrentDrops { get; }
     /// <summary>
     /// Whether the drop grabber is enabled.
     /// </summary>

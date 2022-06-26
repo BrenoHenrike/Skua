@@ -1,37 +1,81 @@
-﻿
-using Skua.Core.Utils;
-using Skua.Core.PostSharp;
-using System.Diagnostics;
+﻿using Skua.Core.Utils;
 using Skua.Core.Models.Quests;
 using Skua.Core.Interfaces;
 using Skua.Core.Models;
 using Skua.Core.Models.Items;
+using Skua.Core.Flash;
 
 namespace Skua.Core.Scripts;
 
-public class ScriptQuest : ScriptableObject, IScriptQuest
+public partial class ScriptQuest : IScriptQuest
 {
+    private readonly Lazy<IFlashUtil> _lazyFlash;
+    private readonly Lazy<IScriptWait> _lazyWait;
+    private readonly Lazy<IScriptOption> _lazyOptions;
+    private readonly Lazy<IScriptPlayer> _lazyPlayer;
+    private readonly Lazy<IScriptMap> _lazyMap;
+    private readonly Lazy<IScriptCombat> _lazyCombat;
+    private readonly Lazy<IScriptSend> _lazySend;
+    private readonly Lazy<IScriptInventory> _lazyInventory;
+    private IFlashUtil Flash => _lazyFlash.Value;
+    private IScriptWait Wait => _lazyWait.Value;
+    private IScriptOption Options => _lazyOptions.Value;
+    private IScriptPlayer Player => _lazyPlayer.Value;
+    private IScriptMap Map => _lazyMap.Value;
+    private IScriptCombat Combat => _lazyCombat.Value;
+    private IScriptSend Send => _lazySend.Value;
+    private IScriptInventory Inventory => _lazyInventory.Value;
+
+    public ScriptQuest(
+        Lazy<IFlashUtil> flash,
+        Lazy<IScriptWait> wait,
+        Lazy<IScriptOption> options,
+        Lazy<IScriptMap> map,
+        Lazy<IScriptPlayer> player,
+        Lazy<IScriptCombat> combat,
+        Lazy<IScriptSend> send,
+        Lazy<IScriptInventory> inventory)
+    {
+        _lazyFlash = flash;
+        _lazyWait = wait;
+        _lazyOptions = options;
+        _lazyPlayer = player;
+        _lazyMap = map;
+        _lazyCombat = combat;
+        _lazySend = send;
+        _lazyInventory = inventory;
+    }
+
     private Thread? QuestThread;
     private CancellationTokenSource? QuestsCTS;
     private readonly List<int> _add = new();
     private readonly List<int> _rem = new();
+
     public int RegisterCompleteInterval { get; set; } = 2000;
-    [ObjectBinding("world.questTree")]
-    private Dictionary<int, Quest> _quests { get; } = new();
-    public List<Quest> Tree => _quests.Values.ToList();
+    [ObjectBinding("world.questTree", Default = "new()")]
+    private Dictionary<int, Quest> _quests = new();
+    public List<Quest> Tree => Quests.Values.ToList() ?? new();
     public List<Quest> Active => Tree.FindAll(x => x.Active);
     public List<Quest> Completed => Tree.FindAll(x => x.Status == "c");
-    public Dictionary<int, Quest> Cached { get; set; } = new();
+    public List<QuestData> Cached { get; set; } = new();
     public List<int> Registered { get; } = new();
 
     public void Load(params int[] ids)
     {
-        Bot.Flash.CallGameFunction("world.showQuests", ids.Cast<string>().ToArray().Join(','), "q");
+        if(ids.Length < 30)
+        {
+            Flash.CallGameFunction("world.showQuests", ids.Select(id => id.ToString()).Join(','), "q");
+            return;
+        }
+        foreach(int[] idchunk in ids.Chunk(30))
+        {
+            Flash.CallGameFunction("world.showQuests", idchunk.Select(id => id.ToString()).Join(','), "q");
+        }
     }
 
     public Quest EnsureLoad(int id)
     {
-        Bot.Wait.ForTrue(() => Tree.Contains(x => x.ID == id), () => Load(id), 20);
+        Wait.ForTrue(() => Tree.Contains(x => x.ID == id), () => Load(id), 20);
         return Tree.Find(q => q.ID == id)!;
     }
 
@@ -42,11 +86,11 @@ public class ScriptQuest : ScriptableObject, IScriptQuest
 
     public bool Accept(int id)
     {
-        if (Bot.Options.SafeTimings)
-            Bot.Wait.ForActionCooldown(GameActions.AcceptQuest);
-        Bot.Flash.CallGameFunction("world.acceptQuest", id);
-        if (Bot.Options.SafeTimings)
-            Bot.Wait.ForQuestAccept(id);
+        if (Options.SafeTimings)
+            Wait.ForActionCooldown(GameActions.AcceptQuest);
+        Flash.CallGameFunction("world.acceptQuest", id);
+        if (Options.SafeTimings)
+            Wait.ForQuestAccept(id);
         return IsInProgress(id);
     }
 
@@ -55,18 +99,18 @@ public class ScriptQuest : ScriptableObject, IScriptQuest
         for(int i = 0; i < ids.Length; i++)
         {
             Accept(ids[i]);
-            Bot.Sleep(Bot.Options.ActionDelay);
+            Thread.Sleep(Options.ActionDelay);
         }
     }
 
     public bool EnsureAccept(int id)
     {
-        for (int i = 0; i < Bot.Options.QuestAcceptAndCompleteTries; i++)
+        for (int i = 0; i < Options.QuestAcceptAndCompleteTries; i++)
         {
             Accept(id);
             if (IsInProgress(id))
                 break;
-            Bot.Sleep(Bot.Options.ActionDelay);
+            Thread.Sleep(Options.ActionDelay);
         }
         return IsInProgress(id);
     }
@@ -76,19 +120,19 @@ public class ScriptQuest : ScriptableObject, IScriptQuest
         for (int i = 0; i < ids.Length; i++)
         {
             EnsureAccept(ids[i]);
-            Bot.Sleep(Bot.Options.ActionDelay);
+            Thread.Sleep(Options.ActionDelay);
         }
     }
 
     public bool Complete(int id, int itemId = -1, bool special = false)
     {
-        if (Bot.Options.SafeTimings)
-            Bot.Wait.ForActionCooldown(GameActions.TryQuestComplete);
-        if (Bot.Options.ExitCombatBeforeQuest && Bot.Player.InCombat)
-            Bot.Map.Jump(Bot.Player.Cell, Bot.Player.Pad);
-        Bot.Flash.CallGameFunction("world.tryQuestComplete", id, itemId, special);
-        if (Bot.Options.SafeTimings)
-            Bot.Wait.ForQuestComplete(id);
+        if (Options.SafeTimings)
+            Wait.ForActionCooldown(GameActions.TryQuestComplete);
+        if (Options.ExitCombatBeforeQuest && Player.InCombat)
+            Map.Jump(Player.Cell, Player.Pad);
+        Flash.CallGameFunction("world.tryQuestComplete", id, itemId, special);
+        if (Options.SafeTimings)
+            Wait.ForQuestComplete(id);
         return !IsInProgress(id);
     }
 
@@ -97,26 +141,26 @@ public class ScriptQuest : ScriptableObject, IScriptQuest
         for(int i = 0; i < ids.Length; i++)
         {
             Complete(ids[i]);
-            Bot.Sleep(Bot.Options.ActionDelay);
+            Thread.Sleep(Options.ActionDelay);
         }
     }
 
     public bool EnsureComplete(int id, int itemId = -1, bool special = false)
     {
-        if (Bot.Options.ExitCombatBeforeQuest)
-            Bot.Combat.Exit();
+        if (Options.ExitCombatBeforeQuest)
+            Combat.Exit();
         _EnsureComplete(id, itemId, special);
         return !IsInProgress(id);
     }
 
     private void _EnsureComplete(int id, int itemId = -1, bool special = false)
     {
-        for (int i = 0; i < Bot.Options.QuestAcceptAndCompleteTries; i++)
+        for (int i = 0; i < Options.QuestAcceptAndCompleteTries; i++)
         {
             Complete(id, itemId, special);
             if (IsInProgress(id))
                 break;
-            Bot.Sleep(Bot.Options.ActionDelay);
+            Thread.Sleep(Options.ActionDelay);
         }
     }
 
@@ -125,25 +169,25 @@ public class ScriptQuest : ScriptableObject, IScriptQuest
         for(int i = 0; i < ids.Length; i++)
         {
             EnsureComplete(ids[i]);
-            Bot.Sleep(Bot.Options.ActionDelay);
+            Thread.Sleep(Options.ActionDelay);
         }
     }
 
     [MethodCallBinding("world.isQuestInProgress", GameFunction = true)]
-    public bool IsInProgress(int id) => false;
+    private bool _isInProgress(int id) => false;
 
     public bool UpdateQuest(int id)
     {
         Quest? quest = EnsureLoad(id);
         if(quest is null)
             return false;
-        Bot.Send.ClientPacket("{\"t\":\"xt\",\"b\":{\"r\":-1,\"o\":{\"cmd\":\"updateQuest\",\"iValue\":" + quest.Value + ",\"iIndex\":" + quest.Slot + "}}}", "json");
+        Send.ClientPacket("{\"t\":\"xt\",\"b\":{\"r\":-1,\"o\":{\"cmd\":\"updateQuest\",\"iValue\":" + quest.Value + ",\"iIndex\":" + quest.Slot + "}}}", "json");
         return true;
     }
 
     public void UpdateQuest(int value, int slot)
     {
-        Bot.Send.ClientPacket("{\"t\":\"xt\",\"b\":{\"r\":-1,\"o\":{\"cmd\":\"updateQuest\",\"iValue\":" + value + ",\"iIndex\":" + slot + "}}}", "json");
+        Send.ClientPacket("{\"t\":\"xt\",\"b\":{\"r\":-1,\"o\":{\"cmd\":\"updateQuest\",\"iValue\":" + value + ",\"iIndex\":" + slot + "}}}", "json");
     }
 
     public bool CanComplete(int id)
@@ -166,7 +210,7 @@ public class ScriptQuest : ScriptableObject, IScriptQuest
             return true;
         foreach (ItemBase item in requirements)
         {
-            if (Bot.Inventory.Contains(item.Name, item.Quantity))
+            if (Inventory.Contains(item.Name, item.Quantity))
                 continue;
             return false;
         }
@@ -178,7 +222,7 @@ public class ScriptQuest : ScriptableObject, IScriptQuest
         Quest? quest = EnsureLoad(id);
         if (quest is null)
             return false;
-        return Bot.Flash.CallGameFunction<int>("world.getAchievement", quest.Field, quest.Index) != 0;
+        return Flash.CallGameFunction<int>("world.getAchievement", quest.Field, quest.Index) != 0;
     }
 
     public bool IsUnlocked(int id)
@@ -186,7 +230,7 @@ public class ScriptQuest : ScriptableObject, IScriptQuest
         Quest? quest = EnsureLoad(id);
         if (quest is null)
             return false;
-        return quest.Slot < 0 || Bot.Flash.CallGameFunction<int>("world.getQuestValue", quest.Slot) >= quest.Value - 1;
+        return quest.Slot < 0 || Flash.CallGameFunction<int>("world.getQuestValue", quest.Slot) >= quest.Value - 1;
     }
 
     public bool HasBeenCompleted(int id)
@@ -194,7 +238,7 @@ public class ScriptQuest : ScriptableObject, IScriptQuest
         Quest? quest = EnsureLoad(id);
         if (quest is null)
             return false;
-        return quest.Slot < 0 || Bot.Flash.CallGameFunction<int>("world.getQuestValue", quest.Slot) >= quest.Value;
+        return quest.Slot < 0 || Flash.CallGameFunction<int>("world.getQuestValue", quest.Slot) >= quest.Value;
     }
 
     public bool IsAvailable(int id)
@@ -203,11 +247,11 @@ public class ScriptQuest : ScriptableObject, IScriptQuest
         return quest is not null
                && !IsDailyComplete(quest.ID)
                && IsUnlocked(quest.ID)
-               && (!quest.Upgrade || Bot.Player.Upgrade)
-               && Bot.Player.Level >= quest.Level
-               && (quest.RequiredClassID <= 0 || Bot.Flash.CallGameFunction<int>("world.myAvatar.getCPByID", quest.RequiredClassID) >= quest.RequiredClassPoints)
-               && (quest.RequiredFactionId <= 1 || Bot.Flash.CallGameFunction<int>("world.myAvatar.getRep", quest.RequiredFactionId) >= quest.RequiredFactionRep)
-               && quest.AcceptRequirements.All(r => Bot.Inventory.Contains(r.Name, r.Quantity));
+               && (!quest.Upgrade || Player.Upgrade)
+               && Player.Level >= quest.Level
+               && (quest.RequiredClassID <= 0 || Flash.CallGameFunction<int>("world.myAvatar.getCPByID", quest.RequiredClassID) >= quest.RequiredClassPoints)
+               && (quest.RequiredFactionId <= 1 || Flash.CallGameFunction<int>("world.myAvatar.getRep", quest.RequiredFactionId) >= quest.RequiredFactionRep)
+               && quest.AcceptRequirements.All(r => Inventory.Contains(r.Name, r.Quantity));
     }
 
     public void RegisterQuests(params int[] ids)
@@ -243,7 +287,7 @@ public class ScriptQuest : ScriptableObject, IScriptQuest
         if (QuestThread?.IsAlive ?? false)
         {
             QuestsCTS?.Cancel();
-            Bot.Wait.ForTrue(() => QuestsCTS is null, 20);
+            Wait.ForTrue(() => QuestsCTS is null, 20);
         }
     }
 
@@ -263,7 +307,7 @@ public class ScriptQuest : ScriptableObject, IScriptQuest
                 lock (_rem)
                     _rem.Clear();
             }
-            if (Bot.Player.Playing)
+            if (Player.Playing)
             {
                 _CompleteQuest(Registered);
             }
@@ -278,13 +322,13 @@ public class ScriptQuest : ScriptableObject, IScriptQuest
         {
             if (!CanComplete(registered[i]))
                 continue;
-            if (Bot.Options.SafeTimings)
-                Bot.Wait.ForActionCooldown(GameActions.TryQuestComplete);
-            Bot.Flash.CallGameFunction("world.tryQuestComplete", registered[i], -1, false);
-            if (Bot.Options.SafeTimings)
-                Bot.Wait.ForQuestComplete(registered[i]);
+            if (Options.SafeTimings)
+                Wait.ForActionCooldown(GameActions.TryQuestComplete);
+            Flash.CallGameFunction("world.tryQuestComplete", registered[i], -1, false);
+            if (Options.SafeTimings)
+                Wait.ForQuestComplete(registered[i]);
             Accept(registered[i]);
-            Bot.Sleep(Bot.Options.ActionDelay);
+            Thread.Sleep(Options.ActionDelay);
         }
     }
 }

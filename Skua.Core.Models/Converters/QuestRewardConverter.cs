@@ -1,4 +1,5 @@
 ﻿using Newtonsoft.Json;
+using Newtonsoft.Json.Linq;
 using Skua.Core.Models.Items;
 
 namespace Skua.Core.Models.Converters;
@@ -17,6 +18,6 @@ public class QuestRewardConverter : JsonConverter
 
     public override void WriteJson(JsonWriter writer, object value, JsonSerializer serializer)
     {
-        throw new NotImplementedException();
+        serializer.Serialize(writer, value);
     }
 }

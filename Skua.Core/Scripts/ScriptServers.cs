@@ -2,80 +2,115 @@
 using Newtonsoft.Json;
 using Skua.Core.Interfaces;
 using Skua.Core.Models.Servers;
-using Skua.Core.PostSharp;
 using Skua.Core.Utils;
+using Skua.Core.Flash;
+using Microsoft.Toolkit.Mvvm.ComponentModel;
 
 namespace Skua.Core.Scripts;
 
-public class ScriptServers : ScriptableObject, IScriptServers
+public partial class ScriptServers : ObservableObject, IScriptServers
 {
+    private readonly Lazy<IFlashUtil> _lazyFlash;
+    private readonly Lazy<IScriptPlayer> _lazyPlayer;
+    private readonly Lazy<IScriptWait> _lazyWait;
+    private readonly Lazy<IScriptOption> _lazyOptions;
+    private readonly Lazy<IScriptBotStats> _lazyStats;
+    private readonly Lazy<IScriptManager> _lazyManager;
+
+    private IFlashUtil Flash => _lazyFlash.Value;
+    private IScriptPlayer Player => _lazyPlayer.Value;
+    private IScriptWait Wait => _lazyWait.Value;
+    private IScriptOption Options => _lazyOptions.Value;
+    private IScriptBotStats Stats => _lazyStats.Value;
+    private IScriptManager Manager => _lazyManager.Value;
+
+    public ScriptServers(
+        Lazy<IFlashUtil> flash,
+        Lazy<IScriptPlayer> player,
+        Lazy<IScriptWait> wait,
+        Lazy<IScriptOption> options,
+        Lazy<IScriptBotStats> stats,
+        Lazy<IScriptManager> manager)
+    {
+        _lazyFlash = flash;
+        _lazyPlayer = player;
+        _lazyWait = wait;
+        _lazyOptions = options;
+        _lazyStats = stats;
+        _lazyManager = manager;
+    }
+
     public string LastIP { get; set; } = default!;
     public string LastName { get; set; } = default!;
     [ObjectBinding("serialCmd.servers")]
-    public List<Server> ServerList { get; } = new();
-    public List<Server> CachedServers { get; private set; } = new();
+    private List<Server> _serverList = new();
+
+    [ObservableProperty]
+    private List<Server> _CachedServers = new();
 
     public async ValueTask<List<Server>> GetServers(bool forceUpdate = false)
     {
         if (CachedServers.Count > 0 && !forceUpdate)
             return CachedServers;
 
-        var response = await HttpClients.GitHubClient.GetStringAsync($"http://content.aq.com/game/api/data/servers").ConfigureAwait(false);
+        string? response = await HttpClients.GetGHClient().GetStringAsync($"http://content.aq.com/game/api/data/servers").ConfigureAwait(false);
         if (response is null)
             return new();
         return CachedServers = JsonConvert.DeserializeObject<List<Server>>(response)!;
     }
 
     [MethodCallBinding("login", GameFunction = true)]
-    public void Login(string username, string password) { }
+    private void _login(string username, string password) { }
+
+    public void Login() => Login(Player.Username, Player.Password);
 
     [MethodCallBinding("connectTo", RunMethodPost = true, GameFunction = true)]
-    public bool ConnectIP(string ip)
+    private bool _connectIP(string ip)
     {
-        Bot.Wait.ForTrue(() => !Bot.ShouldExit && Bot.Player.Playing && Bot.IsWorldLoaded, 30);
-        return Bot.Player.Playing;
+        Wait.ForTrue(() => !Manager.ShouldExit && Player.Playing && Flash.IsWorldLoaded, 30);
+        return Player.Playing;
     }
 
     public bool Reconnect(string serverName, int loginDelay = 2000)
     {
-        Login(Bot.Player.Username, Bot.Player.Password);
-        Bot.Sleep(loginDelay);
+        Login(Player.Username, Player.Password);
+        Thread.Sleep(loginDelay);
         return ((IScriptServers)this).Connect(serverName);
     }
 
     public bool Reconnect(Server server, int loginDelay = 2000)
     {
-        Login(Bot.Player.Username, Bot.Player.Password);
-        Bot.Sleep(loginDelay);
+        Login(Player.Username, Player.Password);
+        Thread.Sleep(loginDelay);
         return ((IScriptServers)this).Connect(server);
     }
 
     [MethodCallBinding("logout", RunMethodPost = true, GameFunction = true)]
-    public void Logout()
+    private void _logout()
     {
-        Bot.Flash.CallGameFunction("gotoAndPlay", "Login");
+        Flash.CallGameFunction("gotoAndPlay", "Login");
     }
 
     public bool Relogin(Server? server = null)
     {
         if (server is null)
-            server = Bot.Options.AutoReloginAny ? ServerList.Find(x => x.IP != LastIP)! : Bot.Options.LoginServer ?? ServerList[0];
+            server = Options.AutoReloginAny ? ServerList.Find(x => x.IP != LastIP)! : Options.LoginServer ?? ServerList[0];
         return ReloginIP(server.IP);
     }
 
     public bool ReloginIP(string ip)
     {
-        bool autoRelogSwitch = Bot.Options.AutoRelogin;
-        Bot.Options.AutoRelogin = false;
-        Bot.Sleep(2000);
+        bool autoRelogSwitch = Options.AutoRelogin;
+        Options.AutoRelogin = false;
+        Thread.Sleep(2000);
         Logout();
-        Bot.Stats.Relogins++;
-        Login(Bot.Player.Username, Bot.Player.Password);
-        Bot.Sleep(2000);
+        Stats.Relogins++;
+        Login(Player.Username, Player.Password);
+        Thread.Sleep(2000);
         ConnectIP(ip);
-        Bot.Wait.ForTrue(() => Bot.Player.Playing && Bot.IsWorldLoaded, 30);
-        Bot.Options.AutoRelogin = autoRelogSwitch;
-        return Bot.Player.Playing;
+        Wait.ForTrue(() => Player.Playing && Flash.IsWorldLoaded, 30);
+        Options.AutoRelogin = autoRelogSwitch;
+        return Player.Playing;
     }
 
     public bool Relogin(string serverName)
@@ -91,24 +126,24 @@ public class ScriptServers : ScriptableObject, IScriptServers
     {
         Server s = ServerList.Find(x => x.Name.Contains(serverName))!;
         int tries = 0;
-        while (!Relogin(s.IP) && !Bot.ShouldExit && !Bot.Player.Playing && ++tries < Bot.Options.ReloginTries)
-            Bot.Sleep(Bot.Options.ReloginTryDelay);
-        return Bot.Player.Playing;
+        while (!Relogin(s.IP) && !Manager.ShouldExit && !Player.Playing && ++tries < Options.ReloginTries)
+            Thread.Sleep(Options.ReloginTryDelay);
+        return Player.Playing;
     }
 
     public async Task<bool> EnsureRelogin(CancellationToken token)
     {
         int tries = 0;
-        while (!token.IsCancellationRequested && !Bot.Player.Playing && ++tries < Bot.Options.ReloginTries)
+        while (!token.IsCancellationRequested && Manager.ShouldExit && !Player.Playing && ++tries < Options.ReloginTries)
         {
-            Login(Bot.Player.Username, Bot.Player.Password);
+            Login(Player.Username, Player.Password);
             await Task.Delay(2000, token);
             await GetServers(true);
-            Server server = Bot.Options.AutoReloginAny ? ServerList.Find(x => x.IP != LastIP)! : Bot.Options.LoginServer ?? ServerList[0];
+            Server server = Options.AutoReloginAny ? ServerList.Find(x => x.IP != LastIP)! : Options.LoginServer ?? ServerList[0];
             ConnectIP(server.IP);
-            while ((!Bot.Player.Playing || !Bot.IsWorldLoaded) && !token.IsCancellationRequested)
+            while ((!Player.Playing || !Flash.IsWorldLoaded) && !token.IsCancellationRequested)
                 await Task.Delay(500, token);
         }
-        return Bot.Player.Playing;
+        return Player.Playing;
     }
 }

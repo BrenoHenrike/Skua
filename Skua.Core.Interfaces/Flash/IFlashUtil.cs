@@ -6,10 +6,20 @@ namespace Skua.Core.Interfaces;
 
 public delegate void FlashCallHandler(string function, params object[] args);
 public delegate void FlashErrorHandler(Exception e, string function, params object[] args);
+public delegate void FlashChangedHandler(IComponent flash);
 public interface IFlashUtil
 {
     event FlashCallHandler? FlashCall;
     event FlashErrorHandler? FlashError;
+    event FlashChangedHandler? FlashChanged;
+
+    /// <summary>
+    /// Whether the world clip has been loaded yet.
+    /// </summary>
+    /// <remarks>This can be used as an additional way of checking if the player is logged in and ready to perform actions.</remarks>
+    bool IsWorldLoaded => !IsNull("world");
+
+    void InitializeFlash();
 
     /// <summary>
     /// Make a flash call for the specified <paramref name="function"/>.
@@ -97,7 +107,7 @@ public interface IFlashUtil
     {
         try
         {
-            return JsonConvert.DeserializeObject<T>(GetGameObject(path));
+            return JsonConvert.DeserializeObject<T>(GetGameObject(path)!);
         }
         catch
         {
@@ -126,7 +136,7 @@ public interface IFlashUtil
     {
         try
         {
-            return JsonConvert.DeserializeObject<T>(GetGameObjectStatic(path));
+            return JsonConvert.DeserializeObject<T>(GetGameObjectStatic(path)!);
         }
         catch
         {
@@ -173,7 +183,7 @@ public interface IFlashUtil
     {
         try
         {
-            return JsonConvert.DeserializeObject<T>(CallGameFunction(path, args));
+            return JsonConvert.DeserializeObject<T>(CallGameFunction(path, args)!);
         }
         catch
         {
@@ -204,7 +214,7 @@ public interface IFlashUtil
     {
         try
         {
-            return JsonConvert.DeserializeObject<T>(GetArrayObject(path, index));
+            return JsonConvert.DeserializeObject<T>(GetArrayObject(path, index)!);
         }
         catch
         {
@@ -223,7 +233,7 @@ public interface IFlashUtil
     {
         try
         {
-            return JsonConvert.DeserializeObject<List<T>>(Call("selectArrayObjects", path, selector));
+            return JsonConvert.DeserializeObject<List<T>>(Call("selectArrayObjects", path, selector)!)!;
         }
         catch
         {

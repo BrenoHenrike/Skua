@@ -1,19 +1,12 @@
 ﻿namespace Skua.Core.Interfaces;
 public interface IScriptInterface
 {
-    /// <summary>
-    /// Whether the world clip has been loaded yet.
-    /// </summary>
-    /// <remarks>This can be used as an additional way of checking if the player is logged in and ready to perform actions.</remarks>
-    bool IsWorldLoaded => !Flash.IsNull("world");
-    /// <summary>
-    /// Whether the current script should terminate.
-    /// </summary>
-    bool ShouldExit { get; }
     IFlashUtil Flash { get; }
     IScriptBoost Boosts { get; }
     IScriptBotStats Stats { get; }
     IScriptCombat Combat { get; }
+    IScriptKill Kill { get; }
+    IScriptHunt Hunt { get; }
     IScriptDrop Drops { get; }
     IScriptEvent Events { get; }
     IScriptFaction Reputation { get; }
@@ -32,6 +25,13 @@ public interface IScriptInterface
     IScriptSkill Skills { get; }
     IScriptWait Wait { get; }
     IScriptServers Servers { get; }
+    IScriptHandlers Handlers { get; }
+    ICaptureProxy GameProxy { get; }
+
+    /// <summary>
+    /// A random instance for the script.
+    /// </summary>
+    Random Random { get; set; }
     /// <summary>
     /// Initializes the <see cref="IScriptInterface"/> timer thread.
     /// </summary>

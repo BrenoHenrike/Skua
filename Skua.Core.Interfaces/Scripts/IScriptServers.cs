@@ -1,7 +1,8 @@
-﻿using Skua.Core.Models.Servers;
+﻿using System.ComponentModel;
+using Skua.Core.Models.Servers;
 
 namespace Skua.Core.Interfaces;
-public interface IScriptServers
+public interface IScriptServers : INotifyPropertyChanged
 {
     /// <summary>
     /// The IP of the last server the player was connected to.
@@ -55,6 +56,7 @@ public interface IScriptServers
     /// <param name="username">Username to login with.</param>
     /// <param name="password">Password to login with.</param>
     void Login(string username, string password);
+    void Login();
     /// <summary>
     /// Logs out of the game.
     /// </summary>

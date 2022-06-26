@@ -12,20 +12,12 @@ public class DefaultTypedValueProvider : ITypedValueProvider
     {
         try
         {
-            return type == null || type == typeof(void) ? null : Activator.CreateInstance(type);
+            object? value = type == null || type == typeof(void) ? null : Activator.CreateInstance(type);
+            return value;
         }
         catch
         {
             return type.GetDefaultValue();
         }
-    }
-}
-
-[Serializable]
-public class EmptyListProvider<T> : ITypedValueProvider
-{
-    public object Provide(Type type)
-    {
-        return new List<T>();
     }
 }

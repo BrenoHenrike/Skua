@@ -1,0 +1,56 @@
+﻿<UserControl
+    x:Class="Skua.App.UserControls.InputDialog"
+    xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+    xmlns:b="http://schemas.microsoft.com/xaml/behaviors"
+    xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+    xmlns:local="clr-namespace:Skua.App.UserControls"
+    xmlns:materialDesign="http://materialdesigninxaml.net/winfx/xaml/themes"
+    xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+    xmlns:vms="clr-namespace:Skua.Core.ViewModels;assembly=Skua.Core"
+    xmlns:wpf="clr-namespace:Skua.WPF;assembly=Skua.WPF"
+    d:DataContext="{d:DesignInstance vms:InputDialogViewModel}"
+    d:DesignHeight="450"
+    d:DesignWidth="800"
+    mc:Ignorable="d">
+    <StackPanel>
+        <TextBlock
+            Margin="6"
+            Style="{StaticResource MaterialDesignHelperTextBlock}"
+            Text="{Binding DialogHint}"
+            Visibility="{Binding DialogHint, Converter={StaticResource StringIsEmptyVisibilityConverter}}" />
+        <TextBox
+            Margin="6"
+            materialDesign:HintAssist.Hint="{Binding TextBoxHint}"
+            Style="{StaticResource MaterialDesignFloatingHintTextBox}"
+            Text="{Binding DialogTextInput}"
+            Visibility="{Binding NumberOnly, Converter={StaticResource BooleanToVisibilityConverter}}">
+            <b:Interaction.Behaviors>
+                <wpf:TextBoxOnlyNumbersBehavior />
+            </b:Interaction.Behaviors>
+        </TextBox>
+        <TextBox
+            Margin="6"
+            materialDesign:HintAssist.Hint="{Binding TextBoxHint}"
+            Style="{StaticResource MaterialDesignFloatingHintTextBox}"
+            Text="{Binding DialogTextInput}"
+            Visibility="{Binding NumberOnly, Converter={StaticResource InverseBoolToVisConverter}}" />
+        <Grid>
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition />
+                <ColumnDefinition />
+            </Grid.ColumnDefinitions>
+            <Button
+                x:Name="btnConfirm"
+                Grid.Column="0"
+                Margin="6"
+                Content="Confirm"
+                IsDefault="True" />
+            <Button
+                Grid.Column="1"
+                Margin="6"
+                Content="Cancel"
+                IsCancel="True" />
+        </Grid>
+    </StackPanel>
+</UserControl>

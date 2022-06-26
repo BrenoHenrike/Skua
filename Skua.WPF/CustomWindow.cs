@@ -17,9 +17,28 @@ public partial class CustomWindow : Window
     /// <summary>
     /// Dependency property to set if the custom window should be of Fixed Size.
     /// </summary>
-    public bool FixedSize { get { return (bool)GetValue(FixedSizeProperty); } set { SetValue(FixedSizeProperty, value); } }
-    public static readonly DependencyProperty FixedSizeProperty = DependencyProperty.Register("FixedSize", typeof(bool), typeof(CustomWindow), new PropertyMetadata(false));
-    
+    public bool FixedSize
+    { 
+        get { return (bool)GetValue(FixedSizeProperty); } 
+        set { SetValue(FixedSizeProperty, value); }
+    }
+    public static readonly DependencyProperty FixedSizeProperty =
+        DependencyProperty.Register("FixedSize", typeof(bool), typeof(CustomWindow), new PropertyMetadata(false));
+
+    /// <summary>
+    /// Dependency property to set if the custom window should hide instead of closing.
+    /// </summary>
+    public bool HideWindow
+    {
+        get { return (bool)GetValue(HideWindowProperty); }
+        set { SetValue(HideWindowProperty, value); }
+    }
+
+    public static readonly DependencyProperty HideWindowProperty =
+        DependencyProperty.Register("HideWindow", typeof(bool), typeof(CustomWindow), new PropertyMetadata(false));
+
+
+
     public CustomWindow() : base()
     {
         SourceInitialized += (s, e) =>
@@ -34,7 +53,16 @@ public partial class CustomWindow : Window
             btnMaximize = (Button)Template.FindName("btnMaximize", this);
             btnMinimize = (Button)Template.FindName("btnMinimize", this);
 
-            btnClose.Click += (s, e) => Close();
+            if(!HideWindow)
+                btnClose.Click += (s, e) => Close();
+            else
+            {
+                Closing += (s, e) => e.Cancel = true;
+                btnClose.Click += (s, e) =>
+                {
+                    Hide();
+                };
+            }
             btnMinimize.Click += (s, e) => WindowState = WindowState.Minimized;
             if(!FixedSize)
             {

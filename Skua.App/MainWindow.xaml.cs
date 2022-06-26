@@ -4,8 +4,10 @@ using Skua.App.Flash;
 using Skua.Core.Interfaces;
 using Skua.Core.ViewModels;
 using Skua.WPF;
+using System.Diagnostics;
 using System.IO;
 using System.Linq;
+using System.Windows;
 using System.Windows.Forms;
 using System.Xml.Linq;
 
@@ -17,61 +19,46 @@ namespace Skua.App;
 public partial class MainWindow : CustomWindow
 {
     public IScriptInterface Bot { get; }
-    public IFlashUtil FlashUtil { get; }
 
-    public MainWindow(IScriptInterface bot, IFlashUtil flashUtil)
+    public MainWindow(IScriptInterface bot)
     {
         Bot = bot;
-        FlashUtil = flashUtil;
-        DataContext = Ioc.Default.GetService(typeof(MainViewModel));
         InitializeComponent();
-        InitFlash();
-
-        Bot.Schedule(2000, b => Bot.Initialize());
+        DataContext = Ioc.Default.GetService<MainViewModel>();
+        gameContainer.Visibility = Visibility.Hidden;
+        Bot.Flash.FlashChanged += Flash_FlashChanged;
+        Loaded += MainWindow_Loaded;
     }
 
-    private void MenuItem_Click(object sender, System.Windows.RoutedEventArgs e)
+    private void Flash_FlashChanged(System.ComponentModel.IComponent flash)
     {
-        InitFlash();
+        gameContainer.Child = (AxShockwaveFlash)flash;
     }
 
-    public void InitFlash()
+    private void MainWindow_Loaded(object sender, RoutedEventArgs e)
     {
-        if (!EoLHook.IsHooked)
-            EoLHook.Hook();
+        Bot.Flash.FlashCall += LoadingFlash;
+        Bot.Flash.InitializeFlash();
+        Loaded -= MainWindow_Loaded;
+    }
 
-        Flash.FlashUtil.Flash?.Dispose();
-
-        AxShockwaveFlash flash = new();
-        flash.BeginInit();
-        flash.Name = "flash";
-        flash.Dock = DockStyle.Fill;
-        flash.TabIndex = 0;
-        flash.FlashCall += CallHandler;
-        gameContainer.Controls.Add(flash);
-        flash.EndInit();
-        Flash.FlashUtil.Flash = flash;
-        // TODO swf from setting manager
-        byte[] swf = File.ReadAllBytes("rbot.swf");
-        using (MemoryStream stream = new())
-        using (BinaryWriter writer = new(stream))
+    private void LoadingFlash(string function, params object[] args)
+    {
+        if(function == "loaded")
         {
-            writer.Write(8 + swf.Length);
-            writer.Write(1432769894);
-            writer.Write(swf.Length);
-            writer.Write(swf);
-            writer.Seek(0, SeekOrigin.Begin);
-            flash.OcxState = new AxHost.State(stream, 1, false, null);
+            LoadingBar.Visibility = Visibility.Hidden;
+            gameContainer.Visibility = Visibility.Visible;
+            Bot.Flash.FlashCall -= LoadingFlash;
         }
-
-        EoLHook.Unhook();
     }
 
-    public void CallHandler(object sender, _IShockwaveFlashEvents_FlashCallEvent e)
+    private void MenuItem_Click(object sender, RoutedEventArgs e)
     {
-        XElement el = XElement.Parse(e.request);
-        string name = el.Attribute("name")!.Value;
-        object[] args = el.Elements().Select(x => FlashUtil.FromFlashXml(x)).ToArray();
-        FlashUtil.OnFlashCall(name, args);
+        Bot.Flash.InitializeFlash();
+    }
+
+    private void MenuItem_Click_1(object sender, RoutedEventArgs e)
+    {
+        Title = "Suco";
     }
 }

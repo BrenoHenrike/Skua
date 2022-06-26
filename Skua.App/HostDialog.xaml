@@ -6,10 +6,12 @@
     xmlns:local="clr-namespace:Skua.App"
     xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
     xmlns:wpf="clr-namespace:Skua.WPF;assembly=Skua.WPF"
-    Title="HostDialog"
-    Width="800"
-    Height="450"
+    Title="{Binding Title}"
+    Width="400"
     FixedSize="True"
+    SizeToContent="Height"
+    Style="{StaticResource CustomWindow}"
+    WindowStartupLocation="CenterScreen"
     mc:Ignorable="d">
-    <Grid />
+    <ContentPresenter Content="{Binding}" />
 </wpf:CustomWindow>

@@ -4,8 +4,9 @@ using Skua.Core.Models.Items;
 
 namespace Skua.Core.Scripts;
 
-public class ScriptEvent : ScriptableObject, IScriptEvent
+public class ScriptEvent : IScriptEvent
 {
+    public event LogoutEventHandler? Logout;
     public event PlayerDeathEventHandler? PlayerDeath;
     public event MonsterKilledEventHandler? MonsterKilled;
     public event QuestAcceptedEventHandler? QuestAccepted;
@@ -39,6 +40,12 @@ public class ScriptEvent : ScriptableObject, IScriptEvent
         RunToArea = null;
     }
 
+    public void OnLogout()
+    {
+        AppGameEvents.OnLogout();
+        Task.Run(() => Logout?.Invoke());
+    }
+
     public void OnRunToArea(string zone)
     {
         Task.Run(() => RunToArea?.Invoke(zone));
@@ -51,6 +58,7 @@ public class ScriptEvent : ScriptableObject, IScriptEvent
 
     public void OnItemDropped(ItemBase item, bool addedToInv = false, int quantityNow = 0)
     {
+        AppGameEvents.OnItemDropped(item, addedToInv, quantityNow);
         Task.Run(() => ItemDropped?.Invoke(item, addedToInv, quantityNow));
     }
 

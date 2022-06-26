@@ -11,7 +11,15 @@ public class AdvancedSkill
         Skills = skills;
         SkillTimeout = skillTimeout;
         ClassUseMode = (ClassUseMode)Enum.Parse(typeof(ClassUseMode), useMode);
-        SkillUseMode = (SkillMode)Enum.Parse(typeof(SkillMode), skillMode);
+        SkillUseMode = (SkillUseMode)Enum.Parse(typeof(SkillUseMode), skillMode);
+    }
+    public AdvancedSkill(string className, string skills, int skillTimeout = -1, int classUseMode = 0, SkillUseMode skillUseMode = SkillUseMode.UseIfAvailable)
+    {
+        ClassName = className;
+        Skills = skills;
+        SkillTimeout = skillTimeout;
+        ClassUseMode = (ClassUseMode)classUseMode;
+        SkillUseMode = skillUseMode;
     }
     [JsonProperty("ClassName")]
     public string ClassName { get; set; } = "Generic";
@@ -22,7 +30,7 @@ public class AdvancedSkill
     [JsonProperty("ClassUseMode")]
     public ClassUseMode ClassUseMode { get; set; } = ClassUseMode.Base;
     [JsonProperty("SkillUseMode")]
-    public SkillMode SkillUseMode { get; set; } = SkillMode.UseIfAvailable;
+    public SkillUseMode SkillUseMode { get; set; } = SkillUseMode.UseIfAvailable;
     public override string ToString()
     {
         return $"{ClassUseMode} : {ClassName} => {Skills}";

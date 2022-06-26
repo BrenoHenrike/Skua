@@ -2,21 +2,45 @@
 using Skua.Core.Interfaces;
 using Skua.Core.Interfaces.Skills;
 using Skua.Core.Models.Skills;
-using Skua.Core.PostSharp;
 using Skua.Core.Skills;
 
 namespace Skua.Core.Scripts;
 
-public class ScriptSkill : ScriptableObject, IScriptSkill
+public partial class ScriptSkill : IScriptSkill
 {
-    public IAdvancedSkillContainer AdvancedSkillContainer { get; set; }
     private const string genericSkills = "1 | 2 | 3 | 4";
-    public ScriptSkill(IAdvancedSkillContainer advContainer)
+    private readonly Lazy<IFlashUtil> _lazyFlash;
+    private readonly Lazy<IScriptPlayer> _lazyPlayer;
+    private readonly Lazy<IScriptCombat> _lazyCombat;
+    private readonly Lazy<IScriptWait> _lazyWait;
+    private readonly Lazy<IScriptOption> _lazyOptions;
+    private readonly Lazy<IScriptInventory> _lazyInventory;
+
+    private IFlashUtil Flash => _lazyFlash.Value;
+    private IScriptPlayer Player => _lazyPlayer.Value;
+    private IScriptCombat Combat => _lazyCombat.Value;
+    private IScriptWait Wait => _lazyWait.Value;
+    private IScriptOption Options => _lazyOptions.Value;
+    private IScriptInventory Inventory => _lazyInventory.Value;
+
+    public IAdvancedSkillContainer AdvancedSkillContainer { get; set; }
+
+    public ScriptSkill(
+        IAdvancedSkillContainer advContainer,
+        Lazy<IFlashUtil> flash,
+        Lazy<IScriptPlayer> player,
+        Lazy<IScriptCombat> combat,
+        Lazy<IScriptOption> options,
+        Lazy<IScriptInventory> inventory,
+        Lazy<IScriptWait> wait)
     {
+        _lazyFlash = flash;
+        _lazyPlayer = player;
+        _lazyCombat = combat;
+        _lazyWait = wait;
+        _lazyOptions = options;
+        _lazyInventory = inventory;
         AdvancedSkillContainer = advContainer;
-        BaseProvider = new AdvancedSkillProvider(Bot);
-        BaseProvider.Load(genericSkills);
-        _provider = BaseProvider;
     }
 
     private ISkillProvider _provider;
@@ -25,20 +49,26 @@ public class ScriptSkill : ScriptableObject, IScriptSkill
     private CancellationTokenSource? SkillsCTS;
 
     [MethodCallBinding("canUseSkill")]
-    public bool CanUseSkill(int index) => false;
+    private bool _canUseSkill(int index) => false;
 
     [MethodCallBinding("useSkill")]
-    public void UseSkill(int index) { }
+    private void _useSkill(int index) { }
 
     public ISkillProvider? OverrideProvider { get; set; } = null;
-    public ISkillProvider BaseProvider { get; }
+    public ISkillProvider BaseProvider { get; private set; }
     public bool TimerRunning => SkillThread?.IsAlive ?? false;
     public int SkillInterval { get; set; } = 100;
     public int SkillTimeout { get; set; } = -1;
-    public SkillMode SkillUseMode { get; set; } = SkillMode.UseIfAvailable;
+    public SkillUseMode SkillUseMode { get; set; } = SkillUseMode.UseIfAvailable;
 
     public void Start()
     {
+        if(BaseProvider is null)
+        {
+            BaseProvider = new AdvancedSkillProvider(Player, Combat);
+            BaseProvider.Load(genericSkills);
+            _provider = BaseProvider;
+        }
         _provider = OverrideProvider ?? BaseProvider;
         if (SkillThread?.IsAlive ?? false)
             return;
@@ -59,7 +89,7 @@ public class ScriptSkill : ScriptableObject, IScriptSkill
     {
         _provider?.Stop();
         SkillsCTS?.Cancel();
-        Bot.Wait.ForTrue(() => !TimerRunning, 20);
+        Wait.ForTrue(() => !TimerRunning, 20);
     }
 
     public void SetProvider(ISkillProvider provider)
@@ -74,9 +104,9 @@ public class ScriptSkill : ScriptableObject, IScriptSkill
 
     public void LoadAdvanced(string className, bool autoEquip, ClassUseMode useMode = ClassUseMode.Base)
     {
-        OverrideProvider = new AdvancedSkillProvider(Bot);
+        OverrideProvider = new AdvancedSkillProvider(Player, Combat);
         if (autoEquip)
-            Bot.Inventory.EquipItem(className);
+            Inventory.EquipItem(className);
         // TODO Implement Advanced Skills
         //List<AdvancedSkill> skills = AdvancedSkillContainer.LoadedSkills?.Where(s => s.ClassName.ToLower() == className.ToLower()).ToList();
         //if (skills is null || skills.Count == 0)
@@ -93,9 +123,9 @@ public class ScriptSkill : ScriptableObject, IScriptSkill
         //SkillUseMode = skill.SkillUseMode;
     }
 
-    public void LoadAdvanced(string skills, int skillTimeout = -1, SkillMode skillMode = SkillMode.UseIfAvailable)
+    public void LoadAdvanced(string skills, int skillTimeout = -1, SkillUseMode skillMode = SkillUseMode.UseIfAvailable)
     {
-        OverrideProvider = new AdvancedSkillProvider(Bot);
+        OverrideProvider = new AdvancedSkillProvider(Player, Combat);
         SkillTimeout = skillTimeout;
         SkillUseMode = skillMode;
         OverrideProvider.Load(skills);
@@ -105,7 +135,7 @@ public class ScriptSkill : ScriptableObject, IScriptSkill
     {
         while (!token.IsCancellationRequested)
         {
-            if (Bot.Options.AttackWithoutTarget || Bot.Player.HasTarget)
+            if (Options.AttackWithoutTarget || Player.HasTarget)
                 _Poll(token);
             _provider?.OnTargetReset();
             if (!token.IsCancellationRequested)
@@ -117,10 +147,10 @@ public class ScriptSkill : ScriptableObject, IScriptSkill
     private SkillInfo[] _lastSkills = null!;
     private void _Poll(CancellationToken token)
     {
-        int rank = Bot.Player.CurrentClassRank;
+        int rank = Player.CurrentClassRank;
         if (_lastSkills is not null && rank > _lastRank)
         {
-            using FlashArray<object> skills = (FlashArray<object>)Bot.Flash.CreateFlashObject<object>("world.actions.active").ToArray();
+            using FlashArray<object> skills = (FlashArray<object>)Flash.CreateFlashObject<object>("world.actions.active").ToArray();
             int k = 0;
             foreach (FlashObject<object> skill in skills)
             {
@@ -129,8 +159,8 @@ public class ScriptSkill : ScriptableObject, IScriptSkill
             }
         }
         _lastRank = rank;
-        if (Bot.Player.Skills is not null)
-            _lastSkills = Bot.Player.Skills;
+        if (Player.Skills is not null)
+            _lastSkills = Player.Skills;
         if (token.IsCancellationRequested)
             return;
         switch (_provider?.ShouldUseSkill())
@@ -152,12 +182,12 @@ public class ScriptSkill : ScriptableObject, IScriptSkill
         {
             switch (SkillUseMode)
             {
-                case SkillMode.UseIfAvailable:
-                    if (Bot.Options.AttackWithoutTarget || CanUseSkill(skill))
+                case SkillUseMode.UseIfAvailable:
+                    if (Options.AttackWithoutTarget || CanUseSkill(skill))
                         UseSkill(skill);
                     break;
-                case SkillMode.WaitForCooldown:
-                    if (Bot.Options.AttackWithoutTarget || (skill != -1 && Bot.Wait.ForTrue(() => CanUseSkill(skill), null, SkillTimeout, SkillInterval)))
+                case SkillUseMode.WaitForCooldown:
+                    if (Options.AttackWithoutTarget || (skill != -1 && Wait.ForTrue(() => CanUseSkill(skill), null, SkillTimeout, SkillInterval)))
                         UseSkill(skill);
                     break;
             }

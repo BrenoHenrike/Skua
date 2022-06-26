@@ -1,9 +1,13 @@
-﻿using Skua.Core.Models.Servers;
+﻿using System.Collections.Immutable;
+using System.ComponentModel;
+using Skua.Core.Models;
+using Skua.Core.Models.Servers;
 
 namespace Skua.Core.Interfaces;
 
-public interface IScriptOption
+public interface IScriptOption : INotifyPropertyChanged
 {
+    ImmutableDictionary<string, Func<object>> OptionsDictionary { get; }
     int ReloginTryDelay { get; set; }
     /// <summary>
     /// When enabled will pickup any AC item that drops, even when the drop should be rejected.
@@ -31,6 +35,10 @@ public interface IScriptOption
     /// Re-logs into any server that wasn't the last one. This ensures the re-log is successful.
     /// </summary>
     bool AutoReloginAny { get; set; }
+    /// <summary>
+    /// Whether it should try certain amount of times (<see cref="ReloginTries"/>) to relogin.
+    /// </summary>
+    bool RetryRelogin { get; set; }
     /// <summary>
     /// Sets a persistent, custom guild name (client side).
     /// </summary>
@@ -149,4 +157,9 @@ public interface IScriptOption
     /// How many tries the bot will make when using <see cref="IScriptServers.EnsureRelogin(string)"/>
     /// </summary>
     int ReloginTries { get; set; }
+    /// <summary>
+    /// The priority mode for hunting.
+    /// </summary>
+    HuntPriorities HuntPriority { get; set; }
+    void ResetOptions();
 }

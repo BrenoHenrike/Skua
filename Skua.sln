@@ -22,7 +22,9 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Skua.Core.Interfaces", "Sku
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Skua.Core.Models", "Skua.Core.Models\Skua.Core.Models.csproj", "{D883487A-7D7A-4557-A23A-CFF9C6807563}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Skua.Core.Utils", "Skua.Core.Utils\Skua.Core.Utils.csproj", "{574CC213-B45A-443F-85BB-B45FAE1F5058}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Skua.Core.Utils", "Skua.Core.Utils\Skua.Core.Utils.csproj", "{574CC213-B45A-443F-85BB-B45FAE1F5058}"
+EndProject
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Skua.Core.Generators", "Skua.Core.Generators\Skua.Core.Generators.csproj", "{079E4ADF-5873-4EE2-BE14-FFCF933DB7BB}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -62,6 +64,10 @@ Global
 		{574CC213-B45A-443F-85BB-B45FAE1F5058}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{574CC213-B45A-443F-85BB-B45FAE1F5058}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{574CC213-B45A-443F-85BB-B45FAE1F5058}.Release|Any CPU.Build.0 = Release|Any CPU
+		{079E4ADF-5873-4EE2-BE14-FFCF933DB7BB}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{079E4ADF-5873-4EE2-BE14-FFCF933DB7BB}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{079E4ADF-5873-4EE2-BE14-FFCF933DB7BB}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{079E4ADF-5873-4EE2-BE14-FFCF933DB7BB}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

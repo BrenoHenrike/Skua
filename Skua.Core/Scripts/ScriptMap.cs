@@ -4,46 +4,72 @@ using Skua.Core.Interfaces;
 using Skua.Core.Models;
 using Skua.Core.Models.Items;
 using Skua.Core.Models.Players;
-using Skua.Core.PostSharp;
 using Skua.Core.Utils;
+using Skua.Core.Flash;
 
 namespace Skua.Core.Scripts;
-public class ScriptMap : ScriptableObject, IScriptMap
+public partial class ScriptMap : IScriptMap
 {
     Dictionary<string, List<MapItem>> SavedMapItems = new();
 
-    public ScriptMap()
+    private readonly Lazy<IFlashUtil> _lazyFlash;
+    private readonly Lazy<IScriptPlayer> _lazyPlayer;
+    private readonly Lazy<IScriptOption> _lazyOptions;
+    private readonly Lazy<IScriptWait> _lazyWait;
+    private readonly Lazy<IScriptManager> _lazyManager;
+    private readonly Lazy<IScriptSend> _lazySend;
+
+    private IFlashUtil Flash => _lazyFlash.Value;
+    private IScriptPlayer Player => _lazyPlayer.Value;
+    private IScriptOption Options => _lazyOptions.Value;
+    private IScriptWait Wait => _lazyWait.Value;
+    private IScriptManager Manager => _lazyManager.Value;
+    private IScriptSend Send => _lazySend.Value;
+
+    public ScriptMap(
+        Lazy<IFlashUtil> flash,
+        Lazy<IScriptPlayer> player,
+        Lazy<IScriptOption> options,
+        Lazy<IScriptSend> send,
+        Lazy<IScriptWait> wait,
+        Lazy<IScriptManager> manager)
     {
+        _lazyFlash = flash;
+        _lazyPlayer = player;
+        _lazyOptions = options;
+        _lazyWait = wait;
+        _lazyManager = manager;
+        _lazySend = send;
         LoadSavedMapItems();
     }
-    public string LastMap { get; set; } = default!;
-    public string FilePath { get; set; } = default!;
-    public string FileName => string.IsNullOrEmpty(FilePath) ? "" : FilePath.Split(new char[] { '/', '\\' }, StringSplitOptions.RemoveEmptyEntries).Last();
-    public string Name => _name.ToLower();
-    public string FullName => Loaded ? Bot.Flash.GetGameObject("ui.mcInterface.areaList.title.t1.text")?.Split(' ').Last() ?? "" : "";
 
-    [ObjectBinding("world.strMapName", RequireNotNull = "world")]
-    private string _name { get; } = string.Empty;
+    public string LastMap { get; set; } = string.Empty;
+    public string FilePath { get; set; } = string.Empty;
+    public string FileName => string.IsNullOrEmpty(FilePath) ? "" : FilePath.Split(new char[] { '/', '\\' }, StringSplitOptions.RemoveEmptyEntries).Last();
+    public string FullName => Loaded ? Flash.GetGameObject("ui.mcInterface.areaList.title.t1.text")?.Split(' ').Last() ?? "" : "";
+
+    [ObjectBinding("world.strMapName", RequireNotNull = "world", Default = "string.Empty")]
+    private string _name;
     [ObjectBinding("world.curRoom")]
-    public int RoomID { get; }
+    private int _roomID;
     [ObjectBinding("world.areaUsers.length")]
-    public int PlayerCount { get; }
-    [ObjectBinding("world.areaUsers")]
-    public List<string> PlayerNames { get; } = new();
-    [ObjectBinding("world.uoTree")]
-    private readonly Dictionary<string, PlayerInfo> _players = new();
-    public List<PlayerInfo> Players => _players.Values.ToList();
-    public List<PlayerInfo> CellPlayers => Players.FindAll(p => p.Cell == Bot.Player.Cell);
-    public bool Loaded => !Bot.Flash.GetGameObject<bool>("world.mapLoadInProgress")
-                        && Bot.Flash.IsNull("mcConnDetail.stage");
-    [ObjectBinding("world.map.currentScene.labels", Select = "name")]
-    public List<string> Cells { get; } = new();
+    private int _playerCount;
+    [ObjectBinding("world.areaUsers", Default = "new()")]
+    private List<string> _playerNames;
+    [ObjectBinding("world.uoTree", Default = "new()")]
+    private readonly Dictionary<string, PlayerInfo> _playersDictionary;
+    public List<PlayerInfo> Players => _playersDictionary.Values.ToList();
+    public List<PlayerInfo> CellPlayers => Players.FindAll(p => p.Cell == Player.Cell);
+    public bool Loaded => !Flash.GetGameObject<bool>("world.mapLoadInProgress")
+                          && Flash.IsNull("mcConnDetail.stage");
+    [ObjectBinding("world.map.currentScene.labels", Select = "name", Default = "new()")]
+    private List<string> _cells;
 
     [MethodCallBinding("world.moveToCell", RunMethodPost = true, GameFunction = true)]
-    public void Jump(string cell, string pad, bool clientOnly = false)
+    private void _jump(string cell, string pad, bool clientOnly = false)
     {
-        if (Bot.Options.SafeTimings)
-            Bot.Wait.ForCellChange(cell);
+        if (Options.SafeTimings)
+            Wait.ForCellChange(cell);
     }
 
     public void Join(string map, string cell = "Enter", string pad = "Spawn", bool ignoreCheck = false)
@@ -54,45 +80,45 @@ public class ScriptMap : ScriptableObject, IScriptMap
     private void _Join(string map, string cell = "Enter", string pad = "Spawn", bool ignoreCheck = false)
     {
         LastMap = map;
-        if (!Bot.Player.Playing || !Bot.Player.Loaded || (!ignoreCheck && Name == map))
+        if (!Player.Playing || !Player.Loaded || (!ignoreCheck && Name == map))
             return;
         int i = 0;
-        while (Name != map && !Bot.ShouldExit && ++i < Bot.Options.JoinMapTries)
+        while (Name != map && !Manager.ShouldExit && ++i < Options.JoinMapTries)
         {
-            if (Bot.Options.PrivateRooms || map.Contains("-1e9"))
-                map = $"{map.Split('-')[0]}{(Bot.Options.PrivateNumber != -1 ? Bot.Options.PrivateNumber : "-100000")}";
-            if (Bot.Options.SafeTimings)
-                Bot.Wait.ForActionCooldown(GameActions.Transfer);
+            if (Options.PrivateRooms || map.Contains("-1e9"))
+                map = $"{map.Split('-')[0]}{(Options.PrivateNumber != -1 ? Options.PrivateNumber : "-100000")}";
+            if (Options.SafeTimings)
+                Wait.ForActionCooldown(GameActions.Transfer);
             JoinPacket(map, cell, pad);
-            if (Bot.Options.SafeTimings)
+            if (Options.SafeTimings)
             {
-                if (!Bot.Wait.ForMapLoad(map, 20) && !Bot.ShouldExit)
-                    Jump(Bot.Player.Cell, Bot.Player.Pad);
+                if (!Wait.ForMapLoad(map, 20) && !Manager.ShouldExit)
+                    Jump(Player.Cell, Player.Pad);
                 else
                     Jump(cell, pad);
-                Bot.Sleep(Bot.Options.ActionDelay);
+                Thread.Sleep(Options.ActionDelay);
             }
         }
     }
 
     public void JoinPacket(string map, string cell = "Enter", string pad = "Spawn")
     {
-        Bot.Send.Packet($"%xt%zm%cmd%{RoomID}%tfer%{Bot.Player.Username}%{map}%{cell}%{pad}%");
+        Send.Packet($"%xt%zm%cmd%{RoomID}%tfer%{Player.Username}%{map}%{cell}%{pad}%");
     }
 
     public PlayerInfo? GetPlayer(string username)
     {
-        return Bot.Flash.GetGameObject<PlayerInfo>($"world.uoTree[\"{username.ToLower()}\"]");
+        return Flash.GetGameObject<PlayerInfo>($"world.uoTree[\"{username.ToLower()}\"]");
     }
 
     [MethodCallBinding("world.reloadCurrentMap", GameFunction = true)]
-    public void Reload() { }
+    private void _reload() { }
 
     [MethodCallBinding("world.getMapItem", RunMethodPre = true, GameFunction = true)]
-    public void GetMapItem(int id)
+    private void _getMapItem(int id)
     {
-        if (Bot.Options.SafeTimings)
-            Bot.Wait.ForActionCooldown(GameActions.GetMapItem);
+        if (Options.SafeTimings)
+            Wait.ForActionCooldown(Skua.Core.Models.GameActions.GetMapItem);
     }
 
     private Dictionary<string, List<MapItem>>? LoadSavedMapItems()
@@ -105,6 +131,7 @@ public class ScriptMap : ScriptableObject, IScriptMap
 
     private readonly string cachePath = Path.Combine(AppContext.BaseDirectory, "tools\\cache");
     private readonly string savedCacheFilePath = Path.Combine(AppContext.BaseDirectory, "tools\\cache", "0SavedMaps.json");
+
     public List<MapItem>? FindMapItems()
     {
         if (string.IsNullOrEmpty(FilePath))
@@ -226,7 +253,7 @@ public class ScriptMap : ScriptableObject, IScriptMap
             sw.Restart();
             Task.Run(async () =>
             {
-                byte[] fileBytes = await HttpClients.GitHubClient.GetByteArrayAsync($"https://game.aq.com/game/gamefiles/maps/{Bot.Map.FilePath}");
+                byte[] fileBytes = await HttpClients.GetGHClient().GetByteArrayAsync($"https://game.aq.com/game/gamefiles/maps/{FilePath}");
                 await File.WriteAllBytesAsync(Path.Combine(cachePath, fileName), fileBytes);
             }).Wait();
             Debug.WriteLine($"Download of \"{fileName}\" took {sw.Elapsed:s\\.ff}s");

@@ -32,6 +32,7 @@ public class EoLHook
     public static void Unhook()
     {
         _hook?.Dispose();
+        _hook = null;
     }
 
     [StructLayout(LayoutKind.Sequential)]

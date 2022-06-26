@@ -8,6 +8,7 @@ namespace Skua.Core.Interfaces;
 
 public interface IScriptPlayer
 {
+    string Guild { get; }
     /// <summary>
     /// Gets the player ID (useful for some packets).
     /// </summary>
@@ -81,17 +82,17 @@ public interface IScriptPlayer
     /// </summary>
     int MaxHealth { get; }
     /// <summary>
-    /// Gets or sets the player's current mana.
+    /// Gets the player's current mana.
     /// </summary>
-    int Mana { get; set; }
+    int Mana { get; }
     /// <summary>
     /// Gets the player's maximum mana.
     /// </summary>
     int MaxMana { get; }
     /// <summary>
-    /// Gets or sets the player's level.
+    /// Gets the player's level.
     /// </summary>
-    int Level { get; set; }
+    int Level { get; }
     /// <summary>
     /// Gets the player's gold.
     /// </summary>
@@ -123,11 +124,11 @@ public interface IScriptPlayer
     /// <summary>
     /// Gets an array containing information about the player's current skills.
     /// </summary>
-    SkillInfo[] Skills { get; }
+    SkillInfo[]? Skills { get; }
     /// <summary>
     /// The player stats.
     /// </summary>
-    PlayerStats Stats { get; }
+    PlayerStats? Stats { get; }
     /// <summary>
     /// Checks whether the player is marked as AFK.
     /// </summary>
@@ -178,4 +179,9 @@ public interface IScriptPlayer
     /// <param name="y">Y coordinate value.</param>
     /// <param name="speed">The speed at which to move the player's avatar.</param>
     void WalkTo(int x, int y, int speed = 8);
+    /// <summary>
+    /// Rests the player (equivilent to clicking the rest button on the UI).
+    /// </summary>
+    /// <param name="full">If <see langword="true"/>, the bot will wait until the player's HP and MP are full.</param>    
+    void Rest(bool full = false);
 }

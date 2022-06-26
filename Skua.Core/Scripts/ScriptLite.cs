@@ -1,74 +1,81 @@
 ﻿using Skua.Core.Interfaces;
-using Skua.Core.PostSharp;
+using Skua.Core.Flash;
 
 namespace Skua.Core.Scripts;
 
-public class ScriptLite : ScriptableObject, IScriptLite
+public partial class ScriptLite : IScriptLite
 {
-    [ObjectBinding("litePreference.data.bDebugger")]
-    public bool Debugger { get; set; }
+    private readonly Lazy<IFlashUtil> _lazyFlash;
+    private IFlashUtil Flash => _lazyFlash.Value;
+    public ScriptLite(Lazy<IFlashUtil> flash)
+    {
+        _lazyFlash = flash;
+    }
 
-    [ObjectBinding("litePreference.data.bHideUI")]
-    public bool HideUI { get; set; }
+    [ObjectBinding("litePreference.data.bDebugger", HasSetter = true)]
+    private bool _debugger;
 
-    [ObjectBinding("litePreference.data.bMonsType")]
-    public bool ShowMonsterType { get; set; }
+    [ObjectBinding("litePreference.data.bHideUI", HasSetter = true)]
+    private bool _hideUI;
 
-    [ObjectBinding("litePreference.data.bSmoothBG")]
-    public bool SmoothBackground { get; set; }
+    [ObjectBinding("litePreference.data.bMonsType", HasSetter = true)]
+    private bool _showMonsterType;
 
-    [ObjectBinding("litePreference.data.bUntargetSelf")]
-    public bool UntargetSelf { get; set; }
+    [ObjectBinding("litePreference.data.bSmoothBG", HasSetter = true)]
+    private bool _smoothBackground;
 
-    [ObjectBinding("litePreference.data.bUntargetDead")]
-    public bool UntargetDead { get; set; }
+    [ObjectBinding("litePreference.data.bUntargetSelf", HasSetter = true)]
+    private bool _untargetSelf;
 
-    [ObjectBinding("litePreference.data.bDisSkillAnim")]
-    public bool DisableSkillAnimations { get; set; }
+    [ObjectBinding("litePreference.data.bUntargetDead", HasSetter = true)]
+    private bool _untargetDead;
 
-    [ObjectBinding("litePreference.data.bCustomDrops")]
-    public bool CustomDropsUI { get; set; }
+    [ObjectBinding("litePreference.data.bDisSkillAnim", HasSetter = true)]
+    private bool _disableSkillAnimations;
 
-    [ObjectBinding("litePreference.data.bDisDmgStrobe")]
-    public bool DisableDamageStrobe { get; set; }
+    [ObjectBinding("litePreference.data.bCustomDrops", HasSetter = true)]
+    private bool _customDropsUI;
 
-    [ObjectBinding("litePreference.data.bDisMonAnim")]
-    public bool DisableMonsterAnimation { get; set; }
+    [ObjectBinding("litePreference.data.bDisDmgStrobe", HasSetter = true)]
+    private bool _disableDamageStrobe;
 
-    [ObjectBinding("litePreference.data.bDisSelfMAnim")]
-    public bool DisableSelfAnimation { get; set; }
+    [ObjectBinding("litePreference.data.bDisMonAnim", HasSetter = true)]
+    private bool _disableMonsterAnimation;
 
-    [ObjectBinding("litePreference.data.bDisSkillAnim")]
-    public bool DisableSkillAnimation { get; set; }
+    [ObjectBinding("litePreference.data.bDisSelfMAnim", HasSetter = true)]
+    private bool _disableSelfAnimation;
 
-    [ObjectBinding("litePreference.data.bDisWepAnim")]
-    public bool DisableWeaponAnimation { get; set; }
+    [ObjectBinding("litePreference.data.bDisSkillAnim", HasSetter = true)]
+    private bool _disableSkillAnimation;
 
-    [ObjectBinding("litePreference.data.bFreezeMons")]
-    public bool FreezeMonsterPosition { get; set; }
+    [ObjectBinding("litePreference.data.bDisWepAnim", HasSetter = true)]
+    private bool _disableWeaponAnimation;
 
-    [ObjectBinding("litePreference.data.bHideMons")]
-    public bool InvisibleMonsters { get; set; }
+    [ObjectBinding("litePreference.data.bFreezeMons", HasSetter = true)]
+    private bool _freezeMonsterPosition;
 
-    [ObjectBinding("litePreference.data.bHidePlayers")]
-    public bool HidePlayers { get; set; }
+    [ObjectBinding("litePreference.data.bHideMons", HasSetter = true)]
+    private bool _invisibleMonsters;
 
-    [ObjectBinding("litePreference.data.bReaccept")]
-    public bool ReacceptQuest { get; set; }
+    [ObjectBinding("litePreference.data.bHidePlayers", HasSetter = true)]
+    private bool _hidePlayers;
 
-    [ObjectBinding("litePreference.data.bCharSelect")]
-    public bool CharacterSelectScreen { get; set; }
+    [ObjectBinding("litePreference.data.bReaccept", HasSetter = true)]
+    private bool _reacceptQuest;
 
-    [ObjectBinding("litePreference.data.dOptions[\"disRed\"]")]
-    public bool DisableRedWarning { get; set; }
+    [ObjectBinding("litePreference.data.bCharSelect", HasSetter = true)]
+    private bool _characterSelectScreen;
+
+    [ObjectBinding("litePreference.data.dOptions[\"disRed\"]", HasSetter = true)]
+    private bool _disableRedWarning;
 
     public T? Get<T>(string optionName)
     {
-        return Bot.Flash.GetGameObject<T>($"litePreference.data.{optionName}");
+        return Flash.GetGameObject<T>($"litePreference.data.{optionName}");
     }
 
     public void Set<T>(string optionName, T value)
     {
-        Bot.Flash.SetGameObject($"litePreference.data.{optionName}", value!);
+        Flash.SetGameObject($"litePreference.data.{optionName}", value!);
     }
 }

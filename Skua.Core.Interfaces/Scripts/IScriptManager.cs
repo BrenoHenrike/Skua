@@ -1,6 +1,11 @@
 ﻿namespace Skua.Core.Interfaces;
 public interface IScriptManager
 {
+    public event Action<bool> ApplicationShutDown;
+    /// <summary>
+    /// Whether the current script should terminate.
+    /// </summary>
+    bool ShouldExit { get; }
     /// <summary>
     /// Whether the script is running.
     /// </summary>
@@ -18,8 +23,8 @@ public interface IScriptManager
     event Action<bool>? ScriptStopped;
     event Action<Exception>? ScriptError;
 
-    Task<Exception> StartScriptAsync();
-    Task<Exception> RestartScriptAsync();
-    void StopScript();
-    object? Compile(string script);
+    Task<Exception?> StartScriptAsync();
+    Task<Exception?> RestartScriptAsync();
+    void StopScript(bool runScriptStoppingEvent = true);
+    object? Compile(string source);
 }

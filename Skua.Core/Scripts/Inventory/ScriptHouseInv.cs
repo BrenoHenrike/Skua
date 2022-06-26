@@ -1,22 +1,55 @@
-﻿using Skua.Core.PostSharp;
+﻿using Skua.Core.Flash;
 using Skua.Core.Interfaces;
 using Skua.Core.Models.Items;
 
 namespace Skua.Core.Scripts;
-public class ScriptHouseInv : ScriptableObject, IScriptHouseInv
+public partial class ScriptHouseInv : IScriptHouseInv
 {
-    [ObjectBinding("world.myAvatar.houseitems")]
-    public List<InventoryItem> Items { get; } = new();
+    private readonly Lazy<IFlashUtil> _lazyFlash;
+    private readonly Lazy<IScriptSend> _lazySend;
+    private readonly Lazy<IScriptOption> _lazyOptions;
+    private readonly Lazy<IScriptWait> _lazyWait;
+    private readonly Lazy<IScriptMap> _lazyMap;
+    private readonly Lazy<IScriptManager> _lazyManager;
+    private readonly Lazy<IScriptPlayer> _lazyPlayer;
+    private IFlashUtil Flash => _lazyFlash.Value;
+    private IScriptOption Options => _lazyOptions.Value;
+    private IScriptWait Wait => _lazyWait.Value;
+    private IScriptMap Map => _lazyMap.Value;
+    private IScriptManager Manager => _lazyManager.Value;
+    private IScriptPlayer Player => _lazyPlayer.Value;
+    private IScriptSend Send => _lazySend.Value;
+
+    public ScriptHouseInv(
+        Lazy<IFlashUtil> flash,
+        Lazy<IScriptSend> send,
+        Lazy<IScriptOption> options,
+        Lazy<IScriptWait> wait,
+        Lazy<IScriptMap> map,
+        Lazy<IScriptManager> manager,
+        Lazy<IScriptPlayer> player)
+    {
+        _lazyFlash = flash;
+        _lazySend = send;
+        _lazyOptions = options;
+        _lazyWait = wait;
+        _lazyMap = map;
+        _lazyManager = manager;
+        _lazyPlayer = player;
+    }
+
+    [ObjectBinding("world.myAvatar.houseitems", Default = "new()")]
+    private List<InventoryItem> _items;
     [ObjectBinding("world.myAvatar.objData.iHouseSlots")]
-    public int Slots { get; }
+    private int _slots;
     [ObjectBinding("world.myAvatar.houseitems.length")]
-    public int UsedSlots { get; }
+    private int _usedSlots;
 
     public bool ToBank(InventoryItem item)
     {
-        Bot.Send.Packet($"%xt%zm%bankFromInv%{Bot.Map.RoomID}%{item.ID}%{item.CharItemID}%");
-        if (Bot.Options.SafeTimings)
-            Bot.Wait.ForHouseInventoryToBank(item.Name);
+        Send.Packet($"%xt%zm%bankFromInv%{Map.RoomID}%{item.ID}%{item.CharItemID}%");
+        if (Options.SafeTimings)
+            Wait.ForHouseInventoryToBank(item.Name);
         return !((IScriptHouseInv)this).Contains(item.Name);
     }
 
@@ -25,8 +58,8 @@ public class ScriptHouseInv : ScriptableObject, IScriptHouseInv
         if (!((IScriptHouseInv)this).TryGetItem(name, out InventoryItem? item))
             return;
         int i = 0;
-        while (!ToBank(item!) && !Bot.ShouldExit && Bot.Player.Playing && ++i < Bot.Options.MaximumTries)
-            Bot.Sleep(Bot.Options.ActionDelay);
+        while (!ToBank(item!) && !Manager.ShouldExit && Player.Playing && ++i < Options.MaximumTries)
+            Thread.Sleep(Options.ActionDelay);
     }
 
     public void EnsureToBank(int id)
@@ -34,7 +67,7 @@ public class ScriptHouseInv : ScriptableObject, IScriptHouseInv
         if (!((IScriptHouseInv)this).TryGetItem(id, out InventoryItem? item))
             return;
         int i = 0;
-        while (!ToBank(item!) && !Bot.ShouldExit && Bot.Player.Playing && ++i < Bot.Options.MaximumTries)
-            Bot.Sleep(Bot.Options.ActionDelay);
+        while (!ToBank(item!) && !Manager.ShouldExit && Player.Playing && ++i < Options.MaximumTries)
+            Thread.Sleep(Options.ActionDelay);
     }
 }

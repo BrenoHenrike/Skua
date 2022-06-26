@@ -1,23 +1,44 @@
 ﻿using Skua.Core.Interfaces;
 using Skua.Core.Models.Monsters;
-using Skua.Core.PostSharp;
+using Skua.Core.Flash;
 
 namespace Skua.Core.Scripts;
 
-public class ScriptMonster : ScriptableObject, IScriptMonster
+public partial class ScriptMonster : IScriptMonster
 {
-    [ObjectBinding("world.monsters", Select = "objData")]
-    public List<Monster> MapMonsters { get; } = new();
-    public List<Monster> CurrentMonsters => MapMonsters.FindAll(m => m.Cell == Bot.Player.Cell);
+    private readonly Lazy<IFlashUtil> _lazyFlash;
+    private readonly Lazy<IScriptMap> _lazyMap;
+    private readonly Lazy<IScriptPlayer> _lazyPlayer;
+
+    private IFlashUtil Flash => _lazyFlash.Value;
+    private IScriptMap Map => _lazyMap.Value;
+    private IScriptPlayer Player => _lazyPlayer.Value;
+
+    public ScriptMonster(
+        Lazy<IFlashUtil> flash,
+        Lazy<IScriptMap> map,
+        Lazy<IScriptPlayer> player)
+    {
+        _lazyFlash = flash;
+        _lazyMap = map;
+        _lazyPlayer = player;
+    }
+
+    [ObjectBinding("world.monsters", Select = "objData", Default = "new()")]
+    private List<Monster> _mapMonsters;
+
+    public List<Monster> CurrentMonsters => MapMonsters?.FindAll(m => m.Cell == Player.Cell) ?? new();
 
     public Dictionary<string, List<Monster>> GetCellMonsters()
     {
+        if (Map.Cells is null)
+            return new();
         Dictionary<string, List<Monster>> monsters = new();
-        foreach (string cell in Bot.Map.Cells)
+        foreach (string cell in Map.Cells)
             monsters[cell] = ((IScriptMonster)this).GetMonstersByCell(cell);
         return monsters;
     }
 
-    [MethodCallBinding("availableMonsters", ForceJSON = true)]
-    public List<Monster> CurrentAvailableMonsters() => new();
+    [MethodCallBinding("availableMonsters", ParseFromJson = true, Default = "new()")]
+    private List<Monster> _currentAvailableMonsters() => new();
 }

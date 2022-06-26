@@ -48,7 +48,18 @@ public class ItemBase
     /// The category of the item.
     /// </summary>
     [JsonProperty("sType")]
-    public virtual ItemCategory Category { get; set; }
+    public virtual string CategoryString { get; set; }
+    private ItemCategory? _category = null;
+    public virtual ItemCategory Category
+    {
+        get
+        {
+            if (_category is not null)
+                return (ItemCategory)_category;
+
+            return (ItemCategory)(_category = Enum.TryParse(CategoryString, true, out ItemCategory result) ? result : ItemCategory.Unknown);
+        }
+    }
     /// <summary>
     /// Indicates if the item is a temporary item.
     /// </summary>
@@ -64,5 +75,10 @@ public class ItemBase
     public override string ToString()
     {
         return $"{Name} [{ID}] x {Quantity}";
+    }
+
+    public bool Equals(ItemBase? other)
+    {
+        return other is not null && ID == other.ID;
     }
 }

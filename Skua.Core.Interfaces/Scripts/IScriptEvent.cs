@@ -2,7 +2,7 @@
 
 namespace Skua.Core.Interfaces;
 
-// TODO Might move that somewhere
+public delegate void LogoutEventHandler();
 public delegate void PlayerDeathEventHandler();
 public delegate void MonsterKilledEventHandler();
 public delegate void QuestAcceptedEventHandler(int questId);
@@ -20,6 +20,10 @@ public delegate void RunToAreaHandler(string zone);
 
 public interface IScriptEvent
 {
+    /// <summary>
+    /// Occurs when the player log out of the game.
+    /// </summary>
+    event LogoutEventHandler Logout;
     /// <summary>
     /// Occurs when the player dies.
     /// </summary>
@@ -84,6 +88,7 @@ public interface IScriptEvent
     /// Clear all of the event handler subscribers.
     /// </summary>
     void ClearHandlers();
+    void OnLogout();
     void OnCellChanged(string map, string cell, string pad);
     void OnCounterAttack(bool faded);
     void OnExtensionPacket(dynamic packet);

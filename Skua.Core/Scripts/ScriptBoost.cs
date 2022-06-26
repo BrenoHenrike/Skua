@@ -2,8 +2,36 @@
 using Skua.Core.Models.Items;
 
 namespace Skua.Core.Scripts;
-public class ScriptBoost : ScriptableObject, IScriptBoost
+public class ScriptBoost : IScriptBoost
 {
+    private readonly Lazy<IScriptInventory> _lazyInventory;
+    private readonly Lazy<IScriptBank> _lazyBank;
+    private readonly Lazy<IScriptSend> _lazySend;
+    private readonly Lazy<IScriptWait> _lazyWait;
+    private readonly Lazy<IScriptMap> _lazyMap;
+    private readonly Lazy<IFlashUtil> _lazyFlash;
+    private IScriptInventory Inventory => _lazyInventory.Value;
+    private IScriptBank Bank => _lazyBank.Value;
+    private IScriptSend Send => _lazySend.Value;
+    private IScriptWait Wait => _lazyWait.Value;
+    private IScriptMap Map => _lazyMap.Value;
+    private IFlashUtil Flash => _lazyFlash.Value;
+    public ScriptBoost(
+        Lazy<IFlashUtil> flash,
+        Lazy<IScriptSend> send,
+        Lazy<IScriptMap> map,
+        Lazy<IScriptInventory> inventory,
+        Lazy<IScriptBank> bank,
+        Lazy<IScriptWait> wait)
+    {
+        _lazyInventory = inventory;
+        _lazyBank = bank;
+        _lazySend = send;
+        _lazyWait = wait;
+        _lazyMap = map;
+        _lazyFlash = flash;
+    }
+
     private Thread? BoostsThread;
     private CancellationTokenSource? BoostsCTS;
 
@@ -22,12 +50,12 @@ public class ScriptBoost : ScriptableObject, IScriptBoost
 
     public bool IsBoostActive(BoostType boost)
     {
-        return Bot.Flash.GetGameObject($"world.myAvatar.objData.{_boostMap[boost]}", 0) > 0;
+        return Flash.GetGameObject($"world.myAvatar.objData.{_boostMap[boost]}", 0) > 0;
     }
 
     public void UseBoost(int id)
     {
-        Bot.Send.Packet($"%xt%zm%serverUseItem%{Bot.Map.RoomID}%+%{id}%");
+        Send.Packet($"%xt%zm%serverUseItem%{Map.RoomID}%+%{id}%");
     }
 
     public int GetBoostID(BoostType boostType, bool searchBank = true)
@@ -44,19 +72,19 @@ public class ScriptBoost : ScriptableObject, IScriptBoost
 
     private int SearchBoost(string name, bool searchBank = true)
     {
-        int id = (Bot.Inventory.Items?
+        int id = (Inventory.Items?
                    .Where(i => i.Category == ItemCategory.ServerUse)
                    .Where(i => i.Name.Contains(name))
                    .FirstOrDefault())?.ID ?? 0;
         if (id == 0 && searchBank)
         {
-            if(!Bot.Bank.Loaded)
-                Bot.Bank.Load();
-            id = (Bot.Bank.Items?
+            if(!Bank.Loaded)
+                Bank.Load();
+            id = (Bank.Items?
                    .Where(i => i.Category == ItemCategory.ServerUse)
                    .Where(i => i.Name.Contains(name))
                    .FirstOrDefault())?.ID ?? 0;
-            Bot.Bank.EnsureToInventory(id, false);
+            Bank.EnsureToInventory(id, false);
         }
         return id;
     }
@@ -84,7 +112,7 @@ public class ScriptBoost : ScriptableObject, IScriptBoost
     {
         BoostsStopped?.Invoke();
         BoostsCTS?.Cancel();
-        Bot.Wait.ForTrue(() => !Enabled, 10);
+        Wait.ForTrue(() => !Enabled, 10);
     }
 
     private void Poll(CancellationToken token)
