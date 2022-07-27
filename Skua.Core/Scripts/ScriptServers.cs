@@ -8,22 +8,8 @@ using Microsoft.Toolkit.Mvvm.ComponentModel;
 
 namespace Skua.Core.Scripts;
 
-public partial class ScriptServers : ObservableObject, IScriptServers
+public partial class ScriptServers : ObservableRecipient, IScriptServers
 {
-    private readonly Lazy<IFlashUtil> _lazyFlash;
-    private readonly Lazy<IScriptPlayer> _lazyPlayer;
-    private readonly Lazy<IScriptWait> _lazyWait;
-    private readonly Lazy<IScriptOption> _lazyOptions;
-    private readonly Lazy<IScriptBotStats> _lazyStats;
-    private readonly Lazy<IScriptManager> _lazyManager;
-
-    private IFlashUtil Flash => _lazyFlash.Value;
-    private IScriptPlayer Player => _lazyPlayer.Value;
-    private IScriptWait Wait => _lazyWait.Value;
-    private IScriptOption Options => _lazyOptions.Value;
-    private IScriptBotStats Stats => _lazyStats.Value;
-    private IScriptManager Manager => _lazyManager.Value;
-
     public ScriptServers(
         Lazy<IFlashUtil> flash,
         Lazy<IScriptPlayer> player,
@@ -40,13 +26,31 @@ public partial class ScriptServers : ObservableObject, IScriptServers
         _lazyManager = manager;
     }
 
+    private readonly Lazy<IFlashUtil> _lazyFlash;
+    private readonly Lazy<IScriptPlayer> _lazyPlayer;
+    private readonly Lazy<IScriptWait> _lazyWait;
+    private readonly Lazy<IScriptOption> _lazyOptions;
+    private readonly Lazy<IScriptBotStats> _lazyStats;
+    private readonly Lazy<IScriptManager> _lazyManager;
+
+    private IFlashUtil Flash => _lazyFlash.Value;
+    private IScriptPlayer Player => _lazyPlayer.Value;
+    private IScriptWait Wait => _lazyWait.Value;
+    private IScriptOption Options => _lazyOptions.Value;
+    private IScriptBotStats Stats => _lazyStats.Value;
+    private IScriptManager Manager => _lazyManager.Value;
+
     public string LastIP { get; set; } = default!;
     public string LastName { get; set; } = default!;
     [ObjectBinding("serialCmd.servers")]
     private List<Server> _serverList = new();
 
-    [ObservableProperty]
     private List<Server> _CachedServers = new();
+    public List<Server> CachedServers
+    {
+        get { return _CachedServers; }
+        set { SetProperty(ref _CachedServers, value, true); }
+    }
 
     public async ValueTask<List<Server>> GetServers(bool forceUpdate = false)
     {
@@ -54,9 +58,7 @@ public partial class ScriptServers : ObservableObject, IScriptServers
             return CachedServers;
 
         string? response = await HttpClients.GetGHClient().GetStringAsync($"http://content.aq.com/game/api/data/servers").ConfigureAwait(false);
-        if (response is null)
-            return new();
-        return CachedServers = JsonConvert.DeserializeObject<List<Server>>(response)!;
+        return response is null ? new() : CachedServers = JsonConvert.DeserializeObject<List<Server>>(response)!;
     }
 
     [MethodCallBinding("login", GameFunction = true)]
@@ -94,7 +96,7 @@ public partial class ScriptServers : ObservableObject, IScriptServers
     public bool Relogin(Server? server = null)
     {
         if (server is null)
-            server = Options.AutoReloginAny ? ServerList.Find(x => x.IP != LastIP)! : Options.LoginServer ?? ServerList[0];
+            server = Options.AutoReloginAny ? ServerList.Find(x => x.IP != LastIP)! : CachedServers.First(s => s.Name == Options.ReloginServer) ?? ServerList[0];
         return ReloginIP(server.IP);
     }
 
@@ -118,7 +120,7 @@ public partial class ScriptServers : ObservableObject, IScriptServers
         Server s = ServerList.Find(x => x.Name.Contains(serverName))!;
         if (s is not null)
             return ReloginIP(s.IP);
-        Debug.WriteLine($"Server with name \"{serverName}\" was not found.");
+        Trace.WriteLine($"Server with name \"{serverName}\" was not found.");
         return false;
     }
 
@@ -134,16 +136,25 @@ public partial class ScriptServers : ObservableObject, IScriptServers
     public async Task<bool> EnsureRelogin(CancellationToken token)
     {
         int tries = 0;
-        while (!token.IsCancellationRequested && Manager.ShouldExit && !Player.Playing && ++tries < Options.ReloginTries)
+        await GetServers(true);
+        try
         {
-            Login(Player.Username, Player.Password);
-            await Task.Delay(2000, token);
-            await GetServers(true);
-            Server server = Options.AutoReloginAny ? ServerList.Find(x => x.IP != LastIP)! : Options.LoginServer ?? ServerList[0];
-            ConnectIP(server.IP);
-            while ((!Player.Playing || !Flash.IsWorldLoaded) && !token.IsCancellationRequested)
-                await Task.Delay(500, token);
+            while (!token.IsCancellationRequested && !Manager.ShouldExit && !Player.Playing && ++tries < Options.ReloginTries)
+            {
+                Login();
+                await Task.Delay(2000, token);
+                Server server = Options.AutoReloginAny ? ServerList.Find(x => x.IP != LastIP)! : CachedServers.First(s => s.Name == Options.ReloginServer) ?? ServerList[0];
+                ConnectIP(server.IP);
+                using CancellationTokenSource waitLogin = new(Options.LoginTimeout);
+                try
+                {
+                    while ((!Player.Playing || !Flash.IsWorldLoaded) && !waitLogin.IsCancellationRequested)
+                        await Task.Delay(500, token);
+                }
+                catch { }
+            }
         }
+        catch { }
         return Player.Playing;
     }
 }

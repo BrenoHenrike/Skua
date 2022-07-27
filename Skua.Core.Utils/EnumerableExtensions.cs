@@ -1,7 +1,6 @@
 ﻿namespace Skua.Core.Utils;
 
 public delegate void Consumer<T>(T arg);
-// TODO Documentation
 public static class EnumerableExtensions
 {
     public static void ForEach<T>(this IEnumerable<T> enumerable, Consumer<T> func)

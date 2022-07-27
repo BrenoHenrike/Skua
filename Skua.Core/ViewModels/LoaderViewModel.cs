@@ -4,11 +4,10 @@ using Skua.Core.Models.Quests;
 using Skua.Core.Utils;
 
 namespace Skua.Core.ViewModels;
-public class LoaderViewModel : BotControlViewModelBase
+public class LoaderViewModel : BotControlViewModelBase, IManagedWindow
 {
-    private CancellationTokenSource? _loaderCTS;
     public LoaderViewModel(IScriptShop shops, IScriptQuest quests, IQuestDataLoaderService questLoader, IClipboardService clipboardService)
-        : base("Loader")
+        : base("Loader", 550, 270)
     {
         Shops = shops;
         Quests = quests;
@@ -18,8 +17,8 @@ public class LoaderViewModel : BotControlViewModelBase
         LoadQuestsCommand = new RelayCommand<IList<object>>(LoadQuests);
         CopyQuestsIDsCommand = new RelayCommand<IList<object>>(CopyQuestIDs);
         CopyQuestsNamesCommand = new RelayCommand<IList<object>>(CopyQuestNames);
-        // TODO real caching
         UpdateQuestsCommand = new AsyncRelayCommand<bool>(UpdateQuests);
+        GetQuestsCommand = new AsyncRelayCommand(GetQuests);
         CancelQuestLoadCommand = new RelayCommand(() =>
         {
             if(_loaderCTS is not null)
@@ -30,6 +29,7 @@ public class LoaderViewModel : BotControlViewModelBase
         });
     }
 
+    private CancellationTokenSource? _loaderCTS;
     private readonly IScriptShop Shops;
     private readonly IScriptQuest Quests;
     private readonly IQuestDataLoaderService _questLoader;
@@ -74,7 +74,9 @@ public class LoaderViewModel : BotControlViewModelBase
     public IRelayCommand CopyQuestsIDsCommand { get; }
     public IRelayCommand CopyQuestsNamesCommand { get; }
     public IAsyncRelayCommand UpdateQuestsCommand { get; }
+    public IAsyncRelayCommand GetQuestsCommand { get; }
     public IRelayCommand CancelQuestLoadCommand { get; }
+
     private void Load()
     {
         if (SelectedIndex == 0 && int.TryParse(InputIDs, out int id))
@@ -132,5 +134,13 @@ public class LoaderViewModel : BotControlViewModelBase
         ProgressReport = string.Empty;
         _loaderCTS.Dispose();
         _loaderCTS = null;
+    }
+
+    private async Task GetQuests()
+    {
+        QuestIDs.Clear();
+        ProgressReport = "Getting quests";
+        QuestIDs.AddRange(await _questLoader.GetFromFileAsync("Quests.txt"));
+        ProgressReport = string.Empty;
     }
 }

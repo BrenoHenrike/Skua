@@ -12,5 +12,5 @@ public partial class ScriptTempInv : IScriptTempInv
         _lazyFlash = flash;
     }
     [ObjectBinding("world.myAvatar.tempitems", Default = "new()")]
-    private List<ItemBase> _items;
+    private List<ItemBase>? _items;
 }

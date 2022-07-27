@@ -1,18 +1,32 @@
 ﻿using System.Collections.Immutable;
 using System.ComponentModel;
 using Skua.Core.Models;
-using Skua.Core.Models.Servers;
 
 namespace Skua.Core.Interfaces;
 
 public interface IScriptOption : INotifyPropertyChanged
 {
-    ImmutableDictionary<string, Func<object>> OptionsDictionary { get; }
+    ImmutableDictionary<string, Func<object>> OptionDictionary { get; }
+    /// <summary>
+    /// Delay between relogin tries using <see cref="IScriptServers.EnsureRelogin"/>.
+    /// </summary>
     int ReloginTryDelay { get; set; }
+    /// <summary>
+    /// Timeout 
+    /// </summary>
+    int LoginTimeout { get; set; }
     /// <summary>
     /// When enabled will pickup any AC item that drops, even when the drop should be rejected.
     /// </summary>
     bool AcceptACDrops { get; set; }
+    /// <summary>
+    /// When enabled will pickup any item that drops.
+    /// </summary>
+    bool AcceptAllDrops { get; set; }
+    /// <summary>
+    /// When enabled will reject all items that drops (if <see cref="AcceptACDrops" /> is <see langword="true"/> will first accept AC items and then reject).
+    /// </summary>
+    bool RejectAllDrops { get; set; }
     /// <summary>
     /// Determines whether all monsters in the MAP should be aggroed (provoked). They will all attack you at the same time.
     /// </summary>
@@ -103,7 +117,7 @@ public interface IScriptOption : INotifyPropertyChanged
     /// <summary>
     /// The server to relogin to.
     /// </summary>
-    Server LoginServer { get; set; }
+    string? ReloginServer { get; set; }
     /// <summary>
     /// When enabled, this will cause all targeted monsters to teleport to you.
     /// </summary>
@@ -134,6 +148,10 @@ public interface IScriptOption : INotifyPropertyChanged
     /// </summary>
     int SetFPS { get; set; }
     /// <summary>
+    /// Whether to show the in-game FPS counter
+    /// </summary>
+    bool ShowFPS { get; set; }
+    /// <summary>
     /// Determines whether cutsenes should be skipped.
     /// </summary>
     bool SkipCutscenes { get; set; }
@@ -161,5 +179,16 @@ public interface IScriptOption : INotifyPropertyChanged
     /// The priority mode for hunting.
     /// </summary>
     HuntPriorities HuntPriority { get; set; }
-    void ResetOptions();
+    /// <summary>
+    /// Resets the options to the user defined defaults. If no user settings are found, uses the application default values.
+    /// </summary>
+    void Reset();
+    /// <summary>
+    /// Resets the options to the application default values.
+    /// </summary>
+    void ResetToDefault();
+    /// <summary>
+    /// Saves the current options to the user settings.
+    /// </summary>
+    void Save();
 }

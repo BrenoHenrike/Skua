@@ -1,6 +1,7 @@
 ﻿using Skua.Core.Interfaces;
 using Skua.Core.Models.Monsters;
 using Skua.Core.Flash;
+using Newtonsoft.Json;
 
 namespace Skua.Core.Scripts;
 
@@ -25,8 +26,15 @@ public partial class ScriptMonster : IScriptMonster
     }
 
     [ObjectBinding("world.monsters", Select = "objData", Default = "new()")]
-    private List<Monster> _mapMonsters;
-
+    private List<Monster> _mapMonsters = new();
+    public List<Monster> CurrentAvailableMonsters
+    {
+        get
+        {
+            string? monsters = Flash.Call("availableMonsters");
+            return string.IsNullOrEmpty(monsters) ? new() : JsonConvert.DeserializeObject<List<Monster>>(monsters) ?? new();
+        }
+    }
     public List<Monster> CurrentMonsters => MapMonsters?.FindAll(m => m.Cell == Player.Cell) ?? new();
 
     public Dictionary<string, List<Monster>> GetCellMonsters()
@@ -38,7 +46,4 @@ public partial class ScriptMonster : IScriptMonster
             monsters[cell] = ((IScriptMonster)this).GetMonstersByCell(cell);
         return monsters;
     }
-
-    [MethodCallBinding("availableMonsters", ParseFromJson = true, Default = "new()")]
-    private List<Monster> _currentAvailableMonsters() => new();
 }

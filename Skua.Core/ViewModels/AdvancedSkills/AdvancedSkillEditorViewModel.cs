@@ -1,14 +1,17 @@
 ﻿using Microsoft.Toolkit.Mvvm.ComponentModel;
+using Microsoft.Toolkit.Mvvm.Messaging;
 using Microsoft.Toolkit.Mvvm.Input;
 using Skua.Core.Interfaces;
 using Skua.Core.Models.Skills;
 using Skua.Core.Utils;
+using Skua.Core.Messaging;
 
 namespace Skua.Core.ViewModels;
 public class AdvancedSkillEditorViewModel : ObservableRecipient
 {
-    public AdvancedSkillEditorViewModel(IDialogService dialogService, SkillRulesViewModel rules)
+    public AdvancedSkillEditorViewModel(IDialogService dialogService)
     {
+        Messenger.Register<AdvancedSkillEditorViewModel, EditAdvancedSkillMessage>(this, Edit);
         ClassUseModes = new[]
         {
             "Base",
@@ -18,7 +21,7 @@ public class AdvancedSkillEditorViewModel : ObservableRecipient
             "Solo",
             "Support"
         };
-        UseRules = rules;
+        UseRules = new();
         AddSkillToCurrentCommand = new RelayCommand<string>(AddSkill);
         SaveSkillsCommand = new RelayCommand(SaveSkills);
         MoveSkillDownCommand = new RelayCommand(MoveSkillDown);
@@ -31,11 +34,23 @@ public class AdvancedSkillEditorViewModel : ObservableRecipient
         _dialogService = dialogService;
     }
 
+    private SkillRuleEditorDialogViewModel _editDialog;
+
+    private void Edit(AdvancedSkillEditorViewModel recipient, EditAdvancedSkillMessage message)
+    {
+        recipient.CurrentSkillsList.Clear();
+        recipient.CurrentSkillTimeout = message.AdvSkill.SkillTimeout;
+        recipient.UseWaitModeBool = message.AdvSkill.SkillUseMode == SkillUseMode.UseIfAvailable ? false : true;
+        recipient.CurrentClassName = message.AdvSkill.ClassName;
+        recipient.SelectedClassUseMode = (int)message.AdvSkill.ClassUseMode;
+        recipient.CurrentSkillsList.AddRange(message.AdvSkill.Skills.Split(new[] { '|' }, StringSplitOptions.RemoveEmptyEntries).Select(s => new SkillItemViewModel(s.Trim())));
+    }
+
     private void EditSkill()
     {
         if (SelectedSkill is null)
             return;
-        UseRuleEditorDialogViewModel toEdit = new(SelectedSkill.UseRules);
+        SkillRuleEditorDialogViewModel toEdit = new(new(SelectedSkill.UseRules));
         if (_dialogService.ShowDialog(toEdit) == true)
             SelectedSkill.UseRules = toEdit.UseRules;
     }
@@ -44,8 +59,7 @@ public class AdvancedSkillEditorViewModel : ObservableRecipient
     {
         string skills = string.Join(" | ", _currentSkillsList.Select(s => s.Convert()));
         AdvancedSkill advSkill = new(CurrentClassName, skills, CurrentSkillTimeout, SelectedClassUseMode, UseWaitModeBool ? SkillUseMode.WaitForCooldown : SkillUseMode.UseIfAvailable);
-        // TODO Send AdvSkill msg
-        //Messenger.Send<>();
+        Messenger.Send<SaveAdvancedSkillMessage>(new(advSkill));
     }
 
     private void AddSkill(string? value)
@@ -64,11 +78,11 @@ public class AdvancedSkillEditorViewModel : ObservableRecipient
         get { return _currentSkillTimeout; }
         set { SetProperty(ref _currentSkillTimeout, value); }
     }
-    private bool _useModeBool = true;
+    private bool _useWaitModeBool;
     public bool UseWaitModeBool
     {
-        get { return _useModeBool; }
-        set { SetProperty(ref _useModeBool, value); }
+        get { return _useWaitModeBool; }
+        set { SetProperty(ref _useWaitModeBool, value); }
     }
     public SkillRulesViewModel UseRules { get; }
 

@@ -1,8 +1,9 @@
-﻿using Skua.Core.Models.Quests;
+﻿using System.ComponentModel;
+using Skua.Core.Models.Quests;
 
 namespace Skua.Core.Interfaces;
 
-public interface IScriptQuest
+public interface IScriptQuest : INotifyPropertyChanged
 {
     /// <summary>
     /// The interval, in milliseconds, at which to complete the <see cref="Registered"/> quests.
@@ -27,7 +28,7 @@ public interface IScriptQuest
     /// <summary>
     /// List of IDs of the current registered quests to complete automatically.
     /// </summary>
-    List<int> Registered { get; }
+    IEnumerable<int> Registered { get; }
 
     /// <summary>
     /// Register quests to be completed while doing another actions, this enables the possibility to complete quests while in combat.
@@ -42,7 +43,7 @@ public interface IScriptQuest
     /// <summary>
     /// Removes all registered quests from the <see cref="Registered">list</see>
     /// </summary>
-    void ClearRegisteredQuests();
+    void UnregisterAllQuests();
 
     /// <summary>
     /// Accepts the quest with specified <paramref name="id"/>.

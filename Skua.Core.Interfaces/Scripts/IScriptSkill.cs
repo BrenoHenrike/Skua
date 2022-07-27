@@ -54,6 +54,7 @@ public interface IScriptSkill
     /// <param name="skills">String of the skills</param>
     /// <param name="skillTimeout">Timeout in multiples of <see cref="SkillInterval"/> milliseconds before skipping the current unavailable skill when using <see cref="SkillUseMode.WaitForCooldown"/>.</param>
     void LoadAdvanced(string skills, int skillTimeout = -1, SkillUseMode skillMode = SkillUseMode.UseIfAvailable);
+
     /// <summary>
     /// Loads the skills of the specified <paramref name="className"/> from AdvancedSkills.txt.
     /// </summary>

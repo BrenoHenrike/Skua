@@ -6,6 +6,8 @@ using Skua.Core.Models.Items;
 using Skua.Core.Models.Players;
 using Skua.Core.Flash;
 using Skua.Core.Models;
+using Microsoft.Toolkit.Mvvm.Messaging;
+using Skua.Core.Messaging;
 
 namespace Skua.Core.Scripts;
 public partial class ScriptPlayer : IScriptPlayer
@@ -15,6 +17,7 @@ public partial class ScriptPlayer : IScriptPlayer
     private readonly Lazy<IScriptOption> _lazyOptions;
     private readonly Lazy<IScriptWait> _lazyWait;
     private readonly Lazy<IScriptInventory> _lazyInventory;
+    private readonly IMessenger _messenger;
     private Lazy<string> _lazyUserName;
     private Lazy<string> _lazyPassword;
     private Lazy<(string UserName, string Password, string Guild)> _lazyLoginInfo;
@@ -29,16 +32,19 @@ public partial class ScriptPlayer : IScriptPlayer
         Lazy<IScriptEvent> events,
         Lazy<IScriptOption> options,
         Lazy<IScriptWait> wait,
-        Lazy<IScriptInventory> inventory)
+        Lazy<IScriptInventory> inventory,
+        IMessenger messenger)
     {
         _lazyFlash = flash;
         _lazyEvents = events;
         _lazyOptions = options;
         _lazyWait = wait;
         _lazyInventory = inventory;
+        _messenger = messenger;
         _lazyLoginInfo = new Lazy<(string UserName, string Password, string Guild)>(GetLoginInfo);
-    }
 
+        _messenger.Register<ScriptPlayer, LogoutMessage>(this, ResetInfo);
+    }
 
     [ObjectBinding("world.myAvatar.uid")]
     private int _ID;
@@ -174,15 +180,13 @@ public partial class ScriptPlayer : IScriptPlayer
     [MethodCallBinding("world.goto", GameFunction = true)]
     private void _goto(string name) { }
 
-    private void ResetLoginInfo()
+    private void ResetInfo(ScriptPlayer recipient, LogoutMessage message)
     {
-        Events.Logout -= ResetLoginInfo;
-        _lazyLoginInfo = new(GetLoginInfo);
+        recipient._lazyLoginInfo = new(recipient.GetLoginInfo);
     }
 
     private (string UserName, string Password, string Guild) GetLoginInfo()
     {
-        Events.Logout += ResetLoginInfo;
-        return (Flash.GetGameObjectStatic("loginInfo.strUsername", string.Empty)!, Flash.GetGameObjectStatic("loginInfo.strPassword", string.Empty)!, Flash.GetGameObject<string>("world.myAvatar.pMC.pname.tg.text").Replace("&lt; ", "< ").Replace(" &gt;", " >"));
+        return (Flash.GetGameObjectStatic("loginInfo.strUsername", string.Empty)!, Flash.GetGameObjectStatic("loginInfo.strPassword", string.Empty)!, Flash.GetGameObject<string>("world.myAvatar.pMC.pname.tg.text")?.Replace("&lt; ", "< ").Replace(" &gt;", " >") ?? string.Empty);
     }
 }

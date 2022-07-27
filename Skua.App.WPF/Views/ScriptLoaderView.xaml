@@ -1,0 +1,108 @@
+﻿<UserControl
+    x:Class="Skua.App.WPF.Views.ScriptLoaderView"
+    xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+    xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+    xmlns:local="clr-namespace:Skua.App.WPF.Views"
+    xmlns:materialDesign="http://materialdesigninxaml.net/winfx/xaml/themes"
+    xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+    xmlns:vms="clr-namespace:Skua.Core.ViewModels;assembly=Skua.Core"
+    xmlns:wpf="clr-namespace:Skua.WPF;assembly=Skua.WPF"
+    d:DataContext="{d:DesignInstance vms:ScriptLoaderViewModel}"
+    d:DesignHeight="450"
+    d:DesignWidth="350"
+    mc:Ignorable="d">
+    <Grid Margin="6">
+        <Grid.RowDefinitions>
+            <RowDefinition Height="auto" />
+            <RowDefinition Height="auto" />
+            <RowDefinition />
+            <RowDefinition Height="auto" />
+        </Grid.RowDefinitions>
+        <StackPanel Grid.Row="0" HorizontalAlignment="Center">
+            <TextBlock
+                Margin="0,0,0,3"
+                HorizontalAlignment="Center"
+                Style="{StaticResource MaterialDesignHeadline6TextBlock}"
+                ToolTip="{Binding ScriptErrorToolTip}">
+                <Run Text="Status:" />
+                <Run Text="{Binding ScriptStatus, FallbackValue='[No script]'}" />
+            </TextBlock>
+            <TextBlock
+                Margin="0,3"
+                HorizontalAlignment="Center"
+                FontSize="20"
+                Text="{Binding LoadedScript, FallbackValue='No script loaded'}" />
+        </StackPanel>
+        <Grid Grid.Row="1" Margin="0,3">
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition />
+                <ColumnDefinition />
+            </Grid.ColumnDefinitions>
+            <Grid.RowDefinitions>
+                <RowDefinition Height="auto" />
+                <RowDefinition Height="auto" />
+                <RowDefinition Height="auto" />
+                <RowDefinition Height="auto" />
+            </Grid.RowDefinitions>
+            <Button
+                Grid.Row="0"
+                Grid.Column="0"
+                Margin="0,0,3,3"
+                Command="{Binding LoadScriptCommand}"
+                Content="Load Script" />
+            <Button
+                Grid.Row="0"
+                Grid.Column="1"
+                Margin="3,0,0,3"
+                Command="{Binding OpenVSCodeCommand}"
+                Content="Open VSCode" />
+            <Button
+                Grid.Row="1"
+                Grid.Column="0"
+                Margin="0,3,3,3"
+                Command="{Binding EditScriptCommand}"
+                Content="Edit Script" />
+            <Button
+                Grid.Row="1"
+                Grid.Column="1"
+                Margin="3,3,0,3"
+                Command="{Binding OpenScriptRepoCommand}"
+                Content="Get Scripts" />
+            <Button
+                Grid.Row="2"
+                Grid.Column="0"
+                Grid.ColumnSpan="2"
+                Margin="0,3"
+                Command="{Binding EditScriptConfigCommand}"
+                Content="Edit Script Options" />
+            <Button
+                Grid.Row="3"
+                Grid.Column="0"
+                Grid.ColumnSpan="2"
+                Margin="0,3,0,0"
+                Command="{Binding ToggleScriptAsyncCommand}"
+                IsEnabled="{Binding ToggleScriptEnabled}">
+                <Button.Style>
+                    <Style BasedOn="{StaticResource MaterialDesignRaisedButton}" TargetType="Button">
+                        <Setter Property="Content" Value="Start Script" />
+                        <Style.Triggers>
+                            <DataTrigger Binding="{Binding ScriptManager.ScriptRunning}" Value="True">
+                                <Setter Property="Content" Value="Stop Script" />
+                            </DataTrigger>
+                        </Style.Triggers>
+                    </Style>
+                </Button.Style>
+            </Button>
+        </Grid>
+        <ContentPresenter
+            Grid.Row="2"
+            Margin="0,3"
+            Content="{Binding ScriptLogs}" />
+        <Button
+            Grid.Row="3"
+            Margin="0,3,0,0"
+            Command="{Binding OpenBrowserFormCommand}"
+            Content="Report/Request Script" />
+    </Grid>
+</UserControl>

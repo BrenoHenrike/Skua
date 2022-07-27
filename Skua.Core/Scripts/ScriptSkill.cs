@@ -1,6 +1,5 @@
 ﻿using Skua.Core.Flash;
 using Skua.Core.Interfaces;
-using Skua.Core.Interfaces.Skills;
 using Skua.Core.Models.Skills;
 using Skua.Core.Skills;
 
@@ -72,16 +71,18 @@ public partial class ScriptSkill : IScriptSkill
         _provider = OverrideProvider ?? BaseProvider;
         if (SkillThread?.IsAlive ?? false)
             return;
-        SkillThread = new(() =>
+        SkillThread = new(async () =>
         {
             SkillsCTS = new();
-            _Timer(SkillsCTS.Token);
+            try
+            {
+                await _Timer(SkillsCTS.Token);
+            }
+            catch { }
             SkillsCTS.Dispose();
             SkillsCTS = null;
-        })
-        {
-            Name = "Skill Timer"
-        };
+        });
+        SkillThread.Name = "Skill Timer";
         SkillThread.Start();
     }
 
@@ -105,22 +106,28 @@ public partial class ScriptSkill : IScriptSkill
     public void LoadAdvanced(string className, bool autoEquip, ClassUseMode useMode = ClassUseMode.Base)
     {
         OverrideProvider = new AdvancedSkillProvider(Player, Combat);
+
+        if(className == "generic")
+        {
+            OverrideProvider.Load(genericSkills);
+            SkillUseMode = SkillUseMode.UseIfAvailable;
+            return;
+        }
+
         if (autoEquip)
             Inventory.EquipItem(className);
-        // TODO Implement Advanced Skills
-        //List<AdvancedSkill> skills = AdvancedSkillContainer.LoadedSkills?.Where(s => s.ClassName.ToLower() == className.ToLower()).ToList();
-        //if (skills is null || skills.Count == 0)
-        //{
-        //    OverrideProvider.Load(genericSkills);
-        //    SkillTimeout = -1;
-        //    SkillUseMode = SkillMode.UseIfAvailable;
-        //    return;
-        //}
 
-        //AdvancedSkill skill = skills.Find(s => s.ClassUseMode == useMode) ?? skills.FirstOrDefault()!;
-        //OverrideProvider.Load(skill.Skills);
-        //SkillTimeout = skill.SkillTimeout;
-        //SkillUseMode = skill.SkillUseMode;
+        List<AdvancedSkill> skills = AdvancedSkillContainer.LoadedSkills.Where(s => s.ClassName.ToLower() == className.ToLower()).ToList();
+        if (skills is null || skills.Count == 0)
+        {
+            OverrideProvider.Load(genericSkills);
+            SkillUseMode = SkillUseMode.UseIfAvailable;
+            return;
+        }
+        AdvancedSkill skill = skills.Find(s => s.ClassUseMode == useMode) ?? skills.FirstOrDefault()!;
+        OverrideProvider.Load(skill.Skills);
+        SkillTimeout = skill.SkillTimeout;
+        SkillUseMode = skill.SkillUseMode;
     }
 
     public void LoadAdvanced(string skills, int skillTimeout = -1, SkillUseMode skillMode = SkillUseMode.UseIfAvailable)
@@ -131,7 +138,7 @@ public partial class ScriptSkill : IScriptSkill
         OverrideProvider.Load(skills);
     }
 
-    private void _Timer(CancellationToken token)
+    private async Task _Timer(CancellationToken token)
     {
         while (!token.IsCancellationRequested)
         {
@@ -139,7 +146,7 @@ public partial class ScriptSkill : IScriptSkill
                 _Poll(token);
             _provider?.OnTargetReset();
             if (!token.IsCancellationRequested)
-                Thread.Sleep(SkillInterval);
+                await Task.Delay(SkillInterval, token);
         }
     }
 
@@ -184,11 +191,11 @@ public partial class ScriptSkill : IScriptSkill
             {
                 case SkillUseMode.UseIfAvailable:
                     if (Options.AttackWithoutTarget || CanUseSkill(skill))
-                        UseSkill(skill);
+                        this.UseSkill(skill);
                     break;
                 case SkillUseMode.WaitForCooldown:
                     if (Options.AttackWithoutTarget || (skill != -1 && Wait.ForTrue(() => CanUseSkill(skill), null, SkillTimeout, SkillInterval)))
-                        UseSkill(skill);
+                        this.UseSkill(skill);
                     break;
             }
         }

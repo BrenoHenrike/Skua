@@ -1,13 +1,12 @@
-﻿using Skua.Core.Models.Items;
+﻿using System.ComponentModel;
+using Skua.Core.Models.Items;
 
 namespace Skua.Core.Interfaces;
 
-public interface IScriptBoost
+public interface IScriptBoost : INotifyPropertyChanged
 {
-    event Action? BoostsStarted;
-    event Action? BoostsStopped;
     /// <summary>
-    /// Whether the boost thread is enabled.
+    /// Whether the boost timer is enabled.
     /// </summary>
     bool Enabled { get; }
     /// <summary>
@@ -50,6 +49,7 @@ public interface IScriptBoost
     /// Return the ID of the first boost found in the player's inventory.
     /// </summary>
     /// <param name="boostType">Type of the boost to search for.</param>
+    /// <param name="searchBank">Whether to search and move to the inventory if a boost is found.</param>
     /// <returns>The ID of the boost.</returns>
     int GetBoostID(BoostType boostType, bool searchBank = true);
     /// <summary>
@@ -69,41 +69,60 @@ public interface IScriptBoost
         SetReputationBoostID();
     }
     /// <summary>
+    /// Get and set all four boost types to the first boost found in the inventory.
+    /// </summary>
+    /// <param name="searchBank">Whether to search and move to the inventory if a boost is found.</param>
+    void SetAllBoostsIDs(bool searchBank)
+    {
+        SetClassBoostID(searchBank);
+        SetGoldBoostID(searchBank);
+        SetExperienceBoostID(searchBank);
+        SetReputationBoostID(searchBank);
+    }
+    /// <summary>
     /// Get and set <see cref="ClassBoostID"/> to the first boost found in the inventory.
     /// </summary>
-    void SetClassBoostID()
+    /// <param name="searchBank">Whether to search and move to the inventory if a boost is found.</param>
+    void SetClassBoostID(bool searchBank = true)
     {
-        ClassBoostID = GetBoostID(BoostType.Class);
+        ClassBoostID = GetBoostID(BoostType.Class, searchBank);
     }
     /// <summary>
     /// Get and set <see cref="ExperienceBoostID"/> to the first boost found in the player's inventory.
     /// </summary>
-    void SetExperienceBoostID()
+    /// <param name="searchBank">Whether to search and move to the inventory if a boost is found.</param>
+    void SetExperienceBoostID(bool searchBank = true)
     {
-        ExperienceBoostID = GetBoostID(BoostType.Experience);
+        ExperienceBoostID = GetBoostID(BoostType.Experience, searchBank);
     }
     /// <summary>
     /// Get and set <see cref="GoldBoostID"/> to the first boost found in the player's inventory.
     /// </summary>
-    void SetGoldBoostID()
+    /// <param name="searchBank">Whether to search and move to the inventory if a boost is found.</param>
+    void SetGoldBoostID(bool searchBank = true)
     {
-        GoldBoostID = GetBoostID(BoostType.Gold);
+        GoldBoostID = GetBoostID(BoostType.Gold, searchBank);
     }
     /// <summary>
     /// Get and set <see cref="ReputationBoostID"/> to the first boost found in the player's inventory.
     /// </summary>
-    void SetReputationBoostID()
+    /// <param name="searchBank">Whether to search and move to the inventory if a boost is found.</param>
+    void SetReputationBoostID(bool searchBank = true)
     {
-        ReputationBoostID = GetBoostID(BoostType.Reputation);
+        ReputationBoostID = GetBoostID(BoostType.Reputation, searchBank);
     }
     /// <summary>
-    /// Start the boost thread.
+    /// Start the boost timer.
     /// </summary>
     void Start();
     /// <summary>
-    /// Stops the boost thread.
+    /// Stops the boost timer.
     /// </summary>
     void Stop();
+    /// <summary>
+    /// Stops the boost timer asynchronously.
+    /// </summary>
+    ValueTask StopAsync();
     /// <summary>
     /// Uses the boost with specified <paramref name="id"/>.
     /// </summary>

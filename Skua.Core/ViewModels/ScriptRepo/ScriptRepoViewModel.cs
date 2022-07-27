@@ -1,76 +1,73 @@
-﻿using Microsoft.Toolkit.Mvvm.Input;
+﻿using Microsoft.Toolkit.Mvvm.ComponentModel;
+using Microsoft.Toolkit.Mvvm.Messaging;
+using Microsoft.Toolkit.Mvvm.Input;
 using Skua.Core.Interfaces;
+using Skua.Core.Messaging;
 using Skua.Core.Models.GitHub;
 using Skua.Core.Utils;
 
 namespace Skua.Core.ViewModels;
-// TODO loading scripts
-public class ScriptRepoViewModel : BotControlViewModelBase
+public partial class ScriptRepoViewModel : BotControlViewModelBase
 {
-    public ScriptRepoViewModel(IGetScriptsService getScripts)
+    public ScriptRepoViewModel(IGetScriptsService getScripts, IVSCodeService vsc)
         : base("Get Scripts")
     {
         _getScriptsService = getScripts;
-
+        _vsc = vsc;
         RefreshScriptsCommand = new AsyncRelayCommand(Refresh);
         DownloadAllCommand = new AsyncRelayCommand(DownloadAll);
         UpdateAllCommand = new AsyncRelayCommand(UpdateAll);
         DownloadCommand = new AsyncRelayCommand(Download);
         DeleteCommand = new AsyncRelayCommand(Delete);
         CancelTaskCommand = new RelayCommand(CancelTask);
+        LoadScriptCommand = new RelayCommand(LoadScript);
+        OpenScriptCommand = new RelayCommand(OpenScript);
+        StartScriptCommand = new RelayCommand(StartScriptAsync);
+        OpenScriptFolderCommand = new RelayCommand(_vsc.Open);
+    }
+
+    private void StartScriptAsync()
+    {
+        if (SelectedItem is null)
+            return;
+
+        Messenger.Send<StartScriptMessage>(new(SelectedItem.LocalFile));
+    }
+
+    private void OpenScript()
+    {
+        if (SelectedItem is null)
+            return;
+
+        Messenger.Send<EditScriptMessage>(new(SelectedItem.LocalFile));
+    }
+
+    private void LoadScript()
+    {
+        if (SelectedItem is null)
+            return;
+
+        Messenger.Send<LoadScriptMessage>(new(SelectedItem.LocalFile));
     }
 
     private readonly IGetScriptsService _getScriptsService;
-    //public RangedObservableCollection<ScriptInfo> Scripts => _getScriptsService.Scripts;
-    public int DownloadedQuantity => _scripts.Count(s => s.Downloaded);
-    public int OutdatedQuantity => _scripts.Count(s => s.Outdated);
+    private readonly IVSCodeService _vsc;
+
+    public int DownloadedQuantity => _getScriptsService.Downloaded;
+    public int OutdatedQuantity => _getScriptsService.Outdated;
     public int ScriptQuantity => _scripts.Count;
+    [ObservableProperty]
+    [AlsoNotifyChangeFor(nameof(DownloadedQuantity), nameof(OutdatedQuantity), nameof(ScriptQuantity))]
     private RangedObservableCollection<ScriptInfoViewModel> _scripts = new();
-    public RangedObservableCollection<ScriptInfoViewModel> Scripts
-    {
-        get { return _scripts; }
-        set
-        {
-            SetProperty(ref _scripts, value);
-            OnPropertyChanged(nameof(DownloadedQuantity));
-            OnPropertyChanged(nameof(OutdatedQuantity));
-            OnPropertyChanged(nameof(ScriptQuantity));
-        }
-    }
-
+    [ObservableProperty]
+    [AlsoNotifyChangeFor(nameof(DownloadedQuantity), nameof(OutdatedQuantity), nameof(ScriptQuantity))]
     private ScriptInfoViewModel? _selectedItem;
-    public ScriptInfoViewModel? SeletedItem
-    {
-        get { return _selectedItem; }
-        set
-        {
-            SetProperty(ref _selectedItem, value);
-            OnPropertyChanged(nameof(DownloadedQuantity));
-            OnPropertyChanged(nameof(OutdatedQuantity));
-            OnPropertyChanged(nameof(ScriptQuantity));
-        }
-    }
-
+    [ObservableProperty]
     private bool _showSnackBar;
-    public bool ShowSnackBar
-    {
-        get { return _showSnackBar; }
-        set { SetProperty(ref _showSnackBar, value); }
-    }
+    [ObservableProperty]
     private bool _isBusy;
-    public bool IsBusy
-    {
-        get { return _isBusy; }
-        set { SetProperty(ref _isBusy, value); }
-    }
-
+    [ObservableProperty]
     private string _progressReportMessage = string.Empty;
-
-    public string ProgressReportMessage
-    {
-        get { return _progressReportMessage; }
-        set { SetProperty(ref _progressReportMessage, value); }
-    }
 
     public IAsyncRelayCommand UpdateAllCommand { get; }
     public IAsyncRelayCommand DownloadAllCommand { get; }
@@ -79,19 +76,25 @@ public class ScriptRepoViewModel : BotControlViewModelBase
     public IAsyncRelayCommand RefreshScriptsCommand { get; }
     public IRelayCommand CancelTaskCommand { get; }
     public IRelayCommand LoadScriptCommand { get; }
-    // Use message?
     public IRelayCommand OpenScriptCommand { get; }
+    public IRelayCommand StartScriptCommand { get; }
     public IRelayCommand OpenScriptFolderCommand { get; }
 
     private async Task Refresh(CancellationToken token)
     {
         IsBusy = true;
-        await Task.Run(async () =>
+        try
         {
-            Progress<string> progress = new(ProgressHandler);
-            await _getScriptsService.RefreshAsync(progress, token);
-        }, token);
-        RefreshScriptsList();
+            await Task.Run(async () =>
+            {
+                Progress<string> progress = new(ProgressHandler);
+                await _getScriptsService.RefreshAsync(progress, token);
+            }, token);
+        }
+        catch
+        {
+            RefreshScriptsList();
+        }
     }
 
     private void RefreshScriptsList()

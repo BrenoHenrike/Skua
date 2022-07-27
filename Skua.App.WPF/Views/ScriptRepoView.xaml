@@ -1,0 +1,179 @@
+﻿<UserControl
+    x:Class="Skua.App.WPF.Views.ScriptRepoView"
+    xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+    xmlns:b="http://schemas.microsoft.com/xaml/behaviors"
+    xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+    xmlns:local="clr-namespace:Skua.App.WPF.Views"
+    xmlns:materialDesign="http://materialdesigninxaml.net/winfx/xaml/themes"
+    xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+    xmlns:vms="clr-namespace:Skua.Core.ViewModels;assembly=Skua.Core"
+    xmlns:wpf="clr-namespace:Skua.WPF;assembly=Skua.WPF"
+    d:DataContext="{d:DesignInstance vms:ScriptRepoViewModel}"
+    d:DesignHeight="450"
+    d:DesignWidth="800"
+    mc:Ignorable="d">
+    <Grid Margin="6">
+        <DockPanel>
+            <DockPanel Margin="0,0,0,6" DockPanel.Dock="Top">
+                <Button
+                    Margin="0,0,3,0"
+                    Command="{Binding UpdateAllCommand}"
+                    Content="Update All"
+                    DockPanel.Dock="Left"
+                    IsEnabled="{Binding IsBusy, UpdateSourceTrigger=PropertyChanged, Converter={StaticResource InvertBooleanConverter}}" />
+                <Button
+                    Margin="3,0"
+                    Command="{Binding DownloadAllCommand}"
+                    Content="Download All"
+                    DockPanel.Dock="Left"
+                    IsEnabled="{Binding IsBusy, UpdateSourceTrigger=PropertyChanged, Converter={StaticResource InvertBooleanConverter}}" />
+                <Button
+                    Margin="3,0,0,0"
+                    Command="{Binding RefreshScriptsCommand}"
+                    Content="Refresh"
+                    DockPanel.Dock="Right"
+                    IsEnabled="{Binding IsBusy, UpdateSourceTrigger=PropertyChanged, Converter={StaticResource InvertBooleanConverter}}" />
+                <TextBox
+                    x:Name="SearchBox"
+                    Margin="3,0"
+                    materialDesign:HintAssist.Hint="Search"
+                    MaxLines="1"
+                    TextChanged="TextBox_TextChanged" />
+            </DockPanel>
+            <Border
+                Margin="0,6,0,0"
+                Background="{DynamicResource MaterialDesignPaper}"
+                BorderBrush="{DynamicResource PrimaryHueLightBrush}"
+                BorderThickness="1"
+                CornerRadius="4"
+                DockPanel.Dock="Bottom">
+                <Grid>
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition Width="auto" />
+                        <ColumnDefinition Width="auto" />
+                        <ColumnDefinition Width="auto" />
+                        <ColumnDefinition Width="auto" />
+                        <ColumnDefinition Width="auto" />
+                        <ColumnDefinition />
+                    </Grid.ColumnDefinitions>
+                    <TextBlock
+                        Grid.Column="0"
+                        Margin="6,4,2,4"
+                        VerticalAlignment="Center"
+                        Text="Downloaded:" />
+                    <TextBlock
+                        Grid.Column="1"
+                        Margin="2"
+                        VerticalAlignment="Center">
+                        <Run Text="{Binding DownloadedQuantity, Mode=OneWay, UpdateSourceTrigger=PropertyChanged, FallbackValue=000}" />
+                        <Run Text="/" />
+                        <Run Text="{Binding ScriptQuantity, Mode=OneWay, UpdateSourceTrigger=PropertyChanged, FallbackValue=000}" />
+                    </TextBlock>
+                    <TextBlock
+                        Grid.Column="2"
+                        Margin="6,4,2,4"
+                        VerticalAlignment="Center"
+                        Text="Outdated:" />
+                    <TextBlock
+                        Grid.Column="3"
+                        Margin="2"
+                        VerticalAlignment="Center"
+                        Text="{Binding OutdatedQuantity, UpdateSourceTrigger=PropertyChanged, Mode=OneWay, FallbackValue=0}" />
+                </Grid>
+            </Border>
+            <DataGrid
+                x:Name="ScriptsDataGrid"
+                AutoGenerateColumns="False"
+                EnableRowVirtualization="True"
+                HorizontalScrollBarVisibility="Disabled"
+                IsEnabled="{Binding ElementName=ScriptsDataGrid, Path=HasItems}"
+                IsReadOnly="True"
+                ItemsSource="{Binding Scripts, UpdateSourceTrigger=PropertyChanged}"
+                SelectedItem="{Binding SelectedItem, UpdateSourceTrigger=PropertyChanged}"
+                SelectionMode="Single"
+                SelectionUnit="FullRow">
+                <DataGrid.ContextMenu>
+                    <ContextMenu>
+                        <MenuItem
+                            Command="{Binding DownloadCommand}"
+                            Header="Download"
+                            IsEnabled="{Binding SelectedItem.Downloaded, Converter={StaticResource InvertBooleanConverter}, FallbackValue=False}" />
+                        <MenuItem
+                            Command="{Binding DeleteCommand}"
+                            Header="Delete"
+                            IsEnabled="{Binding SelectedItem.Downloaded, FallbackValue=False}" />
+                        <MenuItem
+                            Command="{Binding LoadScriptCommand}"
+                            Header="Load"
+                            IsEnabled="{Binding SelectedItem.Downloaded, FallbackValue=False}" />
+                        <MenuItem
+                            Command="{Binding StartScriptCommand}"
+                            Header="Start"
+                            IsEnabled="{Binding SelectedItem.Downloaded, FallbackValue=False}" />
+                        <MenuItem
+                            Command="{Binding OpenScriptCommand}"
+                            Header="Open"
+                            IsEnabled="{Binding SelectedItem.Downloaded, FallbackValue=False}" />
+                        <MenuItem
+                            Command="{Binding OpenScriptFolderCommand}"
+                            Header="Open VSCode"
+                            IsEnabled="{Binding SelectedItem.Downloaded, FallbackValue=False}" />
+                    </ContextMenu>
+                </DataGrid.ContextMenu>
+                <b:Interaction.Triggers>
+                    <b:EventTrigger EventName="MouseDoubleClick">
+                        <b:InvokeCommandAction Command="{Binding DownloadCommand}" />
+                    </b:EventTrigger>
+                </b:Interaction.Triggers>
+                <DataGrid.Columns>
+                    <DataGridTextColumn
+                        Width="2*"
+                        Binding="{Binding FileName}"
+                        Header="Name" />
+                    <DataGridTextColumn
+                        Width="3*"
+                        Binding="{Binding LocalFile, Mode=OneTime}"
+                        Header="Folder Path" />
+                    <DataGridTextColumn
+                        Width="70"
+                        Binding="{Binding Size}"
+                        Header="Size" />
+                </DataGrid.Columns>
+                <DataGrid.RowStyle>
+                    <Style BasedOn="{StaticResource MaterialDesignDataGridRow}" TargetType="DataGridRow">
+                        <Style.Triggers>
+                            <DataTrigger Binding="{Binding Downloaded, UpdateSourceTrigger=PropertyChanged}" Value="True">
+                                <Setter Property="Background">
+                                    <Setter.Value>
+                                        <SolidColorBrush Opacity="0.2" Color="Green" />
+                                    </Setter.Value>
+                                </Setter>
+                            </DataTrigger>
+                            <DataTrigger Binding="{Binding Downloaded, UpdateSourceTrigger=PropertyChanged}" Value="False">
+                                <Setter Property="Background">
+                                    <Setter.Value>
+                                        <SolidColorBrush Opacity="0.2" Color="Red" />
+                                    </Setter.Value>
+                                </Setter>
+                            </DataTrigger>
+                            <DataTrigger Binding="{Binding Outdated, UpdateSourceTrigger=PropertyChanged}" Value="True">
+                                <Setter Property="Background">
+                                    <Setter.Value>
+                                        <SolidColorBrush Opacity="0.2" Color="Yellow" />
+                                    </Setter.Value>
+                                </Setter>
+                            </DataTrigger>
+                        </Style.Triggers>
+                    </Style>
+                </DataGrid.RowStyle>
+            </DataGrid>
+        </DockPanel>
+        <materialDesign:Snackbar IsActive="{Binding ProgressReportMessage, Converter={StaticResource StringToBoolConverter}}">
+            <materialDesign:SnackbarMessage
+                ActionCommand="{Binding CancelTaskCommand}"
+                ActionContent="{materialDesign:PackIcon Kind=Cancel}"
+                Content="{Binding ProgressReportMessage}" />
+        </materialDesign:Snackbar>
+    </Grid>
+</UserControl>

@@ -1,10 +1,14 @@
-﻿using Skua.Core.Interfaces;
+﻿using Microsoft.Toolkit.Mvvm.ComponentModel;
+using Microsoft.Toolkit.Mvvm.Messaging;
+using Microsoft.Toolkit.Mvvm.Messaging.Messages;
+using Skua.Core.Interfaces;
+using Skua.Core.Messaging;
 using Skua.Core.Models.Items;
 using Skua.Core.Utils;
 
 namespace Skua.Core.Scripts;
 
-public class ScriptDrop : IScriptDrop, IDisposable
+public partial class ScriptDrop : ObservableRecipient, IScriptDrop, IAsyncDisposable
 {
     private readonly Lazy<IScriptSend> _lazySend;
     private readonly Lazy<IScriptWait> _lazyWait;
@@ -37,43 +41,28 @@ public class ScriptDrop : IScriptDrop, IDisposable
         _lazyFlash = flash;
         _lazyManager = manager;
 
-        AppGameEvents.ItemDropped += AddDrop;
-        AppGameEvents.Logout += ClearDrops;
-        Manager.ApplicationShutDown += DisposeOnShutDown;
-        void DisposeOnShutDown(bool b)
-        {
-            Dispose();
-            Manager.ApplicationShutDown -= DisposeOnShutDown;
-        }
+        Messenger.Register<ScriptDrop, ItemDroppedMessage>(this, AddDrop);
+        Messenger.Register<ScriptDrop, LogoutMessage>(this, ClearDrops);
+        Messenger.Register<ScriptDrop, PropertyChangedMessage<bool>>(this, OptionsChanged);
+
+        //Options.PropertyChanged += Options_PropertyChanged;
+        _timerDrops = new(TimeSpan.FromMilliseconds(1000));
     }
 
-    private void ClearDrops()
-    {
-        _currentDropInfos.Clear();
-    }
+    private readonly PeriodicTimer _timerDrops;
+    private Task? _taskDrops;
+    private CancellationTokenSource? _ctsDrops;
 
-    private void AddDrop(ItemBase item, bool addedToInv, int quantityNow)
-    {
-        if (CurrentDropInfos.All(d => d.ID != item.ID))
-            _currentDropInfos.Add(item);
-    }
-
-    private CancellationTokenSource? DropsCTS;
-    private Thread? DropsThread;
-    private readonly List<string> _addName = new();
-    private readonly List<string> _remName = new();
-    private readonly List<int> _addID = new();
-    private readonly List<int> _remID = new();
-
-    public event Action? DropsStarted;
-    public event Action? DropsStopped;
-
-    public int Interval { get; set; } = 1000;
-    public List<string> ToPickup { get; } = new();
-    public List<int> ToPickupIDs { get; } = new();
-    public bool RejectElse { get; set; }
-    public bool Enabled => DropsThread?.IsAlive ?? false;
-    internal SynchronizedList<ItemBase> _currentDropInfos { get; set; } = new();
+    [ObservableProperty]
+    private int _Interval;
+    [ObservableProperty]
+    private bool _RejectElse;
+    public bool Enabled => _taskDrops is not null;
+    private SynchronizedList<string> _toPickup = new();
+    public IEnumerable<string> ToPickup => _toPickup.Items;
+    private SynchronizedList<int> _toPickupIDs = new();
+    public IEnumerable<int> ToPickupIDs => _toPickupIDs.Items;
+    private SynchronizedList<ItemBase> _currentDropInfos { get; set; } = new();
     public IEnumerable<ItemBase> CurrentDropInfos => _currentDropInfos.Items;
     public IEnumerable<string> CurrentDrops => CurrentDropInfos.Select(x => x.Name.Trim()).ToList();
 
@@ -85,6 +74,8 @@ public class ScriptDrop : IScriptDrop, IDisposable
         ItemBase drop = _currentDropInfos.Find(d => d.Name == name)!;
         Send.Packet($"%xt%zm%getDrop%{Map.RoomID}%{drop.ID}%");
         _currentDropInfos.Remove(drop);
+        OnPropertyChanged(nameof(CurrentDropInfos));
+        OnPropertyChanged(nameof(CurrentDrops));
     }
 
     public void Pickup(int id)
@@ -94,25 +85,27 @@ public class ScriptDrop : IScriptDrop, IDisposable
 
         Send.Packet($"%xt%zm%getDrop%{Map.RoomID}%{id}%");
         _currentDropInfos.Remove(CurrentDropInfos.SingleOrDefault(d => d.ID == id)!);
+        OnPropertyChanged(nameof(CurrentDropInfos));
+        OnPropertyChanged(nameof(CurrentDrops));
     }
 
     public void Pickup(params string[] names)
     {
-        for(int i = 0; i < names.Length; i++)
+        foreach (string name in names)
         {
-            Pickup(names[i]);
+            Pickup(name);
             if (Options.SafeTimings)
-                Wait.ForPickup(names[i]);
+                Wait.ForPickup(name);
         }
     }
 
     public void Pickup(params int[] ids)
     {
-        for(int i = 0; i < ids.Length; i++)
+        foreach (int id in ids)
         {
-            Pickup(ids[i]);
+            Pickup(id);
             if (Options.SafeTimings)
-                Wait.ForPickup(ids[i]);
+                Wait.ForPickup(id);
         }
     }
 
@@ -123,8 +116,10 @@ public class ScriptDrop : IScriptDrop, IDisposable
 
     public void PickupAll(bool skipWait = false)
     {
-        _currentDropInfos.ForEach(d => Pickup(d.Name));
+        _currentDropInfos.Items.ToList().ForEach(d => Pickup(d.Name));
         _currentDropInfos.Clear();
+        OnPropertyChanged(nameof(CurrentDropInfos));
+        OnPropertyChanged(nameof(CurrentDrops));
         if (Options.SafeTimings && !skipWait)
             Wait.ForPickup("*");
     }
@@ -134,28 +129,9 @@ public class ScriptDrop : IScriptDrop, IDisposable
         if (Options.AcceptACDrops)
             PickupACItems();
         Flash.Call("rejectExcept", names.Join(',').ToLower());
-        if (Options.SafeTimings)
-            Wait.ForPickup("*");
     }
 
     public void RejectExcept(params int[] ids)
-    {
-        if (Options.AcceptACDrops)
-            PickupACItems();
-        IEnumerable<string> items = CurrentDropInfos.Where(d => ids.Contains(d.ID)).Select(d => d.Name);
-        Flash.Call("rejectExcept", items.Join(',').ToLower());
-        if (Options.SafeTimings)
-            Wait.ForPickup("*");
-    }
-
-    public void RejectExceptFast(params string[] names)
-    {
-        if (Options.AcceptACDrops)
-            PickupACItems();
-        Flash.Call("rejectExcept", names.Join(',').ToLower());
-    }
-
-    public void RejectExceptFast(params int[] ids)
     {
         if (Options.AcceptACDrops)
             PickupACItems();
@@ -168,121 +144,165 @@ public class ScriptDrop : IScriptDrop, IDisposable
         if (Options.AcceptACDrops)
             PickupACItems();
         Flash.Call("rejectExcept", "");
-        if (Options.SafeTimings && !skipWait)
-            Wait.ForPickup("*");
     }
 
     public void Start()
     {
-        if (DropsThread?.IsAlive ?? false)
+        if (_taskDrops is not null)
             return;
-        DropsThread = new(() =>
-        {
-            DropsCTS = new();
-            Poll(DropsCTS.Token);
-            DropsCTS.Dispose();
-            DropsCTS = null;
-        })
-        {
-            Name = "Drops Thread"
-        };
-        DropsStarted?.Invoke();
-        DropsThread.Start();
+
+        _ctsDrops = new();
+        _taskDrops = HandleDrops(_timerDrops, _ctsDrops.Token);
+        OnPropertyChanged(nameof(Enabled));
     }
 
     public void Stop()
     {
-        DropsStopped?.Invoke();
-        DropsCTS?.Cancel();
-        Wait.ForTrue(() => !Enabled, 20);
+        if (_taskDrops is null)
+            return;
+
+        _ctsDrops?.Cancel();
+        Wait.ForTrue(() => _taskDrops?.IsCompleted == true, null, 20);
+        _ctsDrops?.Dispose();
+        _taskDrops = null;
+        OnPropertyChanged(nameof(Enabled));
+    }
+
+    public async ValueTask StopAsync()
+    {
+        if (_taskDrops is null)
+            return;
+
+        _ctsDrops?.Cancel();
+        await Wait.ForTrueAsync(() => _taskDrops?.IsCompleted == true, 20);
+        _ctsDrops?.Dispose();
+        _ctsDrops = null;
+        _taskDrops = null;
+        OnPropertyChanged(nameof(Enabled));
     }
 
     public void Add(params string[] names)
     {
-        lock (_addName)
-            _addName.AddRange(names);
+        _toPickup.AddRange(names.Except(_toPickup.Items));
+        OnPropertyChanged(nameof(ToPickup));
     }
 
     public void Add(params int[] ids)
     {
-        lock (_addID)
-            _addID.AddRange(ids);
+        _toPickupIDs.AddRange(ids.Except(_toPickupIDs.Items));
+        OnPropertyChanged(nameof(ToPickupIDs));
     }
 
     public void Clear()
     {
-        lock (_remName)
-            _remName.AddRange(ToPickup);
-        lock (_remID)
-            _remID.AddRange(ToPickupIDs);
+        _toPickupIDs.Clear();
+        _toPickup.Clear();
+        OnPropertyChanged(nameof(ToPickupIDs));
+        OnPropertyChanged(nameof(ToPickup));
     }
 
     public void Remove(params string[] names)
     {
-        lock (_remName)
-            _remName.AddRange(names);
+        _toPickup.Remove(names.Contains);
     }
 
     public void Remove(params int[] ids)
     {
-        lock (_remID)
-            _remID.AddRange(ids);
+        _toPickupIDs.Remove(ids.Contains);
     }
 
-    private void Poll(CancellationToken token)
+    private async Task HandleDrops(PeriodicTimer timer, CancellationToken token)
     {
-        while (!token.IsCancellationRequested)
+        try
         {
-            if (_addName.Count > 0)
+            while (await timer.WaitForNextTickAsync(token))
             {
-                ToPickup.AddRange(_addName.Except(ToPickup));
-                lock (_addName)
-                    _addName.Clear();
-            }
-            if(_addID.Count > 0)
-            {
-                ToPickupIDs.AddRange(_addID.Except(ToPickupIDs));
-                lock (_addID)
-                    _addName.Clear();
-            }
-            if (_remName.Count > 0)
-            {
-                ToPickup.RemoveAll(_remName.Contains);
-                lock (_remName)
-                    _remName.Clear();
-            }
-            if (_remID.Count > 0)
-            {
-                ToPickupIDs.RemoveAll(_remID.Contains);
-                lock (_remID)
-                    _remID.Clear();
-            }
-            if(Player.Playing)
-            {
+                if (!Player.Playing)
+                    continue;
+
+                if (Interval > 0)
+                    await Task.Delay(Interval, token);
+
+                if (Options.AcceptAllDrops)
+                {
+                    PickupAll();
+                    continue;
+                }
+
                 if (Options.AcceptACDrops)
                     PickupACItems();
-                if(ToPickupIDs.Count > 0)
+
+                if (Options.RejectAllDrops)
                 {
-                    Pickup(ToPickupIDs.ToArray());
+                    RejectAll();
+                    continue;
                 }
-                if (ToPickup.Count > 0)
-                {
-                    Pickup(ToPickup.ToArray());
-                }
+
+                if (_toPickupIDs.Any())
+                    Pickup(_toPickupIDs.Items.ToArray());
+
+                if (_toPickup.Any())
+                    Pickup(_toPickup.Items.ToArray());
+
                 if (RejectElse)
-                {
-                    RejectExcept(ToPickup.ToArray());
-                }
+                    RejectExcept(_toPickup.Items.ToArray());
             }
-            if (!token.IsCancellationRequested)
-                Thread.Sleep(Interval);
+        }
+        catch { }
+    }
+
+    //private void Options_PropertyChanged(object? sender, System.ComponentModel.PropertyChangedEventArgs e)
+    //{
+    //    if (e.PropertyName == nameof(IScriptOption.AcceptACDrops) && Options.AcceptACDrops)
+    //        Start();
+    //    if (e.PropertyName == nameof(IScriptOption.AcceptAllDrops) && Options.AcceptAllDrops)
+    //        Start();
+    //    if (e.PropertyName == nameof(IScriptOption.RejectAllDrops) && Options.RejectAllDrops)
+    //        Start();
+    //}
+
+    private void OptionsChanged(ScriptDrop recipient, PropertyChangedMessage<bool> message)
+    {
+        if (message.Sender.GetType() != typeof(ScriptOption))
+            return;
+
+        switch(message.PropertyName)
+        {
+            case nameof(IScriptOption.AcceptACDrops):
+            case nameof(IScriptOption.AcceptAllDrops):
+            case nameof(IScriptOption.RejectAllDrops):
+                recipient.Start();
+                break;
         }
     }
 
-    public void Dispose()
+    private void ClearDrops(ScriptDrop recipient, LogoutMessage message)
     {
+        recipient._currentDropInfos.Clear();
+        recipient.OnPropertyChanged(nameof(recipient.CurrentDropInfos));
+        recipient.OnPropertyChanged(nameof(recipient.CurrentDrops));
+    }
+
+    private void AddDrop(ScriptDrop recipient, ItemDroppedMessage message)
+    {
+        if (message.AddedToInv)
+            return;
+
+        if (!recipient.CurrentDropInfos.Contains(message.Item))
+            recipient._currentDropInfos.Add(message.Item);
+        else
+            recipient._currentDropInfos.Find(i => i.Equals(message.Item))!.Quantity += message.Item.Quantity;
+        recipient.OnPropertyChanged(nameof(recipient.CurrentDropInfos));
+        recipient.OnPropertyChanged(nameof(recipient.CurrentDrops));
+    }
+
+    public async ValueTask DisposeAsync()
+    {
+        _ctsDrops?.Cancel();
+        if(_taskDrops is not null)
+            await _taskDrops;
+        _ctsDrops?.Dispose();
+        _timerDrops.Dispose();
         GC.SuppressFinalize(this);
-        AppGameEvents.ItemDropped -= AddDrop;
-        AppGameEvents.Logout -= ClearDrops;
     }
 }

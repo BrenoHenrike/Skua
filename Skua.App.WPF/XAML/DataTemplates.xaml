@@ -1,0 +1,109 @@
+﻿<ResourceDictionary
+    xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+    xmlns:usercontrols="clr-namespace:Skua.App.WPF.UserControls"
+    xmlns:views="clr-namespace:Skua.App.WPF.Views"
+    xmlns:vms="clr-namespace:Skua.Core.ViewModels;assembly=Skua.Core">
+    <DataTemplate DataType="{x:Type vms:BotControlViewModelBase}">
+        <views:AboutView />
+    </DataTemplate>
+    <DataTemplate DataType="{x:Type vms:LoaderViewModel}">
+        <views:LoaderView />
+    </DataTemplate>
+    <DataTemplate DataType="{x:Type vms:GrabberViewModel}">
+        <views:GrabberView />
+    </DataTemplate>
+    <DataTemplate DataType="{x:Type vms:JumpViewModel}">
+        <usercontrols:JumpUserControl />
+    </DataTemplate>
+    <DataTemplate DataType="{x:Type vms:FastTravelViewModel}">
+        <usercontrols:FastTravelUserControl />
+    </DataTemplate>
+    <DataTemplate DataType="{x:Type vms:FastTravelEditorDialogViewModel}">
+        <usercontrols:FastTravelEditorDialog />
+    </DataTemplate>
+    <DataTemplate DataType="{x:Type vms:GameOptionsViewModel}">
+        <views:GameOptionsView />
+    </DataTemplate>
+    <DataTemplate DataType="{x:Type vms:ApplicationOptionsViewModel}">
+        <views:ApplicationOptionsView />
+    </DataTemplate>
+    <DataTemplate DataType="{x:Type vms:LogsViewModel}">
+        <views:LogsView />
+    </DataTemplate>
+    <DataTemplate DataType="{x:Type vms:LogTabViewModel}">
+        <usercontrols:LogTabUserControl />
+    </DataTemplate>
+    <DataTemplate DataType="{x:Type vms:PacketLoggerViewModel}">
+        <views:PacketLoggerView />
+    </DataTemplate>
+    <DataTemplate DataType="{x:Type vms:InputDialogViewModel}">
+        <usercontrols:InputDialog />
+    </DataTemplate>
+    <DataTemplate DataType="{x:Type vms:MessageBoxDialogViewModel}">
+        <usercontrols:MessageBoxDialog />
+    </DataTemplate>
+    <DataTemplate DataType="{x:Type vms:PacketSpammerViewModel}">
+        <views:PacketSpammerView />
+    </DataTemplate>
+    <DataTemplate DataType="{x:Type vms:ConsoleViewModel}">
+        <views:ConsoleView />
+    </DataTemplate>
+    <DataTemplate DataType="{x:Type vms:ScriptRepoViewModel}">
+        <views:ScriptRepoView />
+    </DataTemplate>
+    <DataTemplate DataType="{x:Type vms:ScriptLoaderViewModel}">
+        <views:ScriptLoaderView />
+    </DataTemplate>
+    <DataTemplate DataType="{x:Type vms:PacketInterceptorViewModel}">
+        <views:PacketInterceptorView />
+    </DataTemplate>
+    <DataTemplate DataType="{x:Type vms:AdvancedSkillsViewModel}">
+        <views:AdvancedSkillsView />
+    </DataTemplate>
+    <DataTemplate DataType="{x:Type vms:SkillRuleEditorDialogViewModel}">
+        <usercontrols:SkillRuleEditorDialog />
+    </DataTemplate>
+    <DataTemplate DataType="{x:Type vms:AutoViewModel}">
+        <usercontrols:AutoUserControl />
+    </DataTemplate>
+    <DataTemplate DataType="{x:Type vms:RuntimeHelpersViewModel}">
+        <views:RuntimeHelpersView />
+    </DataTemplate>
+    <DataTemplate DataType="{x:Type vms:ScriptStatsViewModel}">
+        <usercontrols:ScriptStatsUserControl Margin="6" />
+    </DataTemplate>
+    <DataTemplate DataType="{x:Type vms:CurrentDropsViewModel}">
+        <usercontrols:CurrentDropsUserControl />
+    </DataTemplate>
+    <DataTemplate DataType="{x:Type vms:GitHubAuthViewModel}">
+        <views:GitHubAuthView />
+    </DataTemplate>
+    <DataTemplate DataType="{x:Type vms:ApplicationThemesViewModel}">
+        <views:ApplicationThemesView />
+    </DataTemplate>
+    <DataTemplate DataType="{x:Type vms:OptionContainerViewModel}">
+        <usercontrols:OptionContainerUserControl />
+    </DataTemplate>
+    <DataTemplate DataType="{x:Type vms:PluginsViewModel}">
+        <views:PluginsView />
+    </DataTemplate>
+    <DataTemplate DataType="{x:Type vms:PluginItemViewModel}">
+        <usercontrols:PluginItemUserControl />
+    </DataTemplate>
+    <DataTemplate DataType="{x:Type vms:CoreBotsViewModel}">
+        <views:CoreBotsOptionsView />
+    </DataTemplate>
+    <DataTemplate DataType="{x:Type vms:CBOOtherOptionsViewModel}">
+        <usercontrols:CBOOtherOptionsUserControl />
+    </DataTemplate>
+    <DataTemplate DataType="{x:Type vms:CBOClassEquipmentViewModel}">
+        <usercontrols:CBOClassEquipmentUserControl />
+    </DataTemplate>
+    <DataTemplate DataType="{x:Type vms:CBOLoadoutViewModel}">
+        <usercontrols:CBOLoadoutUserControl />
+    </DataTemplate>
+    <DataTemplate DataType="{x:Type vms:CBOptionsViewModel}">
+        <usercontrols:CBOptionsUserControl />
+    </DataTemplate>
+</ResourceDictionary>

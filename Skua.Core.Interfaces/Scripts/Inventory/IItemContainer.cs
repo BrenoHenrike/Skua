@@ -6,5 +6,5 @@ public interface IItemContainer<T> where T : ItemBase
     /// <summary>
     /// A list of items in this inventory.
     /// </summary>
-    List<T> Items { get; }
+    List<T>? Items { get; }
 }

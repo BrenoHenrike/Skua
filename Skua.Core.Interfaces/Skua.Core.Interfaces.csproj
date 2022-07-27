@@ -7,6 +7,10 @@
   </PropertyGroup>
 
   <ItemGroup>
+    <PackageReference Include="Caseless.Fody" Version="1.9.1" />
+  </ItemGroup>
+
+  <ItemGroup>
     <ProjectReference Include="..\Skua.Core.Models\Skua.Core.Models.csproj" />
     <ProjectReference Include="..\Skua.Core.Utils\Skua.Core.Utils.csproj" />
   </ItemGroup>

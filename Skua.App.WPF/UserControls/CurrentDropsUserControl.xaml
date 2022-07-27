@@ -1,0 +1,47 @@
+﻿<UserControl
+    x:Class="Skua.App.WPF.UserControls.CurrentDropsUserControl"
+    xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+    xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+    xmlns:local="clr-namespace:Skua.App.WPF.UserControls"
+    xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+    xmlns:vms="clr-namespace:Skua.Core.ViewModels;assembly=Skua.Core"
+    d:DataContext="{d:DesignInstance vms:CurrentDropsViewModel}"
+    d:DesignHeight="450"
+    d:DesignWidth="800"
+    mc:Ignorable="d">
+    <Grid Margin="6">
+        <Grid.RowDefinitions>
+            <RowDefinition />
+            <RowDefinition Height="auto" />
+        </Grid.RowDefinitions>
+        <ListBox
+            x:Name="CurrentDropsListBox"
+            ItemsSource="{Binding CurrentDrops, Mode=OneWay, UpdateSourceTrigger=PropertyChanged}"
+            SelectedItem="{Binding SelectedDrop}"
+            SelectionMode="Multiple" />
+        <Grid Grid.Row="1" Margin="0,6,0,0">
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition />
+                <ColumnDefinition />
+                <ColumnDefinition />
+            </Grid.ColumnDefinitions>
+            <Button
+                Grid.Column="0"
+                Margin="0,0,3,0"
+                Command="{Binding PickupSelectedCommand}"
+                CommandParameter="{Binding ElementName=CurrentDropsListBox, Path=SelectedItems}"
+                Content="Pickup Selected" />
+            <Button
+                Grid.Column="1"
+                Margin="3,0"
+                Command="{Binding PickupAllCommand}"
+                Content="Pickup All" />
+            <Button
+                Grid.Column="2"
+                Margin="3,0,0,0"
+                Command="{Binding PickupACCommand}"
+                Content="Pickup AC" />
+        </Grid>
+    </Grid>
+</UserControl>

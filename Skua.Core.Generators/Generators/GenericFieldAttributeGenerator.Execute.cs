@@ -31,6 +31,13 @@ public partial class GenericFieldAttributeGenerator<TInfo>
             return $"{char.ToUpper(propertyName[0], CultureInfo.InvariantCulture)}{propertyName.Substring(1)}";
         }
 
+        public static bool HasNotifyPropertyChanged(IFieldSymbol fieldSymbol)
+        {
+            return (fieldSymbol.ContainingType.BaseType?.HasFullyQualifiedName("Microsoft.Toolkit.Mvvm.ComponentModel.ObservableObject") ?? false)
+                || (fieldSymbol.ContainingType.BaseType?.HasFullyQualifiedName("Microsoft.Toolkit.Mvvm.ComponentModel.ObservableRecipient") ?? false)
+                || (fieldSymbol.ContainingType.BaseType?.HasFullyQualifiedName("Microsoft.Toolkit.Mvvm.ComponentModel.ObservableValidator") ?? false);
+        }
+
         /// <summary>
         /// Tries to gather a name/path from the given attribute.
         /// </summary>

@@ -1,4 +1,5 @@
 ﻿using System.Dynamic;
+using LazyCache;
 using Newtonsoft.Json;
 using Skua.Core.Interfaces;
 using Skua.Core.Models.Quests;
@@ -7,47 +8,50 @@ using static System.Collections.Generic.Dictionary<int, Skua.Core.Models.Quests.
 namespace Skua.Core.Services;
 public class QuestDataLoaderService : IQuestDataLoaderService
 {
-    // TODO Cache
-    private readonly IScriptQuest Quests;
-    private readonly IFlashUtil Flash;
-    private readonly IScriptPlayer Player;
-    private readonly IScriptEvent Events;
+    private readonly IScriptQuest _quests;
+    private readonly IFlashUtil _flash;
+    private readonly IScriptPlayer _player;
+    private readonly IScriptEvent _events;
+    private readonly IAppCache _cache;
 
-    public QuestDataLoaderService(IScriptQuest quests, IScriptPlayer player, IFlashUtil flash, IScriptEvent events)
+    public QuestDataLoaderService(IScriptQuest quests, IScriptPlayer player, IFlashUtil flash, IScriptEvent events, IAppCache cache)
     {
-        Quests = quests;
-        Flash = flash;
-        Player = player;
-        Events = events;
+        _quests = quests;
+        _flash = flash;
+        _player = player;
+        _events = events;
+        _cache = cache;
     }
 
     public async Task<List<QuestData>> GetFromFileAsync(string fileName)
     {
         if (!File.Exists(fileName))
             return new();
+        if (_cache.TryGetValue($"CachedQuests_{fileName}", out List<QuestData>? quests))
+            return quests ?? new();
         string text = await File.ReadAllTextAsync(fileName);
-        List<QuestData>? quests = JsonConvert.DeserializeObject<List<QuestData>>(text);
-
-        return quests is null || quests.Count == 0 ? new() : quests;
+        quests = JsonConvert.DeserializeObject<List<QuestData>>(text);
+        _cache.Add($"CachedQuests_{fileName}", quests);
+        return quests ?? new();
     }
 
     public async Task<List<QuestData>> UpdateAsync(string fileName, bool all, IProgress<string>? progress, CancellationToken token)
     {
         return await Task.Run(async () =>
         {
-            if (!Player.LoggedIn)
-                return Quests.Cached = await GetFromFileAsync(fileName);
-            Quests.Cached = await GetFromFileAsync(fileName);
+            if (!_player.LoggedIn)
+                return _quests.Cached = await GetFromFileAsync(fileName);
+            _quests.Cached = await GetFromFileAsync(fileName);
             AutoResetEvent wait = new(false);
-            int start = all ? 1 : Quests.Cached.Count > 0 ? Quests.Cached.Last().ID + 1 : 1;
+            int start = all ? 1 : _quests.Cached.Count > 0 ? _quests.Cached.Last().ID + 1 : 1;
             List<QuestData> quests = new();
             for (int i = start; i < 13000; i += 29)
             {
                 if (token.IsCancellationRequested)
                     break;
-                Flash.SetGameObject("world.questTree", new ExpandoObject());
+                _flash.SetGameObject("world.questTree", new ExpandoObject());
                 progress?.Report($"Loading Quests {i}-{i + 29}...");
-                Quests.Load(Enumerable.Range(i, 29).ToArray());
+                _quests.Load(Enumerable.Range(i, 29).ToArray());
                 List<Quest> currQuests = new();
                 void packetListener(dynamic packet)
                 {
@@ -58,9 +62,9 @@ public class QuestDataLoaderService : IQuestDataLoaderService
                         wait.Set();
                     }
                 }
-                Events.ExtensionPacketReceived += packetListener;
+                _events.ExtensionPacketReceived += packetListener;
                 wait.WaitOne(5000);
-                Events.ExtensionPacketReceived -= packetListener;
+                _events.ExtensionPacketReceived -= packetListener;
                 if (currQuests.Count == 0)
                 {
                     progress?.Report("No more quests found.");
@@ -70,10 +74,10 @@ public class QuestDataLoaderService : IQuestDataLoaderService
                 if (!token.IsCancellationRequested)
                     await Task.Delay(1500);
             }
-            quests.AddRange(Quests.Cached);
+            quests.AddRange(_quests.Cached);
             await File.WriteAllTextAsync(fileName, JsonConvert.SerializeObject(quests.Distinct().OrderBy(q => q.ID), Formatting.Indented));
             progress?.Report($"Getting quests from file {fileName}");
-            return Quests.Cached = await GetFromFileAsync(fileName);
+            return _quests.Cached = await GetFromFileAsync(fileName);
         });
     }
 

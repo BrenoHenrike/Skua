@@ -6,7 +6,6 @@ namespace Skua.WPF;
 public static class WindowChromePatch
 {
     #region WindowChrome Fix
-
     public static IntPtr WindowProc(IntPtr hwnd, int msg, IntPtr wParam, IntPtr lParam, ref bool handled)
     {
         switch (msg)

@@ -4,9 +4,6 @@ namespace Skua.Core.Interfaces;
 
 public interface IScriptWait
 {
-    AutoResetEvent ItemBuyEvent { get; }
-    AutoResetEvent ItemSellEvent { get; }
-    AutoResetEvent BankLoadEvent { get; }
     /// <summary>
     /// The duration, in milliseconds, for which the thread will sleep before re-checking whether the awaited condition is met.
     /// </summary>
@@ -90,6 +87,13 @@ public interface IScriptWait
     /// <param name="value">Value to wait for.</param>
     /// <param name="timeout">Number of times the thread should be slept (for <see cref="WAIT_SLEEP"/> milliseconds) before the wait is cancelled.</param>
     bool For(Func<object> function, object value, int timeout = 10);
+    /// <summary>
+    /// Waits for the specified <paramref name="function"/> to return the desired <paramref name="value"/>.
+    /// </summary>
+    /// <param name="function">Function to poll.</param>
+    /// <param name="value">Value to wait for.</param>
+    /// <param name="timeout">Number of times the thread should be slept (for <see cref="WAIT_SLEEP"/> milliseconds) before the wait is cancelled.</param>
+    ValueTask<bool> ForAsync(Func<object> function, object value, int timeout = 10, CancellationToken token = default);
     /// <summary>
     /// Waits for the specified game action to be available.
     /// </summary>
@@ -281,9 +285,31 @@ public interface IScriptWait
     /// Waits for the specified <paramref name="predicate"/> to return <see langword="true"/>.
     /// </summary>
     /// <param name="predicate">Function to poll.</param>
+    /// <param name="loopFunction">Function to run in between polling the <paramref name="predicate"/> function.</param>
+    /// <param name="timeout">Number of times the thread should be slept (for <see cref="WAIT_SLEEP"/> milliseconds) before the wait is cancelled.</param>
+    /// <param name="sleepOverride">Time to sleep between polling the <paramref name="predicate"/> function (-1 = <see cref="WAIT_SLEEP"/>).</param>
+    ValueTask<bool> ForTrueAsync(Func<bool> predicate, Action? loopFunction, int timeout, int sleepOverride = -1, CancellationToken token = default);
+    /// <summary>
+    /// Waits for the specified <paramref name="predicate"/> to return <see langword="true"/>.
+    /// </summary>
+    /// <param name="predicate">Function to poll.</param>
     /// <param name="timeout">Number of times the thread should be slept (for <see cref="WAIT_SLEEP"/> milliseconds) before the wait is cancelled.</param>
     /// <param name="sleepOverride">Time to sleep between polling the <paramref name="predicate"/> function (-1 = <see cref="WAIT_SLEEP"/>).</param>
     bool ForTrue(Func<bool> predicate, int timeout, int sleepOverride = -1);
+    /// <summary>
+    /// Waits for the specified <paramref name="predicate"/> to return <see langword="true"/>.
+    /// </summary>
+    /// <param name="predicate">Function to poll.</param>
+    /// <param name="timeout">Number of times the thread should be slept (for <see cref="WAIT_SLEEP"/> milliseconds) before the wait is cancelled.</param>
+    /// <param name="sleepOverride">Time to sleep between polling the <paramref name="predicate"/> function (-1 = <see cref="WAIT_SLEEP"/>).</param>
+    ValueTask<bool> ForTrueAsync(Func<bool> predicate, int timeout, int sleepOverride = -1, CancellationToken token = default);
+    /// <summary>
+    /// Waits for the specified <paramref name="predicate"/> to return <see langword="true"/>.
+    /// </summary>
+    /// <param name="predicate">Function to poll.</param>
+    /// <param name="timeout">Number of times the thread should be slept (for <see cref="WAIT_SLEEP"/> milliseconds) before the wait is cancelled.</param>
+    /// <param name="sleepOverride">Time to sleep between polling the <paramref name="predicate"/> function (-1 = <see cref="WAIT_SLEEP"/>).</param>
+    bool ForTrue(Func<bool> predicate, Action? loopFunction, int sleepOverride, CancellationToken token);
     /// <summary>
     /// Checks whether the given game action is cooled down or not.
     /// </summary>

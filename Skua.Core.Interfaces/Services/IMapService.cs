@@ -1,7 +1,8 @@
 ﻿using System.Collections.Immutable;
+using System.ComponentModel;
 
 namespace Skua.Core.Interfaces;
-public interface IMapService
+public interface IMapService : INotifyPropertyChanged
 {
     string MapName { get; }
     string Cell { get; }

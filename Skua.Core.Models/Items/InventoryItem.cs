@@ -37,4 +37,14 @@ public class InventoryItem : ItemBase
     /// </summary>
     [JsonProperty("InvEnhPatternID")]
     public int EnhancementPatternID { get; set; }
+
+    public override bool Equals(object? obj)
+    {
+        return obj is InventoryItem item && item.ID == ID && item.CharItemID == CharItemID;
+    }
+
+    public override int GetHashCode()
+    {
+        return HashCode.Combine(ID, CharItemID);
+    }
 }

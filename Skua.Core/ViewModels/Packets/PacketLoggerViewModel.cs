@@ -1,10 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Collections.ObjectModel;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using Microsoft.Toolkit.Mvvm.ComponentModel;
+﻿using System.Collections.ObjectModel;
 using Microsoft.Toolkit.Mvvm.Input;
 using Skua.Core.Interfaces;
 
@@ -14,7 +8,7 @@ public class PacketLoggerViewModel : BotControlViewModelBase
     public PacketLoggerViewModel(IEnumerable<PacketLogFilterViewModel> filters, IFlashUtil flash, IFileDialogService fileDialog)
         : base("Packet Logger")
     {
-        Flash = flash;
+        _flash = flash;
         _fileDialog = fileDialog;
         _packetFilters = filters.ToList();
         ClearPacketLogsCommand = new RelayCommand(PacketLogs.Clear);
@@ -22,7 +16,7 @@ public class PacketLoggerViewModel : BotControlViewModelBase
         SavePacketLogsCommand = new RelayCommand(SavePacketLogs);
     }
 
-    private readonly IFlashUtil Flash;
+    private readonly IFlashUtil _flash;
     private readonly IFileDialogService _fileDialog;
     private ObservableCollection<string> _packetLogs = new();
     public ObservableCollection<string> PacketLogs
@@ -54,9 +48,9 @@ public class PacketLoggerViewModel : BotControlViewModelBase
     private void ToggleLogger()
     {
         if (_isReceivingPackets)
-            Flash.FlashCall += LogPackets;
+            _flash.FlashCall += LogPackets;
         else
-            Flash.FlashCall -= LogPackets;
+            _flash.FlashCall -= LogPackets;
     }
 
     private bool _filterEnabled => _packetFilters.Where(f => !f.IsChecked).Any();
@@ -89,6 +83,6 @@ public class PacketLoggerViewModel : BotControlViewModelBase
 
     private void ClearFilters()
     {
-        _packetFilters?.ForEach(f => f.IsChecked = false);
+        _packetFilters.ForEach(f => f.IsChecked = false);
     }
 }

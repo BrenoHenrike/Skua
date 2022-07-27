@@ -1,6 +1,8 @@
-﻿namespace Skua.Core.Interfaces;
+﻿using System.ComponentModel;
 
-public interface IScriptBotStats
+namespace Skua.Core.Interfaces;
+
+public interface IScriptBotStats : INotifyPropertyChanged
 {
     /// <summary>
     /// The number of times the player has died.
@@ -26,4 +28,8 @@ public interface IScriptBotStats
     /// The number of times the player has been relogged in.
     /// </summary>
     int Relogins { get; set; }
+    /// <summary>
+    /// Resets all values.
+    /// </summary>
+    void Reset();
 }

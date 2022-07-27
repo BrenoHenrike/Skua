@@ -1,6 +1,7 @@
-﻿using Skua.Core.Interfaces;
+﻿using Microsoft.Toolkit.Mvvm.Messaging;
+using Skua.Core.Interfaces;
+using Skua.Core.Messaging;
 using Skua.Core.Models;
-using Skua.Core.Models.Items;
 using Skua.Core.Models.Monsters;
 using Skua.Core.Utils;
 
@@ -18,7 +19,8 @@ public class ScriptHunt : IScriptHunt
         Lazy<IScriptManager> manager,
         Lazy<IScriptMap> map,
         Lazy<IScriptKill> kill,
-        ILogService logger)
+        ILogService logger,
+        IMessenger messenger)
     {
         _lazyOptions = options;
         _lazyCombat = combat;
@@ -31,6 +33,7 @@ public class ScriptHunt : IScriptHunt
         _lazyMap = map;
         _lazyKill = kill;
         _logger = logger;
+        _messenger = messenger;
         _lastHuntTick = Environment.TickCount;
     }
     private readonly Lazy<IScriptOption> _lazyOptions;
@@ -44,6 +47,7 @@ public class ScriptHunt : IScriptHunt
     private readonly Lazy<IScriptMap> _lazyMap;
     private readonly Lazy<IScriptKill> _lazyKill;
     private readonly ILogService _logger;
+    private readonly IMessenger _messenger;
 
     private IScriptOption Options => _lazyOptions.Value;
     private IScriptCombat Combat => _lazyCombat.Value;
@@ -141,7 +145,6 @@ public class ScriptHunt : IScriptHunt
             _Hunt(name, token);
             return;
         }
-        _lastHuntTick = Environment.TickCount;
         while (!token?.IsCancellationRequested ?? !Manager.ShouldExit)
         {
             string[] names = name.Split('|').Select(x => x.ToLower()).ToArray();
@@ -181,7 +184,6 @@ public class ScriptHunt : IScriptHunt
             _Hunt(id, token);
             return;
         }
-        _lastHuntTick = Environment.TickCount;
         while (!token?.IsCancellationRequested ?? !Manager.ShouldExit)
         {
             IOrderedEnumerable<Monster> ordered = Monsters.MapMonsters.OrderBy(x => 0);
@@ -214,41 +216,43 @@ public class ScriptHunt : IScriptHunt
         }
     }
 
+    private (string name, int quantity, bool isTemp) _item = ("", 0, false);
+    private CancellationTokenSource? _ctsHunt;
+
     public void ForItem(string name, string item, int quantity, bool tempItem = false)
     {
-        HuntCTS = new();
-        this.item = (item, quantity, tempItem);
-        AppGameEvents.ItemDropped += ItemHunted;
+        _ctsHunt = new();
+        _item = (item, quantity, tempItem);
+        _messenger.Register<ScriptHunt, ItemDroppedMessage>(this, ItemHunted);
         while (!Manager.ShouldExit
             && (tempItem || !Inventory.Contains(item, quantity))
             && (!tempItem || !TempInv.Contains(item, quantity)))
         {
-            _HuntWithPriority(name, Options.HuntPriority, HuntCTS.Token);
+            if (_ctsHunt.IsCancellationRequested)
+                break;
+            _HuntWithPriority(name, Options.HuntPriority, _ctsHunt.Token);
             Drops.Pickup(item);
         }
-        AppGameEvents.ItemDropped -= ItemHunted;
-        HuntCTS.Dispose();
-        HuntCTS = null;
+        _messenger.Unregister<ItemDroppedMessage>(this);
+        _ctsHunt.Dispose();
+        _ctsHunt = null;
         Combat.Exit();
     }
 
-    private (string name, int quantity, bool isTemp) item = ("", 0, false);
-    private CancellationTokenSource? HuntCTS;
-
-    private void ItemHunted(ItemBase item, bool addedToInv, int quantityNow)
+    private void ItemHunted(ScriptHunt recipient, ItemDroppedMessage message)
     {
-        if (item.Name != this.item.name)
+        if (message.Item.Name != recipient._item.name)
             return;
 
-        if (addedToInv && !item.Temp && quantityNow >= this.item.quantity)
+        if (message.AddedToInv && !message.Item.Temp && message.QuantityNow >= recipient._item.quantity)
         {
-            HuntCTS?.Cancel();
+            recipient._ctsHunt?.Cancel();
             return;
         }
-        Drops.Pickup(item.Name);
-        int quant = this.item.isTemp ? TempInv.GetQuantity(item.Name) : Inventory.GetQuantity(item.Name);
-        if (quant >= this.item.quantity)
-            HuntCTS?.Cancel();
+        recipient.Drops.Pickup(message.Item.Name);
+        int quant = recipient._item.isTemp ? recipient.TempInv.GetQuantity(message.Item.Name) : recipient.Inventory.GetQuantity(message.Item.Name);
+        if (quant >= recipient._item.quantity)
+            recipient._ctsHunt?.Cancel();
     }
 
     public void ForItems(string name, IEnumerable<string> items, IEnumerable<int> quantities, IEnumerable<bool> tempItems)

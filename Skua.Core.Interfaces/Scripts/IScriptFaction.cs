@@ -6,7 +6,7 @@ public interface IScriptFaction
     /// <summary>
     /// Get a list of all factions the player has atleast 1 point in Reputation.
     /// </summary>
-    List<Faction> FactionList { get; }
+    List<Faction>? FactionList { get; }
     /// <summary>
     /// Get the rank of the faction with specified <paramref name="name"/>.
     /// </summary>
@@ -31,7 +31,7 @@ public interface IScriptFaction
     /// <param name="name">Name of the faction to check.</param>
     /// <param name="rank">Desired rank for that faction.</param>
     /// <returns><see langword="true"/> if the rank is equal or greater than the desired <paramref name="rank"/>.</returns>
-    bool HasRank(string name, int rank)
+    bool HasRank(string name, int rank = 1)
     {
         return GetRank(name) >= rank;
     }
@@ -41,7 +41,7 @@ public interface IScriptFaction
     /// <param name="name">ID of the faction to check.</param>
     /// <param name="rank">Desired rank for that faction.</param>
     /// <returns><see langword="true"/> if the rank is equal or greater than the desired <paramref name="rank"/>.</returns>
-    bool HasRank(int id, int rank)
+    bool HasRank(int id, int rank = 1)
     {
         return GetRank(id) >= rank;
     }

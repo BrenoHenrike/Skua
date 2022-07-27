@@ -11,7 +11,12 @@ public class SynchronizedList<T>
     /// <summary>
     /// The items contained in this list.
     /// </summary>
-    public List<T> Items => list;
+    public IEnumerable<T> Items => list;
+
+    /// <summary>
+    /// Gets the number of elements contained in the <see cref="SynchronizedList{T}"/>
+    /// </summary>
+    public int Count => list.Count;
 
     /// <summary>
     /// Adds an object to the end of the <see cref="List{T}"/>.
@@ -64,6 +69,26 @@ public class SynchronizedList<T>
     public T? Find(Predicate<T> predicate)
     {
         return list.Find(predicate);
+    }
+
+    /// <summary>
+    /// Determines if there is any item inside the underlying list.
+    /// </summary>
+    /// <returns><see langword="true"/> if the list contains any items, otherwise <see langword="false"/>.</returns>
+    public bool Any()
+    {
+        lock (sync)
+            return list.Any();
+    }
+
+    /// <summary>
+    /// Determines if any item inside the underlying list satisfies the condition.
+    /// </summary>
+    /// <returns><see langword="true"/> if the list is not empty and have atleast one item that satifies the <paramref name="predicate"/>, otherwise <see langword="false"/>.</returns>
+    public bool Any(Func<T, bool> predicate)
+    {
+        lock (sync)
+            return list.Any(predicate);
     }
 
     /// <summary>

@@ -1,5 +1,7 @@
-﻿using Newtonsoft.Json;
+﻿using Microsoft.Toolkit.Mvvm.Messaging;
+using Newtonsoft.Json;
 using Skua.Core.Interfaces;
+using Skua.Core.Messaging;
 using Skua.Core.Models;
 using Skua.Core.Models.Items;
 
@@ -18,6 +20,7 @@ public class ScriptWait : IScriptWait
     private readonly Lazy<IScriptQuest> _lazyQuests;
     private readonly Lazy<IScriptDrop> _lazyDrops;
     private readonly Lazy<IScriptSkill> _lazySkills;
+    private readonly IMessenger _messenger;
 
     private IFlashUtil Flash => _lazyFlash.Value;
     private IScriptPlayer Player => _lazyPlayer.Value;
@@ -42,7 +45,8 @@ public class ScriptWait : IScriptWait
         Lazy<IScriptHouseInv> house,
         Lazy<IScriptQuest> quests,
         Lazy<IScriptDrop> drops,
-        Lazy<IScriptSkill> skills)
+        Lazy<IScriptSkill> skills,
+        IMessenger messenger)
     {
         _lazyFlash = flash;
         _lazyPlayer = player;
@@ -55,13 +59,20 @@ public class ScriptWait : IScriptWait
         _lazyQuests = quests;
         _lazyDrops = drops;
         _lazySkills = skills;
+        _messenger = messenger;
+
+        _messenger.Register<ScriptWait, ItemBoughtMessage>(this, (r, m) => r.ItemBuyEvent.Set());
+        _messenger.Register<ScriptWait, ItemSoldMessage>(this, (r, m) => r.ItemSellEvent.Set());
+        _messenger.Register<ScriptWait, BankLoadedMessage>(this, (r, m) => r.BankLoadEvent.Set());
     }
 
     public int WAIT_SLEEP { get; set; } = 250;
 
-    public AutoResetEvent ItemBuyEvent => new(false);
-    public AutoResetEvent ItemSellEvent => new(false);
-    public AutoResetEvent BankLoadEvent => new(false);
+    private AutoResetEvent ItemBuyEvent { get; } = new(false);
+    private AutoResetEvent ItemSellEvent { get; } = new(false);
+    private AutoResetEvent BankLoadEvent { get; } = new(false);
+
+
 
     public bool OverrideTimeout { get; set; } = false;
     public int PlayerActionTimeout { get; set; } = 15;
@@ -87,7 +98,7 @@ public class ScriptWait : IScriptWait
         return ForTrue(() => !Player.Playing || !Player.HasTarget, () =>
         {
             Combat.UntargetSelf();
-            Combat.ApproachTarget();
+            //Combat.ApproachTarget();
         }, timeout, WAIT_SLEEP / 5);
     }
 
@@ -223,28 +234,66 @@ public class ScriptWait : IScriptWait
         return ForTrue(() => function() == value, timeout);
     }
 
+    public async ValueTask<bool> ForAsync(Func<object> function, object value, int timeout = 10, CancellationToken token = default)
+    {
+        return await ForTrueAsync(() => function() == value, timeout, token: token);
+    }
+
     public bool ForTrue(Func<bool> predicate, int timeout, int sleepOverride = -1)
     {
         return ForTrue(predicate, null, timeout, sleepOverride);
     }
 
+    public bool ForTrue(Func<bool> predicate, Action? loopFunction, int sleepOverride, CancellationToken token)
+    {
+        int counter = 0;
+        while (!predicate() && !Manager.ShouldExit && !token.IsCancellationRequested)
+        {
+            loopFunction?.Invoke();
+            if (token.IsCancellationRequested)
+                break;
+            Thread.Sleep(sleepOverride == -1 ? WAIT_SLEEP : sleepOverride);
+            counter++;
+        }
+        return true;
+    }
+
+    public async ValueTask<bool> ForTrueAsync(Func<bool> predicate, int timeout, int sleepOverride = -1, CancellationToken token = default)
+    {
+        return await ForTrueAsync(predicate, null, timeout, sleepOverride, token);
+    }
+
     public bool ForTrue(Func<bool> predicate, Action? loopFunction, int timeout, int sleepOverride = -1)
     {
-        if (timeout <= 0)
-            return predicate();
-        for (int counter = 0; counter < timeout; counter++)
+        int counter = 0;
+        while (!predicate() && !Manager.ShouldExit)
         {
-            if (predicate())
-                return true;
             if (timeout > 0 && counter >= timeout)
                 return false;
             loopFunction?.Invoke();
             Thread.Sleep(sleepOverride == -1 ? WAIT_SLEEP : sleepOverride);
             counter++;
         }
-        if (Manager.ShouldExit)
-            Thread.Sleep(1000);
         return true;
+    }
+
+    public async ValueTask<bool> ForTrueAsync(Func<bool> predicate, Action? loopFunction, int timeout, int sleepOverride = -1, CancellationToken token = default)
+    {
+        try
+        {
+            int counter = 0;
+            while (!predicate() && !Manager.ShouldExit && !token.IsCancellationRequested)
+            {
+                if (timeout > 0 && counter >= timeout)
+                    return false;
+                loopFunction?.Invoke();
+                await Task.Delay(sleepOverride == -1 ? WAIT_SLEEP : sleepOverride, token);
+                counter++;
+            }
+            return true;
+        }
+        catch { }
+        return false;
     }
 
     public bool ForActionCooldown(GameActions action, int timeout = 40)

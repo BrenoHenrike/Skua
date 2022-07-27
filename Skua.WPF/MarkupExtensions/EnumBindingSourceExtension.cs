@@ -2,7 +2,7 @@
 using System.Linq;
 using System.Windows.Markup;
 
-namespace Skua.WPF.MarkupExtensions;
+namespace Skua.WPF;
 public class EnumBindingSourceExtension : MarkupExtension
 {
     public Type EnumType { get; private set; }

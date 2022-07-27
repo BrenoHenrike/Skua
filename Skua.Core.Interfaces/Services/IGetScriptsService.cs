@@ -5,6 +5,10 @@ using Skua.Core.Utils;
 namespace Skua.Core.Interfaces;
 public interface IGetScriptsService : INotifyPropertyChanged
 {
+    int Downloaded => Scripts.Count(s => s.Downloaded);
+    int Outdated => Scripts.Count(s => s.Outdated);
+    int Total => Scripts.Count;
+    int Missing => Total - Downloaded;
     RangedObservableCollection<ScriptInfo> Scripts { get; }
 
     ValueTask<List<ScriptInfo>> GetScriptsAsync(IProgress<string>? progress, CancellationToken token);

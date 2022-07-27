@@ -65,4 +65,14 @@ public class Server
     {
         return s0?.Name != s1?.Name;
     }
+
+    public override bool Equals(object? obj)
+    {
+        return obj is Server server && server.Name == Name;
+    }
+
+    public override int GetHashCode()
+    {
+        return HashCode.Combine(Name, IP);
+    }
 }

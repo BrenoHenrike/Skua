@@ -5,7 +5,7 @@
     xmlns:materialdesign="http://materialdesigninxaml.net/winfx/xaml/themes">
 
     <Style x:Key="CustomWindow" TargetType="{x:Type local:CustomWindow}">
-        <Setter Property="Background" Value="{DynamicResource MaterialDesignPaper}" />
+        <Setter Property="Background" Value="{DynamicResource MaterialDesignBackground}" />
         <Setter Property="Foreground" Value="{DynamicResource MaterialDesignBody}" />
         <Setter Property="WindowChrome.WindowChrome">
             <Setter.Value>
@@ -36,6 +36,7 @@
                                         <Button
                                             Height="32"
                                             materialdesign:ButtonAssist.CornerRadius="0"
+                                            materialdesign:RippleAssist.IsDisabled="True"
                                             Content="{materialdesign:PackIcon Kind=Information,
                                                                               Size=30}"
                                             Style="{StaticResource MaterialDesignIconButton}" />

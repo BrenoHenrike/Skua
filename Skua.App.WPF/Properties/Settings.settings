@@ -1,0 +1,77 @@
+﻿<?xml version='1.0' encoding='utf-8'?>
+<SettingsFile xmlns="http://schemas.microsoft.com/VisualStudio/2004/01/settings" CurrentProfile="(Default)" GeneratedClassNamespace="Skua.App.Main.Properties" GeneratedClassName="Settings">
+  <Profiles />
+  <Settings>
+    <Setting Name="FastTravels" Type="System.Collections.Specialized.StringCollection" Scope="User">
+      <Value Profile="(Default)">&lt;?xml version="1.0" encoding="utf-16"?&gt;
+&lt;ArrayOfString xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"&gt;
+  &lt;string&gt;Tercessuinotlim,tercessuinotlim,Enter,Spawn&lt;/string&gt;
+  &lt;string&gt;Nulgath,tercessuinotlim,Boss2,Right&lt;/string&gt;
+  &lt;string&gt;VHL &amp;amp; Taro,tercessuinotlim,Taro,Left&lt;/string&gt;
+  &lt;string&gt;Swindle,tercessuinotlim,Swindle,Left&lt;/string&gt;
+  &lt;string&gt;Polish,tercessuinotlim,m12,Right&lt;/string&gt;
+  &lt;string&gt;Yin &amp;amp; Yang,tercessuinotlim,Twins,Left&lt;/string&gt;
+  &lt;string&gt;Carnage,tercessuinotlim,m4,Right&lt;/string&gt;
+  &lt;string&gt;Lae,tercessuinotlim,m5,Top&lt;/string&gt;
+  &lt;string&gt;Binky,doomvault,r5,Left&lt;/string&gt;
+  &lt;string&gt;Museum,museum,Crossroad,Left&lt;/string&gt;
+&lt;/ArrayOfString&gt;</Value>
+    </Setting>
+    <Setting Name="DefaultFastTravels" Type="System.Collections.Specialized.StringCollection" Scope="Application">
+      <Value Profile="(Default)">&lt;?xml version="1.0" encoding="utf-16"?&gt;
+&lt;ArrayOfString xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"&gt;
+  &lt;string&gt;Tercessuinotlim,tercessuinotlim,Enter,Spawn&lt;/string&gt;
+  &lt;string&gt;Nulgath,tercessuinotlim,Boss2,Right&lt;/string&gt;
+  &lt;string&gt;VHL &amp;amp; Taro,tercessuinotlim,Taro,Left&lt;/string&gt;
+  &lt;string&gt;Swindle,tercessuinotlim,Swindle,Left&lt;/string&gt;
+  &lt;string&gt;Polish,tercessuinotlim,m12,Right&lt;/string&gt;
+  &lt;string&gt;Yin &amp;amp; Yang,tercessuinotlim,Twins,Left&lt;/string&gt;
+  &lt;string&gt;Carnage,tercessuinotlim,m4,Right&lt;/string&gt;
+  &lt;string&gt;Lae,tercessuinotlim,m5,Top&lt;/string&gt;
+  &lt;string&gt;Binky,doomvault,r5,Left&lt;/string&gt;
+  &lt;string&gt;Museum,museum,Crossroad,Left&lt;/string&gt;
+&lt;/ArrayOfString&gt;</Value>
+    </Setting>
+    <Setting Name="DefaultThemes" Type="System.Collections.Specialized.StringCollection" Scope="Application">
+      <Value Profile="(Default)">&lt;?xml version="1.0" encoding="utf-16"?&gt;
+&lt;ArrayOfString xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"&gt;
+  &lt;string&gt;Skua,Dark,#FF607D8B,#FF607D8B,#FF000000,#FF000000,true,4.5,Medium,All&lt;/string&gt;
+  &lt;string&gt;RBot,Light,#FF9C934E,#FF9C934E,#FF000000,#FF000000&lt;/string&gt;
+  &lt;string&gt;Grimoire,Dark,#FFCC1F41,#FFCC1F41,#FFFFFFFF,#FFFFFFFF&lt;/string&gt;
+&lt;/ArrayOfString&gt;</Value>
+    </Setting>
+    <Setting Name="UserThemes" Type="System.Collections.Specialized.StringCollection" Scope="User">
+      <Value Profile="(Default)" />
+    </Setting>
+    <Setting Name="CurrentTheme" Type="System.String" Scope="User">
+      <Value Profile="(Default)">Skua,Dark,#FF607D8B,#FF607D8B,#FF000000,#FF000000,true,4.5,Medium,All</Value>
+    </Setting>
+    <Setting Name="UserOptions" Type="System.Collections.Specialized.StringCollection" Scope="User">
+      <Value Profile="(Default)" />
+    </Setting>
+    <Setting Name="UserGitHubToken" Type="System.String" Scope="User">
+      <Value Profile="(Default)" />
+    </Setting>
+    <Setting Name="AnimationFrameRate" Type="System.Int32" Scope="User">
+      <Value Profile="(Default)">60</Value>
+    </Setting>
+    <Setting Name="AutoUpdateScripts" Type="System.Boolean" Scope="User">
+      <Value Profile="(Default)">True</Value>
+    </Setting>
+    <Setting Name="CheckClientUpdates" Type="System.Boolean" Scope="User">
+      <Value Profile="(Default)">True</Value>
+    </Setting>
+    <Setting Name="CheckClientPrereleases" Type="System.Boolean" Scope="User">
+      <Value Profile="(Default)">False</Value>
+    </Setting>
+    <Setting Name="CheckScriptUpdates" Type="System.Boolean" Scope="User">
+      <Value Profile="(Default)">True</Value>
+    </Setting>
+    <Setting Name="IgnoreGHAuth" Type="System.Boolean" Scope="User">
+      <Value Profile="(Default)">False</Value>
+    </Setting>
+    <Setting Name="ApplicationVersion" Type="System.String" Scope="Application">
+      <Value Profile="(Default)">0.1.0.0</Value>
+    </Setting>
+  </Settings>
+</SettingsFile>

@@ -10,7 +10,6 @@ public class ItemBase
     /// </summary>
     [JsonProperty("ItemID")]
     public virtual int ID { get; set; }
-
     /// <summary>
     /// The name of the item.
     /// </summary>
@@ -77,8 +76,13 @@ public class ItemBase
         return $"{Name} [{ID}] x {Quantity}";
     }
 
-    public bool Equals(ItemBase? other)
+    public override bool Equals(object? obj)
     {
-        return other is not null && ID == other.ID;
+        return obj is ItemBase item && ID == item.ID;
+    }
+
+    public override int GetHashCode()
+    {
+        return HashCode.Combine(ID);
     }
 }

@@ -3,10 +3,12 @@ using System.Diagnostics;
 using Skua.Core.Interfaces;
 using Skua.Core.Models.Items;
 using Skua.Core.Utils;
-using Skua.Core.GameProxy;
+using Microsoft.Toolkit.Mvvm.Messaging;
+using Skua.Core.Messaging;
+using Microsoft.Toolkit.Mvvm.DependencyInjection;
 
 namespace Skua.Core.Scripts;
-public class ScriptInterface : IScriptInterface
+public class ScriptInterface : IScriptInterface, IScriptInterfaceManager
 {
     private CancellationTokenSource? ScriptInterfaceCTS;
     private readonly Thread ScriptInterfaceThread;
@@ -14,8 +16,12 @@ public class ScriptInterface : IScriptInterface
     private readonly TimeLimiter _limit = new();
     private readonly ILogService _logger;
 
-    public IScriptManager ScriptManager { get; }
+    public bool ShouldExit => Manager.ShouldExit;
+
+    public IScriptStatus Manager { get; }
     public IFlashUtil Flash { get; }
+    public IScriptAuto Auto { get; }
+    public IMessenger Messenger { get; }
     public IScriptBoost Boosts { get; }
     public IScriptBotStats Stats { get; }
     public IScriptCombat Combat { get; }
@@ -28,6 +34,7 @@ public class ScriptInterface : IScriptInterface
     public IScriptInventory Inventory { get; }
     public IScriptTempInv TempInv { get; }
     public IScriptBank Bank { get; }
+    public IScriptInventoryHelper InvHelper { get; }
     public IScriptLite Lite { get; }
     public IScriptOption Options { get; }
     public IScriptMap Map { get; }
@@ -41,6 +48,7 @@ public class ScriptInterface : IScriptInterface
     public IScriptServers Servers { get; }
     public IScriptHandlers Handlers { get; }
     public ICaptureProxy GameProxy { get; }
+    public IScriptOptionContainer? Config => Manager.Config;
     public Random Random { get; set; } = new Random();
 
     public ScriptInterface(
@@ -59,6 +67,7 @@ public class ScriptInterface : IScriptInterface
         IScriptInventory inventory,
         IScriptTempInv tempInv,
         IScriptBank bank,
+        IScriptInventoryHelper invManager,
         IScriptLite lite,
         IScriptOption options,
         IScriptMap map,
@@ -71,16 +80,20 @@ public class ScriptInterface : IScriptInterface
         IScriptWait wait,
         IScriptKill kill,
         IScriptHunt hunt,
-        ICaptureProxy gameProxy)
+        ICaptureProxy gameProxy,
+        IScriptAuto auto,
+        IMessenger messenger)
     {
         _logger = logger;
-        ScriptManager = manager;
+        Manager = manager;
         Boosts = boosts;
         Stats = stats;
         Combat = combat;
         Kill = kill;
         Hunt = hunt;
         GameProxy = gameProxy;
+        Auto = auto;
+        Messenger = messenger;
         Drops = drops;
         Events = events;
         Reputation = rep;
@@ -88,6 +101,7 @@ public class ScriptInterface : IScriptInterface
         Inventory = inventory;
         TempInv = tempInv;
         Bank = bank;
+        InvHelper = invManager;
         Lite = lite;
         Options = options;
         Map = map;
@@ -103,8 +117,6 @@ public class ScriptInterface : IScriptInterface
         Flash = flash;
 
         Flash.FlashCall += HandleFlashCall;
-
-        Task.Run(async () => await Servers.GetServers());
 
         ScriptInterfaceThread = new(() =>
         {
@@ -131,18 +143,37 @@ public class ScriptInterface : IScriptInterface
 
     public void Log(string message)
     {
+        CheckScriptTermination();
         _logger.ScriptLog(message);
     }
 
     public void Sleep(int ms)
     {
+        CheckScriptTermination();
         Thread.Sleep(ms);
+    }
+
+    private void CheckScriptTermination()
+    {
+        if (Manager.ShouldExit && Thread.CurrentThread.Name == "Script Thread")
+            throw new OperationCanceledException();
     }
 
     public void Initialize()
     {
         if (!ScriptInterfaceThread.IsAlive)
             ScriptInterfaceThread.Start();
+    }
+
+    public async Task StopTimerAsync()
+    {
+        ScriptInterfaceCTS?.Cancel();
+        await Wait.ForTrueAsync(() => ScriptInterfaceCTS == null, 20);
+    }
+
+    public void Stop(bool runScriptStoppingEvent = true)
+    {
+        Manager.StopScript(runScriptStoppingEvent);
     }
 
     private void ScriptTimer(CancellationToken token)
@@ -172,32 +203,12 @@ public class ScriptInterface : IScriptInterface
                         catching = true;
                     }
 
-                    _limit.LimitedRun("opts", 250, () =>
-                    {
-                        if (Options.Magnetise)
-                            Flash.Call("magnetise");
-                        if (Options.InfiniteRange)
-                            Flash.Call("infiniteRange");
-                        if (Options.AggroMonsters)
-                            Flash.CallGameFunction("world.aggroAllMon");
-                        if (Options.AggroAllMonsters)
-                            Send.Packet($"%xt%zm%aggroMon%{Map.RoomID}%{string.Join("%", Monsters.MapMonsters.Select(m => m.MapID))}%");
-                        if (Options.SkipCutscenes)
-                            Flash.Call("skipCutscenes");
-                        if (Options.LagKiller)
-                            Flash.Call("killLag", true);
-                        if (Options.WalkSpeed != 8)
-                            Player.WalkSpeed = Options.WalkSpeed;
-                        if (!Lite.UntargetSelf)
-                            Lite.UntargetSelf = true;
-                        if (!Lite.UntargetDead)
-                            Lite.UntargetDead = true;
-                    });
+                    _limit.LimitedRun("opts", 250, CheckOptions);
                 }
 
                 _limit.LimitedRun("connDetail", 100, () => (lastConnChange, lastConnDetail) = CheckStuckonLoading(lastConnChange, lastConnDetail));
 
-                if (ScriptManager.ScriptRunning)
+                if (Manager.ScriptRunning)
                     RunScriptHandlers();
 
                 sw.Stop();
@@ -205,9 +216,35 @@ public class ScriptInterface : IScriptInterface
             }
             catch (Exception e)
             {
-                Debug.WriteLine($"Error in timer thread: {e.Message}");
+                Trace.WriteLine($"Error in timer thread: {e.Message}");
             }
         }
+    }
+
+    private void CheckOptions()
+    {
+        if (Options.LagKiller)
+            Flash.Call("killLag", true);
+
+        if (!Player.Playing)
+            return;
+
+        if (Options.Magnetise)
+            Flash.Call("magnetise");
+        if (Options.InfiniteRange)
+            Flash.Call("infiniteRange");
+        if (Options.AggroMonsters)
+            Flash.CallGameFunction("world.aggroAllMon");
+        if (Options.AggroAllMonsters)
+            Send.Packet($"%xt%zm%aggroMon%{Map.RoomID}%{string.Join("%", Monsters.MapMonsters.Select(m => m.MapID))}%");
+        if (Options.SkipCutscenes)
+            Flash.Call("skipCutscenes");
+        if (Options.WalkSpeed != 8)
+            Player.WalkSpeed = Options.WalkSpeed;
+        if (!Lite.UntargetSelf)
+            Lite.UntargetSelf = true;
+        if (!Lite.UntargetDead)
+            Lite.UntargetDead = true;
     }
 
     /// <summary>
@@ -229,7 +266,7 @@ public class ScriptInterface : IScriptInterface
                 Map.Reload();
                 Handlers.RegisterOnce(500, b =>
                 {
-                if (Flash.GetGameObject("mcConnDetail.txtDetail.text") == "loading map")
+                    if (Flash.GetGameObject("mcConnDetail.txtDetail.text") == "loading map")
                     {
                         Logout();
                         return;
@@ -248,6 +285,7 @@ public class ScriptInterface : IScriptInterface
         {
             _waitForLogin = false;
             _reloginCTS?.Cancel();
+            Wait.ForTrue(() => _reloginTask == null, 20);
             Servers.Logout();
         }
     }
@@ -270,6 +308,7 @@ public class ScriptInterface : IScriptInterface
         }
         Handlers.Remove(rem);
     }
+
     private void HandleFlashCall(string name, object[] args)
     {
         switch (name)
@@ -278,7 +317,7 @@ public class ScriptInterface : IScriptInterface
                 Initialize();
                 break;
             case "debug":
-                Debug.WriteLine(args[0]);
+                Trace.WriteLine(args[0]);
                 break;
             case "pext":
                 dynamic packet = JsonConvert.DeserializeObject<dynamic>((string)args[0])!;
@@ -292,14 +331,12 @@ public class ScriptInterface : IScriptInterface
                         case "event":
                             string zone = data.args?["zoneSet"]!;
                             if (zone is not null)
-                                Events.OnRunToArea(zone);
+                                Messenger.Send<RunToAreaMessage>(new(zone));
                             break;
                         case "moveToArea":
-                            if (!string.IsNullOrEmpty(Options.CustomName))
-                                Options.CustomName = Options.CustomName;
-                            if (!string.IsNullOrEmpty(Options.CustomGuild))
-                                Options.CustomGuild = Options.CustomGuild;
-                            Events.OnMapChanged(Convert.ToString(data.strMapName));
+                            Options.CustomName = !string.IsNullOrWhiteSpace(Options.CustomName) ? Options.CustomName : Player.Username;
+                            Options.CustomGuild = !string.IsNullOrWhiteSpace(Options.CustomGuild) ? Options.CustomGuild : Player.Guild;
+                            Messenger.Send<MapChangedMessage>(new(Convert.ToString(data.strMapName)));
                             Map.FilePath = Convert.ToString(data.strMapFileName);
                             Map.LastMap = Convert.ToString(data.strMapName);
                             break;
@@ -308,7 +345,7 @@ public class ScriptInterface : IScriptInterface
                             if (p is not null && p.intHP == 0)
                             {
                                 Stats.Deaths++;
-                                Events.OnPlayerDeath();
+                                Messenger.Send<PlayerDeathMessage>();
                                 break;
                             }
                             dynamic anims = data.anims?[0]!;
@@ -317,7 +354,7 @@ public class ScriptInterface : IScriptInterface
                                 string msg = anims["msg"];
                                 if (msg is not null && msg.Contains("prepares a counter attack!"))
                                 {
-                                    Events.OnCounterAttack(false);
+                                    Messenger.Send<CounterAttackMessage>(new(false));
                                     break;
                                 }
                             }
@@ -330,61 +367,65 @@ public class ScriptInterface : IScriptInterface
                                         continue;
                                     if (a.aura is not null && (string)a.aura["nam"] == "Counter Attack")
                                     {
-                                        Events.OnCounterAttack(true);
+                                        Messenger.Send<CounterAttackMessage>(new(true));
                                         break;
                                     }
                                 }
                             }
                             break;
                         case "sellItem":
-                            Wait.ItemSellEvent.Set();
+                            Messenger.Send<ItemSoldMessage>(new(data.CharItemID, data.iQty, data.iQtyNow, data.intAmount, data.bCoins == 1));
                             break;
                         case "buyItem":
                             if (data.bitSuccess == 1)
-                                Wait.ItemBuyEvent.Set();
+                                Messenger.Send<ItemBoughtMessage>(new(Convert.ToInt32(data.CharItemID)));
                             break;
                         case "dropItem":
                             string items = Convert.ToString(data["items"]);
                             InventoryItem drop = JsonConvert.DeserializeObject<Dictionary<string, InventoryItem>>(items)!.First().Value;
-                            Events.OnItemDropped(drop);
+                            Messenger.Send<ItemDroppedMessage>(new(drop));
                             break;
                         case "addItems":
                             string addItems = Convert.ToString(data["items"]);
-                            Dictionary<int, dynamic> obj = JsonConvert.DeserializeObject<Dictionary<int, dynamic>>(addItems)!;
-                            ItemBase invItem = Inventory.GetItem(obj.Keys.First())!;
+                            Dictionary<int, dynamic> addedItem = JsonConvert.DeserializeObject<Dictionary<int, dynamic>>(addItems)!;
+                            ItemBase invItem = Inventory.GetItem(addedItem.Keys.First())!;
                             if (invItem is null)
-                                invItem = TempInv.GetItem(obj.Keys.First())!;
+                                invItem = TempInv.GetItem(addedItem.Keys.First())!;
                             if (!invItem.Temp)
                                 Stats.Drops++;
-                            Events.OnItemDropped(invItem, true, Convert.ToInt32(obj.Values.First().iQtyNow));
+                            Messenger.Send<ItemDroppedMessage>(new(invItem, true, Convert.ToInt32(addedItem.Values.First().iQtyNow)));
                             break;
                         case "getDrop":
-                            // TODO check getDrop packet
+                            bool toBank = Convert.ToBoolean(data.bBank);
                             if (data.bSuccess == 1)
                                 Stats.Drops += (int)data.iQty;
+                            if(toBank)
+                            {
+                                ItemBase bankItem = Bank.GetItem(Convert.ToInt32(data.ItemID))!;
+                                Messenger.Send<ItemAddedToBankMessage>(new(bankItem, Convert.ToInt32(data.iQtyNow)));
+                            }
                             break;
                         case "addGoldExp":
-                            // TODO check addGoldExp packet
-                            string aa = Convert.ToString(packet);
-                            Debug.WriteLine(aa);
                             if (data.typ == "m")
                             {
                                 Stats.Kills++;
-                                Events.OnMonsterKilled();
+                                Messenger.Send<MonsterKilledMessage>(new(Convert.ToInt32(data.id)));
                             }
                             break;
                         case "ccqr":
+                            string aa = Convert.ToString(packet);
+                            Trace.WriteLine(aa);
                             if (data.bSuccess == 1)
                             {
                                 Stats.QuestsCompleted++;
-                                Events.OnQuestTurnIn(Convert.ToInt32(data.QuestID));
+                                Messenger.Send<QuestTurninMessage>(new(Convert.ToInt32(data.QuestID)));
                             }
                             break;
                         case "loadBank":
-                            Wait.BankLoadEvent.Set();
+                            Messenger.Send<BankLoadedMessage>();
                             break;
                         case "loadShop":
-                            Shops.OnLoaded(Shops.ID, Shops.Name, Shops.Items);
+                            Messenger.Send<ShopLoadedMessage>(new(new(Shops.ID, Shops.Name, Shops.Items)));
                             break;
                     }
                 }
@@ -395,32 +436,32 @@ public class ScriptInterface : IScriptInterface
                     {
                         case "uotls":
                             if (Player.Username == (string)data[2] && data[3] == "afk:true")
-                                Events.OnPlayerAFK();
+                                Messenger.Send<PlayerAFKMessage>();
                             break;
                         case "loginResponse":
-
+                            Messenger.Send<LoginMessage>(new(Convert.ToString(data[4])));
                             break;
                     }
                 }
-                Events.OnExtensionPacket(packet);
+                Messenger.Send<ExtensionPacketMessage>(new(packet));
                 break;
             case "packet":
                 string[] parts = ((string)args[0]).Split('%', StringSplitOptions.RemoveEmptyEntries);
                 switch (parts[2])
                 {
                     case "moveToCell":
-                        Events.OnCellChanged(Map.Name, parts[4], parts[5]);
+                        Messenger.Send<CellChangedMessage>(new(Map.Name, parts[4], parts[5]));
                         break;
                     case "buyItem":
-                        Events.OnTryBuyItem(int.Parse(parts[5]), int.Parse(parts[4]), int.Parse(parts[6]));
+                        Messenger.Send<TryBuyItemMessage>(new(int.Parse(parts[5]), int.Parse(parts[4]), int.Parse(parts[6])));
                         break;
                     case "acceptQuest":
                         Stats.QuestsAccepted++;
-                        Events.OnQuestAccepted(int.Parse(parts[4]));
+                        Messenger.Send<QuestAcceptedMessage>(new(int.Parse(parts[4])));
                         break;
                     case "cmd":
                         if (parts.Length >= 5 && parts[4] == "logout")
-                            Events.OnLogout();
+                            Messenger.Send<LogoutMessage>();
                             OnLogout();
                         break;
                 }
@@ -446,12 +487,12 @@ public class ScriptInterface : IScriptInterface
         }
 
         Log("Autorelogin triggered.");
-        bool wasRunning = ScriptManager.ScriptRunning;
-        ScriptManager.StopScript();
+        bool wasRunning = Manager.ScriptRunning;
+        Manager.StopScript();
         bool kicked = Player.Kicked;
         _waitForLogin = true;
         Servers.Logout();
-        Events.OnReloginTriggered(kicked);
+        Messenger.Send<ReloginTriggeredMessage>(new(kicked));
 
         Relogin((!Options.SafeRelogin && !kicked) ? 5000 : 70000, wasRunning);
 
@@ -464,7 +505,7 @@ public class ScriptInterface : IScriptInterface
                 Stats.Relogins++;
                 bool relogged = await Servers.EnsureRelogin(_reloginCTS.Token);
                 if (startScript)
-                    await ScriptManager.StartScriptAsync();
+                    await Ioc.Default.GetService<IScriptManager>()!.StartScriptAsync();
                 Log($"Relogin was {(relogged ? "successful" : "cancelled or unsuccessful")}.");
                 Drops.Start();
                 _reloginCTS.Dispose();

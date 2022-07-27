@@ -1,49 +1,48 @@
 ﻿using System.Diagnostics;
 using Microsoft.Toolkit.Mvvm.ComponentModel;
+using Microsoft.Toolkit.Mvvm.Messaging;
 using Skua.Core.Interfaces;
+using Skua.Core.Messaging;
 using Skua.Core.Models;
 
 namespace Skua.Core.Services;
-public class LogService : ObservableObject, ILogService, IDisposable
+public class LogService : ObservableRecipient, ILogService
 {
-    private readonly IFlashUtil _flash;
-
     public LogService(IFlashUtil flash)
     {
         Trace.Listeners.Add(new DebugListener(this));
-        _flash = flash;
-        _flash.FlashError += Flash_FlashError;
+        Messenger.Register<LogService, FlashErrorMessage>(this, LogFlashError);
     }
 
-    private void Flash_FlashError(Exception e, string function, params object[] args)
+    private void LogFlashError(LogService recipient, FlashErrorMessage message)
     {
-        FlashLogs += $"{function} Args[{args.Length}] {(args.Length > 0 ? $"= {{{string.Join(",", args.Select(a => a.ToString()))}" : string.Empty)}}}\r\n";
+        recipient.FlashLog($"{message.Function} Args[{message.Args.Length}] {(message.Args.Length > 0 ? $"= {{{string.Join(",", message.Args.Select(a => a?.ToString()))}}}" : string.Empty)}");
     }
 
-    public string DebugLogs { get; private set; } = string.Empty;
-    public string ScriptLogs { get; private set; } = string.Empty;
-    public string FlashLogs { get; private set; } = string.Empty;
+    private List<string> _debugLogs = new();
+    private List<string> _scriptLogs = new();
+    private List<string> _flashLogs = new();
 
     public void DebugLog(string message)
     {
-        DebugLogs += message;
-        OnPropertyChanged(nameof(DebugLogs));
+        _debugLogs.Add(message);
+        Messenger.Send(new LogsChangedMessage(LogType.Debug));
     }
 
     public void FlashLog(string? message)
     {
         if (message is null)
             return;
-        FlashLogs += message;
-        OnPropertyChanged(nameof(FlashLogs));
+        _flashLogs.Add(message);
+        Messenger.Send(new LogsChangedMessage(LogType.Flash));
     }
 
     public void ScriptLog(string? message)
     {
         if (message is null)
             return;
-        ScriptLogs += message;
-        OnPropertyChanged(nameof(ScriptLogs));
+        _scriptLogs.Add(message);
+        Messenger.Send(new LogsChangedMessage(LogType.Script));
     }
 
     public void ClearLog(LogType logType)
@@ -51,24 +50,34 @@ public class LogService : ObservableObject, ILogService, IDisposable
         switch (logType)
         {
             case LogType.Debug:
-                DebugLogs = string.Empty;
-                OnPropertyChanged(nameof(DebugLogs));
+                _debugLogs.Clear();
                 break;
             case LogType.Script:
-                ScriptLogs = string.Empty;
-                OnPropertyChanged(nameof(ScriptLogs));
+                _scriptLogs.Clear();
                 break;
             case LogType.Flash:
-                FlashLogs = string.Empty;
-                OnPropertyChanged(nameof(FlashLogs));
+                _flashLogs.Clear();
                 break;
         }
+        Messenger.Send(new LogsChangedMessage(logType));
     }
 
-    public void Dispose()
+    public List<string> GetLogs(LogType logType)
     {
-        GC.SuppressFinalize(this);
-        _flash.FlashError += Flash_FlashError;
+        List<string> logs = new();
+        switch (logType)
+        {
+            case LogType.Debug:
+                logs = _debugLogs.ToList();
+                break;
+            case LogType.Script:
+                logs = _scriptLogs.ToList();
+                break;
+            case LogType.Flash:
+                logs = _flashLogs.ToList();
+                break;
+        }
+        return logs;
     }
 }
 
@@ -92,6 +101,6 @@ public class DebugListener : TraceListener
     {
         if (message is null)
             return;
-        _logService.DebugLog($"{message}\r\n");
+        _logService.DebugLog(message);
     }
 }

@@ -44,6 +44,8 @@ public class CallBindingGenerator : GenericFieldAttributeGenerator<CallBindingPr
                     source.Append($"Flash.Call(\"{info.Values.Path}\");");
                 if (info.NotifyProp)
                     source.Append($"SetProperty(ref this.{info.FieldName}, value);");
+                else
+                    source.Append($"this.{info.FieldName} = value;");
             }
             else
             {
@@ -65,7 +67,7 @@ public class CallBindingGenerator : GenericFieldAttributeGenerator<CallBindingPr
         string typeNameWithNullabilityAnnotations = fieldSymbol.Type.GetFullyQualifiedNameWithNullabilityAnnotations();
         string fieldName = fieldSymbol.Name;
         string propertyName = Execute.GetGeneratedPropertyName(fieldSymbol);
-        bool notifyProp = fieldSymbol.ContainingType.BaseType?.HasFullyQualifiedName("Microsoft.Toolkit.Mvvm.ComponentModel.ObservableObject") ?? false;
+        bool notifyProp = Execute.HasNotifyPropertyChanged(fieldSymbol);
 
         // Check for name collisions
         if (fieldName == propertyName)

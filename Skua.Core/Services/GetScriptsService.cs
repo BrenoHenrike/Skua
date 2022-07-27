@@ -10,17 +10,14 @@ public partial class GetScriptsService : ObservableObject, IGetScriptsService
     public GetScriptsService(IDialogService dialogService)
     {
         _dialogService = dialogService;
+        _repos = new();
+        _repos.Add(new("BrenoHenrike", "Scripts", string.Empty, "Master Project", "Skua"));
     }
-    private const string BaseUrl = "https://raw.githubusercontent.com/brenohenrike/rbot/master/repos";
-    private const string DebugUrl = "https://raw.githubusercontent.com/brenohenrike/rbot/master/debugrepos";
+    private const string BaseUrl = "https://raw.githubusercontent.com/brenohenrike/skua/master/repos";
     private readonly IDialogService _dialogService;
     private List<ScriptRepo>? _repos;
+    [ObservableProperty]
     private RangedObservableCollection<ScriptInfo> _scripts = new();
-    public RangedObservableCollection<ScriptInfo> Scripts
-    {
-        get { return _scripts; }
-        set { SetProperty(ref _scripts, value); }
-    }
 
     public async ValueTask<List<ScriptInfo>> GetScriptsAsync(IProgress<string>? progress, CancellationToken token)
     {
@@ -66,13 +63,13 @@ public partial class GetScriptsService : ObservableObject, IGetScriptsService
         if (_repos is not null)
             return _repos;
         using HttpResponseMessage response = await HttpClients.Default.GetAsync(BaseUrl, token);
-        return _repos = (await response.Content.ReadAsStringAsync(token)).Split('\n').Select(l => l.Trim().Split('|')).Where(p => p.Length == 4).Select(p => new ScriptRepo(p[0], p[1], p[2], p[3])).ToList();
+        return _repos = (await response.Content.ReadAsStringAsync(token)).Split('\n').Select(l => l.Trim().Split('|')).Where(p => p.Length == 5).Select(p => new ScriptRepo(p[0], p[1], p[2], p[3], p[5])).ToList();
     }
 
     private async Task<List<ScriptInfo>> GetScriptsInfo(ScriptRepo repo, CancellationToken token)
     {
         await GetLastCommitRecursiveTree(repo, token);
-        if (repo.RecursiveTreeUrl == string.Empty)
+        if (string.IsNullOrEmpty(repo.RecursiveTreeUrl))
             return new();
         using HttpResponseMessage treeResponse = await HttpClients.GetGHClient().GetAsync(repo.RecursiveTreeUrl, token);
         IEnumerable<ScriptTreeInfo>? treeInfos = 
@@ -100,7 +97,7 @@ public partial class GetScriptsService : ObservableObject, IGetScriptsService
         dynamic? commits = JsonConvert.DeserializeObject(await response.Content.ReadAsStringAsync());
         if (commits is null)
             return string.Empty;
-        return repo.RecursiveTreeUrl = $"https://api.github.com/repos/{repo.Username}/{repo.Name}/git/trees/{Convert.ToString(commits[0].sha)}?recursive=true";
+        return repo.RecursiveTreeUrl = $"https://api.github.com/repos/{repo.Username}/{repo.Name}/git/trees/{Convert.ToString(commits.sha)}?recursive=true";
     }
 
     public async Task DownloadScriptAsync(ScriptInfo info)

@@ -13,5 +13,5 @@ public partial class ScriptFaction : IScriptFaction
     }
 
     [ObjectBinding("world.myAvatar.factions", Default = "new()", HasSetter = false)]
-    private List<Faction> _factionList;
+    private List<Faction>? _factionList;
 }

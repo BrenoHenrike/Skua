@@ -496,24 +496,32 @@
                         </wpf:PropertyGridDataTemplate>-->
                             <wpf:PropertyGridDataTemplate PropertyType="System.Nullable`1[System.Boolean]">
                                 <DataTemplate>
-                                    <TextBox Text="{Binding BooleanValue}">
-                                        <i:Interaction.Behaviors>
-                                            <wpf:TextBoxSelectAllBehavior />
-                                        </i:Interaction.Behaviors>
-                                    </TextBox>
-                                    <!--<CheckBox
-                                        IsChecked="{Binding BooleanValue, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"
-                                        IsEnabled="{Binding IsReadWrite}"
-                                        IsThreeState="True" />-->
+                                    <StackPanel HorizontalAlignment="Stretch" Orientation="Horizontal">
+                                        <TextBox IsEnabled="{Binding IsReadWrite}" Text="{Binding BooleanValue, Mode=OneWay, UpdateSourceTrigger=PropertyChanged}">
+                                            <i:Interaction.Behaviors>
+                                                <wpf:TextBoxSelectAllBehavior />
+                                            </i:Interaction.Behaviors>
+                                        </TextBox>
+                                        <CheckBox
+                                            IsChecked="{Binding BooleanValue, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"
+                                            IsEnabled="{Binding IsReadWrite}"
+                                            IsThreeState="True" />
+                                    </StackPanel>
                                 </DataTemplate>
                             </wpf:PropertyGridDataTemplate>
                             <wpf:PropertyGridDataTemplate IsReadOnly="False" PropertyType="System.Boolean">
                                 <DataTemplate>
-                                    <TextBlock Text="{Binding BooleanValue}" />
-                                    <!--<CheckBox
-                                        IsChecked="{Binding BooleanValue, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"
-                                        IsEnabled="{Binding IsReadWrite}"
-                                        IsThreeState="False" />-->
+                                    <StackPanel HorizontalAlignment="Stretch" Orientation="Horizontal">
+                                        <TextBox IsEnabled="{Binding IsReadWrite}" Text="{Binding BooleanValue, Mode=OneWay, UpdateSourceTrigger=PropertyChanged}">
+                                            <i:Interaction.Behaviors>
+                                                <wpf:TextBoxSelectAllBehavior />
+                                            </i:Interaction.Behaviors>
+                                        </TextBox>
+                                        <CheckBox
+                                            IsChecked="{Binding BooleanValue, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"
+                                            IsEnabled="{Binding IsReadWrite}"
+                                            IsThreeState="False" />
+                                    </StackPanel>
                                 </DataTemplate>
                             </wpf:PropertyGridDataTemplate>
                             <wpf:PropertyGridDataTemplate IsReadOnly="False" PropertyType="System.DateTime|System.Nullable`1[System.DateTime]">

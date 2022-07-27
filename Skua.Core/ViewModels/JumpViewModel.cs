@@ -1,57 +1,47 @@
 ﻿using System.Collections.Immutable;
+using Microsoft.Toolkit.Mvvm.ComponentModel;
 using Microsoft.Toolkit.Mvvm.Input;
 using Skua.Core.Interfaces;
 using Skua.Core.Utils;
 
 namespace Skua.Core.ViewModels;
-public class JumpViewModel : BotControlViewModelBase
+public partial class JumpViewModel : BotControlViewModelBase
 {
     public JumpViewModel(IMapService mapService)
         : base("Jump")
     {
-        MapService = mapService;
-        Pads = MapService.Pads;
-        JumpToCommand = new RelayCommand(() => MapService.Jump(SelectedCell, SelectedPad));
-        GetCurrentCommand = new RelayCommand(() => (SelectedCell, SelectedPad) = MapService.GetCurrentCell());
-        UpdateCellsCommand = new RelayCommand(() => UpdateCells());
+        _mapService = mapService;
+        Pads = _mapService.Pads;
+        JumpToCommand = new RelayCommand(JumpTo);
+        GetCurrentCommand = new RelayCommand(GetCurrent);
+        UpdateCellsCommand = new RelayCommand(UpdateCells);
     }
 
-    private readonly IMapService MapService;
+    private readonly IMapService _mapService;
+    [ObservableProperty]
     private string _selectedCell = string.Empty;
+    [ObservableProperty]
     private string _selectedPad = string.Empty;
+    [ObservableProperty]
     private RangedObservableCollection<string> _cells = new();
-
-    public RangedObservableCollection<string> Cells
-    {
-        get { return _cells; }
-        set { SetProperty(ref _cells, value); }
-    }
     public ImmutableList<string> Pads { get; }
-    public string SelectedCell
-    {
-        get { return _selectedCell; }
-        set { SetProperty(ref _selectedCell, value); }
-    }
-    public string SelectedPad
-    {
-        get { return _selectedPad; }
-        set { SetProperty(ref _selectedPad, value); }
-    }
 
     public IRelayCommand JumpToCommand { get; }
     public IRelayCommand GetCurrentCommand { get; }
     public IRelayCommand UpdateCellsCommand { get; }
 
-    private string _lastMap = string.Empty;
-    public bool UpdateCells()
+    private void GetCurrent()
     {
-        string map = MapService.MapName;
-        if (!string.IsNullOrEmpty(map) && _lastMap != map)
-        {
-            Cells.ReplaceRange(MapService.Cells);
-            _lastMap = map;
-            return true;
-        }
-        return false;
+        (SelectedCell, SelectedPad) = _mapService.GetCurrentCell();
+    }
+
+    private void JumpTo()
+    {
+        _mapService.Jump(SelectedCell, SelectedPad);
+    }
+
+    public void UpdateCells()
+    {
+        Cells.ReplaceRange(_mapService.Cells);
     }
 }

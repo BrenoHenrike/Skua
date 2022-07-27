@@ -42,7 +42,7 @@ public partial class ScriptInventory : IScriptInventory
     }
 
     [ObjectBinding("world.myAvatar.items", Default = "new()")]
-    private List<InventoryItem> _items;
+    private List<InventoryItem>? _items;
     [ObjectBinding("world.myAvatar.objData.iBagSlots")]
     private int _slots;
     [ObjectBinding("world.myAvatar.items.length")]

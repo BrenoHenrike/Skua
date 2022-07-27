@@ -91,7 +91,7 @@ public interface ICheckInventory<T> : IItemContainer<T> where T : ItemBase
     /// <returns>The <see cref="T"/> with the specified <paramref name="name"/> or <see langword="null"/> if it doesn't exist.</returns>
     T? GetItem(string name)
     {
-        return Items.Find(x => x.Name == name);
+        return Items?.Find(x => x.Name == name);
     }
     /// <summary>
     /// Get the <see cref="T">item</see> with the specified <paramref name="id"/>.
@@ -100,7 +100,7 @@ public interface ICheckInventory<T> : IItemContainer<T> where T : ItemBase
     /// <returns>The <see cref="T"/> with the specified <paramref name="id"/> or <see langword="null"/> if it doesn't exist.</returns>
     T? GetItem(int id)
     {
-        return Items.Find(x => x.ID == id);
+        return Items?.Find(x => x.ID == id);
     }
     /// <summary>
     /// Gets the quantity of the item with specified <paramref name="name"/>.

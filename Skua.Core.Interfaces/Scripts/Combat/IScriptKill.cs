@@ -14,6 +14,11 @@ public interface IScriptKill
     /// <param name="name">Name of the monster to kill.</param>
     void Monster(Monster monster);
     /// <summary>
+    /// Attacks the specified instance of <paramref name="monster"/> and waits until they are killed (if SafeTimings are enabled).
+    /// </summary>
+    /// <param name="name">Name of the monster to kill.</param>
+    void Monster(Monster monster, CancellationToken? token);
+    /// <summary>
     /// Attacks the monster with specified name and waits until it is killed (if SafeTimings are enabled).
     /// </summary>
     /// <param name="name">The name of the monster to kill.</param>

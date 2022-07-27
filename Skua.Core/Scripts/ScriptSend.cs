@@ -18,12 +18,12 @@ public class ScriptSend : IScriptSend
 
     public Task PacketSpam(string packet, string type, int delay, CancellationToken token)
     {
-        return Task.Factory.StartNew(() =>
+        return Task.Factory.StartNew(async () =>
         {
             while (!token.IsCancellationRequested)
             {
                 Packet(packet, type);
-                Task.Delay(delay, token);
+                await Task.Delay(delay, token);
             }
         }, token);
     }
@@ -35,12 +35,12 @@ public class ScriptSend : IScriptSend
 
     public Task ClientPacketSpam(string packet, string type, int delay, CancellationToken token)
     {
-        return Task.Factory.StartNew(() =>
+        return Task.Factory.StartNew(async () =>
         {
             while (!token.IsCancellationRequested)
             {
                 ClientPacket(packet, type);
-                Task.Delay(delay, token);
+                await Task.Delay(delay, token);
             }
         }, token);
     }

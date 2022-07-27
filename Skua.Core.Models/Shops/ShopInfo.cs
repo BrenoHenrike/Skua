@@ -22,4 +22,14 @@ public class ShopInfo
     {
         return $"{Name} [{ID}]";
     }
+
+    public override bool Equals(object? obj)
+    {
+        return obj is ShopInfo info && info.ID == ID;
+    }
+
+    public override int GetHashCode()
+    {
+        return HashCode.Combine(ID, Name);
+    }
 }

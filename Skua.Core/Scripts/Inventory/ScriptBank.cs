@@ -1,10 +1,37 @@
-﻿using Skua.Core.Interfaces;
+﻿using Microsoft.Toolkit.Mvvm.ComponentModel;
+using Microsoft.Toolkit.Mvvm.Messaging;
+using Skua.Core.Interfaces;
 using Skua.Core.Models.Items;
 using Skua.Core.Flash;
+using Skua.Core.Messaging;
 
 namespace Skua.Core.Scripts;
 public partial class ScriptBank : IScriptBank
 {
+    public ScriptBank(
+        Lazy<IFlashUtil> flash,
+        Lazy<IScriptSend> send,
+        Lazy<IScriptMap> map,
+        Lazy<IScriptWait> wait,
+        Lazy<IScriptInventory> inventory,
+        Lazy<IScriptOption> options,
+        Lazy<IScriptManager> manager,
+        Lazy<IScriptPlayer> player,
+        IMessenger messenger)
+    {
+        _lazyFlash = flash;
+        _lazySend = send;
+        _lazyMap = map;
+        _lazyWait = wait;
+        _lazyInventory = inventory;
+        _lazyOptions = options;
+        _lazyManager = manager;
+        _lazyPlayer = player;
+        _messenger = messenger;
+
+        _messenger.Register<ScriptBank, BankLoadedMessage>(this, (r, m) => r.Loaded = true);
+    }
+
     private readonly Lazy<IFlashUtil> _lazyFlash;
     private readonly Lazy<IScriptSend> _lazySend;
     private readonly Lazy<IScriptMap> _lazyMap;
@@ -13,6 +40,7 @@ public partial class ScriptBank : IScriptBank
     private readonly Lazy<IScriptOption> _lazyOptions;
     private readonly Lazy<IScriptManager> _lazyManager;
     private readonly Lazy<IScriptPlayer> _lazyPlayer;
+    private readonly IMessenger _messenger;
 
     private IFlashUtil Flash => _lazyFlash.Value;
     private IScriptSend Send => _lazySend.Value;
@@ -23,35 +51,20 @@ public partial class ScriptBank : IScriptBank
     private IScriptManager Manager => _lazyManager.Value;
     private IScriptPlayer Player => _lazyPlayer.Value;
 
-    public ScriptBank(
-        Lazy<IFlashUtil> flash,
-        Lazy<IScriptSend> send,
-        Lazy<IScriptMap> map,
-        Lazy<IScriptWait> wait,
-        Lazy<IScriptInventory> inventory,
-        Lazy<IScriptOption> options,
-        Lazy<IScriptManager> manager,
-        Lazy<IScriptPlayer> player)
-    {
-        _lazyFlash = flash;
-        _lazySend = send;
-        _lazyMap = map;
-        _lazyWait = wait;
-        _lazyInventory = inventory;
-        _lazyOptions = options;
-        _lazyManager = manager;
-        _lazyPlayer = player;
-    }
     public bool Loaded { get; set; } = false;
     [ObjectBinding("world.bankinfo.items", Default = "new()")]
-    private List<InventoryItem> _items;
+    private List<InventoryItem>? _items;
     [ObjectBinding("world.myAvatar.objData.iBankSlots")]
     private int _slots;
     [ObjectBinding("world.myAvatar.iBankCount")]
     private int _usedSlots;
 
-    [MethodCallBinding("world.toggleBank", GameFunction = true)]
-    public void _open() { }
+    [MethodCallBinding("world.toggleBank", RunMethodPre = true, GameFunction = true)]
+    private void _open()
+    {
+        if (Flash.GetGameObject("ui.mcPopup.currentLabel") == "Bank")
+            return;
+    }
 
     public void Load(bool waitForLoad = true)
     {

@@ -5,7 +5,7 @@ VisualStudioVersion = 17.1.32407.343
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Skua.Core", "Skua.Core\Skua.Core.csproj", "{6C5FB35E-68B8-4C18-B86B-80D566DA0C24}"
 EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Skua.App", "Skua.App\Skua.App.csproj", "{143D3155-93D5-478D-A3BB-D7D1CC9250C3}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Skua.App.WPF", "Skua.App.WPF\Skua.App.WPF.csproj", "{143D3155-93D5-478D-A3BB-D7D1CC9250C3}"
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Skua.Manager", "Skua.Manager\Skua.Manager.csproj", "{9F731FCB-2047-46C5-BD7A-F747C7B44AD0}"
 EndProject
@@ -25,6 +25,8 @@ EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Skua.Core.Utils", "Skua.Core.Utils\Skua.Core.Utils.csproj", "{574CC213-B45A-443F-85BB-B45FAE1F5058}"
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Skua.Core.Generators", "Skua.Core.Generators\Skua.Core.Generators.csproj", "{079E4ADF-5873-4EE2-BE14-FFCF933DB7BB}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Skua.App.WPF.Lite", "Skua.App.WPF.Lite\Skua.App.WPF.Lite.csproj", "{EBCD8634-576F-4325-BDFE-828DF7ED5206}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -68,6 +70,10 @@ Global
 		{079E4ADF-5873-4EE2-BE14-FFCF933DB7BB}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{079E4ADF-5873-4EE2-BE14-FFCF933DB7BB}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{079E4ADF-5873-4EE2-BE14-FFCF933DB7BB}.Release|Any CPU.Build.0 = Release|Any CPU
+		{EBCD8634-576F-4325-BDFE-828DF7ED5206}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{EBCD8634-576F-4325-BDFE-828DF7ED5206}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{EBCD8634-576F-4325-BDFE-828DF7ED5206}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{EBCD8634-576F-4325-BDFE-828DF7ED5206}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

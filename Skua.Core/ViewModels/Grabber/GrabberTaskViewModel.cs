@@ -44,7 +44,7 @@ public class GrabberTaskViewModel : ObservableRecipient
         ProgressReportMessage = progress;
     }
 
-    public void CancelTask(GrabberTaskViewModel receiver, CancelGrabberTaskMessage message)
+    private void CancelTask(GrabberTaskViewModel receiver, CancelGrabberTaskMessage message)
     {
         receiver.Command.Cancel();
     }

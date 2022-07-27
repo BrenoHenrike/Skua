@@ -1,11 +1,13 @@
-﻿using Skua.Core.Interfaces;
+﻿using Microsoft.Toolkit.Mvvm.ComponentModel;
+using Skua.Core.Interfaces;
 using Skua.Core.Models.Items;
 
 namespace Skua.Core.Scripts;
-public class ScriptBoost : IScriptBoost
+public partial class ScriptBoost : ObservableObject, IScriptBoost, IAsyncDisposable
 {
     private readonly Lazy<IScriptInventory> _lazyInventory;
     private readonly Lazy<IScriptBank> _lazyBank;
+    private readonly Lazy<IScriptPlayer> _lazyPlayer;
     private readonly Lazy<IScriptSend> _lazySend;
     private readonly Lazy<IScriptWait> _lazyWait;
     private readonly Lazy<IScriptMap> _lazyMap;
@@ -22,31 +24,40 @@ public class ScriptBoost : IScriptBoost
         Lazy<IScriptMap> map,
         Lazy<IScriptInventory> inventory,
         Lazy<IScriptBank> bank,
+        Lazy<IScriptPlayer> player,
         Lazy<IScriptWait> wait)
     {
         _lazyInventory = inventory;
         _lazyBank = bank;
+        _lazyPlayer = player;
         _lazySend = send;
         _lazyWait = wait;
         _lazyMap = map;
         _lazyFlash = flash;
+        _timerBoosts = new PeriodicTimer(TimeSpan.FromSeconds(30));
     }
 
-    private Thread? BoostsThread;
-    private CancellationTokenSource? BoostsCTS;
+    private PeriodicTimer _timerBoosts;
+    private Task? _taskBoosts;
+    private CancellationTokenSource? _ctsBoosts;
 
-    public event Action? BoostsStarted;
-    public event Action? BoostsStopped;
-
-    public bool Enabled => BoostsThread?.IsAlive ?? false;
-    public bool UseClassBoost { get; set; } = false;
-    public int ClassBoostID { get; set; }
-    public bool UseExperienceBoost { get; set; } = false;
-    public int ExperienceBoostID { get; set; }
-    public bool UseGoldBoost { get; set; } = false;
-    public int GoldBoostID { get; set; }
-    public bool UseReputationBoost { get; set; } = false;
-    public int ReputationBoostID { get; set; }
+    public bool Enabled => _taskBoosts is not null;
+    [ObservableProperty]
+    private bool _UseClassBoost = false;
+    [ObservableProperty]
+    private int _ClassBoostID;
+    [ObservableProperty]
+    private bool _UseExperienceBoost = false;
+    [ObservableProperty]
+    private int _ExperienceBoostID;
+    [ObservableProperty]
+    private bool _UseGoldBoost = false;
+    [ObservableProperty]
+    private int _GoldBoostID;
+    [ObservableProperty]
+    private bool _UseReputationBoost = false;
+    [ObservableProperty]
+    private int _ReputationBoostID;
 
     public bool IsBoostActive(BoostType boost)
     {
@@ -70,8 +81,10 @@ public class ScriptBoost : IScriptBoost
         };
     }
 
-    private int SearchBoost(string name, bool searchBank = true)
+    private int SearchBoost(string name, bool searchBank = false)
     {
+        if (!_lazyPlayer.Value.LoggedIn)
+            return 0;
         int id = (Inventory.Items?
                    .Where(i => i.Category == ItemCategory.ServerUse)
                    .Where(i => i.Name.Contains(name))
@@ -91,54 +104,79 @@ public class ScriptBoost : IScriptBoost
 
     public void Start()
     {
-        if (BoostsThread?.IsAlive ?? false)
+        if (_taskBoosts is not null)
             return;
 
-        BoostsStarted?.Invoke();
-        BoostsThread = new(() =>
-        {
-            BoostsCTS = new();
-            Poll(BoostsCTS.Token);
-            BoostsCTS.Dispose();
-            BoostsCTS = null;
-        })
-        {
-            Name = "Boosts Thread"
-        };
-        BoostsThread.Start();
+        _ctsBoosts = new();
+        _taskBoosts = HandleBoosts(_timerBoosts, _ctsBoosts.Token);
+        OnPropertyChanged(nameof(Enabled));
     }
 
     public void Stop()
     {
-        BoostsStopped?.Invoke();
-        BoostsCTS?.Cancel();
-        Wait.ForTrue(() => !Enabled, 10);
+        if (_taskBoosts is null)
+            return;
+
+        _ctsBoosts?.Cancel();
+        Wait.ForTrue(() => _taskBoosts?.IsCompleted == true, null, 20);
+        _ctsBoosts?.Dispose();
+        _taskBoosts = null;
+        OnPropertyChanged(nameof(Enabled));
     }
 
-    private void Poll(CancellationToken token)
+    public async ValueTask StopAsync()
     {
-        while (!token.IsCancellationRequested)
-        {
-            _UseBoost(UseGoldBoost, GoldBoostID, BoostType.Gold);
+        if (_taskBoosts is null)
+            return;
 
-            _UseBoost(UseClassBoost, ClassBoostID, BoostType.Class);
-
-            _UseBoost(UseExperienceBoost, ExperienceBoostID, BoostType.Experience);
-
-            _UseBoost(UseReputationBoost, ReputationBoostID, BoostType.Reputation);
-
-            if(!token.IsCancellationRequested)
-                Thread.Sleep(5000);
-        }
+        _ctsBoosts?.Cancel();
+        await Wait.ForTrueAsync(() => _taskBoosts?.IsCompleted == true, 20);
+        _ctsBoosts?.Dispose();
+        _ctsBoosts = null;
+        _taskBoosts = null;
+        OnPropertyChanged(nameof(Enabled));
     }
 
-    private void _UseBoost(bool useBoost, int id, BoostType boostType)
+    private async Task HandleBoosts(PeriodicTimer timer, CancellationToken token)
+    {
+        try
+        {
+            await PollBoosts(token);
+
+            while (await timer.WaitForNextTickAsync(token))
+                await PollBoosts(token);
+        }
+        catch { }
+    }
+
+    private async Task PollBoosts(CancellationToken token)
+    {
+        await _UseBoost(UseGoldBoost, GoldBoostID, BoostType.Gold, token);
+
+        await _UseBoost(UseClassBoost, ClassBoostID, BoostType.Class, token);
+
+        await _UseBoost(UseExperienceBoost, ExperienceBoostID, BoostType.Experience, token);
+
+        await _UseBoost(UseReputationBoost, ReputationBoostID, BoostType.Reputation, token);
+    }
+
+    private async ValueTask _UseBoost(bool useBoost, int id, BoostType boostType, CancellationToken token)
     {
         if (!useBoost || id == 0 || IsBoostActive(boostType))
             return;
 
         UseBoost(id);
-        Thread.Sleep(1000);
+        await Task.Delay(1000, token);
+    }
+
+    public async ValueTask DisposeAsync()
+    {
+        _ctsBoosts?.Cancel();
+        if(_taskBoosts is not null)
+            await _taskBoosts;
+        _timerBoosts.Dispose();
+        _ctsBoosts?.Dispose();
+        GC.SuppressFinalize(this);
     }
 
     private readonly Dictionary<BoostType, string> _boostMap = new()

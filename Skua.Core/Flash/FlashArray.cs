@@ -16,7 +16,7 @@ public class FlashArray<T> : FlashObject<T[]>, IFlashArray<T>, IEnumerable<Flash
 
     public void Set(int index, T value)
     {
-        FlashUtil.Call("lnkSetArray", ID, index, value);
+        FlashUtil.Call("lnkSetArray", ID, index, value!);
     }
 
     IEnumerator<FlashObject<T>> IEnumerable<FlashObject<T>>.GetEnumerator()

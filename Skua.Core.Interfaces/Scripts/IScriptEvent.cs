@@ -4,17 +4,20 @@ namespace Skua.Core.Interfaces;
 
 public delegate void LogoutEventHandler();
 public delegate void PlayerDeathEventHandler();
-public delegate void MonsterKilledEventHandler();
+public delegate void MonsterKilledEventHandler(int mapId);
 public delegate void QuestAcceptedEventHandler(int questId);
 public delegate void QuestTurnInEventHandler(int questId);
 public delegate void MapChangedEventHandler(string map);
 public delegate void CellChangedEventHandler(string map, string cell, string pad);
-public delegate void ReloginTriggeredEventHandler(bool kicked);
+public delegate void ReloginTriggeredEventHandler(bool wasKicked);
 public delegate void ExtensionPacketEventHandler(dynamic packet);
 public delegate void AFKEventHandler();
 public delegate void TryBuyItemHandler(int shopId, int itemId, int shopItemId);
 public delegate void CounterAttackHandler(bool faded);
 public delegate void ItemDroppedHandler(ItemBase item, bool addedToInv, int quantityNow);
+public delegate void ItemBoughtHandler(int CharItemID);
+public delegate void ItemSoldHandler(int CharItemID, int QuantitySold, int CurrentQuantity, int Cost, bool IsAC);
+public delegate void ItemAddedToBankHandler(ItemBase item, int quantityNow);
 public delegate bool ScriptStoppingHandler();
 public delegate void RunToAreaHandler(string zone);
 
@@ -75,6 +78,18 @@ public interface IScriptEvent
     /// </summary>
     event ItemDroppedHandler ItemDropped;
     /// <summary>
+    /// Occurs when an item is sold.
+    /// </summary>
+    event ItemSoldHandler ItemSold;
+    /// <summary>
+    /// Occurs when an item is bought;
+    /// </summary>
+    event ItemBoughtHandler ItemBought;
+    /// <summary>
+    /// Occurs when an accepted item goes to bank.
+    /// </summary>
+    event ItemAddedToBankHandler ItemAddedToBank;
+    /// <summary>
     /// Occurs when the script is finishing, you can place cleanup code here (like reset options and such).
     /// </summary>
     event ScriptStoppingHandler ScriptStopping;
@@ -88,19 +103,20 @@ public interface IScriptEvent
     /// Clear all of the event handler subscribers.
     /// </summary>
     void ClearHandlers();
-    void OnLogout();
-    void OnCellChanged(string map, string cell, string pad);
-    void OnCounterAttack(bool faded);
-    void OnExtensionPacket(dynamic packet);
-    void OnItemDropped(ItemBase item, bool addedToInv = false, int quantityNow = 0);
-    void OnMapChanged(string map);
-    void OnMonsterKilled();
-    void OnPlayerAFK();
-    void OnPlayerDeath();
-    void OnQuestAccepted(int questId);
-    void OnQuestTurnIn(int questId);
-    void OnReloginTriggered(bool kicked);
-    void OnRunToArea(string zone);
-    Task<bool?> OnScriptStoppedAsync();
-    void OnTryBuyItem(int shopId, int itemId, int shopItemId);
+    //void OnLogout();
+    //void OnCellChanged(string map, string cell, string pad);
+    //void OnCounterAttack(bool faded);
+    //void OnExtensionPacket(dynamic packet);
+    //void OnItemDropped(ItemBase item, bool addedToInv = false, int quantityNow = 0);
+    //void OnItemAddedToBank(ItemBase item, int quantityNow);
+    //void OnMapChanged(string map);
+    //void OnMonsterKilled(int mapId);
+    //void OnPlayerAFK();
+    //void OnPlayerDeath();
+    //void OnQuestAccepted(int questId);
+    //void OnQuestTurnIn(int questId);
+    //void OnReloginTriggered(bool kicked);
+    //void OnRunToArea(string zone);
+    //Task<bool?> OnScriptStoppedAsync();
+    //void OnTryBuyItem(int shopId, int itemId, int shopItemId);
 }

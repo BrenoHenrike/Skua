@@ -1,9 +1,10 @@
 ﻿using System.Collections.Immutable;
+using Microsoft.Toolkit.Mvvm.ComponentModel;
 using Skua.Core.Interfaces;
 using Skua.Core.ViewModels;
 
 namespace Skua.Core.Services;
-public class MapService : IMapService
+public partial class MapService : ObservableObject, IMapService
 {
     private readonly IScriptMap Map;
     private readonly IScriptPlayer Player;
@@ -20,9 +21,11 @@ public class MapService : IMapService
     public string Pad => Player.Pad;
 
     public List<string> Cells => Map.Cells;
-
-    public bool UsePrivateRoom { get; set; }
-    public int PrivateRoomNumber { get; set; } = 111111;
+    
+    [ObservableProperty]
+    private bool _UsePrivateRoom;
+    [ObservableProperty]
+    private int _PrivateRoomNumber = 111111;
 
     public ImmutableList<string> Pads { get; } = ImmutableList.Create("Spawn", "Center", "Left", "Right", "Up", "Down", "Top", "Bottom");
 

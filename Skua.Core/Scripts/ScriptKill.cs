@@ -1,6 +1,7 @@
 ﻿using Skua.Core.Interfaces;
 using Skua.Core.Models.Monsters;
 using Skua.Core.Utils;
+using System.Diagnostics;
 
 namespace Skua.Core.Scripts;
 public class ScriptKill : IScriptKill
@@ -63,36 +64,35 @@ public class ScriptKill : IScriptKill
     public void Monster(string name) => _Kill(name, null);
     public void Monster(string name, CancellationToken? token) => _Kill(name, token);
 
-    public void Monster(Monster monster) => _Kill(monster.ID, null);
+    public void Monster(Monster monster) => _Kill(monster.MapID, null);
     public void Monster(Monster monster, CancellationToken? token) => _Kill(monster.MapID, token);
 
     public void Monster(int id) => _Kill(id, null);
     public void Monster(int id, CancellationToken? token) => _Kill(id, token);
-
     private void _Kill(string name, CancellationToken? token)
     {
         if (Options.SafeTimings)
-            Wait.ForMonsterSpawn(name, 30);
+            Wait.ForMonsterSpawn(name);
         Combat.Attack(name);
         if (token is null)
         {
             Wait.ForMonsterDeath();
             return;
         }
-        //Wait.ForMonsterDeath((CancellationToken)token);
+        WaitMonsterDeathOrCancellation((CancellationToken)token);
     }
+
     private void _Kill(int id, CancellationToken? token)
     {
         if (Options.SafeTimings)
-            Wait.ForTrue(() => Monsters.CurrentMonsters.Any(m => m.ID == id && m.Alive), 30);
+            Wait.ForMonsterSpawn(id);
         Combat.Attack(id);
         if (token is null)
         {
             Wait.ForMonsterDeath();
             return;
         }
-        // Wait with cancellation tokens
-        //Wait.ForMonsterDeath((CancellationToken)token);
+        WaitMonsterDeathOrCancellation((CancellationToken)token);
     }
 
     public void ForItem(string name, string item, int quantity, bool tempItem = false)
@@ -145,5 +145,14 @@ public class ScriptKill : IScriptKill
     public void ForItems(IEnumerable<string> names, IEnumerable<string> items, IEnumerable<int> quantities, IEnumerable<bool> tempItems)
     {
         ForItems(names.JoinWithPipeCharacter(), items, quantities, tempItems);
+    }
+
+    private void WaitMonsterDeathOrCancellation(CancellationToken token)
+    {
+        Wait.ForTrue(() => !_player.Playing || !_player.HasTarget, () =>
+        {
+            Combat.UntargetSelf();
+            //Combat.ApproachTarget();
+        }, -1, token);
     }
 }

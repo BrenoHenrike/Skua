@@ -24,15 +24,25 @@ public class ShopItem : ItemBase
     /// The faction needed to buy this item.
     /// </summary>
     [JsonProperty("sFaction")]
-    public string Faction { get; set; }
+    public string Faction { get; set; } = string.Empty;
     /// <summary>
     /// The needed reputation amount to buy this item.
     /// </summary>
     [JsonProperty("iReqRep")]
     public int RequiredReputation { get; set; }
     /// <summary>
-    /// Requirements to merge this item (if it is an merge item).
+    /// Requirements to merge this item (if it is a merge item).
     /// </summary>
     [JsonProperty("turnin")]
-    public List<ItemBase> Requirements { get; set; }
+    public List<ItemBase> Requirements { get; set; } = new();
+
+    public override bool Equals(object? obj)
+    {
+        return obj is ShopItem item && item.ID == ID && item.ShopItemID == ShopItemID;
+    }
+
+    public override int GetHashCode()
+    {
+        return HashCode.Combine(ID, ShopItemID);
+    }
 }

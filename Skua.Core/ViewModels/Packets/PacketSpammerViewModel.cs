@@ -6,7 +6,7 @@ namespace Skua.Core.ViewModels;
 public class PacketSpammerViewModel : BotControlViewModelBase
 {
     public PacketSpammerViewModel(IScriptSend send, IFileDialogService fileDialog)
-        : base("Packet Spammer")
+        : base("Packet Spammer", 700, 400)
     {
         _send = send;
         _fileDialog = fileDialog;

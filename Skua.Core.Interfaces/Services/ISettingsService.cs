@@ -4,10 +4,10 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace Skua.Core.Interfaces.Services;
+namespace Skua.Core.Interfaces;
 public interface ISettingsService
 {
-    void SetValue<T>(string key, T value);
-    T? GetValue<T>(string key);
+    void Set<T>(string key, T value);
+    T? Get<T>(string key);
     T GetValue<T>(string key, T defaultValue);
 }

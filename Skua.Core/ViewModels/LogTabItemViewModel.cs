@@ -1,73 +1,54 @@
 ﻿using Microsoft.Toolkit.Mvvm.ComponentModel;
 using Microsoft.Toolkit.Mvvm.Input;
+using Microsoft.Toolkit.Mvvm.Messaging;
 using Skua.Core.Interfaces;
+using Skua.Core.Messaging;
 using Skua.Core.Models;
 
 namespace Skua.Core.ViewModels;
-public class LogTabItemViewModel : ObservableObject, IDisposable
+public partial class LogTabViewModel : ObservableRecipient
 {
-    public LogTabItemViewModel(string title, ILogService logService, IClipboardService clipBoard, IFileDialogService fileDialog, LogType logType)
+    public LogTabViewModel(string title, ILogService logService, IClipboardService clipBoard, IFileDialogService fileDialog, LogType logType)
     {
+        Messenger.Register<LogTabViewModel, LogsChangedMessage>(this, Receive);
         Title = title;
-        LogService = logService;
+        _logService = logService;
         _fileDialog = fileDialog;
-        LogType = logType;
-        _log = GetLog();
-        LogService.PropertyChanged += LogService_PropertyChanged;
-        CopyLogCommand = new RelayCommand(() => clipBoard.SetText(Log));
+        _logType = logType;
+        CopyLogCommand = new RelayCommand(() => clipBoard.SetText(LogsToString()));
         ClearLogCommand = new RelayCommand(ClearLog);
         SaveLogCommand = new RelayCommand(Save);
     }
 
-    // TODO Change to messenger
-    private void LogService_PropertyChanged(object? sender, System.ComponentModel.PropertyChangedEventArgs e)
-    {
-        if (e.PropertyName == $"{LogType}Logs")
-        {
-            Log = GetLog();
-        }
-    }
-
-    public void Dispose()
-    {
-        GC.SuppressFinalize(this);
-        LogService.PropertyChanged -= LogService_PropertyChanged;
-    }
-
-    private readonly ILogService LogService;
+    private readonly ILogService _logService;
     private readonly IFileDialogService _fileDialog;
-    private readonly LogType LogType;
+    private readonly LogType _logType;
 
     public string Title { get; }
-    private string _log;
-    public string Log
-    {
-        get { return _log; }
-        set { SetProperty(ref _log, value); }
-    }
+    public List<string> Logs => _logService.GetLogs(_logType);
 
     public IRelayCommand ClearLogCommand { get; }
     public IRelayCommand CopyLogCommand { get; }
     public IRelayCommand SaveLogCommand { get; }
 
-    private string GetLog()
-    {
-        return LogType switch
-        {
-            LogType.Debug => LogService.DebugLogs,
-            LogType.Script => LogService.ScriptLogs,
-            LogType.Flash => LogService.FlashLogs,
-            _ => string.Empty,
-        };
-    }
-
     private void Save()
     {
-        _fileDialog.SaveText(_log);
+        _fileDialog.SaveText(LogsToString());
     }
 
     private void ClearLog()
     {
-        LogService.ClearLog(LogType);
+        _logService.ClearLog(_logType);
+    }
+
+    private string LogsToString()
+    {
+        return string.Join(Environment.NewLine, Logs);
+    }
+
+    private void Receive(LogTabViewModel recipient, LogsChangedMessage message)
+    {
+        if (message.LogType == recipient._logType)
+            recipient.OnPropertyChanged(nameof(recipient.Logs));
     }
 }

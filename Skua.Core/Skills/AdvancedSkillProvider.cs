@@ -62,7 +62,6 @@ public class AdvancedSkillProvider : ISkillProvider
 
     public void Save(string file)
     {
-        // TODO Save?
     }
 
     public void OnTargetReset()

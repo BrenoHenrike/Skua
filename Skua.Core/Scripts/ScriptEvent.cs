@@ -1,11 +1,35 @@
-﻿
+﻿using Microsoft.Toolkit.Mvvm.Messaging;
 using Skua.Core.Interfaces;
-using Skua.Core.Models.Items;
+using Skua.Core.Messaging;
 
 namespace Skua.Core.Scripts;
-
 public class ScriptEvent : IScriptEvent
 {
+    public ScriptEvent(IMessenger messenger)
+    {
+        _messenger = messenger;
+        _messenger.Register<ScriptEvent, LogoutMessage>(this, OnLogout);
+        _messenger.Register<ScriptEvent, PlayerDeathMessage>(this, OnPlayerDeath);
+        _messenger.Register<ScriptEvent, MonsterKilledMessage>(this, OnMonsterKilled);
+        _messenger.Register<ScriptEvent, QuestAcceptedMessage>(this, OnQuestAccepted);
+        _messenger.Register<ScriptEvent, QuestTurninMessage>(this, OnQuestTurnIn);
+        _messenger.Register<ScriptEvent, MapChangedMessage>(this, OnMapChanged);
+        _messenger.Register<ScriptEvent, CellChangedMessage>(this, OnCellChanged);
+        _messenger.Register<ScriptEvent, ReloginTriggeredMessage>(this, OnReloginTriggered);
+        _messenger.Register<ScriptEvent, ExtensionPacketMessage>(this, OnExtensionPacket);
+        _messenger.Register<ScriptEvent, PlayerAFKMessage>(this, OnPlayerAFK);
+        _messenger.Register<ScriptEvent, TryBuyItemMessage>(this, OnTryBuyItem);
+        _messenger.Register<ScriptEvent, CounterAttackMessage>(this, OnCounterAttack);
+        _messenger.Register<ScriptEvent, ItemDroppedMessage>(this, OnItemDropped);
+        _messenger.Register<ScriptEvent, ItemBoughtMessage>(this, OnItemBought);
+        _messenger.Register<ScriptEvent, ItemSoldMessage>(this, OnItemSold);
+        _messenger.Register<ScriptEvent, ItemAddedToBankMessage>(this, OnItemAddedToBank);
+        _messenger.Register<ScriptEvent, RunToAreaMessage>(this, OnRunToArea);
+        _messenger.Register<ScriptEvent, ScriptStoppingMessage>(this, OnScriptStopping);
+    }
+
+    private readonly IMessenger _messenger;
+
     public event LogoutEventHandler? Logout;
     public event PlayerDeathEventHandler? PlayerDeath;
     public event MonsterKilledEventHandler? MonsterKilled;
@@ -19,6 +43,9 @@ public class ScriptEvent : IScriptEvent
     public event TryBuyItemHandler? TryBuyItem;
     public event CounterAttackHandler? CounterAttack;
     public event ItemDroppedHandler? ItemDropped;
+    public event ItemSoldHandler? ItemSold;
+    public event ItemBoughtHandler? ItemBought;
+    public event ItemAddedToBankHandler? ItemAddedToBank;
     public event ScriptStoppingHandler? ScriptStopping;
     public event RunToAreaHandler? RunToArea;
 
@@ -40,80 +67,93 @@ public class ScriptEvent : IScriptEvent
         RunToArea = null;
     }
 
-    public void OnLogout()
+    public void OnLogout(ScriptEvent recipient, LogoutMessage message)
     {
-        AppGameEvents.OnLogout();
-        Task.Run(() => Logout?.Invoke());
+        recipient.Logout?.Invoke();
     }
 
-    public void OnRunToArea(string zone)
+    public void OnRunToArea(ScriptEvent recipient, RunToAreaMessage message)
     {
-        Task.Run(() => RunToArea?.Invoke(zone));
+        recipient.RunToArea?.Invoke(message.Zone);
     }
 
-    public async Task<bool?> OnScriptStoppedAsync()
+    public void OnScriptStopping(ScriptEvent recipient, ScriptStoppingMessage message)
     {
-        return await Task.Run(() => ScriptStopping?.Invoke());
+        message.Reply(Task.Run(() => recipient.ScriptStopping?.Invoke()));
     }
 
-    public void OnItemDropped(ItemBase item, bool addedToInv = false, int quantityNow = 0)
+    public void OnItemDropped(ScriptEvent recipient, ItemDroppedMessage message)
     {
-        AppGameEvents.OnItemDropped(item, addedToInv, quantityNow);
-        Task.Run(() => ItemDropped?.Invoke(item, addedToInv, quantityNow));
+        recipient.ItemDropped?.Invoke(message.Item, message.AddedToInv, message.QuantityNow);
     }
 
-    public void OnCounterAttack(bool faded)
+    private void OnItemSold(ScriptEvent recipient, ItemSoldMessage message)
     {
-        Task.Run(() => CounterAttack?.Invoke(faded));
+        recipient.ItemSold?.Invoke(message.CharItemID, message.QuantitySold, message.CurrentQuantity, message.Cost, message.IsAC);
     }
 
-    public void OnPlayerDeath()
+    private void OnItemBought(ScriptEvent recipient, ItemBoughtMessage message)
     {
-        Task.Run(() => PlayerDeath?.Invoke());
+        recipient.ItemBought?.Invoke(message.CharItemID);
     }
 
-    public void OnMonsterKilled()
+    public void OnItemAddedToBank(ScriptEvent recipient, ItemAddedToBankMessage message)
     {
-        Task.Run(() => MonsterKilled?.Invoke());
+        recipient.ItemAddedToBank?.Invoke(message.Item, message.QuantityNow);
     }
 
-    public void OnQuestAccepted(int questId)
+    public void OnCounterAttack(ScriptEvent recipient, CounterAttackMessage message)
     {
-        Task.Run(() => QuestAccepted?.Invoke(questId));
+        recipient.CounterAttack?.Invoke(message.Faded);
     }
 
-    public void OnQuestTurnIn(int questId)
+    public void OnPlayerDeath(ScriptEvent recipient, PlayerDeathMessage message)
     {
-        Task.Run(() => QuestTurnedIn?.Invoke(questId));
+        recipient.PlayerDeath?.Invoke();
     }
 
-    public void OnMapChanged(string map)
+    public void OnMonsterKilled(ScriptEvent recipient, MonsterKilledMessage message)
     {
-        Task.Run(() => MapChanged?.Invoke(map));
+        recipient.MonsterKilled?.Invoke(message.MapID);
     }
 
-    public void OnCellChanged(string map, string cell, string pad)
+    public void OnQuestAccepted(ScriptEvent recipient, QuestAcceptedMessage message)
     {
-        Task.Run(() => CellChanged?.Invoke(map, cell, pad));
+        recipient.QuestAccepted?.Invoke(message.QuestID);
     }
 
-    public void OnReloginTriggered(bool kicked)
+    public void OnQuestTurnIn(ScriptEvent recipient, QuestTurninMessage message)
     {
-        Task.Run(() => ReloginTriggered?.Invoke(kicked));
+        recipient.QuestTurnedIn?.Invoke(message.QuestID);
     }
 
-    public void OnExtensionPacket(dynamic packet)
+    public void OnMapChanged(ScriptEvent recipient, MapChangedMessage message)
     {
-        Task.Run(() => { ExtensionPacketReceived?.Invoke(packet); });
+        recipient.MapChanged?.Invoke(message.Map);
     }
 
-    public void OnPlayerAFK()
+    public void OnCellChanged(ScriptEvent recipient, CellChangedMessage message)
     {
-        Task.Run(() => PlayerAFK?.Invoke());
+        recipient.CellChanged?.Invoke(message.Map, message.Cell, message.Pad);
     }
 
-    public void OnTryBuyItem(int shopId, int itemId, int shopItemId)
+    public void OnReloginTriggered(ScriptEvent recipient, ReloginTriggeredMessage message)
     {
-        Task.Run(() => TryBuyItem?.Invoke(shopId, itemId, shopItemId));
+        recipient.ReloginTriggered?.Invoke(message.WasKicked);
+    }
+
+    public void OnExtensionPacket(ScriptEvent recipient, ExtensionPacketMessage message)
+    {
+        recipient.ExtensionPacketReceived?.Invoke(message.Packet);
+    }
+
+    public void OnPlayerAFK(ScriptEvent recipient, PlayerAFKMessage message)
+    {
+        recipient.PlayerAFK?.Invoke();
+    }
+
+    public void OnTryBuyItem(ScriptEvent recipient, TryBuyItemMessage message)
+    {
+        recipient.TryBuyItem?.Invoke(message.ShopID, message.ItemID, message.ShopItemID);
     }
 }

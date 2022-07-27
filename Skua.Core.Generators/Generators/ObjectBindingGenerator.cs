@@ -26,7 +26,7 @@ public partial class ObjectBindingGenerator : GenericFieldAttributeGenerator<Obj
         string typeNameWithNullabilityAnnotations = fieldSymbol.Type.GetFullyQualifiedNameWithNullabilityAnnotations();
         string fieldName = fieldSymbol.Name;
         string propertyName = Execute.GetGeneratedPropertyName(fieldSymbol);
-        bool notifyProp = fieldSymbol.ContainingType.BaseType?.HasFullyQualifiedName("Microsoft.Toolkit.Mvvm.ComponentModel.ObservableObject") ?? false;
+        bool notifyProp = Execute.HasNotifyPropertyChanged(fieldSymbol);
 
         // Check for name collisions
         if (fieldName == propertyName)

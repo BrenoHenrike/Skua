@@ -13,9 +13,9 @@ public interface IScriptMonster
     /// </summary>
     List<Monster> MapMonsters { get; }
     /// <summary>
-    /// Gets all monsters that the player can attack in the current cell.
+    /// A list of all monsters that the player can attack in the current cell.
     /// </summary>
-    List<Monster> CurrentAvailableMonsters();
+    List<Monster> CurrentAvailableMonsters { get; }
     /// <summary>
     /// Checks whether the specified <paramref name="name"/> exists in the current cell.
     /// </summary>
@@ -23,7 +23,7 @@ public interface IScriptMonster
     /// <returns><see langword="true"/> if the specified monster exists and is alive in the current cell.</returns>
     bool Exists(string name)
     {
-        return MapMonsters.Any(m => name == "*" || m.Name.Trim() == name.Trim() && m.Alive);
+        return MapMonsters.Any(m => name == "*" || (m.Name.Trim() == name.Trim() && m.Alive));
     }
     /// <summary>
     /// Checks whether the specified <paramref name="id"/> exists in the current cell.

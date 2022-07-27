@@ -3,15 +3,27 @@ using System.Reflection;
 using System.Text;
 using Microsoft.CodeAnalysis;
 using Microsoft.CodeAnalysis.CSharp;
+using Microsoft.Toolkit.Mvvm.ComponentModel;
+using Microsoft.Toolkit.Mvvm.DependencyInjection;
+using Microsoft.Toolkit.Mvvm.Messaging;
 using Skua.Core.Interfaces;
+using Skua.Core.Messaging;
 using Skua.Core.Models;
+using Skua.Core.Options;
 using Westwind.Scripting;
 
 namespace Skua.Core.Scripts;
-public class ScriptManager : IScriptManager
+public partial class ScriptManager : ObservableObject, IScriptManager
 {
-    public ScriptManager(CSharpScriptExecution compiler, ILogService logger, Lazy<IScriptInterface> scriptInterface,
-        Lazy<IScriptHandlers> handlers, Lazy<IScriptOption> options, Lazy<IScriptEvent> events, Lazy<IScriptSkill> skills, Lazy<IScriptDrop> drops)
+    public ScriptManager(
+        ILogService logger,
+        Lazy<IScriptInterface> scriptInterface,
+        Lazy<IScriptHandlers> handlers,
+        Lazy<IScriptOption> options,
+        Lazy<IScriptEvent> events,
+        Lazy<IScriptSkill> skills,
+        Lazy<IScriptDrop> drops,
+        Lazy<IScriptWait> wait)
     {
         _lazyBot = scriptInterface;
         _lazyHandlers = handlers;
@@ -19,9 +31,8 @@ public class ScriptManager : IScriptManager
         _lazyEvents = events;
         _lazySkills = skills;
         _lazyDrops = drops;
-        _logger = logger;
-
-        _compiler = compiler;
+        _lazyWait = wait;
+        _logger = logger;;
     }
 
     private readonly Lazy<IScriptInterface> _lazyBot;
@@ -30,23 +41,28 @@ public class ScriptManager : IScriptManager
     private readonly Lazy<IScriptEvent> _lazyEvents;
     private readonly Lazy<IScriptSkill> _lazySkills;
     private readonly Lazy<IScriptDrop> _lazyDrops;
+    private readonly Lazy<IScriptWait> _lazyWait;
     private readonly ILogService _logger;
+    private Dictionary<string, bool> _configured = new();
     private IScriptHandlers Handlers => _lazyHandlers.Value;
     private IScriptOption Options => _lazyOptions.Value;
     private IScriptEvent Events => _lazyEvents.Value;
     private IScriptSkill Skills => _lazySkills.Value;
     private IScriptDrop Drops => _lazyDrops.Value;
-    private readonly CSharpScriptExecution _compiler;
+    private IScriptWait Wait => _lazyWait.Value;
     private Thread? CurrentScriptThread;
-    private CancellationTokenSource? ScriptCTS;
-    public bool ScriptRunning { get; set; }
-    public string LoadedScript { get; set; } = string.Empty;
-    public string CompiledScript { get; set; } = string.Empty;
+    public CancellationTokenSource? ScriptCTS { get; private set; }
+
+    public bool ScriptRunning => CurrentScriptThread?.IsAlive ?? false;
+    [ObservableProperty]
+    private string _LoadedScript = string.Empty;
+    [ObservableProperty]
+    private string _CompiledScript = string.Empty;
+    public IScriptOptionContainer? Config { get; set; }
 
     public event Action? ScriptStarted;
     public event Action<bool>? ScriptStopped;
     public event Action<Exception>? ScriptError;
-    public event Action<bool>? ApplicationShutDown;
 
     public bool ShouldExit => ScriptCTS?.IsCancellationRequested ?? false;
 
@@ -63,13 +79,12 @@ public class ScriptManager : IScriptManager
 
         try
         {
-            // TODO Auto
-            //Forms.Main.StopAuto();
+            await _lazyBot.Value.Auto.StopAsync();
 
-            object? script = await Task.Run(() => Compile(File.ReadAllText(LoadedScript)));
-            //LoadScriptConfig(script);
-            //if (_configured.TryGetValue(ScriptInterface.Instance.Config.Storage, out bool b) && !b)
-            //    ScriptInterface.Instance.Config.Configure();
+            object? script = Compile(File.ReadAllText(LoadedScript));
+            LoadScriptConfig(script);
+            if (_configured.TryGetValue(Config!.Storage, out bool b) && !b)
+                Config.Configure();
             Handlers.Clear();
             CurrentScriptThread = new(async () =>
             {
@@ -83,26 +98,24 @@ public class ScriptManager : IScriptManager
                 {
                     if (e is not TargetInvocationException || !stoppedByScript)
                     {
-                        Debug.WriteLine($"Error while running script:\r\nMessage: {e.InnerException?.Message ?? e.Message}\r\nStackTrace: {e.InnerException?.StackTrace ?? e.StackTrace}");
+                        Trace.WriteLine($"Error while running script:\r\nMessage: {e.Message}\r\n{(e.InnerException is not null ? $"Inner Exception Message: {e.InnerException.Message}" : string.Empty)}StackTrace: {e.StackTrace}");
                         ScriptError?.Invoke(e);
                     }
                 }
                 finally
                 {
                     stoppedByScript = false;
-                    ScriptCTS.Dispose();
-                    ScriptCTS = null;
                     if (runScriptStoppingBool)
                     {
                         try
                         {
-                            switch (await Events.OnScriptStoppedAsync())
+                            switch (await WeakReferenceMessenger.Default.Send<ScriptStoppingMessage>())
                             {
                                 case true:
-                                    Debug.WriteLine("Script finished succesfully.");
+                                    Trace.WriteLine("Script finished succesfully.");
                                     break;
                                 case false:
-                                    Debug.WriteLine("Script finished early or with errors.");
+                                    Trace.WriteLine("Script finished early or with errors.");
                                     break;
                                 default:
                                     break;
@@ -121,11 +134,14 @@ public class ScriptManager : IScriptManager
                     Drops.Stop();
                     Events.ClearHandlers();
                     ScriptStopped?.Invoke(true);
+                    ScriptCTS.Dispose();
+                    ScriptCTS = null;
+                    OnPropertyChanged(nameof(ScriptRunning));
                 }
             });
             CurrentScriptThread.Name = "Script Thread";
             CurrentScriptThread.Start();
-
+            OnPropertyChanged(nameof(ScriptRunning));
             return null;
         }
         catch (Exception e)
@@ -134,9 +150,26 @@ public class ScriptManager : IScriptManager
         }
     }
 
-    public Task<Exception?> RestartScriptAsync()
+    public async Task RestartScriptAsync()
     {
-        throw new NotImplementedException();
+        Trace.WriteLine("Restarting script");
+        await StopScriptAsync(false);
+        await Task.Run(async () =>
+        {
+            await Task.Delay(5000);
+            await StartScriptAsync();
+        });
+    }
+
+    public void RestartScript()
+    {
+        Trace.WriteLine("Restarting script");
+        StopScript(false);
+        Task.Run(async () =>
+        {
+            await Task.Delay(5000);
+            await StartScriptAsync();
+        });
     }
 
     public void StopScript(bool runScriptStoppingEvent = true)
@@ -145,7 +178,26 @@ public class ScriptManager : IScriptManager
         stoppedByScript = true;
         ScriptCTS?.Cancel();
         if(Thread.CurrentThread.Name == "Script Thread")
+        {
             ScriptCTS?.Token.ThrowIfCancellationRequested();
+            return;
+        }
+        Wait.ForTrue(() => ScriptCTS == null, 20);
+        OnPropertyChanged(nameof(ScriptRunning));
+    }
+
+    public async ValueTask StopScriptAsync(bool runScriptStoppingEvent = true)
+    {
+        runScriptStoppingBool = runScriptStoppingEvent;
+        stoppedByScript = true;
+        ScriptCTS?.Cancel();
+        if (Thread.CurrentThread.Name == "Script Thread")
+        {
+            ScriptCTS?.Token.ThrowIfCancellationRequested();
+            return;
+        }
+        await Wait.ForTrueAsync(() => ScriptCTS == null, 30);
+        OnPropertyChanged(nameof(ScriptRunning));
     }
 
     public object? Compile(string source)
@@ -165,7 +217,7 @@ public class ScriptManager : IScriptManager
                 break;
             if (line.StartsWith("//cs_"))
             {
-                string[] parts = line.Split((char[])null, 2, StringSplitOptions.RemoveEmptyEntries);
+                string[] parts = line.Split((char[])null!, 2, StringSplitOptions.RemoveEmptyEntries);
                 string cmd = parts[0].Substring(5);
                 switch (cmd)
                 {
@@ -191,7 +243,7 @@ public class ScriptManager : IScriptManager
         if (sources.Count > 1)
         {
             sources[0] = sources[0].Replace(toRemove, "");
-            string joinedSource = string.Join('\n', sources);
+            string joinedSource = string.Join(Environment.NewLine, sources);
             List<string> lines = joinedSource.Split('\n').Select(l => l.Trim()).ToList();
             List<string> usings = new();
             for (int i = lines.Count - 1; i >= 0; i--)
@@ -202,23 +254,63 @@ public class ScriptManager : IScriptManager
                     lines.RemoveAt(i);
                 }
             }
-            lines.Insert(0, $"{string.Join('\n', usings.Distinct())}\n#nullable enable\n");
+            lines.Insert(0, $"{string.Join(Environment.NewLine, usings.Distinct())}{Environment.NewLine}#nullable enable{Environment.NewLine}");
             sources = lines;
         }
+
         string final = string.Join('\n', sources);
-        SyntaxTree tree = CSharpSyntaxTree.ParseText(final.ToString(), encoding: Encoding.UTF8);
+        SyntaxTree tree = CSharpSyntaxTree.ParseText(final, encoding: Encoding.UTF8);
         final = tree.GetRoot().NormalizeWhitespace().ToFullString();
+        CSharpScriptExecution compiler = Ioc.Default.GetService<CSharpScriptExecution>()!;
         if (references.Count > 0)
-            _compiler.AddAssemblies(references.ToArray());
+            compiler.AddAssemblies(references.ToArray());
 
-        dynamic assembly = _compiler.CompileClass(final);
+        dynamic assembly = compiler.CompileClass(final);
         sw.Stop();
-        Debug.WriteLine($"Script compilation took {sw.ElapsedMilliseconds}ms.");
-
-        if (_compiler.Error)
-            throw new ScriptCompileException(_compiler.ErrorMessage, _compiler.GeneratedClassCodeWithLineNumbers);
+        Trace.WriteLine($"Script compilation took {sw.ElapsedMilliseconds}ms.");
+        File.WriteAllText(Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "Scripts", "z_CompiledScript.cs"), final);
+        if (compiler.Error)
+            throw new ScriptCompileException(compiler.ErrorMessage, compiler.GeneratedClassCodeWithLineNumbers);
 
         return assembly;
+    }
+    public void LoadScriptConfig(object? script)
+    {
+        if (script is null)
+            return;
+
+        IScriptOptionContainer opts = Config = Ioc.Default.GetRequiredService<IScriptOptionContainer>();
+        Type t = script.GetType();
+        FieldInfo? storageField = t.GetField("OptionsStorage");
+        FieldInfo? optsField = t.GetField("Options");
+        FieldInfo? multiOptsField = t.GetField("MultiOptions");
+        FieldInfo? dontPreconfField = t.GetField("DontPreconfigure");
+        if (multiOptsField is not null)
+        {
+            List<FieldInfo> multiOpts = new();
+            foreach (string optField in (string[])multiOptsField.GetValue(script))
+            {
+                FieldInfo? fi = t.GetField(optField);
+                if (fi is not null)
+                    multiOpts.Add(fi);
+            }
+            foreach (FieldInfo opt in multiOpts)
+            {
+                List<IOption> parsedOpt = (List<IOption>)opt.GetValue(script)!;
+                parsedOpt.ForEach(o => o.Category = opt.Name.Replace('_', ' '));
+                opts.MultipleOptions.Add(opt.Name, parsedOpt);
+            }
+        }
+        if (optsField is not null)
+            opts.Options.AddRange((List<IOption>)optsField.GetValue(script)!);
+        if (storageField is not null)
+            opts.Storage = (string)storageField.GetValue(script)!;
+        if (dontPreconfField is not null)
+            _configured[opts.Storage] = (bool)dontPreconfField.GetValue(script)!;
+        else if (optsField is not null)
+            _configured[opts.Storage] = false;
+        opts.SetDefaults();
+        opts.Load();
     }
 
     private static bool CanLoadAssembly(string path)

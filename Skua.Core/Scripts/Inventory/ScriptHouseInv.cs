@@ -39,7 +39,7 @@ public partial class ScriptHouseInv : IScriptHouseInv
     }
 
     [ObjectBinding("world.myAvatar.houseitems", Default = "new()")]
-    private List<InventoryItem> _items;
+    private List<InventoryItem>? _items;
     [ObjectBinding("world.myAvatar.objData.iHouseSlots")]
     private int _slots;
     [ObjectBinding("world.myAvatar.houseitems.length")]

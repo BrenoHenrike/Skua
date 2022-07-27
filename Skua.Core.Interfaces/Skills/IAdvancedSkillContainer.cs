@@ -1,7 +1,9 @@
-﻿using Skua.Core.Models.Skills;
+﻿using System.ComponentModel;
+using Skua.Core.Models.Skills;
+using Skua.Core.Utils;
 
-namespace Skua.Core.Interfaces.Skills;
-public interface IAdvancedSkillContainer
+namespace Skua.Core.Interfaces;
+public interface IAdvancedSkillContainer : INotifyPropertyChanged
 {
     /// <summary>
     /// The current loaded sets of advanced skills.
@@ -15,11 +17,10 @@ public interface IAdvancedSkillContainer
     /// <remarks>This doesn't save the modification to the file.</remarks>
     void Add(AdvancedSkill skill);
     /// <summary>
-    /// Converts a skill string to an <see cref="AdvancedSkill"/>
+    /// Tries to replace a given skill, if not found, adds it to the list.
     /// </summary>
-    /// <param name="skillString">String containing info about the skill sequence.</param>
-    /// <returns>An <see cref="AdvancedSkill"/> object made from the string.</returns>
-    AdvancedSkill ConvertFromString(string skillString);
+    /// <param name="skill">Skill to save.</param>
+    void TryOverride(AdvancedSkill skill);
     /// <summary>
     /// Reads and loads all the skills from the skills file.
     /// </summary>

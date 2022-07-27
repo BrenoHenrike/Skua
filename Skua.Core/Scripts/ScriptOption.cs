@@ -1,111 +1,216 @@
 ﻿using Skua.Core.Interfaces;
-using Skua.Core.Models.Servers;
 using Skua.Core.Flash;
 using Microsoft.Toolkit.Mvvm.ComponentModel;
 using System.Reflection;
 using System.Linq.Expressions;
 using System.Collections.Immutable;
 using Skua.Core.Models;
+using System.Collections.Specialized;
 
 namespace Skua.Core.Scripts;
-public partial class ScriptOption : ObservableObject, IScriptOption
+public partial class ScriptOption : ObservableRecipient, IScriptOption, IOptionDictionary
 {
-    public ScriptOption(Lazy<IFlashUtil> flash)
+    private ScriptOption(Lazy<IFlashUtil> flash)
     {
         _lazyFlash = flash;
-        OptionsDictionary = GenerateDictionary().ToImmutableDictionary();
+    }
+    public ScriptOption(
+        Lazy<IFlashUtil> flash,
+        ISettingsService settingsService)
+    {
+        _lazyFlash = flash;
+        _settingsService = settingsService;
+        GetOptions();
+        OptionDictionary = GenerateDictionary().ToImmutableDictionary();
     }
     private readonly Lazy<IFlashUtil> _lazyFlash;
+    private readonly ISettingsService _settingsService;
+    private Dictionary<string, string>? _userOptions;
+
     private IFlashUtil Flash => _lazyFlash.Value;
 
-    public void ResetOptions()
-    {
-        SafeTimings = true;
-    }
+    public ImmutableDictionary<string, Func<object>> OptionDictionary { get; }
 
-    public ImmutableDictionary<string, Func<object>> OptionsDictionary { get; }
     [ObservableProperty]
-    private bool _AttackWithoutTarget;
+    private bool _attackWithoutTarget;
+    private bool _acceptACDrops;
+    public bool AcceptACDrops
+    {
+        get { return _acceptACDrops; }
+        set { SetProperty(ref _acceptACDrops, value, true); }
+    }
+    private bool _acceptAllDrops;
+    public bool AcceptAllDrops
+    {
+        get { return _acceptAllDrops; }
+        set
+        {
+            if (SetProperty(ref _acceptAllDrops, value, true) && value)
+                RejectAllDrops = false;
+        }
+    }
+    private bool _rejectAllDrops;
+    public bool RejectAllDrops
+    {
+        get { return _rejectAllDrops; }
+        set
+        {
+            if (SetProperty(ref _rejectAllDrops, value, true) && value)
+                AcceptAllDrops = false;
+        }
+    }
     [ObservableProperty]
-    private bool _AcceptACDrops;
+    private bool _restPackets;
     [ObservableProperty]
-    private bool _RestPackets;
+    private bool _safeTimings = true;
     [ObservableProperty]
-    private bool _SafeTimings = true;
-    [ObservableProperty]
-    private bool _ExitCombatBeforeQuest;
+    private bool _exitCombatBeforeQuest;
     [CallBinding("skipCutscenes", UseValue = false, Get = false, HasSetter = true)]
     private bool _skipCutscenes;
-    public bool PrivateRooms { get; set; }
+    [ObservableProperty]
+    private bool _privateRooms;
     [CallBinding("magnetize", UseValue = false, Get = false, HasSetter = true)]
-    private bool _Magnetise;
+    private bool _magnetise;
     [CallBinding("killLag", Get = false, HasSetter = true)]
-    private bool _LagKiller;
+    private bool _lagKiller;
     [ObjectBinding("stage.frameRate", Get = false, HasSetter = true)]
-    private int _SetFPS = 30;
+    private int _setFPS = 30;
+    [ObjectBinding("ui.mcFPS.visible", HasSetter = true)]
+    private bool _showFPS = false;
     [ObservableProperty]
-    private bool _AggroMonsters;
+    private bool _aggroMonsters;
     [ObservableProperty]
-    private bool _AggroAllMonsters;
+    private bool _aggroAllMonsters;
     [CallBinding("infiniteRange", UseValue = false, Get = false, HasSetter = true)]
-    private bool _InfiniteRange;
+    private bool _infiniteRange;
     [ModuleBinding("DisableFX")]
-    private bool _DisableFX;
+    private bool _disableFX;
     [ObservableProperty]
-    private bool _AutoRelogin;
+    private bool _autoRelogin;
     [ObservableProperty]
-    private bool _AutoReloginAny;
+    private bool _autoReloginAny;
     [ObservableProperty]
-    private bool _RetryRelogin = true;
+    private bool _retryRelogin = true;
     [ObservableProperty]
-    private bool _SafeRelogin;
+    private bool _safeRelogin;
     [ModuleBinding("DisableCollisions")]
-    private bool _DisableCollisions;
+    private bool _disableCollisions;
     [CallBinding("disableDeathAd", Get = false, HasSetter = true)]
-    private bool _DisableDeathAds;
+    private bool _disableDeathAds;
     [ModuleBinding("HidePlayers")]
-    private bool _HidePlayers;
-    [ObservableProperty]
-    private Server? _LoginServer = null;
+    private bool _hidePlayers;
+    private string? _reloginServer = null;
+    public string? ReloginServer
+    {
+        get { return _reloginServer; }
+        set { SetProperty(ref _reloginServer, value, true); }
+    }
     [ObjectBinding("world.myAvatar.objData.strUsername", "world.rootClass.ui.mcPortrait.strName.text", "world.myAvatar.pMC.pname.ti.text", Get = false, HasSetter = true, Default = "string.Empty")]
-    private string _CustomName = string.Empty;
-    [ObjectBinding("world.myAvatar.pMC.pname.ti.textColor", Get = false, HasSetter = true)]
-    private int _NameColor;
+    private string _customName = string.Empty;
+    [ObjectBinding("world.myAvatar.pMC.pname.ti.textColor", Get = false, HasSetter = true, Default = "0xFFFFFF")]
+    private int _nameColor = 0xFFFFFF;
     [ObjectBinding("world.myAvatar.pMC.pname.tg.text", Get = false, HasSetter = true, Default = "string.Empty")]
-    private string _CustomGuild = string.Empty;
+    private string _customGuild = string.Empty;
     [ObjectBinding("world.myAvatar.pMC.pname.tg.textColor", Get = false, HasSetter = true)]
-    public int _GuildColor;
+    public int _guildColor;
     [ObjectBinding("world.WALKSPEED", Get = false, HasSetter = true, Default = "8")]
-    private int _WalkSpeed = 8;
+    private int _walkSpeed = 8;
     [ObservableProperty]
-    private int _LoadTimeout = 16000;
+    private int _loadTimeout = 16000;
     [ObservableProperty]
-    private int _HuntDelay = 1000;
+    private int _huntDelay = 1000;
     [ObservableProperty]
-    private int _HuntBuffer = 1;
+    private int _huntBuffer = 1;
     [ObservableProperty]
-    private int _MaximumTries = 10;
+    private int _maximumTries = 10;
     [ObservableProperty]
-    private int _ActionDelay = 700;
+    private int _actionDelay = 700;
     [ObservableProperty]
-    private int _PrivateNumber = 0;
+    private int _privateNumber = 0;
     [ObservableProperty]
-    private int _JoinMapTries = 3;
+    private int _joinMapTries = 3;
     [ObservableProperty]
-    private int _QuestAcceptAndCompleteTries = 30;
+    private int _questAcceptAndCompleteTries = 30;
     [ObservableProperty]
-    private int _ReloginTries = 3;
+    private int _reloginTries = 3;
     [ObservableProperty]
-    private int _ReloginTryDelay = 3000;
+    private int _reloginTryDelay = 3000;
+    [ObservableProperty]
+    private int _loginTimeout = 10_000;
     [ObservableProperty]
     private HuntPriorities _HuntPriority = HuntPriorities.None;
 
-    private Dictionary<string, Func<object>> GenerateDictionary()
+    public void Save()
     {
-        Dictionary<string, Func<object>> dict = new Dictionary<string, Func<object>>();
+        StringCollection saveOptions = new();
         foreach (PropertyInfo pi in GetType().GetProperties())
         {
-            if (pi.Name == nameof(OptionsDictionary))
+            if (pi.Name == nameof(OptionDictionary))
+                continue;
+            var key = pi.Name;
+            var value = pi.GetValue(this);
+            saveOptions.Add($"{key}={value}");
+        }
+        _settingsService.Set("UserOptions", saveOptions);
+    }
+
+    public void Reset()
+    {
+        if (_userOptions is null)
+        {
+            ResetToDefault();
+            return;
+        }
+
+        foreach (PropertyInfo pi in GetType().GetProperties())
+        {
+            if (pi.Name == nameof(OptionDictionary))
+                continue;
+            if (_userOptions.ContainsKey(pi.Name))
+            {
+                if (pi.PropertyType.BaseType == typeof(Enum))
+                {
+                    pi.SetValue(this, Enum.Parse(pi.PropertyType, _userOptions[pi.Name], true));
+                    continue;
+                }
+                pi.SetValue(this, Convert.ChangeType(_userOptions[pi.Name], pi.PropertyType));
+            }
+        }
+    }
+
+    public void ResetToDefault()
+    {
+        var defaults = new ScriptOption(_lazyFlash);
+        foreach (PropertyInfo pi in GetType().GetProperties())
+        {
+            if (pi.Name == nameof(OptionDictionary))
+                continue;
+
+            pi.SetValue(this, pi.GetValue(defaults), null);
+        }
+    }
+    private void GetOptions()
+    {
+        var userOptions = _settingsService.Get<StringCollection>("UserOptions");
+        if (userOptions is null)
+            return;
+        _userOptions = new();
+        foreach (string? option in userOptions)
+        {
+            if (string.IsNullOrEmpty(option))
+                continue;
+            string[] optionKeyValue = option.Split('=', StringSplitOptions.TrimEntries);
+            _userOptions.Add(optionKeyValue[0], optionKeyValue[1]);
+        }
+        Reset();
+    }
+
+    private Dictionary<string, Func<object>> GenerateDictionary()
+    {
+        Dictionary<string, Func<object>> dict = new();
+        foreach (PropertyInfo pi in GetType().GetProperties())
+        {
+            if (pi.Name == nameof(OptionDictionary))
                 continue;
             var methodCall = Expression.Call(Expression.Constant(this), pi.GetGetMethod()!, null);
             var convertedExpression = Expression.Convert(methodCall, typeof(object));

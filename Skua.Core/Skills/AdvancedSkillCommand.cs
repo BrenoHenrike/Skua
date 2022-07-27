@@ -19,7 +19,7 @@ public class AdvancedSkillCommand
 
     public bool? ShouldUse(IScriptPlayer player)
     {
-        if (UseRules[_Index][0].None)
+        if (UseRules.Count == 0 || UseRules[_Index].First().None)
             return true;
         bool shouldUse = true;
         foreach (UseRule useRule in UseRules[_Index])

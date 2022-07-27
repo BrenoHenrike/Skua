@@ -5,13 +5,9 @@ using Newtonsoft.Json;
 namespace Skua.Core.Interfaces;
 
 public delegate void FlashCallHandler(string function, params object[] args);
-public delegate void FlashErrorHandler(Exception e, string function, params object[] args);
-public delegate void FlashChangedHandler(IComponent flash);
-public interface IFlashUtil
+public interface IFlashUtil : IDisposable
 {
     event FlashCallHandler? FlashCall;
-    event FlashErrorHandler? FlashError;
-    event FlashChangedHandler? FlashChanged;
 
     /// <summary>
     /// Whether the world clip has been loaded yet.
@@ -50,19 +46,6 @@ public interface IFlashUtil
     /// <param name="el">Element to parse.</param>
     /// <returns>An <see cref="object"/> representing the converted <see cref="XElement"/>.</returns>
     object FromFlashXml(XElement el);
-    /// <summary>
-    /// Raises the <see cref="FlashCall"/> event.
-    /// </summary>
-    /// <param name="function">Function which was called.</param>
-    /// <param name="args">Parameters of the function.</param>
-    void OnFlashCall(string function, params object[] args);
-    /// <summary>
-    /// Raises the <see cref="FlashError"/> event.
-    /// </summary>
-    /// <param name="e"><see cref="Exception"/> that was thrown.</param>
-    /// <param name="function">The function that threw the exception.</param>
-    /// <param name="args">Array of the arguments passed to the function.</param>
-    void OnFlashError(Exception e, string function, params object[] args);
     /// <summary>
     /// Creates a <see cref="IFlashObject{T}"/> from the specified <paramref name="path"/>.
     /// </summary>

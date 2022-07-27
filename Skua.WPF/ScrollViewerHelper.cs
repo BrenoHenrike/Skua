@@ -22,9 +22,7 @@ public static class ScrollViewerHelper
 
     private static void ShiftScrollChangedCallback(DependencyObject d, DependencyPropertyChangedEventArgs e)
     {
-        var element = d as UIElement;
-
-        if (element == null)
+        if (d is not UIElement element)
             throw new Exception("Attached property must be used with UIElement.");
 
         if ((bool)e.NewValue)
@@ -35,7 +33,7 @@ public static class ScrollViewerHelper
 
     private static void ShiftScroll_OnPreviewMouseWheel(object sender, MouseWheelEventArgs args)
     {
-        var scrollViewer = ((UIElement)sender).FindDescendant<ScrollViewer>();
+        ScrollViewer? scrollViewer = ((UIElement)sender).FindDescendant<ScrollViewer>();
 
         if (scrollViewer == null)
             return;
@@ -53,9 +51,7 @@ public static class ScrollViewerHelper
 
     private static void HorizontalScrollChangedCallback(DependencyObject d, DependencyPropertyChangedEventArgs e)
     {
-        var element = d as UIElement;
-
-        if (element == null)
+        if (d is not UIElement element)
             throw new Exception("Attached property must be used with UIElement.");
 
         if ((bool)e.NewValue)
@@ -63,9 +59,6 @@ public static class ScrollViewerHelper
         else
             element.PreviewMouseWheel -= HorizontalScrool_OnPreviewMouseWheel;
     }
-
-
-
 
     private static void HorizontalScrool_OnPreviewMouseWheel(object sender, MouseWheelEventArgs args)
     {
@@ -88,18 +81,18 @@ public static class ScrollViewerHelper
     public static void SetScrollHorizontally(UIElement element, bool value) => element.SetValue(ScrollHorizontallyProperty, value);
     public static bool GetScrollHorizontally(UIElement element) => (bool)element.GetValue(ScrollHorizontallyProperty);
 
-    private static T FindDescendant<T>(this DependencyObject d) where T : DependencyObject
+    private static T? FindDescendant<T>(this DependencyObject d) where T : DependencyObject
     {
         if (d == null)
             return null;
 
-        var childCount = VisualTreeHelper.GetChildrenCount(d);
+        int childCount = VisualTreeHelper.GetChildrenCount(d);
 
-        for (var i = 0; i < childCount; i++)
+        for (int i = 0; i < childCount; i++)
         {
-            var child = VisualTreeHelper.GetChild(d, i);
+            DependencyObject? child = VisualTreeHelper.GetChild(d, i);
 
-            var result = child as T ?? FindDescendant<T>(child);
+            T? result = child as T ?? FindDescendant<T>(child);
 
             if (result != null)
                 return result;

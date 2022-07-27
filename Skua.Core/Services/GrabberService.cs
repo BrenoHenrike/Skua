@@ -1,10 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using Skua.Core.Interfaces;
-using Skua.Core.Interfaces.Services;
+﻿using Skua.Core.Interfaces;
 using Skua.Core.Models;
 
 namespace Skua.Core.Services;
@@ -17,57 +11,63 @@ public class GrabberService : IGrabberService
         IScriptBank bank,
         IScriptHouseInv house,
         IScriptTempInv tempInv,
-        IScriptMonster monsters)
+        IScriptMonster monsters,
+        IScriptMap map)
     {
-        Shops = shops;
-        Quests = quests;
-        Inventory = inventory;
-        Bank = bank;
-        House = house;
-        TempInv = tempInv;
-        Monsters = monsters;
+        _shops = shops;
+        _quests = quests;
+        _inventory = inventory;
+        _bank = bank;
+        _house = house;
+        _tempInv = tempInv;
+        _monsters = monsters;
+        _map = map;
     }
-    private readonly IScriptShop Shops;
-    private readonly IScriptQuest Quests;
-    private readonly IScriptInventory Inventory;
-    private readonly IScriptBank Bank;
-    private readonly IScriptHouseInv House;
-    private readonly IScriptTempInv TempInv;
-    private readonly IScriptMonster Monsters;
+
+    private readonly IScriptShop _shops;
+    private readonly IScriptQuest _quests;
+    private readonly IScriptInventory _inventory;
+    private readonly IScriptBank _bank;
+    private readonly IScriptHouseInv _house;
+    private readonly IScriptTempInv _tempInv;
+    private readonly IScriptMonster _monsters;
+    private readonly IScriptMap _map;
+
     public List<object> Grab(GrabberTypes grabType)
     {
         List<object> items = new();
         switch (grabType)
         {
             case GrabberTypes.Shop_Items:
-                items.AddRange(Shops.Items);
+                items.AddRange(_shops.Items);
                 break;
             case GrabberTypes.Shop_IDs:
-                items.AddRange(Shops.LoadedCache.Select(s => (object)s.ID).ToList());
+                items.AddRange(_shops.LoadedCache.Select(s => (object)s.ID).ToList());
                 break;
             case GrabberTypes.Quests:
-                items.AddRange(Quests.Tree);
+                items.AddRange(_quests.Tree);
                 break;
             case GrabberTypes.Inventory_Items:
-                items.AddRange(Inventory.Items);
+                items.AddRange(_inventory.Items);
                 break;
             case GrabberTypes.House_Inventory_Items:
-                items.AddRange(House.Items);
+                items.AddRange(_house.Items);
                 break;
             case GrabberTypes.Temp_Inventory_Items:
-                items.AddRange(TempInv.Items);
+                items.AddRange(_tempInv.Items);
                 break;
             case GrabberTypes.Bank_Items:
-                items.AddRange(Bank.Items);
+                items.AddRange(_bank.Items);
                 break;
             case GrabberTypes.Cell_Monsters:
-                items.AddRange(Monsters.CurrentMonsters);
+                items.AddRange(_monsters.CurrentAvailableMonsters);
                 break;
             case GrabberTypes.Map_Monsters:
-                items.AddRange(Monsters.MapMonsters);
+                items.AddRange(_monsters.MapMonsters);
                 break;
             case GrabberTypes.GetMap_Item_IDs:
-                return new();
+                items.AddRange(_map.FindMapItems() ?? new());
+                break;
             default:
                 return new();
         }

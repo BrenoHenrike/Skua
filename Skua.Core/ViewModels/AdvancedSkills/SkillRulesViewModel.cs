@@ -2,24 +2,28 @@
 using Microsoft.Toolkit.Mvvm.Input;
 
 namespace Skua.Core.ViewModels;
-public class SkillRulesViewModel : ObservableRecipient
+public partial class SkillRulesViewModel : ObservableRecipient
 {
     public SkillRulesViewModel()
     {
         ResetUseRulesCommand = new RelayCommand(ResetUseRules);
     }
+    public SkillRulesViewModel(SkillRulesViewModel rules)
+    {
+        _useRuleBool = rules.UseRuleBool;
+        _waitUseValue = rules.WaitUseValue;
+        _healthGreaterThanBool = rules.HealthGreaterThanBool;
+        _healthUseValue = rules.HealthUseValue;
+        _manaGreaterThanBool = rules.ManaGreaterThanBool;
+        _manaUseValue = rules.ManaUseValue;
+        _skipUseBool = rules.SkipUseBool;
+
+        ResetUseRulesCommand = new RelayCommand(ResetUseRules);
+    }
+    [ObservableProperty]
     private bool _useRuleBool;
-    public bool UseRuleBool
-    {
-        get { return _useRuleBool; }
-        set { SetProperty(ref _useRuleBool, value); }
-    }
+    [ObservableProperty]
     private bool _healthGreaterThanBool = true;
-    public bool HealthGreaterThanBool
-    {
-        get { return _healthGreaterThanBool; }
-        set { SetProperty(ref _healthGreaterThanBool, value); }
-    }
     private int _healthUseValue;
     public int HealthUseValue
     {
@@ -31,12 +35,8 @@ public class SkillRulesViewModel : ObservableRecipient
             SetProperty(ref _healthUseValue, value);
         }
     }
+    [ObservableProperty]
     private bool _manaGreaterThanBool = true;
-    public bool ManaGreaterThanBool
-    {
-        get { return _manaGreaterThanBool; }
-        set { SetProperty(ref _manaGreaterThanBool, value); }
-    }
     private int _manaUseValue;
     public int ManaUseValue
     {
@@ -48,18 +48,10 @@ public class SkillRulesViewModel : ObservableRecipient
             SetProperty(ref _manaUseValue, value);
         }
     }
+    [ObservableProperty]
     private int _waitUseValue;
-    public int WaitUseValue
-    {
-        get { return _waitUseValue; }
-        set { SetProperty(ref _waitUseValue, value); }
-    }
+    [ObservableProperty]
     private bool _skipUseBool;
-    public bool SkipUseBool
-    {
-        get { return _skipUseBool; }
-        set { SetProperty(ref _skipUseBool, value); }
-    }
 
     public IRelayCommand ResetUseRulesCommand { get; }
 

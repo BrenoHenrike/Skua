@@ -4,10 +4,11 @@ using Skua.Core.Interfaces;
 using Skua.Core.Models;
 using Skua.Core.Models.Items;
 using Skua.Core.Flash;
+using Microsoft.Toolkit.Mvvm.ComponentModel;
 
 namespace Skua.Core.Scripts;
 
-public partial class ScriptQuest : IScriptQuest
+public partial class ScriptQuest : ObservableObject, IScriptQuest
 {
     private readonly Lazy<IFlashUtil> _lazyFlash;
     private readonly Lazy<IScriptWait> _lazyWait;
@@ -48,8 +49,6 @@ public partial class ScriptQuest : IScriptQuest
 
     private Thread? QuestThread;
     private CancellationTokenSource? QuestsCTS;
-    private readonly List<int> _add = new();
-    private readonly List<int> _rem = new();
 
     public int RegisterCompleteInterval { get; set; } = 2000;
     [ObjectBinding("world.questTree", Default = "new()")]
@@ -58,7 +57,8 @@ public partial class ScriptQuest : IScriptQuest
     public List<Quest> Active => Tree.FindAll(x => x.Active);
     public List<Quest> Completed => Tree.FindAll(x => x.Status == "c");
     public List<QuestData> Cached { get; set; } = new();
-    public List<int> Registered { get; } = new();
+    private SynchronizedList<int> _registered = new();
+    public IEnumerable<int> Registered => _registered.Items;
 
     public void Load(params int[] ids)
     {
@@ -67,6 +67,7 @@ public partial class ScriptQuest : IScriptQuest
             Flash.CallGameFunction("world.showQuests", ids.Select(id => id.ToString()).Join(','), "q");
             return;
         }
+
         foreach(int[] idchunk in ids.Chunk(30))
         {
             Flash.CallGameFunction("world.showQuests", idchunk.Select(id => id.ToString()).Join(','), "q");
@@ -256,14 +257,16 @@ public partial class ScriptQuest : IScriptQuest
 
     public void RegisterQuests(params int[] ids)
     {
-        lock (_add)
-            _add.AddRange(ids);
+        if (ids.Length == 0)
+            return;
+        _registered.AddRange(ids.Except(_registered.Items));
+        OnPropertyChanged(nameof(Registered));
         if (!QuestThread?.IsAlive ?? true)
         {
-            QuestThread = new(() =>
+            QuestThread = new(async () =>
             {
                 QuestsCTS = new();
-                Poll(QuestsCTS.Token);
+                await _Poll(QuestsCTS.Token);
                 QuestsCTS.Dispose();
                 QuestsCTS = null;
             })
@@ -276,14 +279,13 @@ public partial class ScriptQuest : IScriptQuest
 
     public void UnregisterQuests(params int[] ids)
     {
-        lock (_rem)
-            _rem.AddRange(ids);
+        _registered.Remove(ids.Contains);
     }
 
-    public void ClearRegisteredQuests()
+    public void UnregisterAllQuests()
     {
-        lock (_rem)
-            _rem.AddRange(Registered);
+        _registered.Clear();
+        OnPropertyChanged(nameof(Registered));
         if (QuestThread?.IsAlive ?? false)
         {
             QuestsCTS?.Cancel();
@@ -291,44 +293,30 @@ public partial class ScriptQuest : IScriptQuest
         }
     }
 
-    private void Poll(CancellationToken token)
+    private async Task _Poll(CancellationToken token)
     {
         while (!token.IsCancellationRequested)
         {
-            if (_add.Count > 0)
-            {
-                Registered.AddRange(_add.Except(Registered));
-                lock (_add)
-                    _add.Clear();
-            }
-            if (_rem.Count > 0)
-            {
-                Registered.RemoveAll(_rem.Contains);
-                lock (_rem)
-                    _rem.Clear();
-            }
             if (Player.Playing)
-            {
-                _CompleteQuest(Registered);
-            }
-            if (!token.IsCancellationRequested)
-                Thread.Sleep(RegisterCompleteInterval);
+                await _CompleteQuest(_registered.Items, token).ConfigureAwait(false);
+            await Task.Delay(RegisterCompleteInterval, token);
         }
     }
 
-    private void _CompleteQuest(List<int> registered)
+    private async Task _CompleteQuest(IEnumerable<int> registered, CancellationToken token)
     {
-        for (int i = 0; i < registered.Count; i++)
+        foreach (int quest in registered)
         {
-            if (!CanComplete(registered[i]))
+            Accept(quest);
+            if (!CanComplete(quest))
                 continue;
             if (Options.SafeTimings)
                 Wait.ForActionCooldown(GameActions.TryQuestComplete);
-            Flash.CallGameFunction("world.tryQuestComplete", registered[i], -1, false);
+            Flash.CallGameFunction("world.tryQuestComplete", quest, -1, false);
             if (Options.SafeTimings)
-                Wait.ForQuestComplete(registered[i]);
-            Accept(registered[i]);
-            Thread.Sleep(Options.ActionDelay);
+                Wait.ForQuestComplete(quest);
+            EnsureAccept(quest);
+            await Task.Delay(Options.ActionDelay, token);
         }
     }
 }

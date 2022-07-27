@@ -1,0 +1,101 @@
+﻿<UserControl
+    x:Class="Skua.App.WPF.UserControls.MainMenuUserControl"
+    xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+    xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+    xmlns:local="clr-namespace:Skua.App.WPF.UserControls"
+    xmlns:materialDesign="http://materialdesigninxaml.net/winfx/xaml/themes"
+    xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+    xmlns:vms="clr-namespace:Skua.Core.ViewModels;assembly=Skua.Core"
+    d:DataContext="{d:DesignInstance vms:MainMenuViewModel}"
+    d:DesignHeight="450"
+    d:DesignWidth="800"
+    mc:Ignorable="d">
+    <DockPanel Background="{DynamicResource MaterialDesignPaper}">
+        <Button
+            Height="25"
+            Command="{Binding ShowBotWindowCommand}"
+            Content="{materialDesign:PackIcon Kind=Plus}"
+            DockPanel.Dock="Right"
+            Style="{StaticResource MaterialDesignFlatButton}" />
+
+        <ToggleButton
+            x:Name="JumpToggle"
+            Height="25"
+            Content="Jump"
+            DockPanel.Dock="Right"
+            Style="{StaticResource MaterialDesignFlatButton}" />
+        <Popup
+            DockPanel.Dock="Right"
+            IsOpen="{Binding ElementName=JumpToggle, Path=IsChecked}"
+            StaysOpen="False">
+            <StackPanel Width="300" Background="{DynamicResource MaterialDesignPaper}">
+                <local:JumpUserControl DataContext="{Binding JumpViewModel}" />
+            </StackPanel>
+        </Popup>
+
+        <ToggleButton
+            x:Name="AutoToggle"
+            Height="25"
+            DockPanel.Dock="Right"
+            Style="{StaticResource MaterialDesignFlatButton}">
+            <ToggleButton.Content>
+                <StackPanel Orientation="Horizontal">
+                    <materialDesign:PackIcon Kind="ProgressCheck" Visibility="{Binding AutoViewModel.Auto.IsRunning, Converter={StaticResource BooleanToVisibilityConverter}}" />
+                    <TextBlock Margin="3,0,0,0" Text="Auto" />
+                </StackPanel>
+            </ToggleButton.Content>
+        </ToggleButton>
+        <Popup
+            DockPanel.Dock="Right"
+            IsOpen="{Binding ElementName=AutoToggle, Path=IsChecked}"
+            StaysOpen="False">
+            <StackPanel Width="400" Background="{DynamicResource MaterialDesignPaper}">
+                <local:AutoUserControl DataContext="{Binding AutoViewModel}" />
+            </StackPanel>
+        </Popup>
+
+        <Menu Foreground="{DynamicResource PrimaryHueMidBrush}" ItemsSource="{Binding MainMenuItems}">
+            <Menu.ItemContainerStyle>
+                <Style BasedOn="{StaticResource MaterialDesignMenuItem}" TargetType="MenuItem">
+                    <Setter Property="MaxHeight" Value="25" />
+                    <Setter Property="Padding" Value="6,0" />
+                    <Setter Property="ItemsSource" Value="{Binding SubItems}" />
+                    <Setter Property="Command" Value="{Binding Command}" />
+                    <Setter Property="HeaderTemplate">
+                        <Setter.Value>
+                            <DataTemplate>
+                                <TextBlock
+                                    Height="42"
+                                    FontSize="15"
+                                    Text="{Binding Header}" />
+                            </DataTemplate>
+                        </Setter.Value>
+                    </Setter>
+                    <Setter Property="ItemContainerStyle">
+                        <Setter.Value>
+                            <Style BasedOn="{StaticResource MaterialDesignMenuItem}" TargetType="MenuItem">
+                                <Setter Property="ItemsSource" Value="{Binding SubItems}" />
+                                <Setter Property="Command" Value="{Binding Command}" />
+                                <Setter Property="Header" Value="{Binding Header}" />
+                            </Style>
+                        </Setter.Value>
+                    </Setter>
+                </Style>
+            </Menu.ItemContainerStyle>
+        </Menu>
+        <Menu Foreground="{DynamicResource PrimaryHueMidBrush}">
+            <MenuItem
+                Height="25"
+                Header="Plugins"
+                ItemsSource="{Binding Plugins}">
+                <MenuItem.ItemContainerStyle>
+                    <Style BasedOn="{StaticResource MaterialDesignMenuItem}" TargetType="MenuItem">
+                        <Setter Property="Header" Value="{Binding Header}" />
+                        <Setter Property="Command" Value="{Binding Command}" />
+                    </Style>
+                </MenuItem.ItemContainerStyle>
+            </MenuItem>
+        </Menu>
+    </DockPanel>
+</UserControl>

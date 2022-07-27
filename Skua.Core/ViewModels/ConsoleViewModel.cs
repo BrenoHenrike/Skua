@@ -13,7 +13,7 @@ namespace Skua.Core.ViewModels;
 public class ConsoleViewModel : BotControlViewModelBase
 {
     public ConsoleViewModel(CSharpScriptExecution compiler, IDialogService dialogService, IScriptManager scriptManager, IScriptInterface bot)
-        : base("Console")
+        : base("Console", 700, 400)
     {
         _compiler = compiler;
         _dialogService = dialogService;
@@ -35,12 +35,13 @@ public class ConsoleViewModel : BotControlViewModelBase
     }
 
     public IAsyncRelayCommand RunCommand { get; }
+
     private Task Run()
     {
         try
         {
             //_compiler.ExecuteMethod($"public object Snippet(IScriptInterface bot){{\n{SnippetText}\nreturn null;}}", "Snippet", Bot);
-            string source = $"using Skua.Core; using Skua.Core.Interfaces; public class Script{{ public void ScriptMain(IScriptInterface bot){{{_snippetText}}}";
+            string source = $"using Skua.Core; using Skua.Core.Interfaces; public class Script{{ public void ScriptMain(IScriptInterface bot){{{_snippetText}}}}}";
             object? o = ScriptManager.Compile(source);
             o!.GetType().GetMethod("ScriptMain")!.Invoke(o, new[] { Bot });
         }

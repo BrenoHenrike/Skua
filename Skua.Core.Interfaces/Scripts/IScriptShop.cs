@@ -33,7 +33,7 @@ public interface IScriptShop
     /// Buys the item with specified <paramref name="id"/> from the <see cref="ID">currently loaded shop</see>.
     /// </summary>
     /// <param name="id">Name of the item to buy.</param>
-    void BuyItem(int id);
+    void BuyItem(int id, int shopItemId = 0);
     /// <summary>
     /// Buys the item with specified <paramref name="name"/> from the specified <paramref name="shopId"/>.
     /// </summary>
@@ -51,10 +51,10 @@ public interface IScriptShop
     /// <param name="shopId">ID of the shop to buy the item from.</param>
     /// <param name="itemId">ID of the item to buy.</param>
     /// <remarks>This loads the shop, waits until it is fully loaded, and then sends the buy item request.</remarks>
-    void BuyItem(int shopId, int itemId)
+    void BuyItem(int shopId, int itemId, int shopItemId = 0)
     {
         Load(shopId);
-        BuyItem(itemId);
+        BuyItem(itemId, shopItemId);
     }
     /// <summary>
     /// Loads the shop with specified <paramref name="id"/>.
@@ -81,9 +81,4 @@ public interface IScriptShop
     /// </summary>
     /// <param name="id">ID of the item to sell.</param>
     void SellItem(int id);
-    void OnLoaded(int id, string name, List<ShopItem> items)
-    {
-        if (!LoadedCache.Any(s => s.ID == id))
-            LoadedCache.Add(new ShopInfo(id, name, items));
-    }
 }

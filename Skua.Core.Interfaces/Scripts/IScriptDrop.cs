@@ -1,12 +1,10 @@
-﻿using Skua.Core.Models.Items;
+﻿using System.ComponentModel;
+using Skua.Core.Models.Items;
 using Skua.Core.Utils;
 
 namespace Skua.Core.Interfaces;
-public interface IScriptDrop
+public interface IScriptDrop : INotifyPropertyChanged
 {
-    event Action? DropsStarted;
-    event Action? DropsStopped;
-
     /// <summary>
     /// Get a list of drops available in the drop stack (even if they aren't in the screen).
     /// </summary>
@@ -20,7 +18,7 @@ public interface IScriptDrop
     /// </summary>
     bool Enabled { get; }
     /// <summary>
-    /// The interval, in milliseconds, at which to pickup the drops.
+    /// The interval, in milliseconds, at which to pickup the drops (the base interval is 1000ms, any value assigned to this property will be added to that interval).
     /// </summary>
     int Interval { get; set; }
     /// <summary>
@@ -30,11 +28,11 @@ public interface IScriptDrop
     /// <summary>
     /// The list of item names to pickup every <see cref="Interval"/>.
     /// </summary>
-    List<string> ToPickup { get; }
+    IEnumerable<string> ToPickup { get; }
     /// <summary>
     /// The list of item IDs to pickup every <see cref="Interval"/>
     /// </summary>
-    List<int> ToPickupIDs { get; }
+    IEnumerable<int> ToPickupIDs { get; }
     /// <summary>
     /// Adds the specified items in the <see cref="ToPickup"/> list.
     /// </summary>
@@ -64,6 +62,10 @@ public interface IScriptDrop
     /// </summary>
     void Stop();
     /// <summary>
+    /// Stops the drop grabber.
+    /// </summary>
+    ValueTask StopAsync();
+    /// <summary>
     /// Removes all items from the pickup list.
     /// </summary>
     void Clear();
@@ -74,7 +76,7 @@ public interface IScriptDrop
     /// <returns><see langword="true"/> if a drop with the specified <paramref name="name"/> exists.</returns>
     bool Exists(string name)
     {
-        return name == "*" || CurrentDrops.Contains(name, StringComparer.OrdinalIgnoreCase);
+        return (name == "*" && CurrentDrops.Any()) || CurrentDrops.Contains(name, StringComparer.OrdinalIgnoreCase);
     }
     /// <summary>
     /// Checks if a drop with the specified <paramref name="id"/> exists.
@@ -152,14 +154,4 @@ public interface IScriptDrop
     /// </summary>
     /// <param name="ids">IDs of the items to not reject.</param>
     void RejectExcept(params int[] ids);
-    /// <summary>
-    /// Rejects all drops except those in the specified list of <paramref name="names"/>, without waiting for the items to be rejected. This method disregards the <see cref="IScriptOption.SafeTimings"/> option.
-    /// </summary>
-    /// <param name="names">Names of the items to not reject.</param>
-    void RejectExceptFast(params string[] names);
-    /// <summary>
-    /// Rejects all drops except those in the specified list of <paramref name="ids"/>, without waiting for the items to be rejected. This method disregards the <see cref="IScriptOption.SafeTimings"/> option.
-    /// </summary>
-    /// <param name="ids">Names of the items to not reject.</param>
-    void RejectExceptFast(params int[] ids);
 }

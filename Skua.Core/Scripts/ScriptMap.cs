@@ -10,13 +10,14 @@ using Skua.Core.Flash;
 namespace Skua.Core.Scripts;
 public partial class ScriptMap : IScriptMap
 {
-    Dictionary<string, List<MapItem>> SavedMapItems = new();
+    private Dictionary<string, List<MapItem>> _savedMapItems = new();
 
     private readonly Lazy<IFlashUtil> _lazyFlash;
     private readonly Lazy<IScriptPlayer> _lazyPlayer;
     private readonly Lazy<IScriptOption> _lazyOptions;
     private readonly Lazy<IScriptWait> _lazyWait;
     private readonly Lazy<IScriptManager> _lazyManager;
+    private readonly IDialogService _dialogService;
     private readonly Lazy<IScriptSend> _lazySend;
 
     private IFlashUtil Flash => _lazyFlash.Value;
@@ -32,14 +33,16 @@ public partial class ScriptMap : IScriptMap
         Lazy<IScriptOption> options,
         Lazy<IScriptSend> send,
         Lazy<IScriptWait> wait,
-        Lazy<IScriptManager> manager)
+        Lazy<IScriptManager> manager,
+        IDialogService dialogService)
     {
         _lazyFlash = flash;
         _lazyPlayer = player;
         _lazyOptions = options;
+        _lazySend = send;
         _lazyWait = wait;
         _lazyManager = manager;
-        _lazySend = send;
+        _dialogService = dialogService;
         LoadSavedMapItems();
     }
 
@@ -49,21 +52,21 @@ public partial class ScriptMap : IScriptMap
     public string FullName => Loaded ? Flash.GetGameObject("ui.mcInterface.areaList.title.t1.text")?.Split(' ').Last() ?? "" : "";
 
     [ObjectBinding("world.strMapName", RequireNotNull = "world", Default = "string.Empty")]
-    private string _name;
+    private string _name = string.Empty;
     [ObjectBinding("world.curRoom")]
     private int _roomID;
     [ObjectBinding("world.areaUsers.length")]
     private int _playerCount;
     [ObjectBinding("world.areaUsers", Default = "new()")]
-    private List<string> _playerNames;
+    private List<string> _playerNames = new();
     [ObjectBinding("world.uoTree", Default = "new()")]
-    private readonly Dictionary<string, PlayerInfo> _playersDictionary;
+    private readonly Dictionary<string, PlayerInfo> _playersDictionary = new();
     public List<PlayerInfo> Players => _playersDictionary.Values.ToList();
     public List<PlayerInfo> CellPlayers => Players.FindAll(p => p.Cell == Player.Cell);
     public bool Loaded => !Flash.GetGameObject<bool>("world.mapLoadInProgress")
                           && Flash.IsNull("mcConnDetail.stage");
     [ObjectBinding("world.map.currentScene.labels", Select = "name", Default = "new()")]
-    private List<string> _cells;
+    private List<string>? _cells;
 
     [MethodCallBinding("world.moveToCell", RunMethodPost = true, GameFunction = true)]
     private void _jump(string cell, string pad, bool clientOnly = false)
@@ -79,14 +82,15 @@ public partial class ScriptMap : IScriptMap
 
     private void _Join(string map, string cell = "Enter", string pad = "Spawn", bool ignoreCheck = false)
     {
-        LastMap = map;
+        string mapName = map.Split('-')[0];
+        LastMap = mapName;
         if (!Player.Playing || !Player.Loaded || (!ignoreCheck && Name == map))
             return;
         int i = 0;
-        while (Name != map && !Manager.ShouldExit && ++i < Options.JoinMapTries)
+        while (Name != mapName && !Manager.ShouldExit && ++i < Options.JoinMapTries)
         {
-            if (Options.PrivateRooms || map.Contains("-1e9"))
-                map = $"{map.Split('-')[0]}{(Options.PrivateNumber != -1 ? Options.PrivateNumber : "-100000")}";
+            if ((Options.PrivateRooms && !map.Contains('-')) || map.Contains("-1e9"))
+                map = $"{mapName}{(Options.PrivateNumber != -1 ? Options.PrivateNumber : "-100000")}";
             if (Options.SafeTimings)
                 Wait.ForActionCooldown(GameActions.Transfer);
             JoinPacket(map, cell, pad);
@@ -123,42 +127,42 @@ public partial class ScriptMap : IScriptMap
 
     private Dictionary<string, List<MapItem>>? LoadSavedMapItems()
     {
-        if (!File.Exists(savedCacheFilePath))
+        if (!File.Exists(_savedCacheFilePath))
             return null;
 
-        return SavedMapItems = JsonConvert.DeserializeObject<Dictionary<string, List<MapItem>>>(File.ReadAllText(savedCacheFilePath))!;
+        return _savedMapItems = JsonConvert.DeserializeObject<Dictionary<string, List<MapItem>>>(File.ReadAllText(_savedCacheFilePath))!;
     }
 
-    private readonly string cachePath = Path.Combine(AppContext.BaseDirectory, "tools\\cache");
-    private readonly string savedCacheFilePath = Path.Combine(AppContext.BaseDirectory, "tools\\cache", "0SavedMaps.json");
+    private readonly string _cachePath = Path.Combine(AppContext.BaseDirectory, "tools\\cache");
+    private readonly string _savedCacheFilePath = Path.Combine(AppContext.BaseDirectory, "tools\\cache", "0SavedMaps.json");
 
     public List<MapItem>? FindMapItems()
     {
         if (string.IsNullOrEmpty(FilePath))
             return null;
 
-        if (!Directory.Exists(cachePath))
-            Directory.CreateDirectory(cachePath);
+        if (!Directory.Exists(_cachePath))
+            Directory.CreateDirectory(_cachePath);
 
-        if (SavedMapItems.ContainsKey(FileName))
-            return SavedMapItems[FileName];
+        if (_savedMapItems.ContainsKey(FileName))
+            return _savedMapItems[FileName];
         List<string> files = new();
-        files = Directory.GetFiles(cachePath).ToList();
+        files = Directory.GetFiles(_cachePath).ToList();
         var sw = Stopwatch.StartNew();
-        if (files.Count > 0 && files.Contains(Path.Combine(cachePath, FileName)))
+        if (files.Count > 0 && files.Contains(Path.Combine(_cachePath, FileName)))
             return !DecompileSWF(FileName) ? null : ParseMapSWFData();
 
         return !DownloadMapSWF(FileName) ? null : !DecompileSWF(FileName) ? null : ParseMapSWFData();
 
         void SaveMapItemInfo(List<MapItem> info)
         {
-            SavedMapItems.Add(FileName, info);
-            File.WriteAllText(savedCacheFilePath, JsonConvert.SerializeObject(SavedMapItems, Formatting.Indented));
+            _savedMapItems.Add(FileName, info);
+            File.WriteAllText(_savedCacheFilePath, JsonConvert.SerializeObject(_savedMapItems, Formatting.Indented));
         }
 
         List<MapItem>? ParseMapSWFData()
         {
-            if (!Directory.Exists($"{cachePath}\\tmp\\scripts\\town_fla"))
+            if (!Directory.Exists($"{_cachePath}\\tmp\\scripts\\town_fla"))
                 return null;
             sw.Restart();
             List<MapItem> items = new();
@@ -166,8 +170,8 @@ public partial class ScriptMap : IScriptMap
             string[] files = Array.Empty<string>();
             try
             {
-                MainTimelineText = File.ReadAllLines($"{cachePath}\\tmp\\scripts\\town_fla\\MainTimeline.as").ToList();
-                files = Directory.GetFiles($"{cachePath}\\tmp\\scripts", "*APOP*", SearchOption.TopDirectoryOnly) ?? Array.Empty<string>();
+                MainTimelineText = File.ReadAllLines($"{_cachePath}\\tmp\\scripts\\town_fla\\MainTimeline.as").ToList();
+                files = Directory.GetFiles($"{_cachePath}\\tmp\\scripts", "*APOP*", SearchOption.TopDirectoryOnly) ?? Array.Empty<string>();
 
                 var mapItemLines = MainTimelineText.Select((l, i) => new Tuple<string, int>(l, i)).Where(l => l.Item1.Contains("mapitem", StringComparison.OrdinalIgnoreCase) || l.Item1.Contains("itemdrop", StringComparison.OrdinalIgnoreCase));
                 foreach ((string mapItemLine, int index) in mapItemLines)
@@ -220,31 +224,31 @@ public partial class ScriptMap : IScriptMap
                         AddMapItem(int.Parse(mapItem.RemoveLetters()), int.Parse(questID.Split("isquestinprogress")[1].Split(')')[0].RemoveLetters()), FilePath, LastMap);
                     }
                 }
-                Directory.Delete($"{cachePath}\\tmp\\", true);
+                Directory.Delete($"{_cachePath}\\tmp\\", true);
 
                 void AddMapItem(int mapitem, int questid, string mapfilepath, string mapname)
                 {
-                    if (!items.Contains(i => i.MapItemID == mapitem))
+                    if (!items.Contains(i => i.ID == mapitem))
                         items.Add(new MapItem(mapitem, questid, mapfilepath, mapname));
                 }
             }
             catch (Exception ex)
             {
-                //if (ex is FileNotFoundException || ex is DirectoryNotFoundException)
-                //    ControlUtils.ShowErrorMessage("Could not find one or more files to read.", "Get Map Item");
-                //else if (ex is PathTooLongException)
-                //    ControlUtils.ShowErrorMessage($"The path for the file is too long.\r\n{cachePath}\\tmp\\scripts\\town_fla\\MainTimeline.as", "Get Map Item");
-                //else if (ex is UnauthorizedAccessException)
-                //    ControlUtils.ShowErrorMessage("The program don't have permission to access the file", "Get Map Item");
-                //else
-                //    ControlUtils.ShowErrorMessage($"An error ocurred.\r\nMessage: {ex.Message}\r\nStackTrace:{ex.StackTrace}", "Get Map Item");
+                if (ex is FileNotFoundException || ex is DirectoryNotFoundException)
+                    _dialogService.ShowMessageBox("Could not find one or more files to read.", "Get Map Item");
+                else if (ex is PathTooLongException)
+                    _dialogService.ShowMessageBox($"The path for the file is too long.\r\n{_cachePath}\\tmp\\scripts\\town_fla\\MainTimeline.as", "Get Map Item");
+                else if (ex is UnauthorizedAccessException)
+                    _dialogService.ShowMessageBox("The program don't have permission to access the file", "Get Map Item");
+                else
+                    _dialogService.ShowMessageBox($"An error ocurred.\r\nMessage: {ex.Message}\r\nStackTrace:{ex.StackTrace}", "Get Map Item");
             }
             if (items.Count > 0)
             {
-                items = items.OrderBy(i => i.MapItemID).ToList();
+                items = items.OrderBy(i => i.ID).ToList();
                 SaveMapItemInfo(items);
             }
-            Debug.WriteLine($"Parsing took {sw.Elapsed:s\\.ff}s");
+            Trace.WriteLine($"Parsing took {sw.Elapsed:s\\.ff}s");
             return items;
         }
 
@@ -254,10 +258,10 @@ public partial class ScriptMap : IScriptMap
             Task.Run(async () =>
             {
                 byte[] fileBytes = await HttpClients.GetGHClient().GetByteArrayAsync($"https://game.aq.com/game/gamefiles/maps/{FilePath}");
-                await File.WriteAllBytesAsync(Path.Combine(cachePath, fileName), fileBytes);
+                await File.WriteAllBytesAsync(Path.Combine(_cachePath, fileName), fileBytes);
             }).Wait();
-            Debug.WriteLine($"Download of \"{fileName}\" took {sw.Elapsed:s\\.ff}s");
-            return File.Exists($"{cachePath}\\{fileName}");
+            Trace.WriteLine($"Download of \"{fileName}\" took {sw.Elapsed:s\\.ff}s");
+            return File.Exists($"{_cachePath}\\{fileName}");
         }
 
         bool DecompileSWF(string fileName)
@@ -272,17 +276,17 @@ public partial class ScriptMap : IScriptMap
                     RedirectStandardError = true,
                     FileName = "powershell.exe",
                     WorkingDirectory = Path.Combine(AppContext.BaseDirectory, "tools\\ffdec"),
-                    Arguments = $"/c ./ffdec.bat -export script \"{cachePath}\\tmp\" \"{cachePath}\\{fileName}\""
+                    Arguments = $"/c ./ffdec.bat -export script \"{_cachePath}\\tmp\" \"{_cachePath}\\{fileName}\""
                 }
             };
             decompile.Start();
             string error = decompile.StandardError.ReadToEnd();
             decompile.WaitForExit();
             if (!string.IsNullOrEmpty(error))
-                Debug.WriteLine($"Error while decompiling the SWF: {error}");
+                Trace.WriteLine($"Error while decompiling the SWF: {error}");
             else
-                Debug.WriteLine($"Decompilation of \"{fileName}\" took {sw.Elapsed:s\\.ff}s");
-            return Directory.Exists($"{cachePath}\\tmp");
+                Trace.WriteLine($"Decompilation of \"{fileName}\" took {sw.Elapsed:s\\.ff}s");
+            return Directory.Exists($"{_cachePath}\\tmp");
         }
     }
 }

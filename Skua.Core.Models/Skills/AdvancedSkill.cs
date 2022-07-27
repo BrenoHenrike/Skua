@@ -1,17 +1,15 @@
-﻿using Newtonsoft.Json;
-
-namespace Skua.Core.Models.Skills;
+﻿namespace Skua.Core.Models.Skills;
 
 public class AdvancedSkill
 {
     public AdvancedSkill() { }
-    public AdvancedSkill(string className, string skills, int skillTimeout = -1, string useMode = "Base", string skillMode = "UseIfAvailable")
+    public AdvancedSkill(string className, string skills, int skillTimeout = -1, string classUseMode = "Base", string skillUseMode = "UseIfAvailable")
     {
         ClassName = className;
         Skills = skills;
         SkillTimeout = skillTimeout;
-        ClassUseMode = (ClassUseMode)Enum.Parse(typeof(ClassUseMode), useMode);
-        SkillUseMode = (SkillUseMode)Enum.Parse(typeof(SkillUseMode), skillMode);
+        ClassUseMode = (ClassUseMode)Enum.Parse(typeof(ClassUseMode), classUseMode);
+        SkillUseMode = (SkillUseMode)Enum.Parse(typeof(SkillUseMode), skillUseMode);
     }
     public AdvancedSkill(string className, string skills, int skillTimeout = -1, int classUseMode = 0, SkillUseMode skillUseMode = SkillUseMode.UseIfAvailable)
     {
@@ -21,18 +19,41 @@ public class AdvancedSkill
         ClassUseMode = (ClassUseMode)classUseMode;
         SkillUseMode = skillUseMode;
     }
-    [JsonProperty("ClassName")]
+    public AdvancedSkill(string className, string skills, int skillTimeout, ClassUseMode classUseMode, SkillUseMode skillUseMode)
+    {
+        ClassName = className;
+        Skills = skills;
+        SkillTimeout = skillTimeout;
+        ClassUseMode = classUseMode;
+        SkillUseMode = skillUseMode;
+    }
+    public AdvancedSkill(string className, string skills, int skillTimeout, string classUseMode, SkillUseMode skillUseMode)
+    {
+        ClassName = className;
+        Skills = skills;
+        SkillTimeout = skillTimeout;
+        ClassUseMode = (ClassUseMode)Enum.Parse(typeof(ClassUseMode), classUseMode);
+        SkillUseMode = skillUseMode;
+    }
+
     public string ClassName { get; set; } = "Generic";
-    [JsonProperty("Skills")]
     public string Skills { get; set; } = "1 | 2 | 3 | 4";
-    [JsonProperty("Timeout")]
-    public int SkillTimeout { get; set; } = -1;
-    [JsonProperty("ClassUseMode")]
+    public int SkillTimeout { get; set; } = 250;
     public ClassUseMode ClassUseMode { get; set; } = ClassUseMode.Base;
-    [JsonProperty("SkillUseMode")]
     public SkillUseMode SkillUseMode { get; set; } = SkillUseMode.UseIfAvailable;
+    public string SaveString => $"{ClassUseMode} = {ClassName} = {Skills} = {(SkillUseMode == SkillUseMode.UseIfAvailable ? "Use if Available" : SkillTimeout)}";
     public override string ToString()
     {
-        return $"{ClassUseMode} : {ClassName} => {Skills}";
+        return $"{ClassUseMode} : {ClassName} = {Skills} [{(SkillUseMode == SkillUseMode.UseIfAvailable ? "Use if Available" : "Wait for Cooldown")}]";
+    }
+
+    public override bool Equals(object? obj)
+    {
+        return obj is AdvancedSkill skill && skill.ClassName == ClassName && skill.ClassUseMode == ClassUseMode;
+    }
+
+    public override int GetHashCode()
+    {
+        return HashCode.Combine(ClassName, ClassUseMode);
     }
 }
