@@ -9,10 +9,7 @@ using System.Threading.Tasks;
 using System.Windows;
 using System.Windows.Input;
 using System.Windows.Media.Animation;
-using LazyCache;
-using LazyCache.Providers;
 using Microsoft.CodeAnalysis;
-using Microsoft.Extensions.Caching.Memory;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Toolkit.Mvvm.DependencyInjection;
 using Microsoft.Toolkit.Mvvm.Messaging;
@@ -20,6 +17,7 @@ using Skua.App.WPF.AppStartup;
 using Skua.App.WPF.Flash;
 using Skua.App.WPF.Properties;
 using Skua.App.WPF.Services;
+using Skua.Core;
 using Skua.Core.GameProxy;
 using Skua.Core.Interfaces;
 using Skua.Core.Options;
@@ -63,45 +61,6 @@ public sealed partial class App : Application
         Dispatcher.ShutdownStarted -= Dispatcher_ShutdownStarted;
     }
 
-    public static void DisableWPFTabletSupport()
-    {
-        // Get a collection of the tablet devices for this window.    
-        TabletDeviceCollection devices = Tablet.TabletDevices;
-
-
-        if (devices.Count > 0)
-        {
-            // Get the Type of InputManager.  
-            Type inputManagerType = typeof(InputManager);
-
-
-            // Call the StylusLogic method on the InputManager.Current instance.  
-            object? stylusLogic = inputManagerType.InvokeMember("StylusLogic",
-                        BindingFlags.GetProperty | BindingFlags.Instance |
-                        BindingFlags.NonPublic,
-                        null, InputManager.Current, null);
-
-
-            if (stylusLogic != null)
-            {
-                // Get the type of the stylusLogic returned 
-                // from the call to StylusLogic.  
-                Type stylusLogicType = stylusLogic.GetType();
-
-
-                // Loop until there are no more devices to remove.  
-                while (devices.Count > 0)
-                {
-                    // Remove the first tablet device in the devices collection.  
-                    stylusLogicType.InvokeMember("OnTabletRemoved",
-                            BindingFlags.InvokeMethod |
-                            BindingFlags.Instance | BindingFlags.NonPublic,
-                            null, stylusLogic, new object[] { (uint)0 });
-                }
-            }
-        }
-    }
-
     private readonly IScriptInterface _bot;
     private void Application_Startup(object sender, StartupEventArgs e)
     {
@@ -111,53 +70,40 @@ public sealed partial class App : Application
         main.WindowStartupLocation = WindowStartupLocation.CenterScreen;
         Application.Current.MainWindow = main;
 
-        //IDialogService dialogService = Services.GetRequiredService<IDialogService>();
-        //string? token = Settings.Default.UserGitHubToken;
-        //if (string.IsNullOrWhiteSpace(token))
-        //{
-        //    if (Settings.Default.IgnoreGHAuth)
-        //        return;
+        if (!Directory.Exists(Path.Combine(AppContext.BaseDirectory, "VSCode")))
+            Settings.Default.UseLocalVSC = false;
 
-        //    dialogService.ShowDialog(Services.GetRequiredService<GitHubAuthViewModel>());
+        IDialogService dialogService = Services.GetRequiredService<IDialogService>();
+        string? token = Settings.Default.UserGitHubToken;
+        if (string.IsNullOrWhiteSpace(token))
+        {
+            if (Settings.Default.IgnoreGHAuth)
+                return;
 
-        //    token = Settings.Default.UserGitHubToken;
-        //    if (!string.IsNullOrWhiteSpace(token))
-        //        HttpClients.UserGitHubClient = new(token);
-        //}
-        //else
-        //    HttpClients.UserGitHubClient = new(token);
+            dialogService.ShowDialog(Services.GetRequiredService<GitHubAuthViewModel>());
+
+            token = Settings.Default.UserGitHubToken;
+            if (!string.IsNullOrWhiteSpace(token))
+                HttpClients.UserGitHubClient = new(token);
+        }
+        else
+            HttpClients.UserGitHubClient = new(token);
 
         main.Show();
 
-        //if (Settings.Default.CheckClientUpdates)
-        //{
-        //    Task.Run(async () =>
-        //    {
-        //        List<UpdateInfo> infos = await UpdateChecker.GetReleases();
-        //        UpdateInfo latest = infos.OrderByDescending(x => x.ParsedVersion).FirstOrDefault(x => Settings.Default.CheckClientPrereleases || !x.Prerelease);
-
-        //        if (latest == null || latest.ParsedVersion.CompareTo(Version.Parse(Settings.Default.ApplicationVersion)) <= 0)
-        //            return;
-
-        //        if (dialogService.ShowMessageBox($"An update is available:\r\n{latest.Name}\r\nVersion: {latest.Version}\r\n{(latest.Prerelease ? "This is a prerelease update.\r\n" : "")}Would you like to download it?",
-        //                            "Update Available", true) == true)
-        //            Services.GetRequiredService<IBrowserService>().Open(latest.URL);
-        //    });
-        //}
-
-        //if (Settings.Default.CheckScriptUpdates)
-        //{
-        //    Task.Run(async () =>
-        //    {
-        //        var getScripts = Ioc.Default.GetRequiredService<IGetScriptsService>();
-        //        await getScripts.GetScriptsAsync(null, default);
-        //        if (getScripts.Missing > 0 && (Settings.Default.AutoUpdateScripts || Ioc.Default.GetRequiredService<IDialogService>().ShowMessageBox("Would you like to update your scripts?", "Script Update", true) == true))
-        //        {
-        //            int count = await getScripts.DownloadAllWhereAsync(s => !s.Downloaded || s.Outdated);
-        //            Ioc.Default.GetRequiredService<IDialogService>().ShowMessageBox($"Downloaded {count} scripts.\r\nYou can disable auto script updates in Options.", "Script Update");
-        //        }
-        //    });
-        //}
+        if (Settings.Default.CheckScriptUpdates)
+        {
+            Task.Run(async () =>
+            {
+                var getScripts = Ioc.Default.GetRequiredService<IGetScriptsService>();
+                await getScripts.GetScriptsAsync(null, default);
+                if (getScripts.Missing > 0 && (Settings.Default.AutoUpdateScripts || Ioc.Default.GetRequiredService<IDialogService>().ShowMessageBox("Would you like to update your scripts?", "Script Update", true) == true))
+                {
+                    int count = await getScripts.DownloadAllWhereAsync(s => !s.Downloaded || s.Outdated);
+                    Ioc.Default.GetRequiredService<IDialogService>().ShowMessageBox($"Downloaded {count} scripts.\r\nYou can disable auto script updates in Options.", "Script Update");
+                }
+            });
+        }
 
         Services.GetRequiredService<IPluginManager>().Initialize();
     }
@@ -177,13 +123,6 @@ public sealed partial class App : Application
         IServiceCollection services = new ServiceCollection();
 
         services.AddTransient(typeof(Lazy<>), typeof(LazyInstance<>));
-
-        services.AddOptions();
-        services.AddSingleton<IMemoryCache, MemoryCache>();
-        services.AddSingleton<ICacheProvider, MemoryCacheProvider>();
-        services.AddSingleton<IAppCache, CachingService>(s =>
-                new CachingService(
-                    new Lazy<ICacheProvider>(s.GetRequiredService<ICacheProvider>)));
 
         services.AddSingleton(typeof(IMessenger), GetMessenger());
         services.AddSingleton<IFlashUtil, FlashUtil>();
@@ -243,8 +182,7 @@ public sealed partial class App : Application
         services.AddSingleton<IWindowService, WindowService>();
         services.AddSingleton<IGetScriptsService, GetScriptsService>();
         services.AddSingleton<IFileDialogService, FileDialogService>();
-        services.AddSingleton<IVSCodeService, VSCodeService>();
-        services.AddSingleton<IBrowserService, BrowserService>();
+        services.AddSingleton<IProcessStartService, ProcessStartService>();
         services.AddSingleton<IThemeService, ThemeService>();
         services.AddSingleton<ThemeUserSettingsService>();
 
@@ -261,7 +199,6 @@ public sealed partial class App : Application
                 s.GetRequiredService<AutoViewModel>(),
                 s.GetRequiredService<JumpViewModel>(),
                 s.GetRequiredService<FastTravelViewModel>(),
-                s.GetRequiredService<ApplicationThemesViewModel>(),
                 s.GetRequiredService<CurrentDropsViewModel>(),
                 s.GetRequiredService<RuntimeHelpersViewModel>(),
                 s.GetRequiredService<LoaderViewModel>(),
@@ -273,6 +210,7 @@ public sealed partial class App : Application
                 s.GetRequiredService<PacketInterceptorViewModel>(),
                 s.GetRequiredService<PacketSpammerViewModel>(),
                 s.GetRequiredService<PacketLoggerViewModel>(),
+                s.GetRequiredService<ApplicationThemesViewModel>(),
                 s.GetRequiredService<GitHubAuthViewModel>(),
                 s.GetRequiredService<PluginsViewModel>(),
             };
@@ -317,7 +255,7 @@ public sealed partial class App : Application
         services.AddSingleton<CBOClassSelectViewModel>();
         services.AddSingleton<CBOLoadoutViewModel>();
 
-        services.AddTransient(s => CreateCompiler(s));
+        services.AddTransient(CreateCompiler);
 
         ServiceProvider provider = services.BuildServiceProvider();
         Ioc.Default.ConfigureServices(provider);
@@ -333,7 +271,6 @@ public sealed partial class App : Application
     private CSharpScriptExecution CreateCompiler(IServiceProvider s)
     {
         CSharpScriptExecution compiler = new();
-        //compiler.AddDefaultReferencesAndNamespaces();
         var refPaths = new[]
         {
             typeof(object).GetTypeInfo().Assembly.Location,

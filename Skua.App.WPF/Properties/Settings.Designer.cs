@@ -202,10 +202,22 @@ namespace Skua.App.WPF.Properties {
         
         [global::System.Configuration.ApplicationScopedSettingAttribute()]
         [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
-        [global::System.Configuration.DefaultSettingValueAttribute("0.1.0.0")]
+        [global::System.Configuration.DefaultSettingValueAttribute("0.2.0.0")]
         public string ApplicationVersion {
             get {
                 return ((string)(this["ApplicationVersion"]));
+            }
+        }
+        
+        [global::System.Configuration.UserScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("True")]
+        public bool UseLocalVSC {
+            get {
+                return ((bool)(this["UseLocalVSC"]));
+            }
+            set {
+                this["UseLocalVSC"] = value;
             }
         }
     }

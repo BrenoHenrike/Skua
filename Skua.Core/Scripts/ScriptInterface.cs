@@ -6,6 +6,7 @@ using Skua.Core.Utils;
 using Microsoft.Toolkit.Mvvm.Messaging;
 using Skua.Core.Messaging;
 using Microsoft.Toolkit.Mvvm.DependencyInjection;
+using Skua.Core.Models;
 
 namespace Skua.Core.Scripts;
 public class ScriptInterface : IScriptInterface, IScriptInterfaceManager
@@ -15,8 +16,10 @@ public class ScriptInterface : IScriptInterface, IScriptInterfaceManager
     private const int _timerDelay = 20;
     private readonly TimeLimiter _limit = new();
     private readonly ILogService _logger;
+    private readonly IDialogService _dialogService;
 
     public bool ShouldExit => Manager.ShouldExit;
+    public Version Version { get; }
 
     public IScriptStatus Manager { get; }
     public IFlashUtil Flash { get; }
@@ -82,7 +85,9 @@ public class ScriptInterface : IScriptInterface, IScriptInterfaceManager
         IScriptHunt hunt,
         ICaptureProxy gameProxy,
         IScriptAuto auto,
-        IMessenger messenger)
+        IMessenger messenger,
+        IDialogService dialogService,
+        ISettingsService settingsService)
     {
         _logger = logger;
         Manager = manager;
@@ -94,6 +99,7 @@ public class ScriptInterface : IScriptInterface, IScriptInterfaceManager
         GameProxy = gameProxy;
         Auto = auto;
         Messenger = messenger;
+        _dialogService = dialogService;
         Drops = drops;
         Events = events;
         Reputation = rep;
@@ -116,6 +122,8 @@ public class ScriptInterface : IScriptInterface, IScriptInterfaceManager
         Handlers = handlers;
         Flash = flash;
 
+        Version = Version.Parse(settingsService.Get("ApplicationVersion", "0.0.0.0"));
+
         Flash.FlashCall += HandleFlashCall;
 
         ScriptInterfaceThread = new(() =>
@@ -129,6 +137,8 @@ public class ScriptInterface : IScriptInterface, IScriptInterfaceManager
             Name = "ScriptInterface",
             IsBackground = true
         };
+
+        IScriptInterface.Instance = this;
     }
 
     public Task Schedule(int delay, Func<IScriptInterface, Task> function)
@@ -157,6 +167,15 @@ public class ScriptInterface : IScriptInterface, IScriptInterfaceManager
     {
         if (Manager.ShouldExit && Thread.CurrentThread.Name == "Script Thread")
             throw new OperationCanceledException();
+    }
+    public bool? ShowMessageBox(string message, string caption, bool yesAndNo = false)
+    {
+        return _dialogService.ShowMessageBox(message, caption, yesAndNo);
+    }
+
+    public DialogResult ShowMessageBox(string message, string caption, params string[] buttons)
+    {
+        return _dialogService.ShowMessageBox(message, caption, buttons);
     }
 
     public void Initialize()

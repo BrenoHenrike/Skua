@@ -133,8 +133,8 @@ public partial class ScriptMap : IScriptMap
         return _savedMapItems = JsonConvert.DeserializeObject<Dictionary<string, List<MapItem>>>(File.ReadAllText(_savedCacheFilePath))!;
     }
 
-    private readonly string _cachePath = Path.Combine(AppContext.BaseDirectory, "tools\\cache");
-    private readonly string _savedCacheFilePath = Path.Combine(AppContext.BaseDirectory, "tools\\cache", "0SavedMaps.json");
+    private readonly string _cachePath = Path.Combine(AppContext.BaseDirectory, "cache");
+    private readonly string _savedCacheFilePath = Path.Combine(AppContext.BaseDirectory, "cache", "0SavedMaps.json");
 
     public List<MapItem>? FindMapItems()
     {
@@ -143,6 +143,9 @@ public partial class ScriptMap : IScriptMap
 
         if (!Directory.Exists(_cachePath))
             Directory.CreateDirectory(_cachePath);
+
+        if (!Directory.Exists(Path.Combine(AppContext.BaseDirectory, "FFDec")))
+            return null;
 
         if (_savedMapItems.ContainsKey(FileName))
             return _savedMapItems[FileName];
@@ -275,7 +278,7 @@ public partial class ScriptMap : IScriptMap
                     UseShellExecute = false,
                     RedirectStandardError = true,
                     FileName = "powershell.exe",
-                    WorkingDirectory = Path.Combine(AppContext.BaseDirectory, "tools\\ffdec"),
+                    WorkingDirectory = Path.Combine(AppContext.BaseDirectory, "FFDec"),
                     Arguments = $"/c ./ffdec.bat -export script \"{_cachePath}\\tmp\" \"{_cachePath}\\{fileName}\""
                 }
             };
@@ -283,7 +286,11 @@ public partial class ScriptMap : IScriptMap
             string error = decompile.StandardError.ReadToEnd();
             decompile.WaitForExit();
             if (!string.IsNullOrEmpty(error))
-                Trace.WriteLine($"Error while decompiling the SWF: {error}");
+            {
+                string errorMsg = $"Error while decompiling the SWF: {error}";
+                Trace.WriteLine(errorMsg);
+                _dialogService.ShowMessageBox(errorMsg, "SWF Decompile Error");
+            }
             else
                 Trace.WriteLine($"Decompilation of \"{fileName}\" took {sw.Elapsed:s\\.ff}s");
             return Directory.Exists($"{_cachePath}\\tmp");

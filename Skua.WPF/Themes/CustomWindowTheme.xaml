@@ -33,20 +33,30 @@
                                         </Grid.ColumnDefinitions>
 
                                         <!--  Icon  -->
-                                        <Button
-                                            Height="32"
-                                            materialdesign:ButtonAssist.CornerRadius="0"
-                                            materialdesign:RippleAssist.IsDisabled="True"
-                                            Content="{materialdesign:PackIcon Kind=Information,
-                                                                              Size=30}"
-                                            Style="{StaticResource MaterialDesignIconButton}" />
+                                        <Grid
+                                            Width="30"
+                                            Height="30"
+                                            Margin="6,0"
+                                            HorizontalAlignment="Center"
+                                            VerticalAlignment="Center">
+                                            <Border
+                                                Width="30"
+                                                Height="30"
+                                                Background="{DynamicResource PrimaryHueMidBrush}"
+                                                CornerRadius="15" />
+                                            <Image HorizontalAlignment="Center" VerticalAlignment="Center">
+                                                <Image.Source>
+                                                    <BitmapImage DecodePixelHeight="32" UriSource="../SkuaImage.png" />
+                                                </Image.Source>
+                                            </Image>
+                                        </Grid>
 
                                         <!--  Title  -->
                                         <Viewbox
                                             Grid.Column="1"
-                                            Margin="15,0,0,0"
+                                            Margin="6,0,0,0"
                                             HorizontalAlignment="Left">
-                                            <TextBlock Text="{TemplateBinding Title}" />
+                                            <TextBlock Foreground="{DynamicResource PrimaryHueMidBrush}" Text="{TemplateBinding Title}" />
                                         </Viewbox>
 
                                         <!--  System Buttons  -->

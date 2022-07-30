@@ -1,9 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using Microsoft.Toolkit.Mvvm.ComponentModel;
+﻿using Microsoft.Toolkit.Mvvm.ComponentModel;
 using Microsoft.Toolkit.Mvvm.Input;
 using Newtonsoft.Json;
 using Skua.Core.Interfaces;
@@ -13,11 +8,11 @@ using Skua.Core.Utils;
 namespace Skua.Core.ViewModels;
 public partial class GitHubAuthViewModel : BotControlViewModelBase
 {
-    public GitHubAuthViewModel(IClipboardService clipboard, IBrowserService browserService, ISettingsService settingsService)
+    public GitHubAuthViewModel(IClipboardService clipboard, IProcessStartService processService, ISettingsService settingsService)
         : base("GitHub Authentication")
     {
         _clipboard = clipboard;
-        _browserService = browserService;
+        _processService = processService;
         _settingsService = settingsService;
         OpenBrowserCommand = new RelayCommand(OpenBrowser);
         GetUserCodeCommand = new AsyncRelayCommand(GetUserCode);
@@ -26,11 +21,11 @@ public partial class GitHubAuthViewModel : BotControlViewModelBase
             HintStatus = "GitHub Authentication already done.";
     }
 
-    private readonly IClipboardService _clipboard;
-    private readonly IBrowserService _browserService;
+    private readonly IProcessStartService _processService;
     private readonly ISettingsService _settingsService;
-    private DeviceCodeResponse? deviceCode;
-    private TokenResponse? token;
+    private readonly IClipboardService _clipboard;
+    private DeviceCodeResponse? _deviceCode;
+    private TokenResponse? _token;
 
     [ObservableProperty]
     private string _userCode = string.Empty;
@@ -43,10 +38,10 @@ public partial class GitHubAuthViewModel : BotControlViewModelBase
     {
         IsBusy = true;
         await GetDeviceCode();
-        if (deviceCode is not null)
+        if (_deviceCode is not null)
         {
-            UserCode = deviceCode.UserCode;
-            _clipboard.SetText(deviceCode.UserCode);
+            UserCode = _deviceCode.UserCode;
+            _clipboard.SetText(_deviceCode.UserCode);
             HintStatus = "Copied. Click Open Browser.";
             IsBusy = false;
             return;
@@ -69,24 +64,24 @@ public partial class GitHubAuthViewModel : BotControlViewModelBase
         FormUrlEncodedContent encodedContent = new(content);
         HttpResponseMessage? response = await HttpClients.GetGHClient().PostAsync("https://github.com/login/device/code", encodedContent);
         return response?.IsSuccessStatusCode ?? false
-            ? deviceCode = JsonConvert.DeserializeObject<DeviceCodeResponse>(await response.Content.ReadAsStringAsync())
+            ? _deviceCode = JsonConvert.DeserializeObject<DeviceCodeResponse>(await response.Content.ReadAsStringAsync())
             : null;
     }
 
     private async Task<TokenResponse?> GetAccessToken()
     {
-        if (deviceCode is null)
+        if (_deviceCode is null)
             return null;
         Dictionary<string, string> content = new()
         {
             { "client_id", "449f889db3d655d2ef4a" },
-            { "device_code", deviceCode.DeviceCode },
+            { "device_code", _deviceCode.DeviceCode },
             { "grant_type", "urn:ietf:params:oauth:grant-type:device_code" }
         };
         FormUrlEncodedContent? encodedContent = new FormUrlEncodedContent(content);
         HttpResponseMessage? response = await HttpClients.GetGHClient().PostAsync("https://github.com/login/oauth/access_token", encodedContent);
         return response?.IsSuccessStatusCode ?? false
-            ? token = JsonConvert.DeserializeObject<TokenResponse>(await response.Content.ReadAsStringAsync())
+            ? _token = JsonConvert.DeserializeObject<TokenResponse>(await response.Content.ReadAsStringAsync())
             : null;
     }
 
@@ -94,11 +89,11 @@ public partial class GitHubAuthViewModel : BotControlViewModelBase
     {
         IsBusy = true;
         await GetAccessToken();
-        if (token is not null)
+        if (_token is not null)
         {
-            HttpClients.UserGitHubClient = new(token.AccessToken);
-            _settingsService.Set("UserGitHubToken", token.AccessToken);
-            string access = token.AccessToken;
+            HttpClients.UserGitHubClient = new(_token.AccessToken);
+            _settingsService.Set("UserGitHubToken", _token.AccessToken);
+            string access = _token.AccessToken;
             IsBusy = false;
             HintStatus = "All good to go!";
             return;
@@ -112,7 +107,7 @@ public partial class GitHubAuthViewModel : BotControlViewModelBase
 
     public void OpenBrowser()
     {
-        _browserService.Open("https://github.com/login/device");
+        _processService.OpenLink("https://github.com/login/device");
         HintStatus = "Do the site verification.\r\nOnly click \"Authorize\" after seeing the All set page.";
     }
 

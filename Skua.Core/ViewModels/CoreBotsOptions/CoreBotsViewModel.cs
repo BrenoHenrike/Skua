@@ -1,11 +1,7 @@
 ﻿using Microsoft.Toolkit.Mvvm.ComponentModel;
 using Microsoft.Toolkit.Mvvm.Input;
 using Skua.Core.Interfaces;
-using System;
-using System.Collections.Generic;
-using System.Linq;
 using System.Text;
-using System.Threading.Tasks;
 
 namespace Skua.Core.ViewModels;
 public partial class CoreBotsViewModel : BotControlViewModelBase
@@ -48,9 +44,9 @@ public partial class CoreBotsViewModel : BotControlViewModelBase
         }
 
 
-        File.WriteAllText(AppContext.BaseDirectory + $@"\plugins\options\CBO_Storage({_player.Username}).txt", bob.ToString());
-        _dialogService.ShowMessageBox($@"Saved to \plugins\options\CBO_Storage({_player.Username}).txt", "Save Successful!");
-        _readValues[_player.Username] = ReadValues(File.ReadAllLines(AppContext.BaseDirectory + $@"\plugins\options\CBO_Storage({_player.Username}).txt"));
+        File.WriteAllText(AppContext.BaseDirectory + $@"\options\CBO_Storage({_player.Username}).txt", bob.ToString());
+        _dialogService.ShowMessageBox($@"Saved to \options\CBO_Storage({_player.Username}).txt", "Save Successful!");
+        _readValues[_player.Username] = ReadValues(File.ReadAllLines(AppContext.BaseDirectory + $@"\options\CBO_Storage({_player.Username}).txt"));
     }
 
     private void Load()
@@ -60,17 +56,17 @@ public partial class CoreBotsViewModel : BotControlViewModelBase
             _dialogService.ShowMessageBox("Login first so that we can fetch your username to load file", "Load");
             return;
         }
-        //
+
         if (_readValues.ContainsKey(_player.Username))
         {
             SetValues(_readValues[_player.Username]);
             return;
         }
 
-        if (!File.Exists(AppContext.BaseDirectory + $@"\plugins\options\CBO_Storage({_player.Username}).txt"))
+        if (!File.Exists(AppContext.BaseDirectory + $@"\options\CBO_Storage({_player.Username}).txt"))
             return;
 
-        Dictionary<string, string> optionsDict = ReadValues(File.ReadAllLines(AppContext.BaseDirectory + $@"\plugins\options\CBO_Storage({_player.Username}).txt"));
+        Dictionary<string, string> optionsDict = ReadValues(File.ReadAllLines(AppContext.BaseDirectory + $@"\options\CBO_Storage({_player.Username}).txt"));
 
         SetValues(optionsDict);
 
@@ -99,11 +95,6 @@ public partial class CoreBotsViewModel : BotControlViewModelBase
     }
 
     private readonly char separator = ':';
-
-    private void Read(string userName)
-    {
-
-    }
 }
 
 internal interface IManageCBOptions

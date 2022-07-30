@@ -9,7 +9,7 @@ public class SettingsService : ISettingsService
         return (T?)Settings.Default[key];
     }
 
-    public T GetValue<T>(string key, T defaultValue)
+    public T Get<T>(string key, T defaultValue)
     {
         T value = (T)Settings.Default[key];
         return value is null ? defaultValue : value;

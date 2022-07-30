@@ -1,4 +1,6 @@
 ﻿using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Toolkit.Mvvm.DependencyInjection;
+using Microsoft.Toolkit.Mvvm.Input;
 using Skua.Core.Interfaces;
 using Skua.Core.ViewModels;
 using System;
@@ -69,6 +71,7 @@ internal class MainMenu
                 new("Logger"),
                 new("Interceptor")
             }),
+            new("Bank", new RelayCommand(Ioc.Default.GetRequiredService<IScriptBank>().Open)),
             new("Logs")
         };
 

@@ -8,6 +8,7 @@ using Skua.Core.Utils;
 using Skua.Core.ViewModels;
 using System;
 using System.Collections.Generic;
+using System.IO;
 using System.Reflection;
 
 namespace Skua.App.WPF.AppStartup;
@@ -72,6 +73,15 @@ internal class Options
             CreateSettingOptionItem<bool>("Check for Client Prereleases", "CheckClientPrereleases"),
             CreateSettingOptionItem<bool>("Check for Script Updates", "CheckScriptUpdates"),
             CreateSettingOptionItem<bool>("Ignore GH Authentication", "IgnoreGHAuth"),
+            new CommandOptionItemViewModel<bool>("Use Local VSCode", "UseLocalVSC", new RelayCommand<bool>(b =>
+            {
+                if(!Directory.Exists(Path.Combine(AppContext.BaseDirectory, "VSCode")))
+                {
+                    Ioc.Default.GetRequiredService<ISettingsService>().Set("UseLocalVSC", false);
+                    return;
+                }
+                Ioc.Default.GetRequiredService<ISettingsService>().Set("UseLocalVSC", b);
+            })),
             new CommandOptionItemViewModel<int>("* Client Animation Framerate", "ClientAnim", new RelayCommand<string>(value =>
             {
                 if (!int.TryParse(value, out int result) || result < 1)

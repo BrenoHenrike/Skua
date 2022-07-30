@@ -9,11 +9,11 @@ using Skua.Core.Utils;
 namespace Skua.Core.ViewModels;
 public partial class ScriptRepoViewModel : BotControlViewModelBase
 {
-    public ScriptRepoViewModel(IGetScriptsService getScripts, IVSCodeService vsc)
+    public ScriptRepoViewModel(IGetScriptsService getScripts, IProcessStartService processService)
         : base("Get Scripts")
     {
         _getScriptsService = getScripts;
-        _vsc = vsc;
+        _processService = processService;
         RefreshScriptsCommand = new AsyncRelayCommand(Refresh);
         DownloadAllCommand = new AsyncRelayCommand(DownloadAll);
         UpdateAllCommand = new AsyncRelayCommand(UpdateAll);
@@ -23,35 +23,11 @@ public partial class ScriptRepoViewModel : BotControlViewModelBase
         LoadScriptCommand = new RelayCommand(LoadScript);
         OpenScriptCommand = new RelayCommand(OpenScript);
         StartScriptCommand = new RelayCommand(StartScriptAsync);
-        OpenScriptFolderCommand = new RelayCommand(_vsc.Open);
-    }
-
-    private void StartScriptAsync()
-    {
-        if (SelectedItem is null)
-            return;
-
-        Messenger.Send<StartScriptMessage>(new(SelectedItem.LocalFile));
-    }
-
-    private void OpenScript()
-    {
-        if (SelectedItem is null)
-            return;
-
-        Messenger.Send<EditScriptMessage>(new(SelectedItem.LocalFile));
-    }
-
-    private void LoadScript()
-    {
-        if (SelectedItem is null)
-            return;
-
-        Messenger.Send<LoadScriptMessage>(new(SelectedItem.LocalFile));
+        OpenScriptFolderCommand = new RelayCommand(_processService.OpenVSC);
     }
 
     private readonly IGetScriptsService _getScriptsService;
-    private readonly IVSCodeService _vsc;
+    private readonly IProcessStartService _processService;
 
     public int DownloadedQuantity => _getScriptsService.Downloaded;
     public int OutdatedQuantity => _getScriptsService.Outdated;
@@ -79,6 +55,30 @@ public partial class ScriptRepoViewModel : BotControlViewModelBase
     public IRelayCommand OpenScriptCommand { get; }
     public IRelayCommand StartScriptCommand { get; }
     public IRelayCommand OpenScriptFolderCommand { get; }
+
+    private void StartScriptAsync()
+    {
+        if (SelectedItem is null)
+            return;
+
+        Messenger.Send<StartScriptMessage>(new(SelectedItem.LocalFile));
+    }
+
+    private void OpenScript()
+    {
+        if (SelectedItem is null)
+            return;
+
+        Messenger.Send<EditScriptMessage>(new(SelectedItem.LocalFile));
+    }
+
+    private void LoadScript()
+    {
+        if (SelectedItem is null)
+            return;
+
+        Messenger.Send<LoadScriptMessage>(new(SelectedItem.LocalFile));
+    }
 
     private async Task Refresh(CancellationToken token)
     {

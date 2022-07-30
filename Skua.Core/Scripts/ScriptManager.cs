@@ -268,7 +268,7 @@ public partial class ScriptManager : ObservableObject, IScriptManager
         dynamic assembly = compiler.CompileClass(final);
         sw.Stop();
         Trace.WriteLine($"Script compilation took {sw.ElapsedMilliseconds}ms.");
-        File.WriteAllText(Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "Scripts", "z_CompiledScript.cs"), final);
+        File.WriteAllText(Path.Combine(AppContext.BaseDirectory, "Scripts", "z_CompiledScript.cs"), final);
         if (compiler.Error)
             throw new ScriptCompileException(compiler.ErrorMessage, compiler.GeneratedClassCodeWithLineNumbers);
 
@@ -324,5 +324,10 @@ public partial class ScriptManager : ObservableObject, IScriptManager
         {
             return false;
         }
+    }
+
+    public void SetLoadedScript(string path)
+    {
+        LoadedScript = path;
     }
 }

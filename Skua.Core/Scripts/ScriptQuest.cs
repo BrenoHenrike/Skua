@@ -5,6 +5,7 @@ using Skua.Core.Models;
 using Skua.Core.Models.Items;
 using Skua.Core.Flash;
 using Microsoft.Toolkit.Mvvm.ComponentModel;
+using Newtonsoft.Json;
 
 namespace Skua.Core.Scripts;
 
@@ -14,16 +15,12 @@ public partial class ScriptQuest : ObservableObject, IScriptQuest
     private readonly Lazy<IScriptWait> _lazyWait;
     private readonly Lazy<IScriptOption> _lazyOptions;
     private readonly Lazy<IScriptPlayer> _lazyPlayer;
-    private readonly Lazy<IScriptMap> _lazyMap;
-    private readonly Lazy<IScriptCombat> _lazyCombat;
     private readonly Lazy<IScriptSend> _lazySend;
     private readonly Lazy<IScriptInventory> _lazyInventory;
     private IFlashUtil Flash => _lazyFlash.Value;
     private IScriptWait Wait => _lazyWait.Value;
     private IScriptOption Options => _lazyOptions.Value;
     private IScriptPlayer Player => _lazyPlayer.Value;
-    private IScriptMap Map => _lazyMap.Value;
-    private IScriptCombat Combat => _lazyCombat.Value;
     private IScriptSend Send => _lazySend.Value;
     private IScriptInventory Inventory => _lazyInventory.Value;
 
@@ -31,9 +28,7 @@ public partial class ScriptQuest : ObservableObject, IScriptQuest
         Lazy<IFlashUtil> flash,
         Lazy<IScriptWait> wait,
         Lazy<IScriptOption> options,
-        Lazy<IScriptMap> map,
         Lazy<IScriptPlayer> player,
-        Lazy<IScriptCombat> combat,
         Lazy<IScriptSend> send,
         Lazy<IScriptInventory> inventory)
     {
@@ -41,8 +36,6 @@ public partial class ScriptQuest : ObservableObject, IScriptQuest
         _lazyWait = wait;
         _lazyOptions = options;
         _lazyPlayer = player;
-        _lazyMap = map;
-        _lazyCombat = combat;
         _lazySend = send;
         _lazyInventory = inventory;
     }
@@ -57,6 +50,7 @@ public partial class ScriptQuest : ObservableObject, IScriptQuest
     public List<Quest> Active => Tree.FindAll(x => x.Active);
     public List<Quest> Completed => Tree.FindAll(x => x.Status == "c");
     public List<QuestData> Cached { get; set; } = new();
+    public Dictionary<int, QuestData> CachedDictionary { get; set; } = new();
     private SynchronizedList<int> _registered = new();
     public IEnumerable<int> Registered => _registered.Items;
 
@@ -129,8 +123,6 @@ public partial class ScriptQuest : ObservableObject, IScriptQuest
     {
         if (Options.SafeTimings)
             Wait.ForActionCooldown(GameActions.TryQuestComplete);
-        if (Options.ExitCombatBeforeQuest && Player.InCombat)
-            Map.Jump(Player.Cell, Player.Pad);
         Flash.CallGameFunction("world.tryQuestComplete", id, itemId, special);
         if (Options.SafeTimings)
             Wait.ForQuestComplete(id);
@@ -148,8 +140,6 @@ public partial class ScriptQuest : ObservableObject, IScriptQuest
 
     public bool EnsureComplete(int id, int itemId = -1, bool special = false)
     {
-        if (Options.ExitCombatBeforeQuest)
-            Combat.Exit();
         _EnsureComplete(id, itemId, special);
         return !IsInProgress(id);
     }
@@ -318,5 +308,37 @@ public partial class ScriptQuest : ObservableObject, IScriptQuest
             EnsureAccept(quest);
             await Task.Delay(Options.ActionDelay, token);
         }
+    }
+
+    public void LoadCachedQuests()
+    {
+        if (Cached.Count > 0)
+            return;
+
+        string text = File.ReadAllText(Path.Combine(AppContext.BaseDirectory, "Quests.txt"));
+        Cached = JsonConvert.DeserializeObject<List<QuestData>>(text) ?? new();
+        CachedDictionary = Cached.ToDictionary(x => x.ID, x => x);
+    }
+
+    public List<QuestData> GetCachedQuests(int start, int count)
+    {
+        if (Cached.Count == 0)
+            LoadCachedQuests();
+
+        return Cached.Skip(start).Take(count).ToList();
+    }
+
+    public List<QuestData> GetCachedQuests(params int[] ids)
+    {
+        if (Cached.Count == 0)
+            LoadCachedQuests();
+
+        List<QuestData> quests = new();
+        foreach(int id in ids)
+        {
+            if (CachedDictionary.TryGetValue(id, out QuestData? value))
+                quests.Add(value);
+        }
+        return quests;
     }
 }

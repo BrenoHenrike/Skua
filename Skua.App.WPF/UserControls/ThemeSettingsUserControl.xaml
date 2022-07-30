@@ -52,7 +52,10 @@
                 VerticalAlignment="Center"
                 IsChecked="{Binding ThemeService.IsDarkTheme}" />
 
-            <TextBlock VerticalAlignment="Center" Text="Dark" />
+            <TextBlock
+                Margin="0,0,6,0"
+                VerticalAlignment="Center"
+                Text="Dark" />
 
             <TextBlock
                 Margin="18,0,0,0"

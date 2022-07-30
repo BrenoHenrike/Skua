@@ -1,31 +1,19 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Diagnostics;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using Microsoft.Toolkit.Mvvm.Input;
+﻿using Microsoft.Toolkit.Mvvm.Input;
 using Skua.Core.Interfaces;
-using Skua.Core.Models;
-using Westwind.Scripting;
 
 namespace Skua.Core.ViewModels;
 public class ConsoleViewModel : BotControlViewModelBase
 {
-    public ConsoleViewModel(CSharpScriptExecution compiler, IDialogService dialogService, IScriptManager scriptManager, IScriptInterface bot)
+    public ConsoleViewModel(IDialogService dialogService, IScriptManager scriptManager)
         : base("Console", 700, 400)
     {
-        _compiler = compiler;
         _dialogService = dialogService;
-        ScriptManager = scriptManager;
-        Bot = bot;
+        _scriptManager = scriptManager;
 
         RunCommand = new AsyncRelayCommand(Run);
     }
-    private readonly CSharpScriptExecution _compiler;
     private readonly IDialogService _dialogService;
-    private readonly IScriptManager ScriptManager;
-    private readonly IScriptInterface Bot;
+    private readonly IScriptManager _scriptManager;
     private string _snippetText = "bot.Log(\"Test\");";
 
     public string SnippetText
@@ -36,19 +24,33 @@ public class ConsoleViewModel : BotControlViewModelBase
 
     public IAsyncRelayCommand RunCommand { get; }
 
-    private Task Run()
+    private async Task Run()
     {
-        try
+        await Task.Run(() =>
         {
-            //_compiler.ExecuteMethod($"public object Snippet(IScriptInterface bot){{\n{SnippetText}\nreturn null;}}", "Snippet", Bot);
-            string source = $"using Skua.Core; using Skua.Core.Interfaces; public class Script{{ public void ScriptMain(IScriptInterface bot){{{_snippetText}}}}}";
-            object? o = ScriptManager.Compile(source);
-            o!.GetType().GetMethod("ScriptMain")!.Invoke(o, new[] { Bot });
-        }
-        catch (Exception e)
-        {
-            _dialogService.ShowMessageBox($"Error running snippet:\r\n{e.InnerException?.Message ?? e.Message}\r\nStackTrace: {e.InnerException?.StackTrace ?? e.StackTrace}", "Error");
-        }
-        return Task.CompletedTask;
+            try
+            {
+                string source = 
+                $@"
+using Skua.Core;
+using Skua.Core.Interfaces;
+using Skua.Core.Utils;
+using Skua.Core.Models;
+using Skua.Core.Models.Items;
+using Skua.Core.Models.Monsters;
+using Skua.Core.Models.Players;
+using Skua.Core.Models.Quests;
+using Skua.Core.Models.Servers;
+using Skua.Core.Models.Shops;
+using Skua.Core.Models.Skills;
+public class Script{{ public void ScriptMain(IScriptInterface bot){{{_snippetText}}}}}";
+                object? o = _scriptManager.Compile(source);
+                o!.GetType().GetMethod("ScriptMain")!.Invoke(o, new[] { IScriptInterface.Instance });
+            }
+            catch (Exception e)
+            {
+                _dialogService.ShowMessageBox($"Error running snippet:\r\n{e.InnerException?.Message ?? e.Message}\r\nStackTrace: {e.InnerException?.StackTrace ?? e.StackTrace}", "Error");
+            }
+        });
     }
 }

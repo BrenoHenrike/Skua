@@ -1,10 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-
-namespace Skua.Core.Interfaces;
+﻿namespace Skua.Core.Interfaces;
 public interface IScriptStatus
 {
     /// <summary>
@@ -18,17 +12,16 @@ public interface IScriptStatus
     /// <summary>
     /// Path to the currently loaded script
     /// </summary>
-    string LoadedScript { get; set; }
+    string LoadedScript { get; }
     /// <summary>
     /// The last script compiled.
     /// </summary>
-    string CompiledScript { get; set; }
+    string CompiledScript { get; }
     IScriptOptionContainer? Config { get; set; }
 
     event Action? ScriptStarted;
     event Action<bool>? ScriptStopped;
     event Action<Exception>? ScriptError;
-
 
     Task RestartScriptAsync();
     void StopScript(bool runScriptStoppingEvent = true);

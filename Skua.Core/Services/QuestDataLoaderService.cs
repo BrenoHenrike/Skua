@@ -1,5 +1,4 @@
 ﻿using System.Dynamic;
-using LazyCache;
 using Newtonsoft.Json;
 using Skua.Core.Interfaces;
 using Skua.Core.Models.Quests;
@@ -8,30 +7,29 @@ using static System.Collections.Generic.Dictionary<int, Skua.Core.Models.Quests.
 namespace Skua.Core.Services;
 public class QuestDataLoaderService : IQuestDataLoaderService
 {
-    private readonly IScriptQuest _quests;
-    private readonly IFlashUtil _flash;
-    private readonly IScriptPlayer _player;
-    private readonly IScriptEvent _events;
-    private readonly IAppCache _cache;
-
-    public QuestDataLoaderService(IScriptQuest quests, IScriptPlayer player, IFlashUtil flash, IScriptEvent events, IAppCache cache)
+    public QuestDataLoaderService(IScriptQuest quests, IScriptPlayer player, IFlashUtil flash, IScriptEvent events)
     {
         _quests = quests;
         _flash = flash;
         _player = player;
         _events = events;
-        _cache = cache;
     }
+
+    private readonly IScriptQuest _quests;
+    private readonly IFlashUtil _flash;
+    private readonly IScriptPlayer _player;
+    private readonly IScriptEvent _events;
+    private readonly Dictionary<string, List<QuestData>?> _cachedQuests = new();
 
     public async Task<List<QuestData>> GetFromFileAsync(string fileName)
     {
         if (!File.Exists(fileName))
             return new();
-        if (_cache.TryGetValue($"CachedQuests_{fileName}", out List<QuestData>? quests))
+        if (_cachedQuests.TryGetValue($"CachedQuests_{fileName}", out List<QuestData>? quests))
             return quests ?? new();
         string text = await File.ReadAllTextAsync(fileName);
         quests = JsonConvert.DeserializeObject<List<QuestData>>(text);
-        _cache.Add($"CachedQuests_{fileName}", quests);
+        _cachedQuests.Add($"CachedQuests_{fileName}", quests);
         return quests ?? new();
     }
 

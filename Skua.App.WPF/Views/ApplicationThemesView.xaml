@@ -14,16 +14,13 @@
     mc:Ignorable="d">
     <ScrollViewer HorizontalScrollBarVisibility="Disabled" VerticalScrollBarVisibility="Auto">
         <StackPanel>
-            <Expander
+            <!--<Expander
                 Margin="6,6,6,3"
                 Header="Color Tool"
-                IsExpanded="False">
-                <usercontrols:ColorSchemeEditorUserControl DataContext="{Binding ColorSchemeEditor}" />
-            </Expander>
-            <Expander
-                Margin="6,3,6,6"
-                Header="Defined Themes"
-                IsExpanded="True">
+                IsExpanded="False">-->
+            <usercontrols:ColorSchemeEditorUserControl DataContext="{Binding ColorSchemeEditor}" />
+            <!--</Expander>-->
+            <Expander Margin="6,3,6,6" Header="Defined Themes">
                 <StackPanel>
                     <ItemsControl Margin="3,0" ItemsSource="{Binding ThemeService.Presets}">
                         <ItemsControl.ItemTemplate>

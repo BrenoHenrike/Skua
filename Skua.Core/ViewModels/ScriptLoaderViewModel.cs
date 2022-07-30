@@ -8,7 +8,13 @@ namespace Skua.Core.ViewModels;
 public partial class ScriptLoaderViewModel : BotControlViewModelBase
 {
     private readonly string _scriptPath;
-    public ScriptLoaderViewModel(IScriptManager scriptManager, IWindowService windowService, IBrowserService browserService, IDialogService dialogService, IFileDialogService fileDialog, IVSCodeService vscService, IEnumerable<LogTabViewModel> logs) 
+    public ScriptLoaderViewModel(
+        IProcessStartService processService,
+        IFileDialogService fileDialog,
+        IScriptManager scriptManager,
+        IWindowService windowService,
+        IDialogService dialogService,
+        IEnumerable<LogTabViewModel> logs) 
         : base("Load Script", 350, 450)
     {
         Messenger.Register<ScriptLoaderViewModel, LoadScriptMessage>(this, ReceiveLoadScript);
@@ -18,63 +24,49 @@ public partial class ScriptLoaderViewModel : BotControlViewModelBase
         ScriptLogs = logs.ToArray()[1];
         ScriptManager = scriptManager;
         _windowService = windowService;
-        _browserService = browserService;
+        _processService = processService;
         _dialogService = dialogService;
         _fileDialog = fileDialog;
-        _vscService = vscService;
         LoadScriptCommand = new RelayCommand(() => LoadScript());
-        OpenVSCodeCommand = new RelayCommand(_vscService.Open);
+        OpenVSCodeCommand = new RelayCommand(_processService.OpenVSC);
         EditScriptCommand = new RelayCommand(() => EditScript());
         EditScriptConfigCommand = new RelayCommand(EditScriptConfig);
         OpenScriptRepoCommand = new RelayCommand(_windowService.ShowWindow<ScriptRepoViewModel>);
-        OpenBrowserFormCommand = new RelayCommand(() => _browserService.Open(@"https://forms.gle/sbp57LBQP5WvCH2B9"));
+        OpenBrowserFormCommand = new RelayCommand(() => _processService.OpenLink(@"https://forms.gle/sbp57LBQP5WvCH2B9"));
         ToggleScriptAsyncCommand = new AsyncRelayCommand(ToggleScriptAsync);
     }
 
-    private void EditScriptConfig()
-    {
-        if (string.IsNullOrWhiteSpace(ScriptManager.LoadedScript))
-        {
-            _dialogService.ShowMessageBox("No script is currently loaded. Please load a script to edit its options.", "No Script Loaded");
-            return;
-        }
+    public IScriptManager ScriptManager { get; }
 
-        try
-        {
-            object compiled = ScriptManager.Compile(File.ReadAllText(ScriptManager.LoadedScript))!;
-            ScriptManager.LoadScriptConfig(compiled);
-            if (ScriptManager.Config!.Options.Count > 0 || ScriptManager.Config.MultipleOptions.Count > 0)
-                ScriptManager.Config.Configure();
-            else
-                _dialogService.ShowMessageBox("The loaded script has no options to configure.", "No Options");
-        }
-        catch (Exception ex)
-        {
-            _dialogService.ShowMessageBox($"Script cannot be configured as it has compilation errors:\r\n{ex}", "Script Error");
-        }
-    }
+    private readonly IWindowService _windowService;
+    private readonly IProcessStartService _processService;
+    private readonly IDialogService _dialogService;
+    private readonly IFileDialogService _fileDialog;
+    public LogTabViewModel ScriptLogs { get; }
 
-    private async void ReceiveToggleScript(ScriptLoaderViewModel recipient, StartScriptMessage message)
-    {
-        await recipient.StartScriptAsync(message.Path);
-    }
+    [ObservableProperty]
+    private string _ScriptErrorToolTip = string.Empty;
+    [ObservableProperty]
+    private bool _ToggleScriptEnabled = true;
+    [ObservableProperty]
+    private string _scriptStatus = "[No Script Loaded]";
+    [ObservableProperty]
+    private string _loadedScript = string.Empty;
 
-    private void ReceiveEditScript(ScriptLoaderViewModel recipient, EditScriptMessage message)
-    {
-        recipient.EditScript(message.Path);
-    }
-
-    private void ReceiveLoadScript(ScriptLoaderViewModel recipient, LoadScriptMessage message)
-    {
-        recipient.LoadScript(message.Path);
-    }
+    public IRelayCommand LoadScriptCommand { get; }
+    public IRelayCommand EditScriptCommand { get; }
+    public IRelayCommand EditScriptConfigCommand { get; }
+    public IRelayCommand OpenScriptRepoCommand { get; }
+    public IRelayCommand OpenBrowserFormCommand { get; }
+    public IRelayCommand OpenVSCodeCommand { get; }
+    public IAsyncRelayCommand ToggleScriptAsyncCommand { get; }
 
     private async Task StartScriptAsync(string? path = null)
     {
         if (string.IsNullOrWhiteSpace(path))
             return;
 
-        ScriptManager.LoadedScript = path;
+        ScriptManager.SetLoadedScript(path);
 
         if (ScriptManager.ScriptRunning)
             await ScriptManager.StopScriptAsync();
@@ -113,33 +105,6 @@ public partial class ScriptLoaderViewModel : BotControlViewModelBase
         ToggleScriptEnabled = true;
     }
 
-    public IScriptManager ScriptManager { get; }
-
-    private readonly IWindowService _windowService;
-    private readonly IBrowserService _browserService;
-    private readonly IDialogService _dialogService;
-    private readonly IFileDialogService _fileDialog;
-    private readonly IVSCodeService _vscService;
-
-    [ObservableProperty]
-    private string _ScriptErrorToolTip = string.Empty;
-    [ObservableProperty]
-    private bool _ToggleScriptEnabled = true;
-    [ObservableProperty]
-    private string _scriptStatus = "[No Script Loaded]";
-    [ObservableProperty]
-    private string _loadedScript = string.Empty;
-
-
-    public IRelayCommand LoadScriptCommand { get; }
-    public IRelayCommand EditScriptCommand { get; }
-    public IRelayCommand EditScriptConfigCommand { get; }
-    public IRelayCommand OpenScriptRepoCommand { get; }
-    public IRelayCommand OpenBrowserFormCommand { get; }
-    public IRelayCommand OpenVSCodeCommand { get; }
-    public IAsyncRelayCommand ToggleScriptAsyncCommand { get; }
-
-    public LogTabViewModel ScriptLogs { get; }
     private void LoadScript(string? path = null)
     {
         if (string.IsNullOrWhiteSpace(path))
@@ -149,10 +114,11 @@ public partial class ScriptLoaderViewModel : BotControlViewModelBase
                 return;
         }
 
-        ScriptManager.LoadedScript = path;
-        LoadedScript = $"{Path.GetFileName(path)}";
+        ScriptManager.SetLoadedScript(path);
+        LoadedScript = Path.GetFileName(path) ?? string.Empty;
         ScriptStatus = "[Script loaded]";
     }
+
     private void EditScript(string? path = null)
     {
         if (path is null && string.IsNullOrEmpty(ScriptManager.LoadedScript))
@@ -160,10 +126,48 @@ public partial class ScriptLoaderViewModel : BotControlViewModelBase
 
         if(!string.IsNullOrWhiteSpace(path))
         {
-            _vscService.Open(path);
+            _processService.OpenVSC(path);
             return;
         }
 
-        _vscService.Open(ScriptManager.LoadedScript);
+        _processService.OpenVSC(ScriptManager.LoadedScript);
+    }
+
+    private void EditScriptConfig()
+    {
+        if (string.IsNullOrWhiteSpace(ScriptManager.LoadedScript))
+        {
+            _dialogService.ShowMessageBox("No script is currently loaded. Please load a script to edit its options.", "No Script Loaded");
+            return;
+        }
+
+        try
+        {
+            object compiled = ScriptManager.Compile(File.ReadAllText(ScriptManager.LoadedScript))!;
+            ScriptManager.LoadScriptConfig(compiled);
+            if (ScriptManager.Config!.Options.Count > 0 || ScriptManager.Config.MultipleOptions.Count > 0)
+                ScriptManager.Config.Configure();
+            else
+                _dialogService.ShowMessageBox("The loaded script has no options to configure.", "No Options");
+        }
+        catch (Exception ex)
+        {
+            _dialogService.ShowMessageBox($"Script cannot be configured as it has compilation errors:\r\n{ex}", "Script Error");
+        }
+    }
+
+    private async void ReceiveToggleScript(ScriptLoaderViewModel recipient, StartScriptMessage message)
+    {
+        await recipient.StartScriptAsync(message.Path);
+    }
+
+    private void ReceiveEditScript(ScriptLoaderViewModel recipient, EditScriptMessage message)
+    {
+        recipient.EditScript(message.Path);
+    }
+
+    private void ReceiveLoadScript(ScriptLoaderViewModel recipient, LoadScriptMessage message)
+    {
+        recipient.LoadScript(message.Path);
     }
 }

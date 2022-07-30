@@ -11,7 +11,7 @@ public class CustomClient : HttpClient
             : new System.Net.Http.Headers.AuthenticationHeaderValue("Basic", _authString2);
         if (accJson)
             DefaultRequestHeaders.Accept.Add(new System.Net.Http.Headers.MediaTypeWithQualityHeaderValue("application/json"));
-        DefaultRequestHeaders.UserAgent.ParseAdd("Skua/Scripts");
+        DefaultRequestHeaders.UserAgent.ParseAdd("Skua");
     }
 
     public CustomClient(string token)

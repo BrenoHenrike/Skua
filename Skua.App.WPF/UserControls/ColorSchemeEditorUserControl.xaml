@@ -63,15 +63,16 @@
                     </Grid.Resources>
 
                     <Grid.RowDefinitions>
-                        <RowDefinition Height="160" />
+                        <RowDefinition Height="auto" />
                     </Grid.RowDefinitions>
 
                     <Grid.ColumnDefinitions>
                         <ColumnDefinition Width="2*" />
                         <ColumnDefinition Width="2*" />
-                        <ColumnDefinition />
+                        <!--<ColumnDefinition />-->
                     </Grid.ColumnDefinitions>
 
+                    <!--#region Commented out Primary selection-->
                     <!--  Primary selection  -->
                     <Border
                         Grid.Column="0"
@@ -166,12 +167,162 @@
                             </Grid>
                         </Button>
                     </Border>
+                    <!--#endregion-->
 
-                    <!--  Secondary selection  -->
+                    <!--  Primary Selection  -->
+                    <Border
+                        Grid.Column="0"
+                        BorderBrush="LightGray"
+                        BorderThickness="1,0,1,0">
+                        <Button Command="{Binding ChangeToPrimaryCommand}">
+                            <Button.Style>
+                                <Style BasedOn="{StaticResource PaletteButton}" TargetType="Button">
+                                    <Style.Triggers>
+                                        <DataTrigger Binding="{Binding ThemeService.ActiveScheme}" Value="Primary">
+                                            <Setter Property="materialDesign:ShadowAssist.ShadowDepth" Value="Depth3" />
+                                        </DataTrigger>
+                                    </Style.Triggers>
+                                </Style>
+                            </Button.Style>
+
+                            <Grid>
+                                <Grid.RowDefinitions>
+                                    <RowDefinition Height="Auto" />
+                                    <RowDefinition Height="*" />
+                                </Grid.RowDefinitions>
+
+                                <TextBlock
+                                    Foreground="{DynamicResource MaterialDesignBody}"
+                                    Style="{StaticResource MaterialDesignBody1TextBlock}"
+                                    Text="Primary" />
+
+                                <Border Grid.Row="1" Background="{DynamicResource PrimaryHueMidBrush}">
+                                    <Grid>
+                                        <Border
+                                            Width="30"
+                                            Height="30"
+                                            HorizontalAlignment="Center"
+                                            VerticalAlignment="Center"
+                                            CornerRadius="15">
+                                            <Border.Style>
+                                                <Style TargetType="Border">
+                                                    <Style.Triggers>
+                                                        <DataTrigger Binding="{Binding ThemeService.ActiveScheme}" Value="Primary">
+                                                            <Setter Property="Background" Value="{DynamicResource PrimaryHueMidForegroundBrush}" />
+                                                        </DataTrigger>
+                                                    </Style.Triggers>
+                                                </Style>
+                                            </Border.Style>
+
+                                            <TextBlock
+                                                HorizontalAlignment="Center"
+                                                VerticalAlignment="Center"
+                                                FontSize="22"
+                                                Text="P">
+                                                <TextBlock.Style>
+                                                    <Style TargetType="TextBlock">
+                                                        <Setter Property="Foreground" Value="{DynamicResource PrimaryHueMidForegroundBrush}" />
+                                                        <Style.Triggers>
+                                                            <DataTrigger Binding="{Binding ThemeService.ActiveScheme}" Value="Primary">
+                                                                <Setter Property="Foreground" Value="{DynamicResource PrimaryHueMidBrush}" />
+                                                            </DataTrigger>
+                                                        </Style.Triggers>
+                                                    </Style>
+                                                </TextBlock.Style>
+                                            </TextBlock>
+                                        </Border>
+
+                                        <TextBlock
+                                            DataContext="{DynamicResource PrimaryHueMidBrush}"
+                                            Foreground="{DynamicResource PrimaryHueMidForegroundBrush}"
+                                            Style="{StaticResource HexLabelTextBlock}"
+                                            Text="{Binding Converter={StaticResource BrushToHexConverter}}" />
+                                    </Grid>
+                                </Border>
+                            </Grid>
+                        </Button>
+                    </Border>
+
+                    <!--  Text on Primary  -->
                     <Border
                         Grid.Column="1"
                         BorderBrush="LightGray"
                         BorderThickness="1,0,1,0">
+                        <Button Command="{Binding ChangeToPrimaryForegroundCommand}">
+                            <Button.Style>
+                                <Style BasedOn="{StaticResource PaletteButton}" TargetType="Button">
+                                    <Style.Triggers>
+                                        <DataTrigger Binding="{Binding ThemeService.ActiveScheme}" Value="PrimaryForeground">
+                                            <Setter Property="materialDesign:ShadowAssist.ShadowDepth" Value="Depth3" />
+                                        </DataTrigger>
+                                    </Style.Triggers>
+                                </Style>
+                            </Button.Style>
+
+                            <Grid>
+                                <Grid.RowDefinitions>
+                                    <RowDefinition Height="Auto" />
+                                    <RowDefinition Height="*" />
+                                </Grid.RowDefinitions>
+
+                                <TextBlock
+                                    Foreground="{DynamicResource MaterialDesignBody}"
+                                    Style="{StaticResource MaterialDesignBody1TextBlock}"
+                                    Text="Text on Primary" />
+
+                                <Border Grid.Row="1" Background="{DynamicResource PrimaryHueMidBrush}">
+                                    <Grid>
+                                        <Border
+                                            Height="30"
+                                            Padding="15,0"
+                                            HorizontalAlignment="Center"
+                                            VerticalAlignment="Center"
+                                            CornerRadius="15">
+                                            <Border.Style>
+                                                <Style TargetType="Border">
+                                                    <Style.Triggers>
+                                                        <DataTrigger Binding="{Binding ThemeService.ActiveScheme}" Value="PrimaryForeground">
+                                                            <Setter Property="Background" Value="{DynamicResource PrimaryHueMidForegroundBrush}" />
+                                                        </DataTrigger>
+                                                    </Style.Triggers>
+                                                </Style>
+                                            </Border.Style>
+
+                                            <TextBlock
+                                                HorizontalAlignment="Center"
+                                                VerticalAlignment="Center"
+                                                FontSize="22"
+                                                Text="Text">
+                                                <TextBlock.Style>
+                                                    <Style TargetType="TextBlock">
+                                                        <Setter Property="Foreground" Value="{DynamicResource PrimaryHueMidForegroundBrush}" />
+                                                        <Style.Triggers>
+                                                            <DataTrigger Binding="{Binding ThemeService.ActiveScheme}" Value="PrimaryForeground">
+                                                                <Setter Property="Foreground" Value="{DynamicResource PrimaryHueMidBrush}" />
+                                                            </DataTrigger>
+                                                        </Style.Triggers>
+                                                    </Style>
+                                                </TextBlock.Style>
+                                            </TextBlock>
+                                        </Border>
+
+                                        <TextBlock
+                                            DataContext="{DynamicResource PrimaryHueMidForegroundBrush}"
+                                            Foreground="{DynamicResource PrimaryHueMidForegroundBrush}"
+                                            Style="{StaticResource HexLabelTextBlock}"
+                                            Text="{Binding Converter={StaticResource BrushToHexConverter}}" />
+                                    </Grid>
+                                </Border>
+                            </Grid>
+                        </Button>
+                    </Border>
+
+                    <!--#region Commented out Secondary Color-->
+                    <!--<Border
+                        Grid.Column="1"
+                        BorderBrush="LightGray"
+                        BorderThickness="1,0,1,0"
+                        Visibility="Hidden">
                         <Button Command="{Binding ChangeToSecondaryCommand}">
                             <Button.Style>
                                 <Style BasedOn="{StaticResource PaletteButton}" TargetType="Button">
@@ -196,7 +347,9 @@
                                     Style="{StaticResource MaterialDesignBody1TextBlock}"
                                     Text="Secondary" />
 
-                                <!--  Secondary mid section  -->
+                    -->
+                    <!--  Secondary mid section  -->
+                    <!--
                                 <Border Grid.Row="1" Background="{DynamicResource SecondaryHueMidBrush}">
                                     <Grid>
                                         <TextBlock
@@ -241,7 +394,9 @@
                                 </Border>
 
                                 <UniformGrid Grid.Row="2" Rows="1">
-                                    <!--  Secondary light  -->
+                    -->
+                    <!--  Secondary light  -->
+                    <!--
                                     <Border Background="{DynamicResource SecondaryHueLightBrush}">
                                         <TextBlock
                                             DataContext="{DynamicResource SecondaryHueLightBrush}"
@@ -250,7 +405,9 @@
                                             Text="{Binding Converter={StaticResource BrushToHexConverter}}" />
                                     </Border>
 
-                                    <!--  Secondary dark  -->
+                    -->
+                    <!--  Secondary dark  -->
+                    <!--
                                     <Border Background="{DynamicResource SecondaryHueDarkBrush}">
                                         <TextBlock
                                             DataContext="{DynamicResource SecondaryHueDarkBrush}"
@@ -261,10 +418,14 @@
                                 </UniformGrid>
                             </Grid>
                         </Button>
-                    </Border>
+                    </Border>-->
+                    <!--#endregion-->
 
-                    <UniformGrid Grid.Column="2" Columns="1">
-                        <!--  Primary foreground selection  -->
+                    <!--#region Commented out Text Colors-->
+                    <!--<UniformGrid Grid.Column="2" Columns="1">
+                    -->
+                    <!--  Primary foreground selection  -->
+                    <!--
                         <Border>
                             <Button Command="{Binding ChangeToPrimaryForegroundCommand}">
                                 <Button.Style>
@@ -336,7 +497,9 @@
                             </Button>
                         </Border>
 
-                        <!--  Secondary foreground selection  -->
+                    -->
+                    <!--  Secondary foreground selection  -->
+                    <!--
                         <Border>
                             <Button Command="{Binding ChangeToSecondaryForegroundCommand}">
                                 <Button.Style>
@@ -408,7 +571,9 @@
                                 </Grid>
                             </Button>
                         </Border>
-                    </UniformGrid>
+                    </UniformGrid>-->
+                    <!--#endregion-->
+
                 </Grid>
             </Border>
 
@@ -448,7 +613,7 @@
                         <materialDesign:ColorPicker
                             x:Name="ColorPicker"
                             Grid.Column="1"
-                            MinHeight="100"
+                            MinHeight="150"
                             Margin="0,3"
                             Color="{Binding ThemeService.SelectedColor, Delay=25}" />
                     </Grid>

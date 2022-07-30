@@ -1,4 +1,6 @@
-﻿namespace Skua.Core.Interfaces;
+﻿using Skua.Core.Models;
+
+namespace Skua.Core.Interfaces;
 
 public interface IScriptInterfaceManager
 {
@@ -7,7 +9,9 @@ public interface IScriptInterfaceManager
 }
 public interface IScriptInterface
 {
+    static IScriptInterface Instance { get; protected set; }
     IFlashUtil Flash { get; }
+    IScriptStatus Manager { get; }
     IScriptAuto Auto { get; }
     IScriptBoost Boosts { get; }
     IScriptBotStats Stats { get; }
@@ -37,7 +41,14 @@ public interface IScriptInterface
     ICaptureProxy GameProxy { get; }
     IScriptOptionContainer? Config { get; }
 
+    /// <summary>
+    /// Whether the bot should stop.
+    /// </summary>
     bool ShouldExit { get; }
+    /// <summary>
+    /// Current version of Skua.
+    /// </summary>
+    Version Version { get; }
 
     /// <summary>
     /// A random instance for the script.
@@ -70,5 +81,21 @@ public interface IScriptInterface
     /// <param name="delay">Time to wait before invoking the action.</param>
     /// <param name="function">Action to run. This can be passed as a lambda expression.</param>
     Task Schedule(int delay, Func<IScriptInterface, Task> function);
+    /// <summary>
+    /// Shows a message box.
+    /// </summary>
+    /// <param name="message">Message in the popup.</param>
+    /// <param name="caption">Title of the popup.</param>
+    /// <param name="yesAndNo">Whether it should have 'Yes' and 'No' buttons. If <see langword="false"/> will only have the 'Ok' button.</param>
+    /// <returns><see langword="true"/> if the 'Yes' or 'Ok' button was clicked.</returns>
+    bool? ShowMessageBox(string message, string caption, bool yesAndNo = false);
+    /// <summary>
+    /// Shows a message box with the specified buttons.
+    /// </summary>
+    /// <param name="message">Message in the popup.</param>
+    /// <param name="caption">Title of the popup.</param>
+    /// <param name="buttons">A list of buttons that will be shown.</param>
+    /// <returns>A <see cref="DialogResult"/> object with the text and value of the button. The value is the index of the button in the passed array, meaning that -1 is no button found.</returns>
+    DialogResult ShowMessageBox(string message, string caption, params string[] buttons);
 
 }

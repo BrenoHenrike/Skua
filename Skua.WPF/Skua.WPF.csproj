@@ -5,7 +5,12 @@
     <Nullable>enable</Nullable>
     <UseWPF>true</UseWPF>
       <UseWindowsForms>true</UseWindowsForms>
+      <Platforms>AnyCPU;x64;x86</Platforms>
   </PropertyGroup>
+
+  <ItemGroup>
+    <None Remove="SkuaImage.png" />
+  </ItemGroup>
 
   <ItemGroup>
     <PackageReference Include="MaterialDesignThemes" Version="4.5.0" />
@@ -14,6 +19,10 @@
 
   <ItemGroup>
     <ProjectReference Include="..\Skua.Core\Skua.Core.csproj" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <Resource Include="SkuaImage.png" />
   </ItemGroup>
 
   <ItemGroup>

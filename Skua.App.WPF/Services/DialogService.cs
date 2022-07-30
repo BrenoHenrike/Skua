@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Windows;
 using Skua.Core.Interfaces;
+using Skua.Core.Models;
 using Skua.Core.ViewModels;
 
 namespace Skua.App.WPF.Services;
@@ -75,6 +76,22 @@ public class DialogService : IDialogService
             };
 
             return dialog.ShowDialog();
+        });
+    }
+
+    public DialogResult ShowMessageBox(string message, string caption, params string[] buttons)
+    {
+        return Application.Current.Dispatcher.Invoke(() =>
+        {
+            CustomDialogViewModel viewModel = new(message, caption, buttons);
+            HostDialog dialog = new()
+            {
+                DataContext = viewModel
+            };
+
+            dialog.ShowDialog();
+
+            return viewModel.Result ?? DialogResult.Cancelled;
         });
     }
 }

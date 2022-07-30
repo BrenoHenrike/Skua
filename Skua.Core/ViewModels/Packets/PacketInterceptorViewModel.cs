@@ -49,7 +49,7 @@ public class PacketInterceptorViewModel : BotControlViewModelBase, IDisposable
         get { return _selectedServer; }
         set { SetProperty(ref _selectedServer, value); }
     }
-    public List<Server> ServerList => _server.CachedServers;
+    public List<Server> ServerList => _server.ServerList;
     private RangedObservableCollection<InterceptedPacketViewModel> _packets = new();
 
     public RangedObservableCollection<InterceptedPacketViewModel> Packets
@@ -90,7 +90,7 @@ public class PacketInterceptorViewModel : BotControlViewModelBase, IDisposable
 
     private void _server_PropertyChanged(object? sender, System.ComponentModel.PropertyChangedEventArgs e)
     {
-        if (e.PropertyName == nameof(_server.CachedServers))
+        if (e.PropertyName == nameof(_server.ServerList))
             OnPropertyChanged(nameof(ServerList));
     }
     public void Dispose()

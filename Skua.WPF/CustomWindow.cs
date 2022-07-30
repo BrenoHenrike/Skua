@@ -46,7 +46,16 @@ public partial class CustomWindow : Window
             IntPtr handle = new WindowInteropHelper(this).Handle;
             HwndSource.FromHwnd(handle).AddHook(new HwndSourceHook(WindowChromePatch.WindowProc));
         };
-        
+
+        MenuItem topMost = new();
+        topMost.IsCheckable = true;
+        topMost.Header = "Top Most";
+        topMost.ToolTip = "Makes this window stick at the top of the others.";
+        topMost.Click += Topmost_Click;
+
+        ContextMenu = new();
+        ContextMenu.Items.Add(topMost);
+
         Loaded += (s, e) =>
         {
             btnClose = (Button)Template.FindName("btnClose", this);
@@ -63,15 +72,32 @@ public partial class CustomWindow : Window
                     Hide();
                 };
             }
-            btnMinimize.Click += (s, e) => WindowState = WindowState.Minimized;
+            btnMinimize.Click += BtnMinimize_Click;
             if(!FixedSize)
             {
-                btnMaximize.Click += (s, e) => WindowState = WindowState == WindowState.Maximized ? WindowState.Normal : WindowState.Maximized;
+                btnMaximize.Click += BtnMaximize_Click;
                 return;
             }
 
             btnMaximize.IsEnabled = false;
             ResizeMode = ResizeMode.NoResize;
         };
+    }
+
+    private void BtnMaximize_Click(object sender, RoutedEventArgs e)
+    {
+        WindowState = WindowState == WindowState.Maximized ? WindowState.Normal : WindowState.Maximized;
+    }
+
+    private void BtnMinimize_Click(object sender, RoutedEventArgs e)
+    {
+        WindowState = WindowState.Minimized;
+    }
+
+    private void Topmost_Click(object sender, RoutedEventArgs e)
+    {
+        if (sender is not MenuItem menuItem)
+            return;
+        Topmost = menuItem.IsChecked;
     }
 }

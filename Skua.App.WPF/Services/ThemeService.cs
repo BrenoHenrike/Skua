@@ -17,9 +17,9 @@ public partial class ThemeService : ObservableObject, IThemeService
         ITheme theme = _paletteHelper.GetTheme();
 
         _primaryColor = theme.PrimaryMid.Color;
-        _secondaryColor = theme.SecondaryMid.Color;
+        //_secondaryColor = theme.SecondaryMid.Color;
         _primaryForegroundColor = theme.PrimaryMid.GetForegroundColor();
-        _secondaryForegroundColor = theme.SecondaryMid.GetForegroundColor();
+        //_secondaryForegroundColor = theme.SecondaryMid.GetForegroundColor();
 
         SelectedColor = _primaryColor;
         IsDarkTheme = theme.GetBaseTheme() == BaseTheme.Dark;
@@ -41,12 +41,9 @@ public partial class ThemeService : ObservableObject, IThemeService
                 IsDarkTheme = e.NewTheme?.GetBaseTheme() == BaseTheme.Dark;
 
                 _primaryColor = e.NewTheme?.PrimaryMid.Color;
-                _secondaryColor = e.NewTheme?.SecondaryMid.Color;
+                //_secondaryColor = e.NewTheme?.SecondaryMid.Color;
                 _primaryForegroundColor = e.NewTheme?.PrimaryMid.GetForegroundColor();
-                _secondaryForegroundColor = e.NewTheme?.SecondaryMid.GetForegroundColor();
-
-                ActiveScheme = ColorScheme.Primary;
-                SelectedColor = e.NewTheme?.PrimaryMid.Color;
+                //_secondaryForegroundColor = e.NewTheme?.SecondaryMid.GetForegroundColor();
             };
         }
     }
@@ -70,9 +67,9 @@ public partial class ThemeService : ObservableObject, IThemeService
         var theme = _paletteHelper.GetTheme();
 
         _primaryColor = theme.PrimaryMid.Color;
-        _secondaryColor = theme.SecondaryMid.Color;
+        //_secondaryColor = theme.SecondaryMid.Color;
         _primaryForegroundColor = theme.PrimaryMid.GetForegroundColor();
-        _secondaryForegroundColor = theme.SecondaryMid.GetForegroundColor();
+        //_secondaryForegroundColor = theme.SecondaryMid.GetForegroundColor();
 
         ActiveScheme = ColorScheme.Primary;
         SelectedColor = theme.PrimaryMid.Color;
@@ -84,9 +81,9 @@ public partial class ThemeService : ObservableObject, IThemeService
     private readonly PaletteHelper _paletteHelper = new();
     private readonly ThemeUserSettingsService _themeSettings;
     private Color? _primaryColor;
-    private Color? _secondaryColor;
+    //private Color? _secondaryColor;
     private Color? _primaryForegroundColor;
-    private Color? _secondaryForegroundColor;
+    //private Color? _secondaryForegroundColor;
 
     [ObservableProperty]
     private ColorScheme _activeScheme;
@@ -107,9 +104,9 @@ public partial class ThemeService : ObservableObject, IThemeService
                 var currentSchemeColor = ActiveScheme switch
                 {
                     ColorScheme.Primary => _primaryColor,
-                    ColorScheme.Secondary => _secondaryColor,
+                    //ColorScheme.Secondary => _secondaryColor,
                     ColorScheme.PrimaryForeground => _primaryForegroundColor,
-                    ColorScheme.SecondaryForeground => _secondaryForegroundColor,
+                    //ColorScheme.SecondaryForeground => _secondaryForegroundColor,
                     _ => throw new NotSupportedException($"{ActiveScheme} is not a handled ColorScheme.")
                 };
 
@@ -231,18 +228,18 @@ public partial class ThemeService : ObservableObject, IThemeService
                 theme.SetPrimaryColor(color);
                 _primaryColor = color;
                 break;
-            case ColorScheme.Secondary:
-                theme.SetSecondaryColor(color);
-                _secondaryColor = color;
-                break;
+            //case ColorScheme.Secondary:
+            //    theme.SetSecondaryColor(color);
+            //    _secondaryColor = color;
+            //    break;
             case ColorScheme.PrimaryForeground:
                 SetPrimaryForegroundToSingleColor(theme, color);
                 _primaryForegroundColor = color;
                 return;
-            case ColorScheme.SecondaryForeground:
-                SetSecondaryForegroundToSingleColor(theme, color);
-                _secondaryForegroundColor = color;
-                return;
+            //case ColorScheme.SecondaryForeground:
+            //    SetSecondaryForegroundToSingleColor(theme, color);
+            //    _secondaryForegroundColor = color;
+            //    return;
         }
 
         _paletteHelper.SetTheme(theme);
@@ -256,15 +253,15 @@ public partial class ThemeService : ObservableObject, IThemeService
             case ColorScheme.Primary:
                 SelectedColor = _primaryColor;
                 break;
-            case ColorScheme.Secondary:
-                SelectedColor = _secondaryColor;
-                break;
+            //case ColorScheme.Secondary:
+            //    SelectedColor = _secondaryColor;
+            //    break;
             case ColorScheme.PrimaryForeground:
                 SelectedColor = _primaryForegroundColor;
                 break;
-            case ColorScheme.SecondaryForeground:
-                SelectedColor = _secondaryForegroundColor;
-                break;
+            //case ColorScheme.SecondaryForeground:
+            //    SelectedColor = _secondaryForegroundColor;
+            //    break;
         }
     }
 

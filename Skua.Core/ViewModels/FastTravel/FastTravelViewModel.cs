@@ -2,7 +2,6 @@
 using Microsoft.Toolkit.Mvvm.Input;
 using Microsoft.Toolkit.Mvvm.Messaging;
 using Skua.Core.Interfaces;
-using Skua.Core.Interfaces.Services;
 using System.Collections.Specialized;
 using Microsoft.Toolkit.Mvvm.ComponentModel;
 using Skua.Core.Messaging;
@@ -16,12 +15,12 @@ public partial class FastTravelViewModel : BotControlViewModelBase
         Messenger.Register<FastTravelViewModel, RemoveFastTravelMessage>(this, RemoveFastTravel);
         Messenger.Register<FastTravelViewModel, EditFastTravelMessage>(this, EditFastTravel);
         MapService = mapService;
-        Settings = settings;
+        _settings = settings;
         _dialogService = dialogService;
         _travelCommand = new RelayCommand<object>(mapService.Travel);
         Editor = new(mapService, _travelCommand);
         List<FastTravelItemViewModel> DefaultFastTravels = new();
-        foreach (string? item in Settings.Get<StringCollection>("FastTravels")!)
+        foreach (string? item in _settings.Get<StringCollection>("FastTravels")!)
         {
             if (string.IsNullOrWhiteSpace(item))
                 continue;
@@ -35,7 +34,7 @@ public partial class FastTravelViewModel : BotControlViewModelBase
     }
 
     public IMapService MapService { get; }
-    private readonly ISettingsService Settings;
+    private readonly ISettingsService _settings;
     private readonly IDialogService _dialogService;
     private readonly IRelayCommand<object> _travelCommand;
 
@@ -90,6 +89,6 @@ public partial class FastTravelViewModel : BotControlViewModelBase
     {
         StringCollection values = new();
         values.AddRange(FastTravelItems.Select(i => i.ToString()).ToArray());
-        Settings.Set("FastTravels", values);
+        _settings.Set("FastTravels", values);
     }
 }

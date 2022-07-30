@@ -9,11 +9,11 @@ public class BoostsViewModel : ObservableObject
     {
         Boosts = boosts;
         ToggleBoostsCommand = new AsyncRelayCommand(ToggleBoosts);
-        SetBoostIDsCommand = new RelayCommand<bool>(Boosts.SetAllBoostsIDs);
+        SetBoostIDsCommand = new AsyncRelayCommand<bool>(async b => await Task.Run(() => Boosts.SetAllBoostsIDs(b)));
     }
     public IScriptBoost Boosts { get; }
     public IAsyncRelayCommand ToggleBoostsCommand { get; }
-    public IRelayCommand SetBoostIDsCommand { get; }
+    public IAsyncRelayCommand SetBoostIDsCommand { get; }
 
     private async Task ToggleBoosts()
     {

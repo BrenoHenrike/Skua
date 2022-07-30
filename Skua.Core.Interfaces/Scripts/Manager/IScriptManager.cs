@@ -7,4 +7,5 @@ public interface IScriptManager : IScriptStatus, INotifyPropertyChanged
     Task<Exception?> StartScriptAsync();
     object? Compile(string source);
     void LoadScriptConfig(object? script);
+    void SetLoadedScript(string path);
 }

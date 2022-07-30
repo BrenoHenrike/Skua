@@ -22,9 +22,14 @@ public interface IScriptQuest : INotifyPropertyChanged
     /// </summary>
     List<Quest> Tree { get; }
     /// <summary>
-    /// Dictionary with <see cref="Quest"/> objects of all the game quests.
+    /// Dictionary with <see cref="QuestData"/> objects of all the game quests.
+    /// </summary>
+    Dictionary<int, QuestData> CachedDictionary { get; set; }
+    /// <summary>
+    /// List with <see cref="QuestData"/> objects of all the game quests.
     /// </summary>
     List<QuestData> Cached { get; set; }
+
     /// <summary>
     /// List of IDs of the current registered quests to complete automatically.
     /// </summary>
@@ -167,4 +172,22 @@ public interface IScriptQuest : INotifyPropertyChanged
     /// <param name="value">Value property of the quest you want it to think you have completed</param>
     /// <param name="slot">Slot property of the questline you want it to think you have progressed</param>
     void UpdateQuest(int value, int slot);
+    /// <summary>
+    /// Load the quests into the <see cref="Cached"/> list from the Quests.txt.
+    /// </summary>
+    /// <returns></returns>
+    void LoadCachedQuests();
+    /// <summary>
+    /// Quests a list of <see cref="QuestData"/> from the Quests.txt file.
+    /// </summary>
+    /// <param name="start">The starting ID.</param>
+    /// <param name="count">How many will be taken.</param>
+    /// <returns></returns>
+    List<QuestData> GetCachedQuests(int start, int count);
+    /// <summary>
+    /// Quests a list of <see cref="QuestData"/> from the Quests.txt file.
+    /// </summary>
+    /// <param name="ids">IDs to get.</param>
+    /// <returns></returns>
+    List<QuestData> GetCachedQuests(params int[] ids);
 }

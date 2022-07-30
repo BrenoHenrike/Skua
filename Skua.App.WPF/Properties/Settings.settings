@@ -1,5 +1,5 @@
 ﻿<?xml version='1.0' encoding='utf-8'?>
-<SettingsFile xmlns="http://schemas.microsoft.com/VisualStudio/2004/01/settings" CurrentProfile="(Default)" GeneratedClassNamespace="Skua.App.Main.Properties" GeneratedClassName="Settings">
+<SettingsFile xmlns="http://schemas.microsoft.com/VisualStudio/2004/01/settings" CurrentProfile="(Default)" GeneratedClassNamespace="Skua.App.WPF.Properties" GeneratedClassName="Settings">
   <Profiles />
   <Settings>
     <Setting Name="FastTravels" Type="System.Collections.Specialized.StringCollection" Scope="User">
@@ -71,7 +71,10 @@
       <Value Profile="(Default)">False</Value>
     </Setting>
     <Setting Name="ApplicationVersion" Type="System.String" Scope="Application">
-      <Value Profile="(Default)">0.1.0.0</Value>
+      <Value Profile="(Default)">0.2.0.0</Value>
+    </Setting>
+    <Setting Name="UseLocalVSC" Type="System.Boolean" Scope="User">
+      <Value Profile="(Default)">True</Value>
     </Setting>
   </Settings>
 </SettingsFile>

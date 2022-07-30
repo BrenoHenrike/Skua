@@ -4,6 +4,7 @@ using Microsoft.Toolkit.Mvvm.Messaging.Messages;
 using Microsoft.Toolkit.Mvvm.Input;
 using Skua.Core.Interfaces;
 using Skua.Core.Models.Items;
+using Skua.Core.Messaging;
 
 namespace Skua.Core.ViewModels;
 public partial class CurrentDropsViewModel : BotControlViewModelBase
@@ -11,7 +12,7 @@ public partial class CurrentDropsViewModel : BotControlViewModelBase
     public CurrentDropsViewModel(IScriptDrop drops, IScriptPlayer player)
         : base("Current Drops", 500, 400)
     {
-        Messenger.Register<CurrentDropsViewModel, PropertyChangedMessage<IEnumerable<ItemBase>>>(this, CurrentDropsChanged);
+        Messenger.Register<CurrentDropsViewModel, ItemDroppedMessage>(this, CurrentDropsChanged);
         _drops = drops;
         _player = player;
         PickupCommand = new RelayCommand(Pickup);
@@ -48,9 +49,8 @@ public partial class CurrentDropsViewModel : BotControlViewModelBase
         _drops.Pickup(drops.Select(d => d.ID).ToArray());
     }
 
-    private void CurrentDropsChanged(CurrentDropsViewModel recipient, PropertyChangedMessage<IEnumerable<ItemBase>> message)
+    private void CurrentDropsChanged(CurrentDropsViewModel recipient, ItemDroppedMessage message)
     {
-        if (message.PropertyName == nameof(IScriptDrop.CurrentDropInfos))
-            recipient.OnPropertyChanged(nameof(recipient.CurrentDrops));
+        recipient.OnPropertyChanged(nameof(recipient.CurrentDrops));
     }
 }

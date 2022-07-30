@@ -9,5 +9,5 @@ public interface ISettingsService
 {
     void Set<T>(string key, T value);
     T? Get<T>(string key);
-    T GetValue<T>(string key, T defaultValue);
+    T Get<T>(string key, T defaultValue);
 }

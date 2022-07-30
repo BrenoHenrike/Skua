@@ -1,0 +1,248 @@
+Base = Abyssal Angel = 4 | 2 | 1 | 3 H<50 = Use if Available
+Base = Abyssal Angel's Shadow = 4 | 2 | 1 | 3H<50S = Use if Available
+Base = Acolyte = 3 | 4 | 2 | 2 | 1 = 0
+Base = Alpha DOOMmega = 3 | 4 | 1 | 2H<50S = 0
+Base = Alpha Omega = 3 | 4 | 1 | 2H<50S = 0
+Base = Alpha Pirate = 4 | 1 | 3 | 2 = Use if Available
+Base = Arachnomancer = 1 | 1 | 1 | 1 | 1 | 1 | 2 | 4 | 3 = 0
+Base = Arcane Dark Caster = 4WW5000 | 3 | 3 | 2 | 1 = 0
+Solo = ArchFiend = 3S | 1S | 2S | 4S = Use if Available
+Farm = ArchFiend = 3S | 1S | 2S = Use if Available
+Base = ArchPaladin = 3S | 4S | 1S | 2S = Use if Available
+Base = Artifact Hunter = 4 | 3 | 2 | 1 = 0
+Base = Assassin = 4 | 3 | 1 | 2 = 0
+Base = Barber = 4 | 1 | 3 | 2 = 0
+Base = Bard = 1 | 3 | 4 | 1 = 0
+Base = Battle Bard = 1 | 3 | 4 | 1 = 0
+Solo = BattleMage = 1 | 4 | 2 | 3 | 1 = 0
+Farm = BattleMage = 2 | 3 | 4 | 2 | 3 | 4 = 0
+Solo = BattleMage of Love = 1 | 4 | 2 | 3 | 1 = 0
+Farm = BattleMage of Love = 2 | 3 | 4 | 2 | 3 | 4 = 0
+Base = Beast Warrior = 1 | 2 | 3 | 4 = Use if Available
+Base = BeastMaster = 1 | 2 | 3 | 4 = Use if Available
+Base = Berserker = 4 | 3 | 1 | 2 = 0
+Base = Beta Berserker = 4 | 3 | 1 | 2 = 0
+Base = BladeMaster = 2 | 3 | 1 | 4 = 0
+Base = BladeMaster Assassin = 2 | 3 | 1 | 4 = 0
+Base = Blaze Binder = 1 | 2 | 4 | 1 | 3 | 2 | 1 | 4 | 1 | 2 | 1 | 3 | 1 | 2 | 4 | 1 | 2 | 1 | 3 | 1 | 2 = 0
+Base = Blood Ancient = 4 | 3 | 2 | 1 = 0
+Base = Blood Sorceress = 4 | 4 | 4 | 2 | 1 | 3 = 0
+Base = Blood Titan = 2 | 4 | 3 | 2 = 0
+Base = CardClasher = 4 | 3 | 1 | 2 = 0
+Base = Chaos Avenger = 4 | 3 | 1 | 2 = 0
+Base = Chaos Avenger Member Preview = 4 | 3 | 1 | 2 = 0
+Base = Chaos Champion Prime = 2 | 4 | 1 | 3 = 0
+Base = Chaos Shaper = 2 | 1 | 3 | 4 = 0
+Base = Chaos Slayer Berserker = 2 | 4 | 1 | 3 = 0
+Base = Chaos Slayer Cleric = 2 | 4 | 1 | 3 = 0
+Base = Chaos Slayer Mystic = 2 | 4 | 1 | 3 = 0
+Base = Chaos Slayer Thief = 2 | 4 | 1 | 3 = 0
+Base = Chrono Assassin = 4 | 1 | 2 | 3 | 1 | 2 | 3 | 1 | 2 | 3 | 1 | 2 | 3 | 1 | 2 | 3 | 3 | 2 | 1 | 2 = 0
+Base = Chrono Chaorruptor = 5 | 2 | 3 | 1 | 1 | 1 | 3 | 1 | 4 | 3 | 1 | 1 | 1 | 3 | 1 | 4 = 0
+Base = Chrono Commandant = 4 | 1 | 1 | 1 | 1 | 2 | 3 = 0
+Base = Chrono DataKnight = 1 | 2 | 3 | 1 | 2S | 3S | 1 | 2S | 3S | 1 | 4 = 0
+Base = Chrono DragonKnight = 1 | 1 | 1 | 1 | 1 | 4 | 2 | 3 = 0
+Base = Chunin = 1 | 2 | 4 | 3 = 0
+Base = Classic Alpha Pirate = 4 | 1 | 3 | 2 = Use if Available
+Base = Classic Barber = 4 | 1 | 3 | 2 = 0
+Base = Classic Defender = 2 | 3 | 2 | 4 | 3 = 0
+Base = Classic DoomKnight = 4 | 3 | 1 | 2 | 3 | 1 | 4 | 1 | 3H<50S = 0
+Base = Classic Dragonlord = 2 | 3 | 1 | 1 | 4 = 0
+Base = Classic Exalted Soul Cleaver = 1 | 2 | 3 | 4 = Use if Available
+Base = Classic Guardian = 1 | 2 | 3 | 4 = Use if Available
+Base = Classic Legion DoomKnight = 1 | 2 | 3 | 4 = Use if Available
+Base = Classic Paladin = 1 | 2 | 3 | 4 = Use if Available
+Base = Classic Pirate = 1 | 2 | 3 | 4 = Use if Available
+Base = Classic Soul Cleaver = 1 | 2 | 3 | 4 = Use if Available
+Base = ClawSuit = 1 | 2 | 3 | 4 = Use if Available
+Solo = Corrupted Chronomancer = 5 | 2 | 3 | 1 | 1 | 1 | 3 | 1 | 4 = 0
+Farm = Corrupted Chronomancer = 5 | 3 | 1 | 1 | 3 | 1 | 1 | 3 | 1 | 4 | 2 Timeout: 250 = Use if Available
+Base = Cryomancer = 3 | 1 | 2 | 4 | 1 | 2 | 1 | 2 = 0
+Base = Cryomancer Mini Pet Coming Soon = 3 | 1 | 2 | 4 | 1 | 2 | 1 | 2 = 0
+Farm = Daimon = 1 | 3 | 2H<50S = Use if Available
+Base = Dark BattleMage = 2 | 3 | 4 | 2 | 3 | 4 = 0
+Base = Dark Caster = 1 | 2 | 3 | 4 = Use if Available
+Base = Dark Chaos Berserker = 4 | 3 | 1 | 2 = 0
+Base = Dark Cryomancer = 3 | 1 | 2 | 4 | 1 | 2 | 1 | 2 = 0
+Base = Dark Harbinger = 1 | 2 | 3 | 4 = Use if Available
+Base = Dark Legendary Hero = 1 | 4H>50S | 2 | 3 | 2 = 0
+Base = Dark Lord = 1 | 2 | 3 | 4 = Use if Available
+Base = Dark Master of Moglins = 2 | 2 | 3 | 1 | 4 = Use if Available
+Base = Dark Metal Necro = 1 | 4H>50S | 2 | 3 | 2 = 0
+Base = Dark Ultra OmniNight = 1 | 2 | 3 | 4 = Use if Available
+Base = Darkblood StormKing = 1 | 2 | 3 | 4 = Use if Available
+Base = Darkside = 1 | 2 | 3 | 4 = Use if Available
+Base = DeathKnight = 1 | 2 | 3 | 4 = Use if Available
+Base = DeathKnight Lord = 1 | 2 | 3 | 4 = Use if Available
+Base = Defender = 1 | 2 | 3 | 4 = Use if Available
+Base = DoomKnight = 1 | 2 | 3 | 4 = Use if Available
+Base = DoomKnight OverLord = 1 | 2 | 3 | 4 = Use if Available
+Base = Dragon Knight = 1 | 2 | 3 | 4 = Use if Available
+Farm = Dragon of Time = 1 | 2 | 3 | 2 | 4 = 0
+Solo = Dragon of Time = 1 | 2 | 4 | 3 | 2 = 0
+Base = Dragon Shinobi = 1 | 2 | 3 | 4 = Use if Available
+Base = Dragonlord = 1 | 2 | 3 | 4 = Use if Available
+Base = Dragonslayer = 1 | 2 | 3 | 4 = Use if Available
+Base = Dragonslayer General = 1 | 2 | 3 | 4 = Use if Available
+Base = DragonSoul Shinobi = 1 | 2 | 3 | 4 = Use if Available
+Base = Drakel Warlord = 1 | 2 | 3 | 4 = Use if Available
+Base = Elemental Dracomancer = 3 | 4 | 2 | 1 = Use if Available
+Base = Empyrean Chronomancer = 4 | 1 | 4 | 1 | 4 | 1 | 4 | 1 | 4 | 1 | 4 | 1 | 2 | 3 | 4 | 1 | 4 | 1 | 4 | 1 | 4 | 1 | 4 | 1 | 4 | 1 | 4 | 1 | 1 | 2 | 3 | 4 | 1 | 4 | 1 | 4 | 1 | 4 | 1 | 4 | 2 | 3 = 0
+Base = Enchanted Vampire Lord = 2 | 4 | 3 | 1 | 1 | 3 = 0
+Base = Enforcer = 1 | 2 | 3 | 4 = Use if Available
+Base = Eternal Chronomancer = 4 | 1 | 4 | 1 | 4 | 1 | 4 | 1 | 4 | 1 | 4 | 1 | 2 | 3 | 4 | 1 | 4 | 1 | 4 | 1 | 4 | 1 | 4 | 1 | 4 | 1 | 4 | 1 | 1 | 2 | 3 | 4 | 1 | 4 | 1 | 4 | 1 | 4 | 1 | 4 | 2 | 3 = 0
+Farm = Eternal Inversionist = 2 | 4 | 1 | 3 = Use if Available
+Base = Evolved ClawSuit = 3 | 4 | 2 | 5 | 2 | 4 | 2 | 2 = 0
+Base = Evolved Dark Caster = 4 | 5 | 3 | 2 = 0
+Base = Evolved Leprechaun = 5 | 4 | 2 | 3 = 0
+Base = Evolved Pumpkin Lord = 3 | 4 | 2 | 1 = 0
+Base = Exalted Harbinger = 4 | 4 | 4 | 3 | 1 | 2H<30S = 0
+Base = Exalted Soul Cleaver = 2 | 3 | 2 | 2 | 3 = 0
+Base = FireLord Summoner = 3 | 2 | 1 | 4 = 0
+Base = Flame Dragon Warrior = 1 | 2 | 3 | 4 = Use if Available
+Base = Frost SpiritReaver = 1 | 2 | 3 | 4 = Use if Available
+Supp = Frostval Barbarian = 3 | 1 | 2 = Use if Available
+Farm = Frostval Barbarian = 4 | 1 | 4 | 2 | 4 = Use if Available
+Base = Giftbox = 1 | 2 | 3 | 4 = Use if Available
+Base = Glacial Berserker = 1 | 3 | 2 | 4 = 0
+Base = Glacial Berserker Test = 1 | 3 | 2 | 4 = 0
+Base = Glacial Warlord = 1 | 2 | 3 | 4 = Use if Available
+Base = Great Thief = 2 | 3 | 4 | 2 = 0
+Base = Grim Necromancer = 1 | 2 | 3 | 4 = Use if Available
+Base = Grunge Rocker = 1 | 2 | 3 | 4 = Use if Available
+Base = Guardian = 1 | 2 | 3 | 4 = Use if Available
+Base = Healer = 1 | 2H<50S | 3 H<50 M>50S | 4 = Use if Available
+Base = Healer (Rare) = 1 | 2H<50S | 3 | 4 = Use if Available
+Base = Heavy Metal Necro = 1 | 4H>50S | 2 | 3 | 2 = 0
+Base = Heavy Metal Rockstar = 1 | 4H>50S | 2 | 3 | 2 = 0
+Base = Heroic Naval Commander = 3WW10000 | 4 | 2 | 1 = 0
+Base = HighSeas Commander = 1 | 4WW15000 | 3 | 2 = 0
+Base = Hobo Highlord = 1 = Use if Available
+Base = Horc Evader = 1 | 2 | 3 | 4 = Use if Available
+Base = Immortal Chronomancer = 4 | 1 | 4 | 1 | 4 | 1 | 4 | 1 | 4 | 1 | 4 | 1 | 2 | 3 | 4 | 1 | 4 | 1 | 4 | 1 | 4 | 1 | 4 | 1 | 4 | 1 | 4 | 1 | 1 | 2 | 3 | 4 | 1 | 4 | 1 | 4 | 1 | 4 | 1 | 4 | 2 | 3 = 0
+Base = Immortal Dark Caster = 1 | 2 | 3 | 4 = Use if Available
+Base = Imperial Chunin = 1 | 2 | 3 | 4 = Use if Available
+Base = Infinite Dark Caster = 1 | 2 | 3 | 4 = Use if Available
+Base = Infinite Legion Dark Caster = 1 | 2 | 3 | 4 = Use if Available
+Base = Infinity Knight = 1 | 2 | 3 | 4 = Use if Available
+Base = Infinity Titan = 4M>50S | 2S | 3H<50S | 2S | 3H<50S | 1 | 1 = Use if Available
+Base = Interstellar Knight = 1 | 2 | 3 | 4 = Use if Available
+Base = Legendary ArchFiend = 1 | 2 | 3 | 4 = Use if Available
+Atk = Legendary Elemental Warrior = 1 | 3 | 4 | 1 | 2 | 1 | 3 | 1 | 2 = 0
+Def = Legendary Elemental Warrior = 1 | 3 | 2 | 1 | 2 | 3 | = Use if Available
+Base = Legendary Hero = 1 | 2 | 3 | 4 = Use if Available
+Base = Legendary Naval Commander = 3WW10000 | 4 | 2 | 1 = 0
+Base = Legion BladeMaster Assassin = 1 | 2 | 3 | 4 = Use if Available
+Base = Legion DoomKnight = 1 | 2 | 3 | 4 = Use if Available
+Base = Legion DoomKnight Tester = 1 | 2 | 3 | 4 = Use if Available
+Base = Legion Evolved Dark Caster = 1 | 2 | 3 | 4 = Use if Available
+Base = Legion Paladin = 1 | 2 | 3 | 4 = Use if Available
+Base = Legion Revenant = 3 | 4 | 1 | 2 = Use if Available
+Base = Legion Revenant Member Test = 3 | 4 | 1 | 2 = Use if Available
+Base = Legion SwordMaster Assassin = 1 | 2 | 3 | 4 = Use if Available
+Base = Leprechaun = 1 | 2 | 3 | 4 = Use if Available
+Base = LightCaster = 3 | 1 | 2 | 4 = Use if Available
+Base = LightCaster Test = 3 | 4 | 1 | 2 | 1 | 2 | 1 | 2 = Use if Available
+Base = LightMage = 3 | 4 | 1 | 2 = 0
+Base = Lord Of Order = 2S | 4S | 1S | 3S = Use if Available
+Base = Love Caster = 1 | 2 | 3 | 4 = Use if Available
+Base = Lycan = 4 | 3 | 2 | 1 | 2 | 1 = 0
+Base = Mage = 2 | 1 | 3 | 4 = Use if Available
+Base = Mage (Rare) = 2 | 1 | 3 | 4 = Use if Available
+Base = Master of Moglins = 2 | 2 | 3 | 1 | 4 = Use if Available
+Base = Master Ranger = 1 | 2 | 3 | 4 = Use if Available
+Base = MechaJouster = 1 | 2 | 3 | 4 = Use if Available
+Base = MindBreaker = 1 | 2 | 3 | 4 = Use if Available
+Base = Mystical Dark Caster = 1 | 2 | 3 | 4 = Use if Available
+Base = Naval Commander = 3WW10000 | 4 | 2 | 1 = 0
+Base = Nechronomancer = 1 | 2 | 3S | 4 = Use if Available
+Base = Necromancer = 1 | 2 | 4 | 1 | 2 | 1 | 3 | 1 | 1 | 3 = Use if Available
+Base = Necrotic Chronomancer = 1 | 2 | 4 | 1 | 2 | 1 | 3 | 1 | 1 | 3 = Use if Available
+Base = Ninja = 1 | 2 | 3 | 4 = Use if Available
+Base = Ninja Warrior = 1 | 2 | 3 | 4 = Use if Available
+Base = Northlands Monk = 1 | 2 | 3 | 4 = Use if Available
+Base = NOT A MOD = 1 | 2 | 3 | 4 = Use if Available
+Base = Nu Metal Necro = 1 | 2 | 3 | 4 = Use if Available
+Base = Oracle = 1 | 2 | 3 | 4 = Use if Available
+Base = Paladin = 1 | 2 | 3 | 4 = Use if Available
+Base = Paladin Highlord = 4 | 1 | 3 | 2 H<60 = 0
+Base = PaladinSlayer = 1 | 2 | 3 | 4 = Use if Available
+Base = Pink Romancer = 1 | 2 | 3 | 4 = Use if Available
+Base = Pinkomancer = 1 | 2 | 3 | 4 = Use if Available
+Base = Pirate = 1 | 2 | 3 | 4 = Use if Available
+Base = Prismatic ClawSuit = 1 | 2 | 3 | 4 = Use if Available
+Base = ProtoSartorium = 1 | 2 | 3 | 4 = Use if Available
+Base = Psionic MindBreaker = 1 | 2M<25S | 3 | 1 | 4 = 0
+Base = Pumpkin Lord = 1 | 2 | 3 | 4 = Use if Available
+Base = PvP Test  |  Bard = 4 | 1 | 3 | 2 = 0
+Base = PvP Test  |  Healer = 4 | 1 | 3 | 2 = 0
+Base = Pyromancer = 2WW20000 | 1 | 4 | 1 | 2 = 0
+Base = Renegade = 1 | 2 | 3 | 4 = Use if Available
+Base = Rogue = 2 | 3 | 1 | 4 = Use if Available
+Base = Rogue (Rare) = 2 | 3 | 1 | 4 = Use if Available
+Base = Royal BattleMage = 1 | 2 | 3 | 4 = Use if Available
+Base = Royal Vampire Lord = 2 | 4 | 3 | 1 | 1 | 3 = 0
+Base = Rustbucket = 4 | 1 | 3 | 2 = 0
+Base = Sakura Cryomancer = 3 | 1 | 2 | 4 | 1 | 2 | 1 | 2 = 0
+Base = Scarlet Sorceress = 4 | 1 | 2 | 3 = 0
+Base = Sentinel = 1 | 2 | 3 | 4 = Use if Available
+Base = Shadow Dragon Shinobi = 1 | 2 | 3 | 4 = Use if Available
+Base = Shadow Ripper = 1 | 2 | 3 | 4 = Use if Available
+Base = Shadow Rocker = 1 | 2 | 3 | 4 = Use if Available
+Base = ShadowFlame DragonLord = 1 | 2 | 3 | 4 = Use if Available
+Base = ShadowScythe General = 1 | 2 | 3 | 4 = Use if Available
+Solo = ShadowStalker of Time = 3 | 2 | 4 | 1 | 2 | 1 | 2 | 1 | 4 | 2 | 3 | 1 | 2 | 1 | 2 = 0
+Def = ShadowStalker of Time = 3 | 2 | 1 | 4 | 2 | 1 | 1 | 2 = 0
+Solo = ShadowWalker of Time = 3 | 2 | 4 | 1 | 2 | 1 | 2 | 1 | 4 | 2 | 3 | 1 | 2 | 1 | 2 = 0
+Def = ShadowWalker of Time = 3 | 2 | 1 | 4 | 2 | 1 | 1 | 2 = 0
+Solo = ShadowWeaver of Time = 3 | 2 | 4 | 1 | 2 | 1 | 2 | 1 | 4 | 2 | 3 | 1 | 2 | 1 | 2 = 0
+Def = ShadowWeaver of Time = 3 | 2 | 1 | 4 | 2 | 1 | 1 | 2 = 0
+Base = Shaman = 4 | 1 | 4 | 1 | 4 | 1 | 4 | 1 | 4 | 1 | 2 | 3 = 0
+Base = Silver Paladin = 1 | 2 | 3 | 4 = Use if Available
+Base = SkyCharged Grenadier = 1 | 2 | 3 | 4 = Use if Available
+Base = SkyGuard Grenadier = 1 | 2 | 3 | 4 = Use if Available
+Base = Sorcerer = 4 | 4 | 4 | 2 | 1 | 3 = 0
+Base = Soul Cleaver = 1 | 2 | 3 | 4 = Use if Available
+Def = Star Captain = 2 | 1S | 2S | 3S | 4 | 2 | Timeout:300 = Use if Available
+Atk = Star Captain = 3 | 1S | 2S | 3S | 4 | 3 | Timeout:300 = Use if Available
+Solo = Star Captain = 1 | 1S | 2S | 3S | 4 | 1 | Timeout:300 = Use if Available
+Base = StarLord = 1 | 2 | 3 | 4 = Use if Available
+Solo = StoneCrusher = 4M>50S | 2S | 3H<50S | 2S | 3H<50S | 1 | 1 = Use if Available
+Base = StoneCrusher = 2 | 3 | 1 | 4 = 0
+Base = SwordMaster = 1 | 2 | 3 | 4 = Use if Available
+Base = SwordMaster Assassin = 1 | 2 | 3 | 4 = Use if Available
+Base = The Collector = 1WW20000 | 3 | 4 | 1 = 0
+Base = Thief of Hours = 4 | 1 | 3 | 2 = 0
+Base = TimeKeeper = 2 | 4 | 1 | 1 | 1 | 4 | 3 | 1 | 2 | 4 | 1 | 1 | 1 | 4 | 3 = 0
+Base = TimeKiller = 2 | 4 | 1 | 1 | 1 | 4 | 3 | 1 | 2 | 4 | 1 | 1 | 1 | 4 | 3 = 0
+Solo = Timeless Chronomancer = 5 | 2 | 3 | 1 | 1 | 1 | 3 | 1 | 4 = 0
+Farm = Timeless Chronomancer = 5 | 3 | 1 | 1 | 3 | 1 | 1 | 3 | 1 | 4 | 2 Timeout: 250 = Use if Available
+Base = Timeless Dark Caster = 1 | 2 | 3 | 4 = Use if Available
+Base = Troll Spellsmith = 1 | 2 | 3 | 4 = Use if Available
+Base = Troubador of Love = 1 | 2 | 3 | 4 = Use if Available
+Atk = Ultra Elemental Warrior = 1 | 3 | 4 | 1 | 2 | 1 | 3 | 1 | 2 = 0
+Def = Ultra Elemental Warrior = 1 | 3 | 2 | 1 | 2 | 3 | = Use if Available
+Base = Ultra OmniKnight = 1 | 2 | 3 | 4 = Use if Available
+Base = Unchained Rocker = 1 | 2 | 3 | 4 = Use if Available
+Base = Unchained Rockstar = 1 | 2 | 3 | 4 = Use if Available
+Base = Undead Goat = 1 | 2 | 3 | 4 = Use if Available
+Base = Undead Leperchaun = 1 | 2 | 3 | 4 = Use if Available
+Base = UndeadSlayer = 1 | 3 | 2H<50S = 0
+Base = Underworld Chronomancer = 5 | 2 | 3 | 1 | 1 | 1 | 3 | 1 | 4 | 3 | 1 | 1 | 1 | 3 | 1 | 4 = 0
+Base = Unlucky Leperchaun = 1 | 2 | 3 | 4 = Use if Available
+Base = Vampire = 2 | 4 | 3 | 1 = 0
+Base = Vampire Lord = 2 | 4 | 3 | 1 | 1 | 3 = 0
+Base = Vindicator Of They = 1WW20000 | 3 | 4 | 1 = 0
+Atk = Void Highlord = 3H>25S | 4 | 2 | 1H>25S | 3H>25S | 2 | 1H>25S | 3H>25S | 2 | 1H>25S = 0
+Def = Void Highlord = 4 | 2 | 1 = Use if Available
+Atk = Void Highlord (IoDA) = 3H>25S | 4 | 2 | 1H>25S | 3H>25S | 2 | 1H>25S | 3H>25S | 2 | 1H>25S = 0
+Def = Void Highlord (IoDA) = 4 | 2 | 1 = Use if Available
+Base = Void Highlord Tester = 3 | 2 | 4 | 3 | 2 | 1 | 3 | 2 | 1 = 0
+Def = Void Highlord Tester = 4 | 2 | 1 = Use if Available
+Base = Warlord = 1 | 2 | 3 | 4 = Use if Available
+Base = Warrior = 1 | 2 | 3 | 4 = Use if Available
+Base = Warrior (Rare) = 1 | 2 | 3 | 4 = Use if Available
+Base = WarriorScythe General = 1 | 2 | 3 | 4 = Use if Available
+Base = Witch = 1 | 2 | 3 | 4 = Use if Available
+Def = Yami no Ronin = 2 | 1 | 1 | 2 | 1 | 4M>50 = 0
+Atk = Yami no Ronin = 3 | 2 | 3 | 3 | 1 | 3 | 1 | 4 = 0

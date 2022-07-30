@@ -74,10 +74,6 @@ public interface IScriptOption : INotifyPropertyChanged
     /// </summary>
     bool DisableFX { get; set; }
     /// <summary>
-    /// The bot will ensure the player is not in combat before attempting to turn in a quest.
-    /// </summary>
-    bool ExitCombatBeforeQuest { get; set; }
-    /// <summary>
     /// Maximum tries for Ensure (like <see cref="IScriptInventory.EnsureToBank(int)"/>) methods.
     /// </summary>
     int MaximumTries { get; set; }
