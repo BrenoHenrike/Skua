@@ -11,35 +11,7 @@ internal class MainMenu
 {
     internal static MainMenuViewModel CreateViewModel(IServiceProvider s)
     {
-        IWindowService windowService = s.GetRequiredService<IWindowService>();
-
-        //windowService.RegisterManagedWindow("About", s.GetRequiredService<AboutViewModel>());
-        windowService.RegisterManagedWindow("Scripts", s.GetRequiredService<ScriptLoaderViewModel>());
-
-        windowService.RegisterManagedWindow("Game", s.GetRequiredService<GameOptionsViewModel>());
-        windowService.RegisterManagedWindow("Application", s.GetRequiredService<ApplicationOptionsViewModel>());
-        windowService.RegisterManagedWindow("CoreBots", s.GetRequiredService<CoreBotsViewModel>());
-
-        windowService.RegisterManagedWindow("Runtime", s.GetRequiredService<RuntimeHelpersViewModel>());
-        windowService.RegisterManagedWindow("Fast Travel", s.GetRequiredService<FastTravelViewModel>());
-        windowService.RegisterManagedWindow("Current Drops", s.GetRequiredService<CurrentDropsViewModel>());
-
-        windowService.RegisterManagedWindow("Loader", s.GetRequiredService<LoaderViewModel>());
-        windowService.RegisterManagedWindow("Grabber", s.GetRequiredService<GrabberViewModel>());
-        windowService.RegisterManagedWindow("Stats", s.GetRequiredService<ScriptStatsViewModel>());
-        windowService.RegisterManagedWindow("Console", s.GetRequiredService<ConsoleViewModel>());
-        
-        windowService.RegisterManagedWindow("Skills", s.GetRequiredService<AdvancedSkillsViewModel>());
-        
-        windowService.RegisterManagedWindow("Spammer", s.GetRequiredService<PacketSpammerViewModel>());
-        windowService.RegisterManagedWindow("Logger", s.GetRequiredService<PacketLoggerViewModel>());
-        windowService.RegisterManagedWindow("Interceptor", s.GetRequiredService<PacketInterceptorViewModel>());
-        
-        windowService.RegisterManagedWindow("Logs", s.GetRequiredService<LogsViewModel>());
-        
-        windowService.RegisterManagedWindow("Plugins", s.GetRequiredService<PluginsViewModel>());
-
-        windowService.RegisterManagedWindow("Application Themes", s.GetRequiredService<ApplicationThemesViewModel>());
+        ManagedWindows.Register(s);
 
         List<MainMenuItemViewModel> menuItems = new()
         {
@@ -75,6 +47,6 @@ internal class MainMenu
             new("Logs")
         };
 
-        return new MainMenuViewModel(menuItems, s.GetRequiredService<AutoViewModel>(), s.GetRequiredService<JumpViewModel>(), windowService);
+        return new MainMenuViewModel(menuItems, s.GetRequiredService<AutoViewModel>(), s.GetRequiredService<JumpViewModel>(), s.GetRequiredService<IWindowService>());
     }
 }
