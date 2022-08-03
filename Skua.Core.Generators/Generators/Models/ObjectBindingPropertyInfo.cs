@@ -7,6 +7,7 @@ public sealed record ObjectBindingPropertyInfo(
     string FieldName,
     string PropertyName,
     string PropertyType,
+    bool IsNullable,
     bool NotifyProp,
     ObjectBindingValues Values)
 {

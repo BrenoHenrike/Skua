@@ -6,7 +6,8 @@ namespace Skua.Core.Generators.Models;
 public sealed record MethodCallBindingPropertyInfo(
     string MethodName,
     string NewMethodName,
-    string ReturnType,
+    string ReturnTypeString,
+    bool IsNullable,
     string MethodParams,
     string[] MethodParamNames,
     string MethodBody,
@@ -22,7 +23,7 @@ public sealed record MethodCallBindingPropertyInfo(
         {
             hashCode.Add(obj.MethodName);
             hashCode.Add(obj.NewMethodName);
-            hashCode.Add(obj.ReturnType);
+            hashCode.Add(obj.ReturnTypeString);
             hashCode.Add(obj.MethodParams);
             hashCode.Add(obj.MethodBody);
             hashCode.Add(obj.Values.Path);
@@ -34,7 +35,7 @@ public sealed record MethodCallBindingPropertyInfo(
             return
                 x.MethodName == y.MethodName &&
                 x.NewMethodName == y.NewMethodName &&
-                x.ReturnType == y.ReturnType &&
+                x.ReturnTypeString == y.ReturnTypeString &&
                 x.MethodParams == y.MethodParams &&
                 x.MethodBody == y.MethodBody &&
                 x.Values.Path == y.Values.Path;
