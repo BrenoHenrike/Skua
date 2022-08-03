@@ -19,14 +19,14 @@ public class CallBindingGenerator : GenericFieldAttributeGenerator<CallBindingPr
             CallBindingPropertyInfo.Comparer.Default) { }
     protected override void GenerateProperties(StringBuilder source, CallBindingPropertyInfo info)
     {
-        string defaultValue = info.Values.Default is not null ? info.Values.Default : Default.Get(info.PropertyType);
+        bool hasDefault = info.Values.Default is not null;
         source.Append($"public {info.PropertyType} {info.PropertyName}{{get{{");
         if(info.Values.Get)
         {
             source.Append("try{");
             source.Append($"{info.PropertyType} returnValue = Flash.Call<{info.PropertyType}>(\"{info.Values.Path}\");");
-            source.Append($"return returnValue{(info.IsNullable ? $" ?? {defaultValue}" : string.Empty)} ;");
-            source.Append($"}}catch{{return {defaultValue};}}");
+            source.Append("return returnValue;");
+            source.Append($"}}catch{{return {(hasDefault ? info.Values.Default : "default")};}}");
         }
         else
         {
@@ -65,7 +65,6 @@ public class CallBindingGenerator : GenericFieldAttributeGenerator<CallBindingPr
 
         // Get the property type and name
         string typeNameWithNullabilityAnnotations = fieldSymbol.Type.GetFullyQualifiedNameWithNullabilityAnnotations();
-        bool isNullable = fieldSymbol.Type.NullableAnnotation == NullableAnnotation.Annotated;
         string fieldName = fieldSymbol.Name;
         string propertyName = Execute.GetGeneratedPropertyName(fieldSymbol);
         bool notifyProp = Execute.HasNotifyPropertyChanged(fieldSymbol);
@@ -106,7 +105,6 @@ public class CallBindingGenerator : GenericFieldAttributeGenerator<CallBindingPr
             fieldName,
             propertyName,
             typeNameWithNullabilityAnnotations,
-            isNullable,
             notifyProp,
             new CallBindingValues(path, defaultValue, useValue, get, set, hasSetter));
     }

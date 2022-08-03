@@ -24,7 +24,6 @@ public partial class ObjectBindingGenerator : GenericFieldAttributeGenerator<Obj
 
         // Get the property type and name
         string typeNameWithNullabilityAnnotations = fieldSymbol.Type.GetFullyQualifiedNameWithNullabilityAnnotations();
-        bool isNullable = fieldSymbol.Type.NullableAnnotation == NullableAnnotation.Annotated;
         string fieldName = fieldSymbol.Name;
         string propertyName = Execute.GetGeneratedPropertyName(fieldSymbol);
         bool notifyProp = Execute.HasNotifyPropertyChanged(fieldSymbol);
@@ -67,19 +66,18 @@ public partial class ObjectBindingGenerator : GenericFieldAttributeGenerator<Obj
             fieldName,
             propertyName,
             typeNameWithNullabilityAnnotations,
-            isNullable,
             notifyProp,
             new ObjectBindingValues(paths, get, set, select, requireNotNull, defaultValue, isStatic, hasSetter));
     }
 
     protected override void GenerateProperties(StringBuilder source, ObjectBindingPropertyInfo info)
     {
-        string defaultValue = info.Values.Default is not null ? info.Values.Default : Default.Get(info.PropertyType);
+        bool hasDefault = info.Values.Default is not null;
         source.Append($"public {info.PropertyType} {info.PropertyName}{{get{{");
         if (info.Values.Get)
         {
             if (info.Values.RequireNotNull is not null)
-                source.Append($"if (Flash.IsNull(\"{info.Values.RequireNotNull}\")) return {defaultValue};");
+                source.Append($"if (Flash.IsNull(\"{info.Values.RequireNotNull}\")) return {(info.Values.Default is not null ? info.Values.Default : "default")};");
             
             source.Append("try{");
             if (info.Values.Select is not null)
@@ -87,8 +85,8 @@ public partial class ObjectBindingGenerator : GenericFieldAttributeGenerator<Obj
             else
                 source.Append($"{info.PropertyType} returnValue = Flash.{(info.Values.IsStatic ? "GetGameObjectStatic" : "GetGameObject")}<{info.PropertyType}>(\"{info.Values.Paths[0]}\");");
 
-            source.Append($"return returnValue{(info.IsNullable ? $"?? {defaultValue}" : string.Empty)};");
-            source.Append($"}}catch{{return {defaultValue};}}");
+            source.Append("return returnValue;");
+            source.Append($"}}catch{{return {(hasDefault ? info.Values.Default : "default")};}}");
         }
         else
         {

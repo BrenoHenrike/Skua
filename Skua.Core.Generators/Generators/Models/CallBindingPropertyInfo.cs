@@ -13,7 +13,6 @@ public sealed record CallBindingPropertyInfo(
     string FieldName,
     string PropertyName,
     string PropertyType,
-    bool IsNullable,
     bool NotifyProp,
     CallBindingValues Values)
 {
