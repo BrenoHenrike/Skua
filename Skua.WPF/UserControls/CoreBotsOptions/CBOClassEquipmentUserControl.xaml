@@ -1,0 +1,98 @@
+﻿<UserControl
+    x:Class="Skua.WPF.UserControls.CBOClassEquipmentUserControl"
+    xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+    xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+    xmlns:local="clr-namespace:Skua.WPF.UserControls"
+    xmlns:materialDesign="http://materialdesigninxaml.net/winfx/xaml/themes"
+    xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+    xmlns:vms="clr-namespace:Skua.Core.ViewModels;assembly=Skua.Core"
+    d:DataContext="{d:DesignInstance vms:CBOClassEquipmentViewModel}"
+    d:DesignHeight="450"
+    d:DesignWidth="800"
+    mc:Ignorable="d">
+    <UserControl.Resources>
+        <Style BasedOn="{StaticResource MaterialDesignComboBox}" TargetType="ComboBox">
+            <Setter Property="Margin" Value="0,3" />
+        </Style>
+    </UserControl.Resources>
+    <Grid>
+        <Grid.ColumnDefinitions>
+            <ColumnDefinition />
+            <ColumnDefinition />
+        </Grid.ColumnDefinitions>
+        <Grid.RowDefinitions>
+            <RowDefinition Height="auto" />
+            <RowDefinition Height="auto" />
+        </Grid.RowDefinitions>
+        <Button
+            Grid.ColumnSpan="2"
+            Command="{Binding RefreshInventoryCommand}"
+            Content="Refresh Inventory" />
+
+        <GroupBox
+            Grid.Row="1"
+            Grid.Column="0"
+            Margin="0,6,3,0"
+            Header="Solo Class Equipment">
+            <StackPanel>
+                <ComboBox
+                    materialDesign:HintAssist.Hint="Helm"
+                    ItemsSource="{Binding Helms}"
+                    SelectedItem="{Binding SelectedSoloHelm}" />
+                <ComboBox
+                    materialDesign:HintAssist.Hint="Armor"
+                    ItemsSource="{Binding Armors}"
+                    SelectedItem="{Binding SelectedSoloArmor}" />
+                <ComboBox
+                    materialDesign:HintAssist.Hint="Cape"
+                    ItemsSource="{Binding Capes}"
+                    SelectedItem="{Binding SelectedSoloCape}" />
+                <ComboBox
+                    materialDesign:HintAssist.Hint="Weapon"
+                    ItemsSource="{Binding Weapons}"
+                    SelectedItem="{Binding SelectedSoloWeapon}" />
+                <ComboBox
+                    materialDesign:HintAssist.Hint="Pet"
+                    ItemsSource="{Binding Pets}"
+                    SelectedItem="{Binding SelectedSoloPet}" />
+                <ComboBox
+                    materialDesign:HintAssist.Hint="Ground Item"
+                    ItemsSource="{Binding GroundItems}"
+                    SelectedItem="{Binding SelectedSoloGroundItem}" />
+            </StackPanel>
+        </GroupBox>
+        <GroupBox
+            Grid.Row="1"
+            Grid.Column="1"
+            Margin="3,6,0,0"
+            Header="Farm Class Equipment">
+            <StackPanel>
+                <ComboBox
+                    materialDesign:HintAssist.Hint="Helm"
+                    ItemsSource="{Binding Helms}"
+                    SelectedItem="{Binding SelectedFarmHelm}" />
+                <ComboBox
+                    materialDesign:HintAssist.Hint="Armor"
+                    ItemsSource="{Binding Armors}"
+                    SelectedItem="{Binding SelectedFarmArmor}" />
+                <ComboBox
+                    materialDesign:HintAssist.Hint="Cape"
+                    ItemsSource="{Binding Capes}"
+                    SelectedItem="{Binding SelectedFarmCape}" />
+                <ComboBox
+                    materialDesign:HintAssist.Hint="Weapon"
+                    ItemsSource="{Binding Weapons}"
+                    SelectedItem="{Binding SelectedFarmWeapon}" />
+                <ComboBox
+                    materialDesign:HintAssist.Hint="Pet"
+                    ItemsSource="{Binding Pets}"
+                    SelectedItem="{Binding SelectedFarmPet}" />
+                <ComboBox
+                    materialDesign:HintAssist.Hint="Ground Item"
+                    ItemsSource="{Binding GroundItems}"
+                    SelectedItem="{Binding SelectedFarmGroundItem}" />
+            </StackPanel>
+        </GroupBox>
+    </Grid>
+</UserControl>

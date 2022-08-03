@@ -10,6 +10,6 @@ public static class DecamelizationService
 
     public static string Decamelize(string text, DecamelizeOptions? options)
     {
-        return ServiceProvider.Current.GetService<IDecamelizer>().Decamelize(text, options);
+        return PropertyGridServiceProvider.Current.GetService<IDecamelizer>().Decamelize(text, options);
     }
 }

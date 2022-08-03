@@ -6,7 +6,7 @@ public static class ConversionService
     public static bool TryChangeType<T>(object input, IFormatProvider provider, out T value)
     {
         object v;
-        bool b = ServiceProvider.Current.GetService<IConverter>().TryChangeType(input, typeof(T), provider, out v);
+        bool b = PropertyGridServiceProvider.Current.GetService<IConverter>().TryChangeType(input, typeof(T), provider, out v);
         if (!b)
         {
             if (v == null)
@@ -42,7 +42,7 @@ public static class ConversionService
 
     public static bool TryChangeType(object input, Type conversionType, IFormatProvider provider, out object value)
     {
-        return ServiceProvider.Current.GetService<IConverter>().TryChangeType(input, conversionType, provider, out value);
+        return PropertyGridServiceProvider.Current.GetService<IConverter>().TryChangeType(input, conversionType, provider, out value);
     }
 
     public static object ChangeType(object input, Type conversionType)

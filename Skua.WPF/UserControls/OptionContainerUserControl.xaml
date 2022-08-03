@@ -1,0 +1,151 @@
+﻿<UserControl
+    x:Class="Skua.WPF.UserControls.OptionContainerUserControl"
+    xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+    xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+    xmlns:i="http://schemas.microsoft.com/xaml/behaviors"
+    xmlns:local="clr-namespace:Skua.WPF.UserControls"
+    xmlns:materialDesign="http://materialdesigninxaml.net/winfx/xaml/themes"
+    xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+    xmlns:vms="clr-namespace:Skua.Core.ViewModels;assembly=Skua.Core"
+    xmlns:wpf="clr-namespace:Skua.WPF"
+    d:DesignHeight="450"
+    d:DesignWidth="800"
+    mc:Ignorable="d">
+    <UserControl.Resources>
+        <CollectionViewSource x:Key="OptionsSource" Source="{Binding Options}">
+            <CollectionViewSource.GroupDescriptions>
+                <PropertyGroupDescription PropertyName="Category" />
+            </CollectionViewSource.GroupDescriptions>
+        </CollectionViewSource>
+    </UserControl.Resources>
+    <Grid Grid.IsSharedSizeScope="True">
+        <Grid.RowDefinitions>
+            <RowDefinition />
+            <RowDefinition Height="auto" />
+        </Grid.RowDefinitions>
+        <Border
+            Margin="6,6,6,3"
+            BorderBrush="{DynamicResource PrimaryHueMidBrush}"
+            BorderThickness="1">
+            <ScrollViewer
+                MaxHeight="700"
+                HorizontalScrollBarVisibility="Disabled"
+                VerticalScrollBarVisibility="Auto">
+                <DataGrid
+                    x:Name="OptionsDataGrid"
+                    AutoGenerateColumns="False"
+                    CanUserReorderColumns="False"
+                    CanUserResizeColumns="True"
+                    CanUserResizeRows="False"
+                    FrozenColumnCount="1"
+                    HeadersVisibility="None"
+                    HorizontalScrollBarVisibility="Disabled"
+                    ItemsSource="{Binding Source={StaticResource OptionsSource}}"
+                    MouseLeftButtonUp="DataGrid_MouseLeftButtonUp"
+                    SelectedItem="{Binding SelectedOption}"
+                    SelectionMode="Single"
+                    SelectionUnit="FullRow">
+                    <i:Interaction.Behaviors>
+                        <wpf:ScrollParentBehavior />
+                    </i:Interaction.Behaviors>
+                    <DataGrid.Resources>
+                        <Style BasedOn="{StaticResource MaterialDesignDataGridTextColumnEditingStyle}" TargetType="TextBox" />
+                        <Style BasedOn="{StaticResource MaterialDesignDataGridComboBox}" TargetType="ComboBox" />
+                        <DataTemplate x:Key="EnumTemplate">
+                            <ComboBox
+                                HorizontalAlignment="Stretch"
+                                ItemsSource="{Binding EnumValues}"
+                                SelectedItem="{Binding SelectedValue, UpdateSourceTrigger=PropertyChanged}" />
+                        </DataTemplate>
+                        <DataTemplate x:Key="BoolTemplate">
+                            <CheckBox
+                                HorizontalAlignment="Stretch"
+                                Content="{Binding Value, UpdateSourceTrigger=PropertyChanged}"
+                                IsChecked="{Binding Value, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"
+                                IsThreeState="False" />
+                        </DataTemplate>
+                        <DataTemplate x:Key="StringTemplate">
+                            <TextBox
+                                HorizontalAlignment="Stretch"
+                                HorizontalContentAlignment="Stretch"
+                                Text="{Binding Value, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}">
+                                <i:Interaction.Behaviors>
+                                    <wpf:TextBoxSelectAllBehavior />
+                                </i:Interaction.Behaviors>
+                            </TextBox>
+                        </DataTemplate>
+                    </DataGrid.Resources>
+                    <DataGrid.Columns>
+                        <DataGridTextColumn
+                            Binding="{Binding Option.DisplayName}"
+                            Header="Name"
+                            IsReadOnly="True" />
+                        <DataGridTemplateColumn Width="*" Header="Value">
+                            <DataGridTemplateColumn.CellTemplateSelector>
+                                <wpf:OptionContainerDataTemplateSelector
+                                    BoolTemplate="{StaticResource BoolTemplate}"
+                                    EnumTemplate="{StaticResource EnumTemplate}"
+                                    StringTemplate="{StaticResource StringTemplate}" />
+                            </DataGridTemplateColumn.CellTemplateSelector>
+                        </DataGridTemplateColumn>
+                    </DataGrid.Columns>
+                    <DataGrid.GroupStyle>
+                        <GroupStyle>
+                            <GroupStyle.ContainerStyle>
+                                <Style TargetType="GroupItem">
+                                    <Setter Property="Margin" Value="0,0,0,6" />
+                                    <Setter Property="Template">
+                                        <Setter.Value>
+                                            <ControlTemplate TargetType="GroupItem">
+                                                <Expander IsExpanded="True">
+                                                    <Expander.Header>
+                                                        <TextBlock>
+                                                            <TextBlock.Style>
+                                                                <Style BasedOn="{StaticResource MaterialDesignTextBlock}" TargetType="TextBlock">
+                                                                    <Setter Property="Text" Value="{Binding Name}" />
+                                                                    <Style.Triggers>
+                                                                        <DataTrigger Binding="{Binding Path=Name.Length, FallbackValue=0, TargetNullValue=0}" Value="0">
+                                                                            <Setter Property="Text" Value="Options" />
+                                                                        </DataTrigger>
+                                                                    </Style.Triggers>
+                                                                </Style>
+                                                            </TextBlock.Style>
+                                                        </TextBlock>
+                                                    </Expander.Header>
+                                                    <Expander.Content>
+                                                        <ItemsPresenter />
+                                                    </Expander.Content>
+                                                </Expander>
+                                            </ControlTemplate>
+                                        </Setter.Value>
+                                    </Setter>
+                                </Style>
+                            </GroupStyle.ContainerStyle>
+                        </GroupStyle>
+                    </DataGrid.GroupStyle>
+                </DataGrid>
+            </ScrollViewer>
+        </Border>
+
+        <Border
+            Grid.Row="1"
+            Margin="6,3,6,6"
+            BorderBrush="{DynamicResource PrimaryHueMidBrush}"
+            BorderThickness="1">
+            <StackPanel>
+                <TextBlock
+                    Margin="6,3"
+                    FontSize="14"
+                    FontWeight="Bold"
+                    Text="{Binding SelectedOption.Option.DisplayName}" />
+                <TextBlock
+                    Margin="6,3"
+                    HorizontalAlignment="Stretch"
+                    Text="{Binding SelectedOption.Option.Description}"
+                    TextWrapping="Wrap" />
+            </StackPanel>
+        </Border>
+
+    </Grid>
+</UserControl>

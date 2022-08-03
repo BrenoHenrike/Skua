@@ -6,6 +6,7 @@
     <UseWPF>true</UseWPF>
       <UseWindowsForms>true</UseWindowsForms>
       <Platforms>AnyCPU;x64;x86</Platforms>
+      <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
   </PropertyGroup>
 
   <ItemGroup>
@@ -13,6 +14,7 @@
   </ItemGroup>
 
   <ItemGroup>
+    <PackageReference Include="Caseless.Fody" Version="1.9.1" />
     <PackageReference Include="MaterialDesignThemes" Version="4.5.0" />
     <PackageReference Include="Microsoft.Xaml.Behaviors.Wpf" Version="1.1.39" />
   </ItemGroup>
@@ -22,20 +24,13 @@
   </ItemGroup>
 
   <ItemGroup>
+    <Reference Include="AxInterop.ShockwaveFlashObjects">
+      <HintPath>..\Skua.App.WPF\Assemblies\AxInterop.ShockwaveFlashObjects.dll</HintPath>
+    </Reference>
+  </ItemGroup>
+
+  <ItemGroup>
     <Resource Include="SkuaImage.png" />
-  </ItemGroup>
-
-  <ItemGroup>
-    <Compile Update="PropertyGrid.xaml.cs">
-      <SubType>Code</SubType>
-    </Compile>
-  </ItemGroup>
-
-  <ItemGroup>
-    <Page Update="PropertyGrid.xaml">
-      <XamlRuntime>$(DefaultXamlRuntime)</XamlRuntime>
-      <SubType>Designer</SubType>
-    </Page>
   </ItemGroup>
 
 </Project>

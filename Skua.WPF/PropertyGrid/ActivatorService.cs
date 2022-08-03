@@ -9,7 +9,7 @@ public static class ActivatorService
         if (type == null)
             throw new ArgumentNullException("type");
 
-        object obj = ServiceProvider.Current.GetService<IActivator>().CreateInstance(type, args);
+        object obj = PropertyGridServiceProvider.Current.GetService<IActivator>().CreateInstance(type, args);
         return obj;
     }
 

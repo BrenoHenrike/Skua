@@ -4,12 +4,12 @@ using Skua.Core.Interfaces;
 using Skua.Core.Utils;
 
 namespace Skua.WPF;
-public class ServiceProvider : IServiceProvider
+public class PropertyGridServiceProvider : IServiceProvider
 {
     private readonly ConcurrentDictionary<Type, object> _services = new ConcurrentDictionary<Type, object>();
-    private static readonly ServiceProvider _current = new ServiceProvider();
+    private static readonly PropertyGridServiceProvider _current = new PropertyGridServiceProvider();
 
-    public ServiceProvider()
+    public PropertyGridServiceProvider()
     {
         ResetDefaultServices();
     }
@@ -37,7 +37,7 @@ public class ServiceProvider : IServiceProvider
         }
     }
 
-    public static ServiceProvider Current
+    public static PropertyGridServiceProvider Current
     {
         get
         {
