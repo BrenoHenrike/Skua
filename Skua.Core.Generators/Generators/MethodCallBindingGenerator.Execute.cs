@@ -22,6 +22,7 @@ public partial class MethodCallBindingGenerator
             ImmutableArray<Diagnostic>.Builder builder = ImmutableArray.CreateBuilder<Diagnostic>();
 
             string returnTypeWithNullabilityAnnotation = methodSymbol.ReturnType.GetFullyQualifiedNameWithNullabilityAnnotations();
+            bool isNullable = methodSymbol.ReturnType.NullableAnnotation == NullableAnnotation.Annotated;
             string methodName = methodSymbol.Name;
             string methodBody = methodDeclaration.Body?.ToFullString().TrimStart(' ', '{', '\r', '\n').TrimEnd('}', '\r', '\n') ?? "";
             string methodParams = methodDeclaration.ParameterList.ToFullString();
@@ -63,6 +64,7 @@ public partial class MethodCallBindingGenerator
                 methodName,
                 newMethodName,
                 returnTypeWithNullabilityAnnotation,
+                isNullable,
                 methodParams,
                 methodParamNames,
                 methodBody,
@@ -89,9 +91,10 @@ public partial class MethodCallBindingGenerator
 
         private static void GenerateMethods(StringBuilder source, MethodCallBindingPropertyInfo info)
         {
-            bool isVoid = info.ReturnType.Contains("void");
+            string defaultValue = info.Values.Default is not null ? info.Values.Default : Default.Get(info.ReturnTypeString);
+            bool isVoid = info.ReturnTypeString.Contains("void");
             string paramNames = info.MethodParamNames.Length == 0 ? "" : $", {string.Join(",", info.MethodParamNames)}";
-            source.Append($"public {info.ReturnType} {info.NewMethodName}{info.MethodParams}{{");
+            source.Append($"public {info.ReturnTypeString} {info.NewMethodName}{info.MethodParams}{{");
             if(info.Values.RunMethodPre)
                 source.Append(info.MethodBody);
             if(info.Values.GameFunction)
@@ -103,7 +106,7 @@ public partial class MethodCallBindingGenerator
                 else
                 {
                     source.Append($"try{{string ret = Flash.CallGameFunction(\"{info.Values.Path}\"{paramNames});");
-                    source.Append($"{info.ReturnType} returnValue = Newtonsoft.Json.JsonConvert.DeserializeObject<{info.ReturnType}>(ret);");
+                    source.Append($"{info.ReturnTypeString} returnValue = Newtonsoft.Json.JsonConvert.DeserializeObject<{info.ReturnTypeString}>(ret);");
                 }
             }
             else
@@ -117,19 +120,22 @@ public partial class MethodCallBindingGenerator
                     if(info.Values.ParseFromJson)
                     {
                         source.Append($"try{{string ret = Flash.Call<string>(\"{info.Values.Path}\"{paramNames});");
-                        source.Append($"{info.ReturnType} returnValue = Newtonsoft.Json.JsonConvert.DeserializeObject<{info.ReturnType}>(ret);");
+                        source.Append($"{info.ReturnTypeString} returnValue = Newtonsoft.Json.JsonConvert.DeserializeObject<{info.ReturnTypeString}>(ret);");
                     }
                     else
                     {
-                        source.Append($"try{{{info.ReturnType} returnValue = Flash.Call<{info.ReturnType}>(\"{info.Values.Path}\"{paramNames});");
+                        source.Append($"try{{{info.ReturnTypeString} returnValue = Flash.Call<{info.ReturnTypeString}>(\"{info.Values.Path}\"{paramNames});");
                     }
                 }
             }
             if(info.Values.RunMethodPost && !info.Values.RunMethodPre)
                 source.Append(info.MethodBody);
 
-            if(!isVoid)
-                source.Append($"return returnValue;}}catch{{return {(info.Values.Default is not null ? info.Values.Default : "default")};}}");
+            if (!isVoid)
+            {
+                source.Append($"return returnValue{(info.IsNullable ? $" ?? {defaultValue}" : string.Empty)};");
+                source.Append($"}}catch{{return {defaultValue};}}");
+            }
 
             source.Append("}");
         }
