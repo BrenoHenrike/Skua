@@ -39,7 +39,7 @@ public partial class ScriptHouseInv : IScriptHouseInv
     }
 
     [ObjectBinding("world.myAvatar.houseitems", Default = "new()")]
-    private List<InventoryItem>? _items;
+    private List<InventoryItem> _items;
     [ObjectBinding("world.myAvatar.objData.iHouseSlots")]
     private int _slots;
     [ObjectBinding("world.myAvatar.houseitems.length")]
@@ -53,21 +53,25 @@ public partial class ScriptHouseInv : IScriptHouseInv
         return !((IScriptHouseInv)this).Contains(item.Name);
     }
 
-    public void EnsureToBank(string name)
+    public bool EnsureToBank(string name)
     {
         if (!((IScriptHouseInv)this).TryGetItem(name, out InventoryItem? item))
-            return;
+            return false;
         int i = 0;
         while (!ToBank(item!) && !Manager.ShouldExit && Player.Playing && ++i < Options.MaximumTries)
             Thread.Sleep(Options.ActionDelay);
+
+        return !((IScriptHouseInv)this).Contains(name);
     }
 
-    public void EnsureToBank(int id)
+    public bool EnsureToBank(int id)
     {
         if (!((IScriptHouseInv)this).TryGetItem(id, out InventoryItem? item))
-            return;
+            return false;
         int i = 0;
         while (!ToBank(item!) && !Manager.ShouldExit && Player.Playing && ++i < Options.MaximumTries)
             Thread.Sleep(Options.ActionDelay);
+
+        return !((IScriptHouseInv)this).Contains(id);
     }
 }

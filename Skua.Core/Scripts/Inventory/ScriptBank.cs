@@ -76,18 +76,18 @@ public partial class ScriptBank : IScriptBank
     public bool Swap(string invItem, string bankItem)
     {
         if (((IScriptBank)this).TryGetItem(bankItem, out InventoryItem? bank) && Inventory.TryGetItem(invItem, out InventoryItem? inv))
-            Swap(bank!, inv!);
+            Swap(inv!, bank!);
         return false;
     }
 
     public bool Swap(int invItem, int bankItem)
     {
         if (((IScriptBank)this).TryGetItem(bankItem, out InventoryItem? bank) && Inventory.TryGetItem(invItem, out InventoryItem? inv))
-            return Swap(bank!, inv!);
+            return Swap(inv!, bank!);
         return false;
     }
 
-    public bool Swap(InventoryItem bankItem, InventoryItem invItem)
+    public bool Swap(InventoryItem invItem, InventoryItem bankItem)
     {
         Send.Packet($"%xt%zm%bankSwapInv%{Map.RoomID}%{invItem.ID}%{invItem.CharItemID}%{bankItem.ID}%{bankItem.CharItemID}%");
         if (Options.SafeTimings)
@@ -95,22 +95,34 @@ public partial class ScriptBank : IScriptBank
         return Inventory.Contains(bankItem.ID);
     }
 
-    public void EnsureSwap(string invItem, string bankItem, bool loadBank = true)
+    public bool EnsureSwap(string invItem, string bankItem, bool loadBank = true)
     {
         if (loadBank)
             Load();
+        if (!((IScriptBank)this).TryGetItem(bankItem, out InventoryItem? bank) || !Inventory.TryGetItem(invItem, out InventoryItem? inv))
+            return false;
+        if (inv is null || bank is null)
+            return false;
         int i = 0;
-        while (!Swap(invItem, bankItem) && !Manager.ShouldExit && Player.Playing && ++i < Options.MaximumTries)
+        while (!Swap(inv, bank) && !Manager.ShouldExit && Player.Playing && ++i < Options.MaximumTries)
             Thread.Sleep(Options.ActionDelay);
+
+        return Inventory.Contains(bankItem);
     }
 
-    public void EnsureSwap(int invItem, int bankItem, bool loadBank = true)
+    public bool EnsureSwap(int invItem, int bankItem, bool loadBank = true)
     {
         if (loadBank)
             Load();
+        if (!((IScriptBank)this).TryGetItem(bankItem, out InventoryItem? bank) || !Inventory.TryGetItem(invItem, out InventoryItem? inv))
+            return false;
+        if (inv is null || bank is null)
+            return false;
         int i = 0;
         while (!Swap(invItem, bankItem) && !Manager.ShouldExit && Player.Playing && ++i < Options.MaximumTries)
             Thread.Sleep(Options.ActionDelay);
+
+        return Inventory.Contains(invItem);
     }
 
     public bool ToInventory(InventoryItem item)
@@ -121,21 +133,29 @@ public partial class ScriptBank : IScriptBank
         return Inventory.Contains(item.ID);
     }
 
-    public void EnsureToInventory(string item, bool loadBank = true)
+    public bool EnsureToInventory(string name, bool loadBank = true)
     {
         if (loadBank)
             Load();
+        if (!((IScriptBank)this).TryGetItem(name, out InventoryItem? item))
+            return false;
         int i = 0;
         while (!((IScriptBank)this).ToInventory(item) && !Manager.ShouldExit && Player.Playing && ++i < Options.MaximumTries)
             Thread.Sleep(Options.ActionDelay);
+
+        return Inventory.Contains(name);
     }
 
-    public void EnsureToInventory(int id, bool loadBank = true)
+    public bool EnsureToInventory(int id, bool loadBank = true)
     {
         if (loadBank)
             Load();
+        if (!((IScriptBank)this).TryGetItem(id, out InventoryItem? item))
+            return false;
         int i = 0;
-        while (!((IScriptBank)this).ToInventory(id) && !Manager.ShouldExit && Player.Playing && ++i < Options.MaximumTries)
+        while (!((IScriptBank)this).ToInventory(item) && !Manager.ShouldExit && Player.Playing && ++i < Options.MaximumTries)
             Thread.Sleep(Options.ActionDelay);
+
+        return Inventory.Contains(id);
     }
 }
