@@ -41,7 +41,7 @@ public interface IScriptMap
     /// <summary>
     /// Gets a list of all of the cells in the current map.
     /// </summary>
-    List<string>? Cells { get; }
+    List<string> Cells { get; }
     /// <summary>
     /// Gets a list of player names in the currently loaded map.
     /// </summary>

@@ -1,4 +1,5 @@
-﻿using Skua.Core.Flash;
+﻿using Microsoft.Toolkit.Mvvm.Messaging;
+using Skua.Core.Flash;
 using Skua.Core.Interfaces;
 using Skua.Core.Models.Skills;
 using Skua.Core.Skills;
@@ -142,7 +143,7 @@ public partial class ScriptSkill : IScriptSkill
     {
         while (!token.IsCancellationRequested)
         {
-            if (Options.AttackWithoutTarget || Player.HasTarget)
+            if (!Combat.StopAttacking && (Options.AttackWithoutTarget || Player.HasTarget))
                 _Poll(token);
             _provider?.OnTargetReset();
             if (!token.IsCancellationRequested)
@@ -166,7 +167,7 @@ public partial class ScriptSkill : IScriptSkill
             }
         }
         _lastRank = rank;
-        if (Player.Skills is not null)
+        if (Player.Skills is not null && Player.Skills.Length > 0)
             _lastSkills = Player.Skills;
         if (token.IsCancellationRequested)
             return;
@@ -190,11 +191,11 @@ public partial class ScriptSkill : IScriptSkill
             switch (SkillUseMode)
             {
                 case SkillUseMode.UseIfAvailable:
-                    if (Options.AttackWithoutTarget || CanUseSkill(skill))
+                    if ((Options.AttackWithoutTarget || CanUseSkill(skill)) && !Combat.StopAttacking)
                         this.UseSkill(skill);
                     break;
                 case SkillUseMode.WaitForCooldown:
-                    if (Options.AttackWithoutTarget || (skill != -1 && Wait.ForTrue(() => CanUseSkill(skill), null, SkillTimeout, SkillInterval)))
+                    if (Options.AttackWithoutTarget || (skill != -1 && Wait.ForTrue(() => CanUseSkill(skill), null, SkillTimeout, SkillInterval) && !Combat.StopAttacking))
                         this.UseSkill(skill);
                     break;
             }

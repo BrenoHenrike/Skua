@@ -55,13 +55,13 @@ public interface ICanBank : ICheckInventory<InventoryItem>, ILimitedInventory
     /// </summary>
     /// <param name="name">Name of the item to transfer.</param>
     /// <remarks>It will try <see cref="IScriptOption.MaximumTries"/> then move on even if the transfer was unsuccessful.</remarks>
-    void EnsureToBank(string name);
+    bool EnsureToBank(string name);
     /// <summary>
     /// Ensures the item with specified <paramref name="id"/> will be moved to the bank.
     /// </summary>
     /// <param name="name">ID of the item to transfer.</param>
     /// <remarks>It will try <see cref="IScriptOption.MaximumTries"/> then move on even if the transfer was unsuccessful.</remarks>
-    void EnsureToBank(int id);
+    bool EnsureToBank(int id);
     /// <summary>
     /// Ensures the items with specified <paramref name="names"/> will be moved to the bank.
     /// </summary>

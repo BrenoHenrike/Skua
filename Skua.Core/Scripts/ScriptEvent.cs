@@ -25,7 +25,7 @@ public class ScriptEvent : IScriptEvent
         _messenger.Register<ScriptEvent, ItemSoldMessage>(this, OnItemSold);
         _messenger.Register<ScriptEvent, ItemAddedToBankMessage>(this, OnItemAddedToBank);
         _messenger.Register<ScriptEvent, RunToAreaMessage>(this, OnRunToArea);
-        _messenger.Register<ScriptEvent, ScriptStoppingMessage>(this, OnScriptStopping);
+        _messenger.Register<ScriptEvent, ScriptStoppingRequestMessage>(this, OnScriptStopping);
     }
 
     private readonly IMessenger _messenger;
@@ -77,7 +77,7 @@ public class ScriptEvent : IScriptEvent
         recipient.RunToArea?.Invoke(message.Zone);
     }
 
-    public void OnScriptStopping(ScriptEvent recipient, ScriptStoppingMessage message)
+    public void OnScriptStopping(ScriptEvent recipient, ScriptStoppingRequestMessage message)
     {
         message.Reply(Task.Run(() => recipient.ScriptStopping?.Invoke()));
     }

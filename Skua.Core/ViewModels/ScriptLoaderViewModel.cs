@@ -20,6 +20,10 @@ public partial class ScriptLoaderViewModel : BotControlViewModelBase
         Messenger.Register<ScriptLoaderViewModel, LoadScriptMessage>(this, ReceiveLoadScript);
         Messenger.Register<ScriptLoaderViewModel, EditScriptMessage>(this, ReceiveEditScript);
         Messenger.Register<ScriptLoaderViewModel, StartScriptMessage>(this, ReceiveToggleScript);
+        Messenger.Register<ScriptLoaderViewModel, ScriptStartedMessage>(this, ScriptStarted);
+        Messenger.Register<ScriptLoaderViewModel, ScriptStoppedMessage>(this, ScriptStopped);
+        Messenger.Register<ScriptLoaderViewModel, ScriptStoppingMessage>(this, ScriptStopping);
+
         _scriptPath = Path.Combine(AppContext.BaseDirectory, "Scripts");
         ScriptLogs = logs.ToArray()[1];
         ScriptManager = scriptManager;
@@ -34,6 +38,23 @@ public partial class ScriptLoaderViewModel : BotControlViewModelBase
         OpenScriptRepoCommand = new RelayCommand(_windowService.ShowWindow<ScriptRepoViewModel>);
         OpenBrowserFormCommand = new RelayCommand(() => _processService.OpenLink(@"https://forms.gle/sbp57LBQP5WvCH2B9"));
         ToggleScriptAsyncCommand = new AsyncRelayCommand(ToggleScriptAsync);
+    }
+
+    private void ScriptStopping(ScriptLoaderViewModel recipient, ScriptStoppingMessage message)
+    {
+        recipient.ToggleScriptEnabled = false;
+        recipient.ScriptStatus = "Stopping...";
+    }
+
+    private void ScriptStopped(ScriptLoaderViewModel recipient, ScriptStoppedMessage message)
+    {
+        recipient.ToggleScriptEnabled = true;
+        recipient.ScriptStatus = "[Stopped]";
+    }
+
+    private void ScriptStarted(ScriptLoaderViewModel recipient, ScriptStartedMessage message)
+    {
+        recipient.ToggleScriptEnabled = true;
     }
 
     public IScriptManager ScriptManager { get; }
@@ -75,15 +96,18 @@ public partial class ScriptLoaderViewModel : BotControlViewModelBase
 
     private async Task ToggleScriptAsync()
     {
+        ToggleScriptEnabled = false;
         if (string.IsNullOrWhiteSpace(ScriptManager.LoadedScript))
         {
             _dialogService.ShowMessageBox("No script loaded.", "Scripts");
+            ToggleScriptEnabled = true;
             return;
         }
 
         if (ScriptManager.ScriptRunning)
         {
             ScriptManager.StopScript();
+            ToggleScriptEnabled = true;
             return;
         }
 
@@ -92,17 +116,19 @@ public partial class ScriptLoaderViewModel : BotControlViewModelBase
 
     private async Task StartScript()
     {
-        ToggleScriptEnabled = false;
         ScriptStatus = "Compiling...";
-        Exception? ex = await ScriptManager.StartScriptAsync();
-        if (ex is not null)
+        await Task.Run(async () =>
         {
-            _dialogService.ShowMessageBox($"Error while starting script:\r\n{ex.Message}", "Script Error");
-            ScriptStatus = "[Error]";
-            ScriptErrorToolTip = $"Error while starting script:\r\n{ex}";
-        }
-        ScriptStatus = "[Running]";
-        ToggleScriptEnabled = true;
+            Exception? ex = await ScriptManager.StartScriptAsync();
+            if (ex is not null)
+            {
+                _dialogService.ShowMessageBox($"Error while starting script:\r\n{ex.Message}", "Script Error");
+                ScriptStatus = "[Error]";
+                ScriptErrorToolTip = $"Error while starting script:\r\n{ex}";
+                ToggleScriptEnabled = true;
+            }
+            ScriptStatus = "[Running]";
+        });
     }
 
     private void LoadScript(string? path = null)

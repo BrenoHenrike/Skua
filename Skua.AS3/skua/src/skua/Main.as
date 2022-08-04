@@ -379,7 +379,6 @@ package skua
                 instance.game.mcExtSWF.removeChildAt(0);
             }
             instance.game.showInterface();
-            instance.game.world.visible = true;
         }
         
         public static function killLag(enable:Boolean):void

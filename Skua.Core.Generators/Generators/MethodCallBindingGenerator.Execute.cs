@@ -106,7 +106,7 @@ public partial class MethodCallBindingGenerator
                 else
                 {
                     source.Append($"try{{string ret = Flash.CallGameFunction(\"{info.Values.Path}\"{paramNames});");
-                    source.Append($"{info.ReturnTypeString} returnValue = Newtonsoft.Json.JsonConvert.DeserializeObject<{info.ReturnTypeString}>(ret);");
+                    source.Append($"{info.ReturnTypeString}{(info.IsNullable ? string.Empty : "?")} returnValue = Newtonsoft.Json.JsonConvert.DeserializeObject<{info.ReturnTypeString}>(ret);");
                 }
             }
             else
@@ -120,11 +120,11 @@ public partial class MethodCallBindingGenerator
                     if(info.Values.ParseFromJson)
                     {
                         source.Append($"try{{string ret = Flash.Call<string>(\"{info.Values.Path}\"{paramNames});");
-                        source.Append($"{info.ReturnTypeString} returnValue = Newtonsoft.Json.JsonConvert.DeserializeObject<{info.ReturnTypeString}>(ret);");
+                        source.Append($"{info.ReturnTypeString}{(info.IsNullable ? string.Empty : "?")} returnValue = Newtonsoft.Json.JsonConvert.DeserializeObject<{info.ReturnTypeString}>(ret);");
                     }
                     else
                     {
-                        source.Append($"try{{{info.ReturnTypeString} returnValue = Flash.Call<{info.ReturnTypeString}>(\"{info.Values.Path}\"{paramNames});");
+                        source.Append($"try{{{info.ReturnTypeString}{(info.IsNullable ? string.Empty : "?")} returnValue = Flash.Call<{info.ReturnTypeString}>(\"{info.Values.Path}\"{paramNames});");
                     }
                 }
             }
@@ -133,7 +133,7 @@ public partial class MethodCallBindingGenerator
 
             if (!isVoid)
             {
-                source.Append($"return returnValue{(info.IsNullable ? $" ?? {defaultValue}" : string.Empty)};");
+                source.Append($"return returnValue ?? {defaultValue};");
                 source.Append($"}}catch{{return {defaultValue};}}");
             }
 

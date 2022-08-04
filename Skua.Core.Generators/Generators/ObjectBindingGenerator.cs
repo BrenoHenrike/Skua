@@ -83,11 +83,11 @@ public partial class ObjectBindingGenerator : GenericFieldAttributeGenerator<Obj
             
             source.Append("try{");
             if (info.Values.Select is not null)
-                source.Append($"{info.PropertyType} returnValue = Newtonsoft.Json.JsonConvert.DeserializeObject<{info.PropertyType}>(Flash.Call(\"selectArrayObjects\", \"{info.Values.Paths[0]}\", \"{info.Values.Select}\"));");
+                source.Append($"{info.PropertyType}{(info.IsNullable ? string.Empty : "?")} returnValue = Newtonsoft.Json.JsonConvert.DeserializeObject<{info.PropertyType}>(Flash.Call(\"selectArrayObjects\", \"{info.Values.Paths[0]}\", \"{info.Values.Select}\"));");
             else
-                source.Append($"{info.PropertyType} returnValue = Flash.{(info.Values.IsStatic ? "GetGameObjectStatic" : "GetGameObject")}<{info.PropertyType}>(\"{info.Values.Paths[0]}\");");
+                source.Append($"{info.PropertyType}{(info.IsNullable ? string.Empty : "?")} returnValue = Flash.{(info.Values.IsStatic ? "GetGameObjectStatic" : "GetGameObject")}<{info.PropertyType}>(\"{info.Values.Paths[0]}\");");
 
-            source.Append($"return returnValue{(info.IsNullable ? $"?? {defaultValue}" : string.Empty)};");
+            source.Append($"return returnValue ?? {defaultValue};");
             source.Append($"}}catch{{return {defaultValue};}}");
         }
         else

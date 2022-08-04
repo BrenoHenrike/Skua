@@ -34,8 +34,6 @@ public class AdvancedSkillEditorViewModel : ObservableRecipient
         _dialogService = dialogService;
     }
 
-    private SkillRuleEditorDialogViewModel _editDialog;
-
     private void Edit(AdvancedSkillEditorViewModel recipient, EditAdvancedSkillMessage message)
     {
         recipient.CurrentSkillsList.Clear();

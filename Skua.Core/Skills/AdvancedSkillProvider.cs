@@ -36,7 +36,7 @@ public class AdvancedSkillProvider : ISkillProvider
 
     private UseRule[] ParseUseRule(string useRule)
     {
-        string[] stringRules = useRule.Split(' ').Select(s => s.Trim()).ToArray();
+        ReadOnlySpan<string> stringRules = useRule.Split(' ', StringSplitOptions.RemoveEmptyEntries).Select(s => s.Trim()).ToArray();
         UseRule[] rules = new UseRule[stringRules.Length];
         bool shouldSkip = useRule.Last() == 's';
         for(int i = 0; i < stringRules.Length; i++)

@@ -298,10 +298,12 @@ public partial class ScriptDrop : ObservableRecipient, IScriptDrop, IAsyncDispos
 
     public async ValueTask DisposeAsync()
     {
-        _ctsDrops?.Cancel();
         if(_taskDrops is not null)
+        {
+            _ctsDrops?.Cancel();
             await _taskDrops;
-        _ctsDrops?.Dispose();
+            _ctsDrops?.Dispose();
+        }
         _timerDrops.Dispose();
         GC.SuppressFinalize(this);
     }

@@ -17,12 +17,7 @@ public partial class ScriptPlayer : IScriptPlayer
     private readonly Lazy<IScriptOption> _lazyOptions;
     private readonly Lazy<IScriptWait> _lazyWait;
     private readonly Lazy<IScriptInventory> _lazyInventory;
-    private readonly IMessenger _messenger;
-    private Lazy<string> _lazyUserName;
-    private Lazy<string> _lazyPassword;
-    private Lazy<(string UserName, string Password, string Guild)> _lazyLoginInfo;
     private IFlashUtil Flash => _lazyFlash.Value;
-    private IScriptEvent Events => _lazyEvents.Value;
     private IScriptOption Options => _lazyOptions.Value;
     private IScriptInventory Inventory => _lazyInventory.Value;
     private IScriptWait Wait => _lazyWait.Value;
@@ -32,18 +27,13 @@ public partial class ScriptPlayer : IScriptPlayer
         Lazy<IScriptEvent> events,
         Lazy<IScriptOption> options,
         Lazy<IScriptWait> wait,
-        Lazy<IScriptInventory> inventory,
-        IMessenger messenger)
+        Lazy<IScriptInventory> inventory)
     {
         _lazyFlash = flash;
         _lazyEvents = events;
         _lazyOptions = options;
         _lazyWait = wait;
         _lazyInventory = inventory;
-        _messenger = messenger;
-        _lazyLoginInfo = new Lazy<(string UserName, string Password, string Guild)>(GetLoginInfo);
-
-        _messenger.Register<ScriptPlayer, LogoutMessage>(this, ResetInfo);
     }
 
     [ObjectBinding("world.myAvatar.uid")]
@@ -61,39 +51,12 @@ public partial class ScriptPlayer : IScriptPlayer
     public bool Playing => LoggedIn && Alive;
     [CallBinding("isLoggedIn")]
     private bool _loggedIn;
-    //[ObjectBindingOld("loginInfo.strUsername", Static = true)]
-    public string Username
-    {
-        get
-        {
-            if (!Playing)
-                return string.Empty;
-
-            return _lazyLoginInfo.Value.UserName;
-        }
-    }
-    //[ObjectBindingOld("loginInfo.strPassword", Static = true)]
-    public string Password
-    {
-        get
-        {
-            if (!Playing)
-                return string.Empty;
-
-            return _lazyLoginInfo.Value.Password;
-        }
-    }
-
-    public string Guild
-    {
-        get
-        {
-            if (!Playing)
-                return string.Empty;
-
-            return _lazyLoginInfo.Value.Guild;
-        }
-    }
+    [ObjectBinding("loginInfo.strUsername", IsStatic = true)]
+    private string _username;
+    [ObjectBinding("loginInfo.strPassword", IsStatic = true)]
+    private string _password;
+    [ObjectBinding("world.myAvatar.objData.guild.Name")]
+    private string _guild;
     [CallBinding("isKicked")]
     private bool _kicked;
     [ObjectBinding("world.myAvatar.dataLeaf.intState", RequireNotNull = "world.myAvatar")]
@@ -179,14 +142,4 @@ public partial class ScriptPlayer : IScriptPlayer
 
     [MethodCallBinding("world.goto", GameFunction = true)]
     private void _goto(string name) { }
-
-    private void ResetInfo(ScriptPlayer recipient, LogoutMessage message)
-    {
-        recipient._lazyLoginInfo = new(recipient.GetLoginInfo);
-    }
-
-    private (string UserName, string Password, string Guild) GetLoginInfo()
-    {
-        return (Flash.GetGameObjectStatic("loginInfo.strUsername", string.Empty)!, Flash.GetGameObjectStatic("loginInfo.strPassword", string.Empty)!, Flash.GetGameObject<string>("world.myAvatar.pMC.pname.tg.text")?.Replace("&lt; ", "< ").Replace(" &gt;", " >") ?? string.Empty);
-    }
 }

@@ -5,6 +5,7 @@ namespace Skua.Core.Interfaces;
 
 public interface IScriptCombat
 {
+    bool StopAttacking { get; }
     /// <summary>
     /// Walks towards (approaches) the currently selected target.
     /// </summary>

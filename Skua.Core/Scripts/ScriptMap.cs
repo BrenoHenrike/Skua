@@ -48,8 +48,8 @@ public partial class ScriptMap : IScriptMap
 
     public string LastMap { get; set; } = string.Empty;
     public string FilePath { get; set; } = string.Empty;
-    public string FileName => string.IsNullOrEmpty(FilePath) ? "" : FilePath.Split(new char[] { '/', '\\' }, StringSplitOptions.RemoveEmptyEntries).Last();
-    public string FullName => Loaded ? Flash.GetGameObject("ui.mcInterface.areaList.title.t1.text")?.Split(' ').Last() ?? "" : "";
+    public string FileName => string.IsNullOrEmpty(FilePath) ? string.Empty : FilePath.Split(new char[] { '/', '\\' }, StringSplitOptions.RemoveEmptyEntries).Last();
+    public string FullName => Loaded ? Flash.GetGameObject("ui.mcInterface.areaList.title.t1.text")?.Split(' ').Last().Replace("\"", string.Empty) ?? string.Empty : string.Empty;
 
     [ObjectBinding("world.strMapName", RequireNotNull = "world", Default = "string.Empty")]
     private string _name = string.Empty;
@@ -66,7 +66,7 @@ public partial class ScriptMap : IScriptMap
     public bool Loaded => !Flash.GetGameObject<bool>("world.mapLoadInProgress")
                           && Flash.IsNull("mcConnDetail.stage");
     [ObjectBinding("world.map.currentScene.labels", Select = "name", Default = "new()")]
-    private List<string>? _cells;
+    private List<string> _cells;
 
     [MethodCallBinding("world.moveToCell", RunMethodPost = true, GameFunction = true)]
     private void _jump(string cell, string pad, bool clientOnly = false)

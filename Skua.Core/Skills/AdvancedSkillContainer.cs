@@ -57,8 +57,8 @@ public class AdvancedSkillContainer : ObservableRecipient, IAdvancedSkillContain
                 _loadedSkills.Add(new AdvancedSkill(parts[1].Trim(), parts[2].Trim(), 250, parts[0].Trim(), "WaitForCooldown"));
             else if (parts.Length == 4)
             {
-                bool useIfAvailble = int.TryParse(parts[3].RemoveLetters(), out int result);
-                _loadedSkills.Add(new AdvancedSkill(parts[1].Trim(), parts[2].Trim(), useIfAvailble ? 250 : result, parts[0].Trim(), useIfAvailble ? SkillUseMode.UseIfAvailable : SkillUseMode.WaitForCooldown));
+                bool waitForCooldown = int.TryParse(parts[3].RemoveLetters(), out int result);
+                _loadedSkills.Add(new AdvancedSkill(parts[1].Trim(), parts[2].Trim(), waitForCooldown ? result : 250, parts[0].Trim(), waitForCooldown ? SkillUseMode.WaitForCooldown : SkillUseMode.UseIfAvailable));
             }
         }
         OnPropertyChanged(nameof(LoadedSkills));

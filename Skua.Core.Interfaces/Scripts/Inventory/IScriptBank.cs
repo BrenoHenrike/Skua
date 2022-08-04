@@ -36,21 +36,21 @@ public interface IScriptBank : ICheckInventory<InventoryItem>, ILimitedInventory
     /// <param name="invItem">Name of the item in the inventory to be transferred to the bank.</param>
     /// <param name="bankItem">Name of the item in the bank to be transferred to the inventory.</param>
     /// <returns><see langword="true"/> if the swap was sucessfull</returns>
-    bool Swap(InventoryItem bankItem, InventoryItem invItem);
+    bool Swap(InventoryItem invItem, InventoryItem bankItem);
     /// <summary>
     /// Ensures the swap of the specified items between the inventory and the bank is successful.
     /// </summary>
     /// <param name="invItem">Name of the item in the inventory to be transferred to the bank.</param>
     /// <param name="bankItem">Name of the item in the bank to be transferred to the inventory.</param>
     /// <remarks>It will try <see cref="IScriptOption.MaximumTries"/> then move on even if the swap was unsuccessful.</remarks>
-    void EnsureSwap(string invItem, string bankItem, bool loadBank = true);
+    bool EnsureSwap(string invItem, string bankItem, bool loadBank = true);
     /// <summary>
     /// Ensures the swap of the specified items between inventory and the bank is successful.
     /// </summary>
     /// <param name="invItem">ID of the item in the inventory to be transferred to the bank.</param>
     /// <param name="bankItem">ID of the item in the bank to be transferred to the inventory.</param>
     /// <remarks>It will try <see cref="IScriptOption.MaximumTries"/> then move on even if the swap was unsuccessful.</remarks>
-    void EnsureSwap(int invItem, int bankItem, bool loadBank = true);
+    bool EnsureSwap(int invItem, int bankItem, bool loadBank = true);
     /// <summary>
     /// Transfers the item with specified <paramref name="name"/> to inventory.
     /// </summary>
@@ -103,14 +103,14 @@ public interface IScriptBank : ICheckInventory<InventoryItem>, ILimitedInventory
     /// <param name="name">Name of the item to transfer.</param>
     /// <param name="loadBank">Whether to load the bank first.</param>
     /// <remarks>It will try <see cref="IScriptOption.MaximumTries"/> then move on even if the transfer was unsuccessful.</remarks>
-    void EnsureToInventory(string name, bool loadBank = true);
+    bool EnsureToInventory(string name, bool loadBank = true);
     /// <summary>
     /// Ensures the item with specified <paramref name="id"/> will be moved to inventory.
     /// </summary>
     /// <param name="id">ID of the item to transfer.</param>
     /// <param name="loadBank">Whether to load the bank first.</param>
     /// <remarks>It will try <see cref="IScriptOption.MaximumTries"/> then move on even if the transfer was unsuccessful.</remarks>
-    void EnsureToInventory(int id, bool loadBank = true);
+    bool EnsureToInventory(int id, bool loadBank = true);
     /// <summary>
     /// Ensures the items with specified <paramref name="names"/> will be moved to inventory.
     /// </summary>

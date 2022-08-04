@@ -24,8 +24,8 @@ public class CallBindingGenerator : GenericFieldAttributeGenerator<CallBindingPr
         if(info.Values.Get)
         {
             source.Append("try{");
-            source.Append($"{info.PropertyType} returnValue = Flash.Call<{info.PropertyType}>(\"{info.Values.Path}\");");
-            source.Append($"return returnValue{(info.IsNullable ? $" ?? {defaultValue}" : string.Empty)} ;");
+            source.Append($"{info.PropertyType}{(info.IsNullable ? string.Empty : "?")} returnValue = Flash.Call<{info.PropertyType}>(\"{info.Values.Path}\");");
+            source.Append($"return returnValue ?? {defaultValue};");
             source.Append($"}}catch{{return {defaultValue};}}");
         }
         else

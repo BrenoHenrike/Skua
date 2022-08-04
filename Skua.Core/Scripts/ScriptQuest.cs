@@ -146,6 +146,8 @@ public partial class ScriptQuest : ObservableObject, IScriptQuest
 
     private void _EnsureComplete(int id, int itemId = -1, bool special = false)
     {
+        if (id == 0)
+            return;
         for (int i = 0; i < Options.QuestAcceptAndCompleteTries; i++)
         {
             Complete(id, itemId, special);

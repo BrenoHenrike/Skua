@@ -298,6 +298,8 @@ public class ScriptInterface : IScriptInterface, IScriptInterfaceManager
                 Logout();
             }
         }
+        if (connDetail == lastConnDetail)
+            return (lastConnChange, connDetail);
         return (Environment.TickCount, connDetail);
 
         void Logout()
@@ -480,8 +482,10 @@ public class ScriptInterface : IScriptInterface, IScriptInterfaceManager
                         break;
                     case "cmd":
                         if (parts.Length >= 5 && parts[4] == "logout")
+                        {
                             Messenger.Send<LogoutMessage>();
                             OnLogout();
+                        }
                         break;
                 }
                 break;
@@ -510,7 +514,7 @@ public class ScriptInterface : IScriptInterface, IScriptInterfaceManager
         Manager.StopScript();
         bool kicked = Player.Kicked;
         _waitForLogin = true;
-        Servers.Logout();
+        //Servers.Logout();
         Messenger.Send<ReloginTriggeredMessage>(new(kicked));
 
         Relogin((!Options.SafeRelogin && !kicked) ? 5000 : 70000, wasRunning);

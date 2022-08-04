@@ -5,7 +5,7 @@ namespace Skua.Core.ViewModels;
 public class AdvancedSkillsViewModel : BotControlViewModelBase
 {
     public AdvancedSkillsViewModel(AdvancedSkillEditorViewModel editor, SavedAdvancedSkillsViewModel savedViewModel)
-        : base("Advanced Skills", 700, 500)
+        : base("Advanced Skills", 700, 530)
     {
         Messenger.Register<AdvancedSkillsViewModel, EditAdvancedSkillMessage>(this, Receive);
         EditViewModel = editor;

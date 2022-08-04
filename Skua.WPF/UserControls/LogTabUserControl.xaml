@@ -28,6 +28,7 @@
             SelectionMode="Multiple">
             <b:Interaction.Behaviors>
                 <wpf:ListBoxCopySelectedBehavior />
+                <wpf:ListBoxScrollToCaretBehavior />
             </b:Interaction.Behaviors>
         </ListBox>
         <Grid Grid.Row="1">

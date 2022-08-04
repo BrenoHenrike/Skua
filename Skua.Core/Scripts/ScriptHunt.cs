@@ -216,7 +216,7 @@ public class ScriptHunt : IScriptHunt
         }
     }
 
-    private (string name, int quantity, bool isTemp) _item = ("", 0, false);
+    private (string name, int quantity, bool isTemp) _item = (string.Empty, 0, false);
     private CancellationTokenSource? _ctsHunt;
 
     public void ForItem(string name, string item, int quantity, bool tempItem = false)
@@ -236,7 +236,6 @@ public class ScriptHunt : IScriptHunt
         _messenger.Unregister<ItemDroppedMessage>(this);
         _ctsHunt.Dispose();
         _ctsHunt = null;
-        Combat.Exit();
     }
 
     private void ItemHunted(ScriptHunt recipient, ItemDroppedMessage message)

@@ -19,10 +19,6 @@ public interface IScriptStatus
     string CompiledScript { get; }
     IScriptOptionContainer? Config { get; set; }
 
-    event Action? ScriptStarted;
-    event Action<bool>? ScriptStopped;
-    event Action<Exception>? ScriptError;
-
     Task RestartScriptAsync();
     void StopScript(bool runScriptStoppingEvent = true);
     ValueTask StopScriptAsync(bool runScriptStoppingEvent = true);

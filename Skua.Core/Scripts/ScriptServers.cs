@@ -142,8 +142,8 @@ public partial class ScriptServers : ObservableRecipient, IScriptServers
             while (!token.IsCancellationRequested && !Manager.ShouldExit && !Player.Playing && ++tries < Options.ReloginTries)
             {
                 Login();
-                await Task.Delay(2000, token);
-                Server server = Options.AutoReloginAny ? ServerList.Find(x => x.IP != LastIP)! : CachedServers.First(s => s.Name == Options.ReloginServer) ?? ServerList[0];
+                await Task.Delay(3000, token);
+                Server server = Options.AutoReloginAny ? ServerList.Find(x => x.IP != LastIP)! : CachedServers.FirstOrDefault(s => s.Name == Options.ReloginServer) ?? ServerList[0];
                 ConnectIP(server.IP);
                 using CancellationTokenSource waitLogin = new(Options.LoginTimeout);
                 try

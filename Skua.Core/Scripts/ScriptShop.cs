@@ -82,20 +82,6 @@ public partial class ScriptShop : IScriptShop
         Flash.Call("buyItemByName", name);
         if (Options.SafeTimings)
             Wait.ForItemBuy();
-        //int index;
-        //List<ShopItem> items = Items;
-        //if (IsLoaded && Player.Playing && (index = items.FindIndex(x => x.Name == name)) > -1)
-        //{
-        //    if (Options.SafeTimings)
-        //        Wait.ForActionCooldown(GameActions.BuyItem);
-        //    ExpandoObject item;
-        //    using (FlashArray<ExpandoObject> fItems = (FlashArray<ExpandoObject>)Flash.CreateFlashObject<ExpandoObject>("world.shopinfo.items").ToArray())
-        //    using (FlashObject<ExpandoObject> fItem = (FlashObject<ExpandoObject>)fItems.Get(index))
-        //        item = fItem.Value!;
-        //    Flash.CallGameFunction("world.sendBuyItemRequest", item);
-        //    if (Options.SafeTimings)
-        //        Wait.ForItemBuy();
-        //}
     }
 
     public void BuyItem(int id, int shopItemId = 0)
@@ -105,10 +91,6 @@ public partial class ScriptShop : IScriptShop
         Flash.Call("buyItemByID", id, shopItemId);
         if (Options.SafeTimings)
             Wait.ForItemBuy();
-        //ShopItem? item = Items.Find(i => i.ID == id);
-        //if (item is null)
-        //    return;
-        //Send.Packet($"%xt%zm%buyItem%{Map.RoomID}%{item.ID}%{ID}%{item.ShopItemID}%");
     }
 
     public void SellItem(string name)

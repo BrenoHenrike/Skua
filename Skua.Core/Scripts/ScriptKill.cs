@@ -1,7 +1,8 @@
-﻿using Skua.Core.Interfaces;
+﻿using Microsoft.Toolkit.Mvvm.Messaging;
+using Skua.Core.Interfaces;
+using Skua.Core.Messaging;
 using Skua.Core.Models.Monsters;
 using Skua.Core.Utils;
-using System.Diagnostics;
 
 namespace Skua.Core.Scripts;
 public class ScriptKill : IScriptKill
@@ -10,44 +11,43 @@ public class ScriptKill : IScriptKill
         Lazy<IScriptOption> options,
         Lazy<IScriptCombat> combat,
         Lazy<IScriptPlayer> player,
-        Lazy<IScriptMonster> monsters,
         Lazy<IScriptDrop> drops,
         Lazy<IScriptInventory> inventory,
         Lazy<IScriptTempInv> tempInv,
         Lazy<IScriptManager> manager,
         Lazy<IScriptMap> map,
-        ILogService logger)
+        ILogService logger,
+        IMessenger messenger)
     {
         _lazyWait = wait;
         _lazyOptions = options;
         _lazyCombat = combat;
         _lazyPlayer = player;
-        _lazyMonsters = monsters;
         _lazyDrops = drops;
         _lazyInventory = inventory;
         _lazyTempInv = tempInv;
         _lazyManager = manager;
         _lazyMap = map;
         _logger = logger;
+        _messenger = messenger;
     }
-    internal string saveCell = "Enter", savePad = "Spawn";
+    internal string _saveCell = "Enter", _savePad = "Spawn";
     private readonly Lazy<IScriptWait> _lazyWait;
     private readonly Lazy<IScriptOption> _lazyOptions;
     private readonly Lazy<IScriptCombat> _lazyCombat;
     private readonly Lazy<IScriptPlayer> _lazyPlayer;
-    private readonly Lazy<IScriptMonster> _lazyMonsters;
     private readonly Lazy<IScriptDrop> _lazyDrops;
     private readonly Lazy<IScriptInventory> _lazyInventory;
     private readonly Lazy<IScriptTempInv> _lazyTempInv;
     private readonly Lazy<IScriptManager> _lazyManager;
     private readonly Lazy<IScriptMap> _lazyMap;
     private readonly ILogService _logger;
+    private readonly IMessenger _messenger;
 
     private IScriptWait Wait => _lazyWait.Value;
     private IScriptOption Options => _lazyOptions.Value;
     private IScriptCombat Combat => _lazyCombat.Value;
     private IScriptPlayer _player => _lazyPlayer.Value;
-    private IScriptMonster Monsters => _lazyMonsters.Value;
     private IScriptDrop Drops => _lazyDrops.Value;
     private IScriptInventory Inventory => _lazyInventory.Value;
     private IScriptTempInv TempInv => _lazyTempInv.Value;
@@ -97,18 +97,24 @@ public class ScriptKill : IScriptKill
 
     public void ForItem(string name, string item, int quantity, bool tempItem = false)
     {
-        saveCell = _player.Cell;
-        savePad = _player.Pad;
+        _saveCell = _player.Cell;
+        _savePad = _player.Pad;
+        _messenger.Register<ScriptKill, CellChangedMessage>(this, CellChanged);
         while (!Manager.ShouldExit
             && (tempItem || !Inventory.Contains(item, quantity))
             && (!tempItem || !TempInv.Contains(item, quantity)))
         {
-            if (_player.Cell != saveCell)
-                Map.Jump(saveCell, savePad);
             Combat.Attack(name);
             Drops.Pickup(item);
         }
-        saveCell = savePad = "";
+        _saveCell = _savePad = "";
+        _messenger.Unregister<CellChangedMessage>(this);
+
+        void CellChanged(ScriptKill recipient, CellChangedMessage message)
+        {
+            if(message.Cell != recipient._saveCell)
+                recipient.Map.Jump(recipient._saveCell, recipient._savePad);
+        }
     }
 
     public void ForItem(IEnumerable<string> names, string item, int quantity, bool tempItem = false)

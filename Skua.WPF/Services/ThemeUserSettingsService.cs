@@ -6,7 +6,7 @@ using System.Collections.Generic;
 using System.Collections.Specialized;
 using System.Linq;
 
-namespace Skua.WPF;
+namespace Skua.WPF.Services;
 public class ThemeUserSettingsService : ObservableObject
 {
     public ThemeUserSettingsService(ISettingsService settings)

@@ -17,6 +17,7 @@ public partial class ScriptManager : ObservableObject, IScriptManager
 {
     public ScriptManager(
         ILogService logger,
+        IMessenger messenger,
         Lazy<IScriptInterface> scriptInterface,
         Lazy<IScriptHandlers> handlers,
         Lazy<IScriptOption> options,
@@ -32,7 +33,8 @@ public partial class ScriptManager : ObservableObject, IScriptManager
         _lazySkills = skills;
         _lazyDrops = drops;
         _lazyWait = wait;
-        _logger = logger;;
+        _logger = logger; _messenger = messenger;
+        ;
     }
 
     private readonly Lazy<IScriptInterface> _lazyBot;
@@ -43,6 +45,7 @@ public partial class ScriptManager : ObservableObject, IScriptManager
     private readonly Lazy<IScriptDrop> _lazyDrops;
     private readonly Lazy<IScriptWait> _lazyWait;
     private readonly ILogService _logger;
+    private readonly IMessenger _messenger;
     private Dictionary<string, bool> _configured = new();
     private IScriptHandlers Handlers => _lazyHandlers.Value;
     private IScriptOption Options => _lazyOptions.Value;
@@ -59,10 +62,6 @@ public partial class ScriptManager : ObservableObject, IScriptManager
     [ObservableProperty]
     private string _CompiledScript = string.Empty;
     public IScriptOptionContainer? Config { get; set; }
-
-    public event Action? ScriptStarted;
-    public event Action<bool>? ScriptStopped;
-    public event Action<Exception>? ScriptError;
 
     public bool ShouldExit => ScriptCTS?.IsCancellationRequested ?? false;
 
@@ -88,8 +87,8 @@ public partial class ScriptManager : ObservableObject, IScriptManager
             Handlers.Clear();
             CurrentScriptThread = new(async () =>
             {
+                Exception? exception = null;
                 ScriptCTS = new();
-                ScriptStarted?.Invoke();
                 try
                 {
                     script?.GetType().GetMethod("ScriptMain")?.Invoke(script, new object[] { _lazyBot.Value });
@@ -98,8 +97,9 @@ public partial class ScriptManager : ObservableObject, IScriptManager
                 {
                     if (e is not TargetInvocationException || !stoppedByScript)
                     {
+                        exception = e;
                         Trace.WriteLine($"Error while running script:\r\nMessage: {e.Message}\r\n{(e.InnerException is not null ? $"Inner Exception Message: {e.InnerException.Message}" : string.Empty)}StackTrace: {e.StackTrace}");
-                        ScriptError?.Invoke(e);
+                        _messenger.Send<ScriptErrorMessage>(new(e));
                     }
                 }
                 finally
@@ -107,9 +107,10 @@ public partial class ScriptManager : ObservableObject, IScriptManager
                     stoppedByScript = false;
                     if (runScriptStoppingBool)
                     {
+                        _messenger.Send<ScriptStoppingMessage>();
                         try
                         {
-                            switch (await WeakReferenceMessenger.Default.Send<ScriptStoppingMessage>())
+                            switch (await Task.Run(async () => await WeakReferenceMessenger.Default.Send<ScriptStoppingRequestMessage>(new(exception))))
                             {
                                 case true:
                                     Trace.WriteLine("Script finished succesfully.");
@@ -133,15 +134,16 @@ public partial class ScriptManager : ObservableObject, IScriptManager
                     Skills.Stop();
                     Drops.Stop();
                     Events.ClearHandlers();
-                    ScriptStopped?.Invoke(true);
                     ScriptCTS.Dispose();
                     ScriptCTS = null;
                     OnPropertyChanged(nameof(ScriptRunning));
+                    _messenger.Send<ScriptStoppedMessage>();
                 }
             });
             CurrentScriptThread.Name = "Script Thread";
             CurrentScriptThread.Start();
             OnPropertyChanged(nameof(ScriptRunning));
+            _messenger.Send<ScriptStartedMessage>();
             return null;
         }
         catch (Exception e)
