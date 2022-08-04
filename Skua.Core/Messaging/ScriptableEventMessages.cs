@@ -23,4 +23,16 @@ public record ShopLoadedMessage(ShopInfo Info);
 public record BankLoadedMessage();
 public record ItemBoughtMessage(int CharItemID);
 public record ItemSoldMessage(int CharItemID, int QuantitySold, int CurrentQuantity, int Cost, bool IsAC);
-public class ScriptStoppingMessage : AsyncRequestMessage<bool?> { }
+public record ScriptStartedMessage();
+public record ScriptErrorMessage(Exception Exception);
+public record ScriptStoppingMessage();
+public record ScriptStoppedMessage();
+public class ScriptStoppingRequestMessage : AsyncRequestMessage<bool?>
+{
+    public Exception? Exception { get; }
+
+    public ScriptStoppingRequestMessage(Exception? exception)
+    {
+        Exception = exception;
+    }
+}
