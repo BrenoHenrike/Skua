@@ -151,7 +151,7 @@ public partial class ScriptQuest : ObservableObject, IScriptQuest
         for (int i = 0; i < Options.QuestAcceptAndCompleteTries; i++)
         {
             Complete(id, itemId, special);
-            if (IsInProgress(id))
+            if (!IsInProgress(id))
                 break;
             Thread.Sleep(Options.ActionDelay);
         }
