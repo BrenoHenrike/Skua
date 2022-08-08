@@ -45,6 +45,7 @@ public sealed partial class App : Application
         _bot.Flash.FlashCall += Flash_FlashCall;
         _ = Services.GetRequiredService<ILogService>();
         _ = Services.GetRequiredService<IThemeService>();
+        RoslynLifetimeManager.WarmupRoslyn();
         Dispatcher.ShutdownStarted += Dispatcher_ShutdownStarted;
         Timeline.DesiredFrameRateProperty.OverrideMetadata(typeof(Timeline), new FrameworkPropertyMetadata { DefaultValue = Services.GetRequiredService<ISettingsService>().Get<int>("AnimationFrameRate") });
     }
@@ -58,6 +59,9 @@ public sealed partial class App : Application
         await ((IAsyncDisposable)Services.GetRequiredService<IScriptDrop>()).DisposeAsync();
         WeakReferenceMessenger.Default.Cleanup();
         WeakReferenceMessenger.Default.Reset();
+        StrongReferenceMessenger.Default.Reset();
+
+        RoslynLifetimeManager.ShutdownRoslyn();
 
         Dispatcher.ShutdownStarted -= Dispatcher_ShutdownStarted;
     }
@@ -269,9 +273,9 @@ public sealed partial class App : Application
         return WeakReferenceMessenger.Default;
     }
 
-    private CSharpScriptExecution CreateCompiler(IServiceProvider s)
+    private Compiler CreateCompiler(IServiceProvider s)
     {
-        CSharpScriptExecution compiler = new();
+        Compiler compiler = new();
         var refPaths = new[]
         {
             typeof(object).GetTypeInfo().Assembly.Location,
