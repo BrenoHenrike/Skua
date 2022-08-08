@@ -11,7 +11,7 @@ using Skua.Core.Interfaces;
 using Skua.Core.Flash;
 using System.IO;
 using System.Windows.Forms;
-using Microsoft.Toolkit.Mvvm.Messaging;
+using CommunityToolkit.Mvvm.Messaging;
 using Skua.Core.Messaging;
 using System.Threading;
 

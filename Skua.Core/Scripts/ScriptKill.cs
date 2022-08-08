@@ -1,4 +1,4 @@
-﻿using Microsoft.Toolkit.Mvvm.Messaging;
+﻿using CommunityToolkit.Mvvm.Messaging;
 using Skua.Core.Interfaces;
 using Skua.Core.Messaging;
 using Skua.Core.Models.Monsters;
@@ -16,8 +16,7 @@ public class ScriptKill : IScriptKill
         Lazy<IScriptTempInv> tempInv,
         Lazy<IScriptManager> manager,
         Lazy<IScriptMap> map,
-        ILogService logger,
-        IMessenger messenger)
+        ILogService logger)
     {
         _lazyWait = wait;
         _lazyOptions = options;
@@ -29,7 +28,6 @@ public class ScriptKill : IScriptKill
         _lazyManager = manager;
         _lazyMap = map;
         _logger = logger;
-        _messenger = messenger;
     }
     internal string _saveCell = "Enter", _savePad = "Spawn";
     private readonly Lazy<IScriptWait> _lazyWait;
@@ -42,7 +40,6 @@ public class ScriptKill : IScriptKill
     private readonly Lazy<IScriptManager> _lazyManager;
     private readonly Lazy<IScriptMap> _lazyMap;
     private readonly ILogService _logger;
-    private readonly IMessenger _messenger;
 
     private IScriptWait Wait => _lazyWait.Value;
     private IScriptOption Options => _lazyOptions.Value;
@@ -99,7 +96,7 @@ public class ScriptKill : IScriptKill
     {
         _saveCell = _player.Cell;
         _savePad = _player.Pad;
-        _messenger.Register<ScriptKill, CellChangedMessage>(this, CellChanged);
+        StrongReferenceMessenger.Default.Register<ScriptKill, CellChangedMessage>(this, CellChanged);
         while (!Manager.ShouldExit
             && (tempItem || !Inventory.Contains(item, quantity))
             && (!tempItem || !TempInv.Contains(item, quantity)))
@@ -108,7 +105,7 @@ public class ScriptKill : IScriptKill
             Drops.Pickup(item);
         }
         _saveCell = _savePad = "";
-        _messenger.Unregister<CellChangedMessage>(this);
+        StrongReferenceMessenger.Default.Unregister<CellChangedMessage>(this);
 
         void CellChanged(ScriptKill recipient, CellChangedMessage message)
         {

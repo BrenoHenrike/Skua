@@ -1,5 +1,5 @@
 ﻿using System.Text;
-using Microsoft.Toolkit.Mvvm.ComponentModel;
+using CommunityToolkit.Mvvm.ComponentModel;
 using Skua.Core.Utils;
 
 namespace Skua.Core.ViewModels;

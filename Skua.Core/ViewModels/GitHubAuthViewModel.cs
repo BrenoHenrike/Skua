@@ -1,5 +1,5 @@
-﻿using Microsoft.Toolkit.Mvvm.ComponentModel;
-using Microsoft.Toolkit.Mvvm.Input;
+﻿using CommunityToolkit.Mvvm.ComponentModel;
+using CommunityToolkit.Mvvm.Input;
 using Newtonsoft.Json;
 using Skua.Core.Interfaces;
 using Skua.Core.Models.GitHub;
@@ -58,7 +58,7 @@ public partial class GitHubAuthViewModel : BotControlViewModelBase
     {
         Dictionary<string, string>? content = new()
         {
-            { "client_id", "449f889db3d655d2ef4a" },
+            { "client_id", "Iv1.c670c450985a5363" },
             { "scope", "public_repo" }
         };
         FormUrlEncodedContent encodedContent = new(content);
@@ -74,11 +74,11 @@ public partial class GitHubAuthViewModel : BotControlViewModelBase
             return null;
         Dictionary<string, string> content = new()
         {
-            { "client_id", "449f889db3d655d2ef4a" },
+            { "client_id", "Iv1.c670c450985a5363" },
             { "device_code", _deviceCode.DeviceCode },
             { "grant_type", "urn:ietf:params:oauth:grant-type:device_code" }
         };
-        FormUrlEncodedContent? encodedContent = new FormUrlEncodedContent(content);
+        FormUrlEncodedContent? encodedContent = new(content);
         HttpResponseMessage? response = await HttpClients.GetGHClient().PostAsync("https://github.com/login/oauth/access_token", encodedContent);
         return response?.IsSuccessStatusCode ?? false
             ? _token = JsonConvert.DeserializeObject<TokenResponse>(await response.Content.ReadAsStringAsync())
@@ -93,7 +93,6 @@ public partial class GitHubAuthViewModel : BotControlViewModelBase
         {
             HttpClients.UserGitHubClient = new(_token.AccessToken);
             _settingsService.Set("UserGitHubToken", _token.AccessToken);
-            string access = _token.AccessToken;
             IsBusy = false;
             HintStatus = "All good to go!";
             return;

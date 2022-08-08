@@ -1,4 +1,4 @@
-﻿using Microsoft.Toolkit.Mvvm.ComponentModel;
+﻿using CommunityToolkit.Mvvm.ComponentModel;
 using Skua.Core.Interfaces;
 using Skua.Core.Models.Items;
 
@@ -171,11 +171,13 @@ public partial class ScriptBoost : ObservableObject, IScriptBoost, IAsyncDisposa
 
     public async ValueTask DisposeAsync()
     {
-        _ctsBoosts?.Cancel();
         if(_taskBoosts is not null)
+        {
+            _ctsBoosts?.Cancel();
             await _taskBoosts;
+            _ctsBoosts?.Dispose();
+        }
         _timerBoosts.Dispose();
-        _ctsBoosts?.Dispose();
         GC.SuppressFinalize(this);
     }
 

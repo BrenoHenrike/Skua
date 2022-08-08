@@ -1,6 +1,6 @@
 ﻿using Skua.Core.Options;
 using Skua.Core.Interfaces;
-using Microsoft.Toolkit.Mvvm.DependencyInjection;
+using CommunityToolkit.Mvvm.DependencyInjection;
 
 namespace Skua.Core.Plugins;
 public class PluginContainer : IPluginContainer

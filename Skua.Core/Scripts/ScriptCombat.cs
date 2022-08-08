@@ -1,8 +1,10 @@
 ﻿using Skua.Core.Interfaces;
 using Skua.Core.Flash;
-using Microsoft.Toolkit.Mvvm.Messaging;
+using CommunityToolkit.Mvvm.Messaging;
+using CommunityToolkit.Mvvm.Messaging;
 using Skua.Core.Messaging;
 using Skua.Core.Models.Monsters;
+using CommunityToolkit.Mvvm.Messaging;
 
 namespace Skua.Core.Scripts;
 public partial class ScriptCombat : IScriptCombat

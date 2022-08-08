@@ -1,4 +1,4 @@
-﻿using Microsoft.Toolkit.Mvvm.Input;
+﻿using CommunityToolkit.Mvvm.Input;
 using Skua.Core.Interfaces;
 using System;
 using System.Collections.Generic;

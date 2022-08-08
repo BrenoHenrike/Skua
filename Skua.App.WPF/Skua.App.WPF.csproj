@@ -14,14 +14,13 @@
     <Platforms>AnyCPU;x64;x86</Platforms>
     <Company>Skua</Company>
     <Description>Scriptable C# bot for AdventureQuest Worlds</Description>
-    <AssemblyVersion>0.2.0.0</AssemblyVersion>
+    <AssemblyVersion>0.3.0.0</AssemblyVersion>
     <ApplicationIcon>SkuaIcon.ico</ApplicationIcon>
   </PropertyGroup>
 
   <ItemGroup>
     <None Remove="AdvancedSkills.txt" />
     <None Remove="Quests.txt" />
-    <None Remove="skua.swf" />
   </ItemGroup>
 
   <ItemGroup>
@@ -31,18 +30,21 @@
     <Content Include="Quests.txt">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
-    <Content Include="skua.swf">
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-    </Content>
     <Content Include="SkuaIcon.ico" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <None Include="..\Skua.AS3\skua\bin\skua.swf" Link="skua.swf">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
   </ItemGroup>
 
     <ItemGroup>
     <PackageReference Include="Caseless.Fody" Version="1.9.1" />
     <PackageReference Include="CliWrap" Version="3.4.4" />
+    <PackageReference Include="CommunityToolkit.Mvvm" Version="8.0.0" />
     <PackageReference Include="MaterialDesignThemes" Version="4.5.0" />
     <PackageReference Include="Microsoft.Extensions.DependencyInjection" Version="6.0.0" />
-    <PackageReference Include="Microsoft.Toolkit.Mvvm" Version="7.1.2" />
     <PackageReference Include="Microsoft.Xaml.Behaviors.Wpf" Version="1.1.39" />
     <PackageReference Include="Newtonsoft.Json" Version="13.0.1" />
   </ItemGroup>
@@ -88,6 +90,9 @@
     <None Update="Assemblies\Interop.ShockwaveFlashObjects.dll">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </None>
+    <None Update="Assemblies\System.IO.FileSystem.Watcher.dll">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
     <None Update="Properties\Settings.settings">
       <Generator>SettingsSingleFileGenerator</Generator>
       <LastGenOutput>Settings.Designer.cs</LastGenOutput>
@@ -95,7 +100,7 @@
   </ItemGroup>
 
   <Target Name="PostBuild" AfterTargets="PostBuildEvent">
-    <Exec Command="if not exist &quot;$(TargetDir)\plugins&quot; mkdir &quot;$(TargetDir)\plugins\options&quot;      &#xD;&#xA;if not exist &quot;$(TargetDir)\options&quot; mkdir &quot;$(TargetDir)\options&quot;&#xD;&#xA;if not exist &quot;$(TargetDir)\Scripts&quot; mkdir &quot;$(TargetDir)\Scripts&quot;&#xD;&#xA;del &quot;$(TargetDir)\Skua.App.WPF.deps.json&quot;&#xD;&#xA;del *.pdb&#xD;&#xA;;; Move all assemblies and related files to Assemblies folder&#xD;&#xA;ROBOCOPY &quot;$(TargetDir) &quot; &quot;$(TargetDir)Assemblies\ &quot; /XF *.xml Skua.App.WPF.dll *.zip *.cfg *.pspdb *.pssym *.json *.txt *.swf *.exe *.config *.manifest /XD assemblies options tmp tools runtimes skills plugins Scripts editor lib data /E /IS /MOVE&#xD;&#xA;if %25errorlevel%25 leq 4 exit 0 else exit %25errorlevel%25" />
+    <Exec Command="if not exist &quot;$(TargetDir)\plugins&quot; mkdir &quot;$(TargetDir)\plugins\options&quot;      &#xD;&#xA;if not exist &quot;$(TargetDir)\options&quot; mkdir &quot;$(TargetDir)\options&quot;&#xD;&#xA;if not exist &quot;$(TargetDir)\Scripts&quot; mkdir &quot;$(TargetDir)\Scripts&quot;&#xD;&#xA;del &quot;$(TargetDir)\Skua.App.WPF.deps.json&quot;&#xD;&#xA;del *.pdb&#xD;&#xA;if $(ConfigurationName) == Release rename &quot;$(TargetDir)Skua.App.WPF.exe&quot; &quot;Skua.exe&quot;&#xD;&#xA;;; Move all assemblies and related files to Assemblies folder&#xD;&#xA;ROBOCOPY &quot;$(TargetDir) &quot; &quot;$(TargetDir)Assemblies\ &quot; /XF *.xml Skua.App.WPF.dll *.zip *.cfg *.pspdb *.pssym *.json *.txt *.swf *.exe *.config *.manifest /XD assemblies options tmp tools runtimes skills plugins Scripts editor lib data /E /IS /MOVE&#xD;&#xA;if %25errorlevel%25 leq 4 exit 0 else exit %25errorlevel%25" />
   </Target>
 
     <Target Name="RemoveDuplicateAnalyzers" BeforeTargets="CoreCompile">
@@ -106,6 +111,10 @@
             <Analyzer Remove="@(Analyzer)" />
             <Analyzer Include="@(FilteredAnalyzer)" />
         </ItemGroup>
+    </Target>
+
+    <Target Name="PreBuild" BeforeTargets="PreBuildEvent">
+      <Exec Command="if $(ConfigurationName) == Release rd /s /q &quot;$(TargetDir)&quot;" />
     </Target>
 
 </Project>

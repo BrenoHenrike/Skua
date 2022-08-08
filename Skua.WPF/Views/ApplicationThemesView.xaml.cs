@@ -1,4 +1,4 @@
-﻿using Microsoft.Toolkit.Mvvm.DependencyInjection;
+﻿using CommunityToolkit.Mvvm.DependencyInjection;
 using Skua.Core.ViewModels;
 using System.Windows.Controls;
 

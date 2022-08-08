@@ -1,5 +1,5 @@
-﻿using Microsoft.Toolkit.Mvvm.ComponentModel;
-using Microsoft.Toolkit.Mvvm.Input;
+﻿using CommunityToolkit.Mvvm.ComponentModel;
+using CommunityToolkit.Mvvm.Input;
 using Skua.Core.Interfaces;
 using System.Text;
 
@@ -42,8 +42,7 @@ public partial class CoreBotsViewModel : BotControlViewModelBase
             if (tab.Content is IManageCBOptions cbo)
                 cbo.Save(bob);
         }
-
-
+        Directory.CreateDirectory(AppContext.BaseDirectory + @"\options\");
         File.WriteAllText(AppContext.BaseDirectory + $@"\options\CBO_Storage({_player.Username}).txt", bob.ToString());
         _dialogService.ShowMessageBox($@"Saved to \options\CBO_Storage({_player.Username}).txt", "Save Successful!");
         _readValues[_player.Username] = ReadValues(File.ReadAllLines(AppContext.BaseDirectory + $@"\options\CBO_Storage({_player.Username}).txt"));

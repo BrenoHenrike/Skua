@@ -1,4 +1,4 @@
-﻿using Microsoft.Toolkit.Mvvm.Input;
+﻿using CommunityToolkit.Mvvm.Input;
 
 namespace Skua.Core.ViewModels;
 public class CommandOptionItemViewModel<TDisplay> : CommandOptionItemViewModel

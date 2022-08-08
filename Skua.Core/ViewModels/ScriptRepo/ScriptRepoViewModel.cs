@@ -1,6 +1,6 @@
-﻿using Microsoft.Toolkit.Mvvm.ComponentModel;
-using Microsoft.Toolkit.Mvvm.Messaging;
-using Microsoft.Toolkit.Mvvm.Input;
+﻿using CommunityToolkit.Mvvm.ComponentModel;
+using CommunityToolkit.Mvvm.Messaging;
+using CommunityToolkit.Mvvm.Input;
 using Skua.Core.Interfaces;
 using Skua.Core.Messaging;
 using Skua.Core.Models.GitHub;
@@ -33,10 +33,10 @@ public partial class ScriptRepoViewModel : BotControlViewModelBase
     public int OutdatedQuantity => _getScriptsService.Outdated;
     public int ScriptQuantity => _scripts.Count;
     [ObservableProperty]
-    [AlsoNotifyChangeFor(nameof(DownloadedQuantity), nameof(OutdatedQuantity), nameof(ScriptQuantity))]
+    [NotifyPropertyChangedFor(nameof(DownloadedQuantity), nameof(OutdatedQuantity), nameof(ScriptQuantity))]
     private RangedObservableCollection<ScriptInfoViewModel> _scripts = new();
     [ObservableProperty]
-    [AlsoNotifyChangeFor(nameof(DownloadedQuantity), nameof(OutdatedQuantity), nameof(ScriptQuantity))]
+    [NotifyPropertyChangedFor(nameof(DownloadedQuantity), nameof(OutdatedQuantity), nameof(ScriptQuantity))]
     private ScriptInfoViewModel? _selectedItem;
     [ObservableProperty]
     private bool _showSnackBar;
@@ -91,10 +91,8 @@ public partial class ScriptRepoViewModel : BotControlViewModelBase
                 await _getScriptsService.RefreshAsync(progress, token);
             }, token);
         }
-        catch
-        {
-            RefreshScriptsList();
-        }
+        catch { }
+        RefreshScriptsList();
     }
 
     private void RefreshScriptsList()
@@ -103,9 +101,6 @@ public partial class ScriptRepoViewModel : BotControlViewModelBase
         foreach (ScriptInfo script in _getScriptsService.Scripts)
             _scripts.Add(new(script));
         OnPropertyChanged(nameof(Scripts));
-        OnPropertyChanged(nameof(DownloadedQuantity));
-        OnPropertyChanged(nameof(OutdatedQuantity));
-        OnPropertyChanged(nameof(ScriptQuantity));
         IsBusy = false;
     }
 

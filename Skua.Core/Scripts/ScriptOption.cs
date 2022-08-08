@@ -1,6 +1,6 @@
 ﻿using Skua.Core.Interfaces;
 using Skua.Core.Flash;
-using Microsoft.Toolkit.Mvvm.ComponentModel;
+using CommunityToolkit.Mvvm.ComponentModel;
 using System.Reflection;
 using System.Linq.Expressions;
 using System.Collections.Immutable;

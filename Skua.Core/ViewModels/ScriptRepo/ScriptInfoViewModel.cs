@@ -1,8 +1,8 @@
-﻿using Microsoft.Toolkit.Mvvm.ComponentModel;
+﻿using CommunityToolkit.Mvvm.ComponentModel;
 using Skua.Core.Models.GitHub;
 
 namespace Skua.Core.ViewModels;
-[INotifyPropertyChanged]
+[ObservableObject]
 public partial class ScriptInfoViewModel
 {
     public ScriptInfoViewModel(ScriptInfo info)
@@ -13,7 +13,7 @@ public partial class ScriptInfoViewModel
     public ScriptInfo Info { get; }
     public string FileName => Info.FileName;
     public int Size => Info.Size;
-    public string LocalFile => Info.LocalFile;
+    public string LocalFile => Info.FilePath;
     private bool _downloaded;
     public bool Downloaded
     {

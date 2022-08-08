@@ -33,9 +33,9 @@ public partial class GenericFieldAttributeGenerator<TInfo>
 
         public static bool HasNotifyPropertyChanged(IFieldSymbol fieldSymbol)
         {
-            return (fieldSymbol.ContainingType.BaseType?.HasFullyQualifiedName("Microsoft.Toolkit.Mvvm.ComponentModel.ObservableObject") ?? false)
-                || (fieldSymbol.ContainingType.BaseType?.HasFullyQualifiedName("Microsoft.Toolkit.Mvvm.ComponentModel.ObservableRecipient") ?? false)
-                || (fieldSymbol.ContainingType.BaseType?.HasFullyQualifiedName("Microsoft.Toolkit.Mvvm.ComponentModel.ObservableValidator") ?? false);
+            return (fieldSymbol.ContainingType.BaseType?.HasFullyQualifiedName("CommunityToolkit.Mvvm.ComponentModel.ObservableObject") ?? false)
+                || (fieldSymbol.ContainingType.BaseType?.HasFullyQualifiedName("CommunityToolkit.Mvvm.ComponentModel.ObservableRecipient") ?? false)
+                || (fieldSymbol.ContainingType.BaseType?.HasFullyQualifiedName("CommunityToolkit.Mvvm.ComponentModel.ObservableValidator") ?? false);
         }
 
         /// <summary>

@@ -1,5 +1,5 @@
 ﻿using System.Windows.Controls;
-using Microsoft.Toolkit.Mvvm.DependencyInjection;
+using CommunityToolkit.Mvvm.DependencyInjection;
 using Skua.Core.ViewModels;
 
 namespace Skua.WPF.Views;

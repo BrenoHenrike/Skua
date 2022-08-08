@@ -1,5 +1,5 @@
 ﻿using System.Net;
-using Microsoft.Toolkit.Mvvm.Input;
+using CommunityToolkit.Mvvm.Input;
 using Skua.Core.Interfaces;
 using Skua.Core.Models;
 using Skua.Core.Models.Servers;

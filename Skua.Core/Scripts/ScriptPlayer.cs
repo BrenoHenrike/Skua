@@ -6,7 +6,7 @@ using Skua.Core.Models.Items;
 using Skua.Core.Models.Players;
 using Skua.Core.Flash;
 using Skua.Core.Models;
-using Microsoft.Toolkit.Mvvm.Messaging;
+using CommunityToolkit.Mvvm.Messaging;
 using Skua.Core.Messaging;
 
 namespace Skua.Core.Scripts;

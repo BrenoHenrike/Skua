@@ -4,7 +4,7 @@ using Skua.Core.Interfaces;
 using Skua.Core.Models.Servers;
 using Skua.Core.Utils;
 using Skua.Core.Flash;
-using Microsoft.Toolkit.Mvvm.ComponentModel;
+using CommunityToolkit.Mvvm.ComponentModel;
 
 namespace Skua.Core.Scripts;
 

@@ -1,4 +1,4 @@
-﻿using Microsoft.Toolkit.Mvvm.Input;
+﻿using CommunityToolkit.Mvvm.Input;
 using Skua.Core.Interfaces;
 using Skua.Core.Models.Quests;
 using Skua.Core.Utils;
@@ -120,7 +120,7 @@ public class LoaderViewModel : BotControlViewModelBase, IManagedWindow
 
     private async Task UpdateQuests(bool getAll)
     {
-        _loaderCTS = new CancellationTokenSource();
+        _loaderCTS = new();
         QuestIDs.Clear();
         Progress<string> progress = new(progress =>
         {

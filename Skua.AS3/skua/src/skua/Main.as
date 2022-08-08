@@ -293,7 +293,6 @@ package skua
         
         public static function attackMonsterByID(id:int):void
         {
-			instance.external.debug("reached attack");
             var monster:* = instance.game.world.getMonster(id);
 			attackTarget(monster);
         }

@@ -3,9 +3,9 @@ using System.Diagnostics;
 using Skua.Core.Interfaces;
 using Skua.Core.Models.Items;
 using Skua.Core.Utils;
-using Microsoft.Toolkit.Mvvm.Messaging;
+using CommunityToolkit.Mvvm.Messaging;
 using Skua.Core.Messaging;
-using Microsoft.Toolkit.Mvvm.DependencyInjection;
+using CommunityToolkit.Mvvm.DependencyInjection;
 using Skua.Core.Models;
 
 namespace Skua.Core.Scripts;
@@ -279,7 +279,7 @@ public class ScriptInterface : IScriptInterface, IScriptInterfaceManager
             return (Environment.TickCount, connDetail);
         if (Environment.TickCount - lastConnChange >= Options.LoadTimeout && connDetail == lastConnDetail)
         {
-            if (connDetail.Contains("loading map") && !_waitForLogin && string.IsNullOrEmpty(Map.LastMap))
+            if (connDetail.Contains("loading map") && !_waitForLogin)
             {
                 Map.Join("battleon");
                 Map.Reload();
@@ -434,8 +434,6 @@ public class ScriptInterface : IScriptInterface, IScriptInterfaceManager
                             }
                             break;
                         case "ccqr":
-                            string aa = Convert.ToString(packet);
-                            Trace.WriteLine(aa);
                             if (data.bSuccess == 1)
                             {
                                 Stats.QuestsCompleted++;

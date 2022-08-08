@@ -1,5 +1,5 @@
 ﻿using System.Windows.Controls;
-using Microsoft.Toolkit.Mvvm.Input;
+using CommunityToolkit.Mvvm.Input;
 using Microsoft.Xaml.Behaviors;
 
 namespace Skua.WPF;

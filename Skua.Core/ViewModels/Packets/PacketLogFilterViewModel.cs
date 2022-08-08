@@ -1,4 +1,4 @@
-﻿using Microsoft.Toolkit.Mvvm.ComponentModel;
+﻿using CommunityToolkit.Mvvm.ComponentModel;
 
 namespace Skua.Core.ViewModels;
 public class PacketLogFilterViewModel : ObservableRecipient
