@@ -6,6 +6,8 @@ using System.Linq.Expressions;
 using System.Collections.Immutable;
 using Skua.Core.Models;
 using System.Collections.Specialized;
+using CommunityToolkit.Mvvm.Messaging;
+using Skua.Core.Messaging;
 
 namespace Skua.Core.Scripts;
 public partial class ScriptOption : ObservableRecipient, IScriptOption, IOptionDictionary
@@ -22,7 +24,20 @@ public partial class ScriptOption : ObservableRecipient, IScriptOption, IOptionD
         _settingsService = settingsService;
         GetOptions();
         OptionDictionary = GenerateDictionary().ToImmutableDictionary();
+        StrongReferenceMessenger.Default.Register<ScriptOption, ScriptStoppedMessage, int>(this, (int)MessageChannels.ScriptStatus, ScriptStopped);
     }
+
+    private void ScriptStopped(ScriptOption recipient, ScriptStoppedMessage message)
+    {
+        recipient.AutoRelogin = false;
+        recipient.LagKiller = false;
+        recipient.LagKiller = true;
+        recipient.LagKiller = false;
+        recipient.AggroAllMonsters = false;
+        recipient.AggroMonsters = false;
+        recipient.SkipCutscenes = false;
+    }
+
     private readonly Lazy<IFlashUtil> _lazyFlash;
     private readonly ISettingsService _settingsService;
     private Dictionary<string, string>? _userOptions;

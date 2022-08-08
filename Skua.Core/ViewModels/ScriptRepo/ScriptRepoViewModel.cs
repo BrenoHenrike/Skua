@@ -39,8 +39,6 @@ public partial class ScriptRepoViewModel : BotControlViewModelBase
     [NotifyPropertyChangedFor(nameof(DownloadedQuantity), nameof(OutdatedQuantity), nameof(ScriptQuantity))]
     private ScriptInfoViewModel? _selectedItem;
     [ObservableProperty]
-    private bool _showSnackBar;
-    [ObservableProperty]
     private bool _isBusy;
     [ObservableProperty]
     private string _progressReportMessage = string.Empty;
@@ -58,26 +56,26 @@ public partial class ScriptRepoViewModel : BotControlViewModelBase
 
     private void StartScriptAsync()
     {
-        if (SelectedItem is null)
+        if (SelectedItem is null || !SelectedItem.Downloaded)
             return;
 
-        Messenger.Send<StartScriptMessage>(new(SelectedItem.LocalFile));
+        StrongReferenceMessenger.Default.Send<StartScriptMessage, int>(new(SelectedItem.LocalFile), (int)MessageChannels.ScriptStatus);
     }
 
     private void OpenScript()
     {
-        if (SelectedItem is null)
+        if (SelectedItem is null || !SelectedItem.Downloaded)
             return;
 
-        Messenger.Send<EditScriptMessage>(new(SelectedItem.LocalFile));
+        StrongReferenceMessenger.Default.Send<EditScriptMessage, int>(new(SelectedItem.LocalFile), (int)MessageChannels.ScriptStatus);
     }
 
     private void LoadScript()
     {
-        if (SelectedItem is null)
+        if (SelectedItem is null || !SelectedItem.Downloaded)
             return;
 
-        Messenger.Send<LoadScriptMessage>(new(SelectedItem.LocalFile));
+        StrongReferenceMessenger.Default.Send<LoadScriptMessage, int>(new(SelectedItem.LocalFile), (int)MessageChannels.ScriptStatus);
     }
 
     private async Task Refresh(CancellationToken token)

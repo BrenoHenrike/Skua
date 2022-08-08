@@ -20,7 +20,6 @@ public class ScriptWait : IScriptWait
     private readonly Lazy<IScriptQuest> _lazyQuests;
     private readonly Lazy<IScriptDrop> _lazyDrops;
     private readonly Lazy<IScriptSkill> _lazySkills;
-    private readonly IMessenger _messenger;
 
     private IFlashUtil Flash => _lazyFlash.Value;
     private IScriptPlayer Player => _lazyPlayer.Value;
@@ -45,8 +44,7 @@ public class ScriptWait : IScriptWait
         Lazy<IScriptHouseInv> house,
         Lazy<IScriptQuest> quests,
         Lazy<IScriptDrop> drops,
-        Lazy<IScriptSkill> skills,
-        IMessenger messenger)
+        Lazy<IScriptSkill> skills)
     {
         _lazyFlash = flash;
         _lazyPlayer = player;
@@ -59,20 +57,17 @@ public class ScriptWait : IScriptWait
         _lazyQuests = quests;
         _lazyDrops = drops;
         _lazySkills = skills;
-        _messenger = messenger;
 
-        _messenger.Register<ScriptWait, ItemBoughtMessage>(this, (r, m) => r.ItemBuyEvent.Set());
-        _messenger.Register<ScriptWait, ItemSoldMessage>(this, (r, m) => r.ItemSellEvent.Set());
-        _messenger.Register<ScriptWait, BankLoadedMessage>(this, (r, m) => r.BankLoadEvent.Set());
+        StrongReferenceMessenger.Default.Register<ScriptWait, ItemBoughtMessage>(this, (r, m) => r._itemBuyEvent.Set());
+        StrongReferenceMessenger.Default.Register<ScriptWait, ItemSoldMessage>(this, (r, m) => r._itemSellEvent.Set());
+        StrongReferenceMessenger.Default.Register<ScriptWait, BankLoadedMessage>(this, (r, m) => r._bankLoadEvent.Set());
     }
 
     public int WAIT_SLEEP { get; set; } = 250;
 
-    private AutoResetEvent ItemBuyEvent { get; } = new(false);
-    private AutoResetEvent ItemSellEvent { get; } = new(false);
-    private AutoResetEvent BankLoadEvent { get; } = new(false);
-
-
+    private readonly AutoResetEvent _itemBuyEvent = new(false);
+    private readonly AutoResetEvent _itemSellEvent = new(false);
+    private readonly AutoResetEvent _bankLoadEvent = new(false);
 
     public bool OverrideTimeout { get; set; } = false;
     public int PlayerActionTimeout { get; set; } = 15;
@@ -151,12 +146,12 @@ public class ScriptWait : IScriptWait
 
     public bool ForItemBuy(int timeout = 10)
     {
-        return ItemBuyEvent.WaitOne((OverrideTimeout ? ItemActionTimeout : timeout) * WAIT_SLEEP);
+        return _itemBuyEvent.WaitOne((OverrideTimeout ? ItemActionTimeout : timeout) * WAIT_SLEEP);
     }
 
     public bool ForItemSell(int timeout = 10)
     {
-        return ItemSellEvent.WaitOne((OverrideTimeout ? ItemActionTimeout : timeout) * WAIT_SLEEP);
+        return _itemSellEvent.WaitOne((OverrideTimeout ? ItemActionTimeout : timeout) * WAIT_SLEEP);
     }
 
     public bool ForItemEquip(int id, int timeout = 10)
@@ -211,7 +206,7 @@ public class ScriptWait : IScriptWait
 
     public bool ForBankLoad(int timeout = 20)
     {
-        return BankLoadEvent.WaitOne(timeout * WAIT_SLEEP);
+        return _bankLoadEvent.WaitOne(timeout * WAIT_SLEEP);
     }
 
     public bool ForQuestAccept(int id, int timeout = 14)

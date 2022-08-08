@@ -1,5 +1,4 @@
-﻿using CommunityToolkit.Mvvm.ComponentModel;
-using CommunityToolkit.Mvvm.Messaging;
+﻿using CommunityToolkit.Mvvm.Messaging;
 using Skua.Core.Interfaces;
 using Skua.Core.Models.Items;
 using Skua.Core.Flash;
@@ -16,8 +15,7 @@ public partial class ScriptBank : IScriptBank
         Lazy<IScriptInventory> inventory,
         Lazy<IScriptOption> options,
         Lazy<IScriptManager> manager,
-        Lazy<IScriptPlayer> player,
-        IMessenger messenger)
+        Lazy<IScriptPlayer> player)
     {
         _lazyFlash = flash;
         _lazySend = send;
@@ -27,9 +25,9 @@ public partial class ScriptBank : IScriptBank
         _lazyOptions = options;
         _lazyManager = manager;
         _lazyPlayer = player;
-        _messenger = messenger;
 
-        _messenger.Register<ScriptBank, BankLoadedMessage>(this, (r, m) => r.Loaded = true);
+        StrongReferenceMessenger.Default.Register<ScriptBank, BankLoadedMessage>(this, (r, m) => r.Loaded = true);
+        StrongReferenceMessenger.Default.Register<ScriptBank, LogoutMessage>(this, (r, m) => r.Loaded = false);
     }
 
     private readonly Lazy<IFlashUtil> _lazyFlash;
@@ -40,7 +38,6 @@ public partial class ScriptBank : IScriptBank
     private readonly Lazy<IScriptOption> _lazyOptions;
     private readonly Lazy<IScriptManager> _lazyManager;
     private readonly Lazy<IScriptPlayer> _lazyPlayer;
-    private readonly IMessenger _messenger;
 
     private IFlashUtil Flash => _lazyFlash.Value;
     private IScriptSend Send => _lazySend.Value;
@@ -53,7 +50,7 @@ public partial class ScriptBank : IScriptBank
 
     public bool Loaded { get; set; } = false;
     [ObjectBinding("world.bankinfo.items", Default = "new()")]
-    private List<InventoryItem>? _items;
+    private List<InventoryItem> _items = new();
     [ObjectBinding("world.myAvatar.objData.iBankSlots")]
     private int _slots;
     [ObjectBinding("world.myAvatar.iBankCount")]

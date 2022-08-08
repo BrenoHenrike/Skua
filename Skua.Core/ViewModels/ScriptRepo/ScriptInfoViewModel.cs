@@ -10,20 +10,16 @@ public partial class ScriptInfoViewModel
         Info = info;
         _downloaded = Info.Downloaded;
     }
+
     public ScriptInfo Info { get; }
     public string FileName => Info.FileName;
     public int Size => Info.Size;
-    public string LocalFile => Info.FilePath;
+    public string LocalFile => Info.LocalFile;
+    public string FilePath => Info.FilePath;
+
+    [ObservableProperty]
+    [NotifyPropertyChangedFor(nameof(Outdated))]
     private bool _downloaded;
-    public bool Downloaded
-    {
-        get { return _downloaded; }
-        set 
-        {
-            SetProperty(ref _downloaded, value);
-            OnPropertyChanged(nameof(Outdated));
-        }
-    }
 
     public bool Outdated => Downloaded && Info.LocalSha != Info.Hash;
 

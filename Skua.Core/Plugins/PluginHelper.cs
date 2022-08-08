@@ -10,9 +10,9 @@ public class PluginHelper : IPluginHelper
     private readonly IMessenger _messenger;
 
     private Dictionary<string, MainMenuItemViewModel> _buttons = new();
-    public PluginHelper(IMessenger messenger)
+    public PluginHelper()
     {
-        _messenger = messenger;
+        _messenger = StrongReferenceMessenger.Default;
     }
     public void AddMenuButton(string text, Action action)
     {
@@ -21,7 +21,7 @@ public class PluginHelper : IPluginHelper
 
         var vm = new MainMenuItemViewModel(text, new RelayCommand(action));
         _buttons.Add(text, vm);
-        _messenger.Send<AddPluginMenuItemMessage>(new(vm));
+        _messenger.Send<AddPluginMenuItemMessage, int>(new(vm), (int)MessageChannels.Plugins);
     }
 
     public void RemoveMenuButton(string text)
@@ -29,7 +29,7 @@ public class PluginHelper : IPluginHelper
         if (!_buttons.ContainsKey(text))
             return;
 
-        _messenger.Send<RemovePluginMenuItemMessage>(new(_buttons[text]));
+        _messenger.Send<RemovePluginMenuItemMessage, int>(new(_buttons[text]), (int)MessageChannels.Plugins);
         _buttons.Remove(text);
     }
 }

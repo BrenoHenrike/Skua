@@ -14,19 +14,18 @@ public partial class ScriptCombat : IScriptCombat
         Lazy<IScriptOption> options,
         Lazy<IScriptWait> wait,
         Lazy<IScriptPlayer> player,
-        Lazy<IScriptMap> map,
-        IMessenger messenger)
+        Lazy<IScriptMap> map)
     {
         _lazyFlash = flash;
         _lazyOptions = options;
         _lazyWait = wait;
         _lazyPlayer = player;
         _lazyMap = map;
-        _messenger = messenger;
+        _messenger = StrongReferenceMessenger.Default;
 
-        _messenger.Register<ScriptCombat, CounterAttackMessage>(this, CounterAttack);
-        _messenger.Register<ScriptCombat, PlayerDeathMessage>(this, PlayerDead);
-        _messenger.Register<ScriptCombat, ScriptStoppedMessage>(this, ScriptStopped);
+        _messenger.Register<ScriptCombat, CounterAttackMessage, int>(this, (int)MessageChannels.GameEvents, CounterAttack);
+        _messenger.Register<ScriptCombat, PlayerDeathMessage, int>(this, (int)MessageChannels.GameEvents, PlayerDead);
+        _messenger.Register<ScriptCombat, ScriptStoppedMessage, int>(this, (int)MessageChannels.ScriptStatus, ScriptStopped);
     }
 
     private readonly Lazy<IFlashUtil> _lazyFlash;
@@ -98,6 +97,7 @@ public partial class ScriptCombat : IScriptCombat
     {
         recipient.StopAttacking = false;
     }
+
     Monster? _target;
     private void CounterAttack(ScriptCombat recipient, CounterAttackMessage message)
     {

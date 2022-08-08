@@ -5,7 +5,6 @@ using Skua.Core.Messaging;
 using Skua.Core.Models;
 using Skua.Core.Models.Items;
 using Skua.Core.Models.Shops;
-using System.Dynamic;
 
 namespace Skua.Core.Scripts;
 
@@ -18,8 +17,7 @@ public partial class ScriptShop : IScriptShop
         Lazy<IScriptMap> map,
         Lazy<IScriptPlayer> player,
         Lazy<IScriptSend> send,
-        Lazy<IScriptInventory> inventory,
-        IMessenger messenger)
+        Lazy<IScriptInventory> inventory)
     {
         _lazyFlash = flash;
         _lazyOptions = options;
@@ -28,9 +26,8 @@ public partial class ScriptShop : IScriptShop
         _lazyPlayer = player;
         _lazySend = send;
         _lazyInventory = inventory;
-        _messenger = messenger;
 
-        _messenger.Register<ScriptShop, ShopLoadedMessage>(this, ShopLoaded);
+        StrongReferenceMessenger.Default.Register<ScriptShop, ShopLoadedMessage, int>(this, (int)MessageChannels.GameEvents, ShopLoaded);
     }
 
     private void ShopLoaded(ScriptShop recipient, ShopLoadedMessage message)
@@ -46,7 +43,6 @@ public partial class ScriptShop : IScriptShop
     private readonly Lazy<IScriptPlayer> _lazyPlayer;
     private readonly Lazy<IScriptSend> _lazySend;
     private readonly Lazy<IScriptInventory> _lazyInventory;
-    private readonly IMessenger _messenger;
 
     private IFlashUtil Flash => _lazyFlash.Value;
     private IScriptOption Options => _lazyOptions.Value;

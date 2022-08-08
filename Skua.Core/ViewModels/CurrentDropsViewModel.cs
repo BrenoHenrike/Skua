@@ -12,7 +12,7 @@ public partial class CurrentDropsViewModel : BotControlViewModelBase
     public CurrentDropsViewModel(IScriptDrop drops, IScriptPlayer player)
         : base("Current Drops", 500, 400)
     {
-        Messenger.Register<CurrentDropsViewModel, ItemDroppedMessage>(this, CurrentDropsChanged);
+        StrongReferenceMessenger.Default.Register<CurrentDropsViewModel, ItemDroppedMessage, int>(this, (int)MessageChannels.GameEvents, CurrentDropsChanged);
         _drops = drops;
         _player = player;
         PickupCommand = new RelayCommand(Pickup);

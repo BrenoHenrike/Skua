@@ -5,27 +5,38 @@ using Skua.Core.Messaging;
 namespace Skua.Core.Scripts;
 public class ScriptEvent : IScriptEvent
 {
-    public ScriptEvent(IMessenger messenger)
+    public ScriptEvent()
     {
-        _messenger = messenger;
-        _messenger.Register<ScriptEvent, LogoutMessage>(this, OnLogout);
-        _messenger.Register<ScriptEvent, PlayerDeathMessage>(this, OnPlayerDeath);
-        _messenger.Register<ScriptEvent, MonsterKilledMessage>(this, OnMonsterKilled);
-        _messenger.Register<ScriptEvent, QuestAcceptedMessage>(this, OnQuestAccepted);
-        _messenger.Register<ScriptEvent, QuestTurninMessage>(this, OnQuestTurnIn);
-        _messenger.Register<ScriptEvent, MapChangedMessage>(this, OnMapChanged);
-        _messenger.Register<ScriptEvent, CellChangedMessage>(this, OnCellChanged);
-        _messenger.Register<ScriptEvent, ReloginTriggeredMessage>(this, OnReloginTriggered);
-        _messenger.Register<ScriptEvent, ExtensionPacketMessage>(this, OnExtensionPacket);
-        _messenger.Register<ScriptEvent, PlayerAFKMessage>(this, OnPlayerAFK);
-        _messenger.Register<ScriptEvent, TryBuyItemMessage>(this, OnTryBuyItem);
-        _messenger.Register<ScriptEvent, CounterAttackMessage>(this, OnCounterAttack);
-        _messenger.Register<ScriptEvent, ItemDroppedMessage>(this, OnItemDropped);
-        _messenger.Register<ScriptEvent, ItemBoughtMessage>(this, OnItemBought);
-        _messenger.Register<ScriptEvent, ItemSoldMessage>(this, OnItemSold);
-        _messenger.Register<ScriptEvent, ItemAddedToBankMessage>(this, OnItemAddedToBank);
-        _messenger.Register<ScriptEvent, RunToAreaMessage>(this, OnRunToArea);
-        _messenger.Register<ScriptEvent, ScriptStoppingRequestMessage>(this, OnScriptStopping);
+        _messenger = StrongReferenceMessenger.Default;
+        _messenger.Register<ScriptEvent, ScriptStoppingRequestMessage, int>(this, (int)MessageChannels.ScriptStatus, OnScriptStopping);
+        _messenger.Register<ScriptEvent, ScriptStartedMessage, int>(this, (int)MessageChannels.ScriptStatus, ScriptStarted);
+        _messenger.Register<ScriptEvent, ScriptStoppedMessage, int>(this, (int)MessageChannels.ScriptStatus, ScriptStopped);
+        RegisterGameEvents();
+    }
+
+    private void RegisterGameEvents()
+    {
+        _messenger.Register<ScriptEvent, LogoutMessage, int>(this, (int)MessageChannels.GameEvents, OnLogout);
+        _messenger.Register<ScriptEvent, PlayerDeathMessage, int>(this, (int)MessageChannels.GameEvents, OnPlayerDeath);
+        _messenger.Register<ScriptEvent, MonsterKilledMessage, int>(this, (int)MessageChannels.GameEvents, OnMonsterKilled);
+        _messenger.Register<ScriptEvent, QuestAcceptedMessage, int>(this, (int)MessageChannels.GameEvents, OnQuestAccepted);
+        _messenger.Register<ScriptEvent, QuestTurninMessage, int>(this, (int)MessageChannels.GameEvents, OnQuestTurnIn);
+        _messenger.Register<ScriptEvent, MapChangedMessage, int>(this, (int)MessageChannels.GameEvents, OnMapChanged);
+        _messenger.Register<ScriptEvent, CellChangedMessage, int>(this, (int)MessageChannels.GameEvents, OnCellChanged);
+        _messenger.Register<ScriptEvent, ReloginTriggeredMessage, int>(this, (int)MessageChannels.GameEvents, OnReloginTriggered);
+        _messenger.Register<ScriptEvent, ExtensionPacketMessage, int>(this, (int)MessageChannels.GameEvents, OnExtensionPacket);
+        _messenger.Register<ScriptEvent, PlayerAFKMessage, int>(this, (int)MessageChannels.GameEvents, OnPlayerAFK);
+        _messenger.Register<ScriptEvent, TryBuyItemMessage, int>(this, (int)MessageChannels.GameEvents, OnTryBuyItem);
+        _messenger.Register<ScriptEvent, CounterAttackMessage, int>(this, (int)MessageChannels.GameEvents, OnCounterAttack);
+        _messenger.Register<ScriptEvent, ItemDroppedMessage, int>(this, (int)MessageChannels.GameEvents, OnItemDropped);
+        _messenger.Register<ScriptEvent, ItemBoughtMessage, int>(this, (int)MessageChannels.GameEvents, OnItemBought);
+        _messenger.Register<ScriptEvent, ItemSoldMessage, int>(this, (int)MessageChannels.GameEvents, OnItemSold);
+        _messenger.Register<ScriptEvent, ItemAddedToBankMessage, int>(this, (int)MessageChannels.GameEvents, OnItemAddedToBank);
+        _messenger.Register<ScriptEvent, RunToAreaMessage, int>(this, (int)MessageChannels.GameEvents, OnRunToArea);
+    }
+    private void UnregisterGameEvents()
+    {
+        _messenger.UnregisterAll(this, (int)MessageChannels.GameEvents);
     }
 
     private readonly IMessenger _messenger;
@@ -65,6 +76,17 @@ public class ScriptEvent : IScriptEvent
         ItemDropped = null;
         ScriptStopping = null;
         RunToArea = null;
+    }
+
+    private void ScriptStopped(ScriptEvent recipient, ScriptStoppedMessage message)
+    {
+        recipient.UnregisterGameEvents();
+        recipient.ClearHandlers();
+    }
+
+    private void ScriptStarted(ScriptEvent recipient, ScriptStartedMessage message)
+    {
+        recipient.RegisterGameEvents();
     }
 
     public void OnLogout(ScriptEvent recipient, LogoutMessage message)

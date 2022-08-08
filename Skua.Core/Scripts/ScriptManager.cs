@@ -9,15 +9,12 @@ using CommunityToolkit.Mvvm.Messaging;
 using Skua.Core.Interfaces;
 using Skua.Core.Messaging;
 using Skua.Core.Models;
-using Skua.Core.Options;
-using Westwind.Scripting;
 
 namespace Skua.Core.Scripts;
 public partial class ScriptManager : ObservableObject, IScriptManager
 {
     public ScriptManager(
         ILogService logger,
-        IMessenger messenger,
         Lazy<IScriptInterface> scriptInterface,
         Lazy<IScriptHandlers> handlers,
         Lazy<IScriptOption> options,
@@ -33,8 +30,7 @@ public partial class ScriptManager : ObservableObject, IScriptManager
         _lazySkills = skills;
         _lazyDrops = drops;
         _lazyWait = wait;
-        _logger = logger; _messenger = messenger;
-        ;
+        _logger = logger;
     }
 
     private readonly Lazy<IScriptInterface> _lazyBot;
@@ -45,29 +41,28 @@ public partial class ScriptManager : ObservableObject, IScriptManager
     private readonly Lazy<IScriptDrop> _lazyDrops;
     private readonly Lazy<IScriptWait> _lazyWait;
     private readonly ILogService _logger;
-    private readonly IMessenger _messenger;
-    private Dictionary<string, bool> _configured = new();
+    private readonly Dictionary<string, bool> _configured = new();
     private IScriptHandlers Handlers => _lazyHandlers.Value;
     private IScriptOption Options => _lazyOptions.Value;
     private IScriptEvent Events => _lazyEvents.Value;
     private IScriptSkill Skills => _lazySkills.Value;
     private IScriptDrop Drops => _lazyDrops.Value;
     private IScriptWait Wait => _lazyWait.Value;
-    private Thread? CurrentScriptThread;
+    private Thread? _currentScriptThread;
     public CancellationTokenSource? ScriptCTS { get; private set; }
 
-    public bool ScriptRunning => CurrentScriptThread?.IsAlive ?? false;
+    public bool ScriptRunning => _currentScriptThread?.IsAlive ?? false;
     [ObservableProperty]
-    private string _LoadedScript = string.Empty;
+    private string _loadedScript = string.Empty;
     [ObservableProperty]
-    private string _CompiledScript = string.Empty;
+    private string _compiledScript = string.Empty;
     public IScriptOptionContainer? Config { get; set; }
 
     public bool ShouldExit => ScriptCTS?.IsCancellationRequested ?? false;
 
-    private bool stoppedByScript;
-    private bool runScriptStoppingBool;
-    private List<string> _refCache = new();
+    private bool _stoppedByScript;
+    private bool _runScriptStoppingBool;
+    private readonly List<string> _refCache = new();
     public async Task<Exception?> StartScriptAsync()
     {
         if (ScriptRunning)
@@ -85,7 +80,7 @@ public partial class ScriptManager : ObservableObject, IScriptManager
             if (_configured.TryGetValue(Config!.Storage, out bool b) && !b)
                 Config.Configure();
             Handlers.Clear();
-            CurrentScriptThread = new(async () =>
+            _currentScriptThread = new(async () =>
             {
                 Exception? exception = null;
                 ScriptCTS = new();
@@ -95,22 +90,22 @@ public partial class ScriptManager : ObservableObject, IScriptManager
                 }
                 catch (Exception e)
                 {
-                    if (e is not TargetInvocationException || !stoppedByScript)
+                    if (e is not TargetInvocationException || !_stoppedByScript)
                     {
                         exception = e;
                         Trace.WriteLine($"Error while running script:\r\nMessage: {e.Message}\r\n{(e.InnerException is not null ? $"Inner Exception Message: {e.InnerException.Message}" : string.Empty)}StackTrace: {e.StackTrace}");
-                        _messenger.Send<ScriptErrorMessage>(new(e));
+                        StrongReferenceMessenger.Default.Send<ScriptErrorMessage, int>(new(e), (int)MessageChannels.ScriptStatus);
                     }
                 }
                 finally
                 {
-                    stoppedByScript = false;
-                    if (runScriptStoppingBool)
+                    _stoppedByScript = false;
+                    if (_runScriptStoppingBool)
                     {
-                        _messenger.Send<ScriptStoppingMessage>();
+                        StrongReferenceMessenger.Default.Send<ScriptStoppingMessage, int>((int)MessageChannels.ScriptStatus);
                         try
                         {
-                            switch (await Task.Run(async () => await WeakReferenceMessenger.Default.Send<ScriptStoppingRequestMessage>(new(exception))))
+                            switch (await Task.Run(async () => await WeakReferenceMessenger.Default.Send<ScriptStoppingRequestMessage, int>(new(exception), (int)MessageChannels.ScriptStatus)))
                             {
                                 case true:
                                     Trace.WriteLine("Script finished succesfully.");
@@ -124,26 +119,18 @@ public partial class ScriptManager : ObservableObject, IScriptManager
                         }
                         catch { }
                     }
-                    Options.AutoRelogin = false;
-                    Options.LagKiller = false;
-                    Options.LagKiller = true;
-                    Options.LagKiller = false;
-                    Options.AggroAllMonsters = false;
-                    Options.AggroMonsters = false;
-                    Options.SkipCutscenes = false;
                     Skills.Stop();
                     Drops.Stop();
-                    Events.ClearHandlers();
                     ScriptCTS.Dispose();
                     ScriptCTS = null;
                     OnPropertyChanged(nameof(ScriptRunning));
-                    _messenger.Send<ScriptStoppedMessage>();
+                    StrongReferenceMessenger.Default.Send<ScriptStoppedMessage, int>((int)MessageChannels.ScriptStatus);
                 }
             });
-            CurrentScriptThread.Name = "Script Thread";
-            CurrentScriptThread.Start();
+            _currentScriptThread.Name = "Script Thread";
+            _currentScriptThread.Start();
             OnPropertyChanged(nameof(ScriptRunning));
-            _messenger.Send<ScriptStartedMessage>();
+            StrongReferenceMessenger.Default.Send<ScriptStartedMessage, int>((int)MessageChannels.ScriptStatus);
             return null;
         }
         catch (Exception e)
@@ -176,8 +163,8 @@ public partial class ScriptManager : ObservableObject, IScriptManager
 
     public void StopScript(bool runScriptStoppingEvent = true)
     {
-        runScriptStoppingBool = runScriptStoppingEvent;
-        stoppedByScript = true;
+        _runScriptStoppingBool = runScriptStoppingEvent;
+        _stoppedByScript = true;
         ScriptCTS?.Cancel();
         if(Thread.CurrentThread.Name == "Script Thread")
         {
@@ -190,8 +177,8 @@ public partial class ScriptManager : ObservableObject, IScriptManager
 
     public async ValueTask StopScriptAsync(bool runScriptStoppingEvent = true)
     {
-        runScriptStoppingBool = runScriptStoppingEvent;
-        stoppedByScript = true;
+        _runScriptStoppingBool = runScriptStoppingEvent;
+        _stoppedByScript = true;
         ScriptCTS?.Cancel();
         if (Thread.CurrentThread.Name == "Script Thread")
         {
@@ -263,11 +250,11 @@ public partial class ScriptManager : ObservableObject, IScriptManager
         string final = string.Join('\n', sources);
         SyntaxTree tree = CSharpSyntaxTree.ParseText(final, encoding: Encoding.UTF8);
         final = tree.GetRoot().NormalizeWhitespace().ToFullString();
-        CSharpScriptExecution compiler = Ioc.Default.GetService<CSharpScriptExecution>()!;
+        Compiler compiler = Ioc.Default.GetRequiredService<Compiler>();
         if (references.Count > 0)
             compiler.AddAssemblies(references.ToArray());
 
-        dynamic assembly = compiler.CompileClass(final);
+        dynamic? assembly = compiler.CompileClass(final);
         sw.Stop();
         Trace.WriteLine($"Script compilation took {sw.ElapsedMilliseconds}ms.");
         File.WriteAllText(Path.Combine(AppContext.BaseDirectory, "Scripts", "z_CompiledScript.cs"), final);

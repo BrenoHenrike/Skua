@@ -17,12 +17,12 @@ public partial class ScriptLoaderViewModel : BotControlViewModelBase
         IEnumerable<LogTabViewModel> logs) 
         : base("Load Script", 350, 450)
     {
-        Messenger.Register<ScriptLoaderViewModel, LoadScriptMessage>(this, ReceiveLoadScript);
-        Messenger.Register<ScriptLoaderViewModel, EditScriptMessage>(this, ReceiveEditScript);
-        Messenger.Register<ScriptLoaderViewModel, StartScriptMessage>(this, ReceiveToggleScript);
-        Messenger.Register<ScriptLoaderViewModel, ScriptStartedMessage>(this, ScriptStarted);
-        Messenger.Register<ScriptLoaderViewModel, ScriptStoppedMessage>(this, ScriptStopped);
-        Messenger.Register<ScriptLoaderViewModel, ScriptStoppingMessage>(this, ScriptStopping);
+        StrongReferenceMessenger.Default.Register<ScriptLoaderViewModel, LoadScriptMessage, int>(this, (int)MessageChannels.ScriptStatus, ReceiveLoadScript);
+        StrongReferenceMessenger.Default.Register<ScriptLoaderViewModel, EditScriptMessage, int>(this, (int)MessageChannels.ScriptStatus, ReceiveEditScript);
+        StrongReferenceMessenger.Default.Register<ScriptLoaderViewModel, StartScriptMessage, int>(this, (int)MessageChannels.ScriptStatus, ReceiveToggleScript);
+        StrongReferenceMessenger.Default.Register<ScriptLoaderViewModel, ScriptStartedMessage, int>(this, (int)MessageChannels.ScriptStatus, ScriptStarted);
+        StrongReferenceMessenger.Default.Register<ScriptLoaderViewModel, ScriptStoppedMessage, int>(this, (int)MessageChannels.ScriptStatus, ScriptStopped);
+        StrongReferenceMessenger.Default.Register<ScriptLoaderViewModel, ScriptStoppingMessage, int>(this, (int)MessageChannels.ScriptStatus, ScriptStopping);
 
         _scriptPath = Path.Combine(AppContext.BaseDirectory, "Scripts");
         ScriptLogs = logs.ToArray()[1];

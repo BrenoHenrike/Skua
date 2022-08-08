@@ -85,7 +85,6 @@ public class ScriptInterface : IScriptInterface, IScriptInterfaceManager
         IScriptHunt hunt,
         ICaptureProxy gameProxy,
         IScriptAuto auto,
-        IMessenger messenger,
         IDialogService dialogService,
         ISettingsService settingsService)
     {
@@ -98,7 +97,7 @@ public class ScriptInterface : IScriptInterface, IScriptInterfaceManager
         Hunt = hunt;
         GameProxy = gameProxy;
         Auto = auto;
-        Messenger = messenger;
+        Messenger = StrongReferenceMessenger.Default;
         _dialogService = dialogService;
         Drops = drops;
         Events = events;
@@ -352,12 +351,12 @@ public class ScriptInterface : IScriptInterface, IScriptInterfaceManager
                         case "event":
                             string zone = data.args?["zoneSet"]!;
                             if (zone is not null)
-                                Messenger.Send<RunToAreaMessage>(new(zone));
+                                Messenger.Send<RunToAreaMessage, int>(new(zone), (int)MessageChannels.GameEvents);
                             break;
                         case "moveToArea":
                             Options.CustomName = !string.IsNullOrWhiteSpace(Options.CustomName) ? Options.CustomName : Player.Username;
                             Options.CustomGuild = !string.IsNullOrWhiteSpace(Options.CustomGuild) ? Options.CustomGuild : Player.Guild;
-                            Messenger.Send<MapChangedMessage>(new(Convert.ToString(data.strMapName)));
+                            Messenger.Send<MapChangedMessage, int>(new(Convert.ToString(data.strMapName)), (int)MessageChannels.GameEvents);
                             Map.FilePath = Convert.ToString(data.strMapFileName);
                             Map.LastMap = Convert.ToString(data.strMapName);
                             break;
@@ -366,7 +365,7 @@ public class ScriptInterface : IScriptInterface, IScriptInterfaceManager
                             if (p is not null && p.intHP == 0)
                             {
                                 Stats.Deaths++;
-                                Messenger.Send<PlayerDeathMessage>();
+                                Messenger.Send<PlayerDeathMessage, int>((int)MessageChannels.GameEvents);
                                 break;
                             }
                             dynamic anims = data.anims?[0]!;
@@ -375,7 +374,7 @@ public class ScriptInterface : IScriptInterface, IScriptInterfaceManager
                                 string msg = anims["msg"];
                                 if (msg is not null && msg.Contains("prepares a counter attack!"))
                                 {
-                                    Messenger.Send<CounterAttackMessage>(new(false));
+                                    Messenger.Send<CounterAttackMessage, int>(new(false), (int)MessageChannels.GameEvents);
                                     break;
                                 }
                             }
@@ -388,23 +387,23 @@ public class ScriptInterface : IScriptInterface, IScriptInterfaceManager
                                         continue;
                                     if (a.aura is not null && (string)a.aura["nam"] == "Counter Attack")
                                     {
-                                        Messenger.Send<CounterAttackMessage>(new(true));
+                                        Messenger.Send<CounterAttackMessage, int>(new(true), (int)MessageChannels.GameEvents);
                                         break;
                                     }
                                 }
                             }
                             break;
                         case "sellItem":
-                            Messenger.Send<ItemSoldMessage>(new(data.CharItemID, data.iQty, data.iQtyNow, data.intAmount, data.bCoins == 1));
+                            Messenger.Send<ItemSoldMessage, int>(new(data.CharItemID, data.iQty, data.iQtyNow, data.intAmount, data.bCoins == 1), (int)MessageChannels.GameEvents);
                             break;
                         case "buyItem":
                             if (data.bitSuccess == 1)
-                                Messenger.Send<ItemBoughtMessage>(new(Convert.ToInt32(data.CharItemID)));
+                                Messenger.Send<ItemBoughtMessage, int>(new(Convert.ToInt32(data.CharItemID)), (int)MessageChannels.GameEvents);
                             break;
                         case "dropItem":
                             string items = Convert.ToString(data["items"]);
                             InventoryItem drop = JsonConvert.DeserializeObject<Dictionary<string, InventoryItem>>(items)!.First().Value;
-                            Messenger.Send<ItemDroppedMessage>(new(drop));
+                            Messenger.Send<ItemDroppedMessage, int>(new(drop), (int)MessageChannels.GameEvents);
                             break;
                         case "addItems":
                             string addItems = Convert.ToString(data["items"]);
@@ -414,7 +413,7 @@ public class ScriptInterface : IScriptInterface, IScriptInterfaceManager
                                 invItem = TempInv.GetItem(addedItem.Keys.First())!;
                             if (!invItem.Temp)
                                 Stats.Drops++;
-                            Messenger.Send<ItemDroppedMessage>(new(invItem, true, Convert.ToInt32(addedItem.Values.First().iQtyNow)));
+                            Messenger.Send<ItemDroppedMessage, int>(new(invItem, true, Convert.ToInt32(addedItem.Values.First().iQtyNow)), (int)MessageChannels.GameEvents);
                             break;
                         case "getDrop":
                             bool toBank = Convert.ToBoolean(data.bBank);
@@ -423,28 +422,28 @@ public class ScriptInterface : IScriptInterface, IScriptInterfaceManager
                             if(toBank)
                             {
                                 ItemBase bankItem = Bank.GetItem(Convert.ToInt32(data.ItemID))!;
-                                Messenger.Send<ItemAddedToBankMessage>(new(bankItem, Convert.ToInt32(data.iQtyNow)));
+                                Messenger.Send<ItemAddedToBankMessage, int>(new(bankItem, Convert.ToInt32(data.iQtyNow)), (int)MessageChannels.GameEvents);
                             }
                             break;
                         case "addGoldExp":
                             if (data.typ == "m")
                             {
                                 Stats.Kills++;
-                                Messenger.Send<MonsterKilledMessage>(new(Convert.ToInt32(data.id)));
+                                Messenger.Send<MonsterKilledMessage, int>(new(Convert.ToInt32(data.id)), (int)MessageChannels.GameEvents);
                             }
                             break;
                         case "ccqr":
                             if (data.bSuccess == 1)
                             {
                                 Stats.QuestsCompleted++;
-                                Messenger.Send<QuestTurninMessage>(new(Convert.ToInt32(data.QuestID)));
+                                Messenger.Send<QuestTurninMessage, int>(new(Convert.ToInt32(data.QuestID)), (int)MessageChannels.GameEvents);
                             }
                             break;
                         case "loadBank":
-                            Messenger.Send<BankLoadedMessage>();
+                            Messenger.Send<BankLoadedMessage, int>((int)MessageChannels.GameEvents);
                             break;
                         case "loadShop":
-                            Messenger.Send<ShopLoadedMessage>(new(new(Shops.ID, Shops.Name, Shops.Items)));
+                            Messenger.Send<ShopLoadedMessage, int>(new(new(Shops.ID, Shops.Name, Shops.Items)), (int)MessageChannels.GameEvents);
                             break;
                     }
                 }
@@ -455,33 +454,33 @@ public class ScriptInterface : IScriptInterface, IScriptInterfaceManager
                     {
                         case "uotls":
                             if (Player.Username == (string)data[2] && data[3] == "afk:true")
-                                Messenger.Send<PlayerAFKMessage>();
+                                Messenger.Send<PlayerAFKMessage, int>((int)MessageChannels.GameEvents);
                             break;
                         case "loginResponse":
-                            Messenger.Send<LoginMessage>(new(Convert.ToString(data[4])));
+                            Messenger.Send<LoginMessage, int>(new(Convert.ToString(data[4])), (int)MessageChannels.GameEvents);
                             break;
                     }
                 }
-                Messenger.Send<ExtensionPacketMessage>(new(packet));
+                Messenger.Send<ExtensionPacketMessage, int>(new(packet), (int)MessageChannels.GameEvents);
                 break;
             case "packet":
                 string[] parts = ((string)args[0]).Split('%', StringSplitOptions.RemoveEmptyEntries);
                 switch (parts[2])
                 {
                     case "moveToCell":
-                        Messenger.Send<CellChangedMessage>(new(Map.Name, parts[4], parts[5]));
+                        Messenger.Send<CellChangedMessage, int>(new(Map.Name, parts[4], parts[5]), (int)MessageChannels.GameEvents);
                         break;
                     case "buyItem":
-                        Messenger.Send<TryBuyItemMessage>(new(int.Parse(parts[5]), int.Parse(parts[4]), int.Parse(parts[6])));
+                        Messenger.Send<TryBuyItemMessage, int>(new(int.Parse(parts[5]), int.Parse(parts[4]), int.Parse(parts[6])), (int)MessageChannels.GameEvents);
                         break;
                     case "acceptQuest":
                         Stats.QuestsAccepted++;
-                        Messenger.Send<QuestAcceptedMessage>(new(int.Parse(parts[4])));
+                        Messenger.Send<QuestAcceptedMessage, int>(new(int.Parse(parts[4])), (int)MessageChannels.GameEvents);
                         break;
                     case "cmd":
                         if (parts.Length >= 5 && parts[4] == "logout")
                         {
-                            Messenger.Send<LogoutMessage>();
+                            Messenger.Send<LogoutMessage, int>((int)MessageChannels.GameEvents);
                             OnLogout();
                         }
                         break;
@@ -495,8 +494,6 @@ public class ScriptInterface : IScriptInterface, IScriptInterfaceManager
     private CancellationTokenSource? _reloginCTS;
     private void OnLogout()
     {
-        Bank.Loaded = false;
-        Drops.Stop();
         if (!Options.AutoRelogin || _waitForLogin)
             return;
 
@@ -512,8 +509,7 @@ public class ScriptInterface : IScriptInterface, IScriptInterfaceManager
         Manager.StopScript();
         bool kicked = Player.Kicked;
         _waitForLogin = true;
-        //Servers.Logout();
-        Messenger.Send<ReloginTriggeredMessage>(new(kicked));
+        Messenger.Send<ReloginTriggeredMessage, int>(new(kicked), (int)MessageChannels.GameEvents);
 
         Relogin((!Options.SafeRelogin && !kicked) ? 5000 : 70000, wasRunning);
 
@@ -528,7 +524,6 @@ public class ScriptInterface : IScriptInterface, IScriptInterfaceManager
                 if (startScript)
                     await Ioc.Default.GetService<IScriptManager>()!.StartScriptAsync();
                 Log($"Relogin was {(relogged ? "successful" : "cancelled or unsuccessful")}.");
-                Drops.Start();
                 _reloginCTS.Dispose();
                 _reloginCTS = null;
                 _reloginTask = null;

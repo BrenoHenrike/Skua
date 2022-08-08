@@ -45,7 +45,7 @@ public class PluginManager : IPluginManager
             plugin.Load(Ioc.Default, Ioc.Default.GetRequiredService<IPluginHelper>());
             container.OptionContainer.SetDefaults();
             container.OptionContainer.Load();
-            WeakReferenceMessenger.Default.Send<PluginLoadedMessage>(new(container));
+            StrongReferenceMessenger.Default.Send<PluginLoadedMessage, int>(new(container), (int)MessageChannels.Plugins);
             return null;
         }
         catch (Exception e)
@@ -60,7 +60,7 @@ public class PluginManager : IPluginManager
     /// <param name="plugin">The plugin to unload.</param>
     public void Unload(ISkuaPlugin plugin)
     {
-        WeakReferenceMessenger.Default.Send<PluginUnloadedMessage>(new(_plugins[plugin]));
+        StrongReferenceMessenger.Default.Send<PluginUnloadedMessage, int>(new(_plugins[plugin]), (int)MessageChannels.Plugins);
         plugin.Unload();
         _plugins.Remove(plugin);
     }
@@ -76,7 +76,7 @@ public class PluginManager : IPluginManager
             return;
 
 
-        WeakReferenceMessenger.Default.Send<PluginUnloadedMessage>(new(_plugins[plugin]));
+        StrongReferenceMessenger.Default.Send<PluginUnloadedMessage, int>(new(_plugins[plugin]), (int)MessageChannels.Plugins);
         plugin.Unload();
         _plugins.Remove(plugin);
     }

@@ -15,14 +15,12 @@ public partial class ScriptDrop : ObservableRecipient, IScriptDrop, IAsyncDispos
     private readonly Lazy<IScriptMap> _lazyMap;
     private readonly Lazy<IScriptOption> _lazyOptions;
     private readonly Lazy<IScriptPlayer> _lazyPlayer;
-    private readonly Lazy<IScriptManager> _lazyManager;
     private readonly Lazy<IFlashUtil> _lazyFlash;
     private IScriptSend Send => _lazySend.Value;
     private IScriptWait Wait => _lazyWait.Value;
     private IScriptMap Map => _lazyMap.Value;
     private IScriptOption Options => _lazyOptions.Value;
     private IScriptPlayer Player => _lazyPlayer.Value;
-    private IScriptManager Manager => _lazyManager.Value;
     private IFlashUtil Flash => _lazyFlash.Value;
     public ScriptDrop(
         Lazy<IFlashUtil> flash,
@@ -30,8 +28,7 @@ public partial class ScriptDrop : ObservableRecipient, IScriptDrop, IAsyncDispos
         Lazy<IScriptMap> map,
         Lazy<IScriptWait> wait,
         Lazy<IScriptOption> options,
-        Lazy<IScriptPlayer> player,
-        Lazy<IScriptManager> manager)
+        Lazy<IScriptPlayer> player)
     {
         _lazySend = send;
         _lazyWait = wait;
@@ -39,13 +36,12 @@ public partial class ScriptDrop : ObservableRecipient, IScriptDrop, IAsyncDispos
         _lazyOptions = options;
         _lazyPlayer = player;
         _lazyFlash = flash;
-        _lazyManager = manager;
 
-        Messenger.Register<ScriptDrop, ItemDroppedMessage>(this, AddDrop);
-        Messenger.Register<ScriptDrop, LogoutMessage>(this, ClearDrops);
+        StrongReferenceMessenger.Default.Register<ScriptDrop, ItemDroppedMessage, int>(this, (int)MessageChannels.GameEvents, AddDrop);
+        StrongReferenceMessenger.Default.Register<ScriptDrop, LogoutMessage, int>(this, (int)MessageChannels.GameEvents, ClearDrops);
+        StrongReferenceMessenger.Default.Register<ScriptDrop, ScriptStoppedMessage, int>(this, (int)MessageChannels.ScriptStatus, ScriptStopped);
         Messenger.Register<ScriptDrop, PropertyChangedMessage<bool>>(this, OptionsChanged);
 
-        //Options.PropertyChanged += Options_PropertyChanged;
         _timerDrops = new(TimeSpan.FromMilliseconds(1000));
     }
 
@@ -54,15 +50,15 @@ public partial class ScriptDrop : ObservableRecipient, IScriptDrop, IAsyncDispos
     private CancellationTokenSource? _ctsDrops;
 
     [ObservableProperty]
-    private int _Interval;
+    private int _interval;
     [ObservableProperty]
-    private bool _RejectElse;
+    private bool _rejectElse;
     public bool Enabled => _taskDrops is not null;
-    private SynchronizedList<string> _toPickup = new();
+    private readonly SynchronizedList<string> _toPickup = new();
     public IEnumerable<string> ToPickup => _toPickup.Items;
-    private SynchronizedList<int> _toPickupIDs = new();
+    private readonly SynchronizedList<int> _toPickupIDs = new();
     public IEnumerable<int> ToPickupIDs => _toPickupIDs.Items;
-    private SynchronizedList<ItemBase> _currentDropInfos { get; set; } = new();
+    private readonly SynchronizedList<ItemBase> _currentDropInfos = new();
     public IEnumerable<ItemBase> CurrentDropInfos => _currentDropInfos.Items;
     public IEnumerable<string> CurrentDrops => CurrentDropInfos.Select(x => x.Name.Trim()).ToList();
 
@@ -251,16 +247,6 @@ public partial class ScriptDrop : ObservableRecipient, IScriptDrop, IAsyncDispos
         catch { }
     }
 
-    //private void Options_PropertyChanged(object? sender, System.ComponentModel.PropertyChangedEventArgs e)
-    //{
-    //    if (e.PropertyName == nameof(IScriptOption.AcceptACDrops) && Options.AcceptACDrops)
-    //        Start();
-    //    if (e.PropertyName == nameof(IScriptOption.AcceptAllDrops) && Options.AcceptAllDrops)
-    //        Start();
-    //    if (e.PropertyName == nameof(IScriptOption.RejectAllDrops) && Options.RejectAllDrops)
-    //        Start();
-    //}
-
     private void OptionsChanged(ScriptDrop recipient, PropertyChangedMessage<bool> message)
     {
         if (message.Sender.GetType() != typeof(ScriptOption))
@@ -294,6 +280,11 @@ public partial class ScriptDrop : ObservableRecipient, IScriptDrop, IAsyncDispos
             recipient._currentDropInfos.Find(i => i.Equals(message.Item))!.Quantity += message.Item.Quantity;
         recipient.OnPropertyChanged(nameof(recipient.CurrentDropInfos));
         recipient.OnPropertyChanged(nameof(recipient.CurrentDrops));
+    }
+
+    private async void ScriptStopped(ScriptDrop recipient, ScriptStoppedMessage message)
+    {
+        await recipient.StopAsync();
     }
 
     public async ValueTask DisposeAsync()

@@ -13,8 +13,8 @@ public class MainMenuViewModel : ObservableRecipient
 
     public MainMenuViewModel(IEnumerable<MainMenuItemViewModel> mainMenuItems, AutoViewModel auto, JumpViewModel jump, IWindowService windowService)
     {
-        Messenger.Register<MainMenuViewModel, AddPluginMenuItemMessage>(this, AddPluginMenuItem);
-        Messenger.Register<MainMenuViewModel, RemovePluginMenuItemMessage>(this, RemovePluginMenuItem);
+        StrongReferenceMessenger.Default.Register<MainMenuViewModel, AddPluginMenuItemMessage, int>(this, (int)MessageChannels.Plugins, AddPluginMenuItem);
+        StrongReferenceMessenger.Default.Register<MainMenuViewModel, RemovePluginMenuItemMessage, int>(this, (int)MessageChannels.Plugins, RemovePluginMenuItem);
         AutoViewModel = auto;
         JumpViewModel = jump;
         _windowService = windowService;

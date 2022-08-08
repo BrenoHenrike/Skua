@@ -20,7 +20,7 @@ public partial class GrabberListViewModel : ObservableRecipient
         _grabType = grabType;
         _grabberCommands = new(commands);
         GrabCommand = new AsyncRelayCommand(Grab);
-        CancelTaskCommand = new RelayCommand(() => Messenger.Send<CancelGrabberTaskMessage>());
+        CancelTaskCommand = new RelayCommand(() => WeakReferenceMessenger.Default.Send<CancelGrabberTaskMessage>());
     }
 
     public GrabberListViewModel(string title, IGrabberService grabberService, GrabberTypes grabType, GrabberTaskViewModel command, bool selectMultiple = false)
@@ -32,7 +32,7 @@ public partial class GrabberListViewModel : ObservableRecipient
         _grabType = grabType;
         _grabberCommands = new() { command };
         GrabCommand = new AsyncRelayCommand(Grab);
-        CancelTaskCommand = new RelayCommand(() => Messenger.Send<CancelGrabberTaskMessage>());
+        CancelTaskCommand = new RelayCommand(() => WeakReferenceMessenger.Default.Send<CancelGrabberTaskMessage>());
     }
     public GrabberListViewModel(string title, IGrabberService grabberService, GrabberTypes grabType, bool selectMultiple = false)
     {
@@ -43,7 +43,7 @@ public partial class GrabberListViewModel : ObservableRecipient
         _grabType = grabType;
         _grabberCommands = new();
         GrabCommand = new AsyncRelayCommand(Grab);
-        CancelTaskCommand = new RelayCommand(() => Messenger.Send<CancelGrabberTaskMessage>());
+        CancelTaskCommand = new RelayCommand(() => WeakReferenceMessenger.Default.Send<CancelGrabberTaskMessage>());
     }
 
     public IRelayCommand CancelTaskCommand { get; }

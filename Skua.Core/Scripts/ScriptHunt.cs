@@ -19,8 +19,7 @@ public class ScriptHunt : IScriptHunt
         Lazy<IScriptManager> manager,
         Lazy<IScriptMap> map,
         Lazy<IScriptKill> kill,
-        ILogService logger,
-        IMessenger messenger)
+        ILogService logger)
     {
         _lazyOptions = options;
         _lazyCombat = combat;
@@ -33,9 +32,11 @@ public class ScriptHunt : IScriptHunt
         _lazyMap = map;
         _lazyKill = kill;
         _logger = logger;
-        _messenger = messenger;
         _lastHuntTick = Environment.TickCount;
+
+        StrongReferenceMessenger.Default.Register<ScriptHunt, ScriptStoppedMessage, int>(this, (int)MessageChannels.ScriptStatus, ScriptStopped);
     }
+
     private readonly Lazy<IScriptOption> _lazyOptions;
     private readonly Lazy<IScriptCombat> _lazyCombat;
     private readonly Lazy<IScriptPlayer> _lazyPlayer;
@@ -47,7 +48,6 @@ public class ScriptHunt : IScriptHunt
     private readonly Lazy<IScriptMap> _lazyMap;
     private readonly Lazy<IScriptKill> _lazyKill;
     private readonly ILogService _logger;
-    private readonly IMessenger _messenger;
 
     private IScriptOption Options => _lazyOptions.Value;
     private IScriptCombat Combat => _lazyCombat.Value;
@@ -223,7 +223,7 @@ public class ScriptHunt : IScriptHunt
     {
         _ctsHunt = new();
         _item = (item, quantity, tempItem);
-        _messenger.Register<ScriptHunt, ItemDroppedMessage>(this, ItemHunted);
+        StrongReferenceMessenger.Default.Register<ScriptHunt, ItemDroppedMessage, int>(this, (int)MessageChannels.GameEvents, ItemHunted);
         while (!Manager.ShouldExit
             && (tempItem || !Inventory.Contains(item, quantity))
             && (!tempItem || !TempInv.Contains(item, quantity)))
@@ -233,8 +233,8 @@ public class ScriptHunt : IScriptHunt
             _HuntWithPriority(name, Options.HuntPriority, _ctsHunt.Token);
             Drops.Pickup(item);
         }
-        _messenger.Unregister<ItemDroppedMessage>(this);
-        _ctsHunt.Dispose();
+        StrongReferenceMessenger.Default.Unregister<ItemDroppedMessage, int>(this, (int)MessageChannels.GameEvents);
+        _ctsHunt?.Dispose();
         _ctsHunt = null;
     }
 
@@ -293,5 +293,12 @@ public class ScriptHunt : IScriptHunt
     private bool CanJumpForHunt()
     {
         return Environment.TickCount - _lastHuntTick >= Options.HuntDelay;
+    }
+
+    private void ScriptStopped(ScriptHunt recipient, ScriptStoppedMessage message)
+    {
+        StrongReferenceMessenger.Default.Unregister<ItemDroppedMessage, int>(recipient, (int)MessageChannels.GameEvents);
+        recipient._ctsHunt?.Dispose();
+        recipient._ctsHunt = null;
     }
 }

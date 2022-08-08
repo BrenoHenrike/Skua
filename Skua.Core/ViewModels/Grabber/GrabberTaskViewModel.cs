@@ -4,7 +4,7 @@ using CommunityToolkit.Mvvm.Messaging;
 using Skua.Core.Messaging;
 
 namespace Skua.Core.ViewModels;
-public class GrabberTaskViewModel : ObservableRecipient
+public partial class GrabberTaskViewModel : ObservableRecipient
 {
     public GrabberTaskViewModel(string content, Func<IList<object>?, IProgress<string>, CancellationToken, Task> command)
     {
@@ -13,21 +13,17 @@ public class GrabberTaskViewModel : ObservableRecipient
         _command = command;
         Command = new AsyncRelayCommand<IList<object>>(GrabberTask);
     }
-    private Func<IList<object>?, IProgress<string>, CancellationToken, Task> _command;
+    private readonly Func<IList<object>?, IProgress<string>, CancellationToken, Task> _command;
     public string Content { get; }
     public IAsyncRelayCommand Command { get; set; }
+
+    [ObservableProperty]
+    [NotifyPropertyChangedRecipients]
     private string _progressReportMessage = string.Empty;
-    public string ProgressReportMessage
-    {
-        get { return _progressReportMessage; }
-        set { SetProperty(ref _progressReportMessage, value, true); }
-    }
+
+    [ObservableProperty]
+    [NotifyPropertyChangedRecipients]
     private bool _isBusy;
-    public bool IsBusy
-    {
-        get { return _isBusy; }
-        set { SetProperty(ref _isBusy, value, true); }
-    }
 
     private async Task GrabberTask(IList<object>? items, CancellationToken token)
     {

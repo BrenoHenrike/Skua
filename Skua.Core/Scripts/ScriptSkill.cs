@@ -1,6 +1,7 @@
 ﻿using CommunityToolkit.Mvvm.Messaging;
 using Skua.Core.Flash;
 using Skua.Core.Interfaces;
+using Skua.Core.Messaging;
 using Skua.Core.Models.Skills;
 using Skua.Core.Skills;
 
@@ -41,12 +42,13 @@ public partial class ScriptSkill : IScriptSkill
         _lazyOptions = options;
         _lazyInventory = inventory;
         AdvancedSkillContainer = advContainer;
+
+        StrongReferenceMessenger.Default.Register<ScriptSkill, CounterAttackMessage, int>(this, (int)MessageChannels.GameEvents, CounterAttack);
     }
 
-    private ISkillProvider _provider;
-    private Thread? SkillThread;
-
-    private CancellationTokenSource? SkillsCTS;
+    private ISkillProvider? _provider;
+    private Thread? _skillThread;
+    private CancellationTokenSource? _skillsCTS;
 
     [MethodCallBinding("canUseSkill")]
     private bool _canUseSkill(int index) => false;
@@ -56,7 +58,7 @@ public partial class ScriptSkill : IScriptSkill
 
     public ISkillProvider? OverrideProvider { get; set; } = null;
     public ISkillProvider BaseProvider { get; private set; }
-    public bool TimerRunning => SkillThread?.IsAlive ?? false;
+    public bool TimerRunning => _skillThread?.IsAlive ?? false;
     public int SkillInterval { get; set; } = 100;
     public int SkillTimeout { get; set; } = -1;
     public SkillUseMode SkillUseMode { get; set; } = SkillUseMode.UseIfAvailable;
@@ -70,27 +72,27 @@ public partial class ScriptSkill : IScriptSkill
             _provider = BaseProvider;
         }
         _provider = OverrideProvider ?? BaseProvider;
-        if (SkillThread?.IsAlive ?? false)
+        if (_skillThread?.IsAlive ?? false)
             return;
-        SkillThread = new(async () =>
+        _skillThread = new(async () =>
         {
-            SkillsCTS = new();
+            _skillsCTS = new();
             try
             {
-                await _Timer(SkillsCTS.Token);
+                await _Timer(_skillsCTS.Token);
             }
             catch { }
-            SkillsCTS.Dispose();
-            SkillsCTS = null;
+            _skillsCTS?.Dispose();
+            _skillsCTS = null;
         });
-        SkillThread.Name = "Skill Timer";
-        SkillThread.Start();
+        _skillThread.Name = "Skill Timer";
+        _skillThread.Start();
     }
 
     public void Stop()
     {
         _provider?.Stop();
-        SkillsCTS?.Cancel();
+        _skillsCTS?.Cancel();
         Wait.ForTrue(() => !TimerRunning, 20);
     }
 
@@ -143,7 +145,12 @@ public partial class ScriptSkill : IScriptSkill
     {
         while (!token.IsCancellationRequested)
         {
-            if (!Combat.StopAttacking && (Options.AttackWithoutTarget || Player.HasTarget))
+            if (Combat.StopAttacking)
+            {
+                _counterAttack.WaitOne(10000);
+                Combat.StopAttacking = false;
+            }
+            if (Options.AttackWithoutTarget || Player.HasTarget)
                 _Poll(token);
             _provider?.OnTargetReset();
             if (!token.IsCancellationRequested)
@@ -167,8 +174,9 @@ public partial class ScriptSkill : IScriptSkill
             }
         }
         _lastRank = rank;
-        if (Player.Skills is not null && Player.Skills.Length > 0)
-            _lastSkills = Player.Skills;
+        SkillInfo[]? playerSkills = Player.Skills;
+        if (playerSkills is not null && playerSkills.Length > 0)
+            _lastSkills = playerSkills;
         if (token.IsCancellationRequested)
             return;
         switch (_provider?.ShouldUseSkill())
@@ -200,5 +208,12 @@ public partial class ScriptSkill : IScriptSkill
                     break;
             }
         }
+    }
+
+    private readonly AutoResetEvent _counterAttack = new(false);
+    private void CounterAttack(ScriptSkill recipient, CounterAttackMessage message)
+    {
+        if (message.Faded)
+            recipient._counterAttack.Set();
     }
 }

@@ -11,8 +11,8 @@ public partial class PluginsViewModel : BotControlViewModelBase
     public PluginsViewModel(IPluginManager pluginManager, IFileDialogService fileService)
         : base("Plugins")
     {
-        Messenger.Register<PluginsViewModel, PluginLoadedMessage>(this, PluginLoaded);
-        Messenger.Register<PluginsViewModel, PluginUnloadedMessage>(this, PluginUnLoaded);
+        StrongReferenceMessenger.Default.Register<PluginsViewModel, PluginLoadedMessage, int>(this, (int)MessageChannels.Plugins, PluginLoaded);
+        StrongReferenceMessenger.Default.Register<PluginsViewModel, PluginUnloadedMessage, int>(this, (int)MessageChannels.Plugins, PluginUnLoaded);
         PluginManager = pluginManager;
         _fileService = fileService;
         LoadPluginCommand = new RelayCommand(LoadPlugin);
