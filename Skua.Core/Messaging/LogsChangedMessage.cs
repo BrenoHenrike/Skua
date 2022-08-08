@@ -1,4 +1,4 @@
 ﻿using Skua.Core.Models;
 
 namespace Skua.Core.Messaging;
-public record LogsChangedMessage(LogType LogType);
+public sealed record LogsChangedMessage(LogType LogType);

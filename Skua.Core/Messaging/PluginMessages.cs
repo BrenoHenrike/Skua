@@ -2,9 +2,8 @@
 using Skua.Core.ViewModels;
 
 namespace Skua.Core.Messaging;
-public record PluginLoadedMessage(IPluginContainer Container);
+public sealed record PluginLoadedMessage(IPluginContainer Container);
+public sealed record PluginUnloadedMessage(IPluginContainer Container);
 
-public record PluginUnloadedMessage(IPluginContainer Container);
-
-public record AddPluginMenuItemMessage(MainMenuItemViewModel ViewModel);
-public record RemovePluginMenuItemMessage(MainMenuItemViewModel ViewModel);
+public sealed record AddPluginMenuItemMessage(MainMenuItemViewModel ViewModel);
+public sealed record RemovePluginMenuItemMessage(MainMenuItemViewModel ViewModel);
