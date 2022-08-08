@@ -123,7 +123,7 @@
                 </DataGrid.ContextMenu>
                 <b:Interaction.Triggers>
                     <b:EventTrigger EventName="MouseDoubleClick">
-                        <b:InvokeCommandAction Command="{Binding DownloadCommand}" />
+                        <b:InvokeCommandAction Command="{Binding LoadScriptCommand}" />
                     </b:EventTrigger>
                 </b:Interaction.Triggers>
                 <DataGrid.Columns>
@@ -133,7 +133,7 @@
                         Header="Name" />
                     <DataGridTextColumn
                         Width="3*"
-                        Binding="{Binding LocalFile, Mode=OneTime}"
+                        Binding="{Binding FilePath, Mode=OneTime}"
                         Header="Folder Path" />
                     <DataGridTextColumn
                         Width="70"
