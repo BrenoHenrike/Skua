@@ -1,7 +1,4 @@
-﻿using CommunityToolkit.Mvvm.DependencyInjection;
-using Skua.Core.ViewModels;
-using Skua.WPF;
-using System;
+﻿using Skua.Core.ViewModels;
 using System.ComponentModel;
 using System.Windows.Data;
 
@@ -11,7 +8,7 @@ namespace Skua.WPF;
 /// </summary>
 public partial class BotWindow : CustomWindow
 {
-    ICollectionView? _collectionView;
+    private ICollectionView? _collectionView;
     public BotWindow()
     {
         InitializeComponent();
@@ -21,8 +18,8 @@ public partial class BotWindow : CustomWindow
     private void BotWindow_Loaded(object sender, System.Windows.RoutedEventArgs e)
     {
         Loaded -= BotWindow_Loaded;
-        var suco = FindResource("BotViewsSource") as CollectionViewSource;
-        _collectionView = suco?.View ?? null;
+        var cvs = FindResource("BotViewsSource") as CollectionViewSource;
+        _collectionView = cvs?.View ?? null;
         if(_collectionView is not null)
             _collectionView.Filter = Search;
     }

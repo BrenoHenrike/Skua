@@ -10,11 +10,11 @@ namespace Skua.WPF.Views;
 /// </summary>
 public partial class ScriptRepoView : UserControl
 {
-    ICollectionView _collectionView;
+    private readonly ICollectionView _collectionView;
     public ScriptRepoView()
     {
         InitializeComponent();
-        DataContext = Ioc.Default.GetService<ScriptRepoViewModel>()!;
+        DataContext = Ioc.Default.GetRequiredService<ScriptRepoViewModel>();
         _collectionView = CollectionViewSource.GetDefaultView(((ScriptRepoViewModel)DataContext).Scripts);
         _collectionView.Filter = Search;
     }

@@ -11,12 +11,12 @@ namespace Skua.WPF.Views;
 /// </summary>
 public partial class LoaderView : UserControl
 {
-    ICollectionView _collectionView;
+    private readonly ICollectionView _collectionView;
     public LoaderView()
     {
         InitializeComponent();
-        DataContext = Ioc.Default.GetService<LoaderViewModel>();
-        _collectionView = CollectionViewSource.GetDefaultView(((LoaderViewModel)DataContext!).QuestIDs);
+        DataContext = Ioc.Default.GetRequiredService<LoaderViewModel>();
+        _collectionView = CollectionViewSource.GetDefaultView(((LoaderViewModel)DataContext).QuestIDs);
         _collectionView.Filter = Search;
         Loaded += LoaderUserControl_Loaded;
     }

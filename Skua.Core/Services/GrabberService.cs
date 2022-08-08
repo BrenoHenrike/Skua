@@ -42,7 +42,7 @@ public class GrabberService : IGrabberService
                 items.AddRange(_shops.Items);
                 break;
             case GrabberTypes.Shop_IDs:
-                items.AddRange(_shops.LoadedCache.Select(s => (object)s.ID).ToList());
+                items.AddRange(_shops.LoadedCache);
                 break;
             case GrabberTypes.Quests:
                 items.AddRange(_quests.Tree);

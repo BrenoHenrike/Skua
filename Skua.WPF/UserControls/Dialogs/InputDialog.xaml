@@ -41,9 +41,9 @@
                 <ColumnDefinition />
             </Grid.ColumnDefinitions>
             <Button
-                x:Name="btnConfirm"
                 Grid.Column="0"
                 Margin="6"
+                Click="BtnConfirm_Click"
                 Content="Confirm"
                 IsDefault="True" />
             <Button

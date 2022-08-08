@@ -10,13 +10,6 @@ public partial class InputDialog : UserControl
     public InputDialog()
     {
         InitializeComponent();
-        Loaded += InputDialog_Loaded;
-    }
-
-    private void InputDialog_Loaded(object sender, RoutedEventArgs e)
-    {
-        btnConfirm.Click += BtnConfirm_Click;
-        Loaded -= InputDialog_Loaded;
     }
 
     private void BtnConfirm_Click(object sender, RoutedEventArgs e)

@@ -1,5 +1,4 @@
-﻿using System.Windows;
-using System.Windows.Controls;
+﻿using System.Windows.Controls;
 using CommunityToolkit.Mvvm.DependencyInjection;
 using Skua.Core.ViewModels;
 
@@ -12,6 +11,6 @@ public partial class JumpUserControl : UserControl
     public JumpUserControl()
     {
         InitializeComponent();
-        DataContext = Ioc.Default.GetService<JumpViewModel>();
+        DataContext = Ioc.Default.GetRequiredService<JumpViewModel>();
     }
 }

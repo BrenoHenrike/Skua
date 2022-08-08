@@ -1,9 +1,7 @@
 ﻿using System.ComponentModel;
 using System.Windows.Controls;
 using System.Windows.Data;
-using System.Windows.Input;
 using CommunityToolkit.Mvvm.DependencyInjection;
-using Skua.Core.Utils;
 using Skua.Core.ViewModels;
 
 namespace Skua.WPF.UserControls;
@@ -12,11 +10,11 @@ namespace Skua.WPF.UserControls;
 /// </summary>
 public partial class FastTravelUserControl : UserControl
 {
-    ICollectionView _collectionView;
+    private readonly ICollectionView _collectionView;
     public FastTravelUserControl()
     {
         InitializeComponent();
-        DataContext = Ioc.Default.GetService<FastTravelViewModel>()!;
+        DataContext = Ioc.Default.GetRequiredService<FastTravelViewModel>();
         _collectionView = CollectionViewSource.GetDefaultView(((FastTravelViewModel)DataContext).FastTravelItems);
         _collectionView.Filter = Search;
     }

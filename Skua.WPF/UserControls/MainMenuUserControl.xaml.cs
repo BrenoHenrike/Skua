@@ -11,6 +11,6 @@ public partial class MainMenuUserControl : UserControl
     public MainMenuUserControl()
     {
         InitializeComponent();
-        DataContext = Ioc.Default.GetService<MainMenuViewModel>();
+        DataContext = Ioc.Default.GetRequiredService<MainMenuViewModel>();
     }
 }

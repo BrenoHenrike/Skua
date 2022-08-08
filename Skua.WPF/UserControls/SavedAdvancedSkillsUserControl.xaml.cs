@@ -1,18 +1,6 @@
-﻿using System;
-using System.Collections.Generic;
-using System.ComponentModel;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using System.Windows;
+﻿using System.ComponentModel;
 using System.Windows.Controls;
 using System.Windows.Data;
-using System.Windows.Documents;
-using System.Windows.Input;
-using System.Windows.Media;
-using System.Windows.Media.Imaging;
-using System.Windows.Navigation;
-using System.Windows.Shapes;
 using CommunityToolkit.Mvvm.DependencyInjection;
 using Skua.Core.Models.Skills;
 using Skua.Core.ViewModels;
@@ -23,12 +11,12 @@ namespace Skua.WPF.UserControls;
 /// </summary>
 public partial class SavedAdvancedSkillsUserControl : UserControl
 {
-    ICollectionView _collectionView;
+    private readonly ICollectionView _collectionView;
     public SavedAdvancedSkillsUserControl()
     {
         InitializeComponent();
-        DataContext = Ioc.Default.GetService<SavedAdvancedSkillsViewModel>();
-        _collectionView = CollectionViewSource.GetDefaultView(((SavedAdvancedSkillsViewModel)DataContext!).LoadedSkills);
+        DataContext = Ioc.Default.GetRequiredService<SavedAdvancedSkillsViewModel>();
+        _collectionView = CollectionViewSource.GetDefaultView(((SavedAdvancedSkillsViewModel)DataContext).LoadedSkills);
         _collectionView.Filter = Search;
     }
 

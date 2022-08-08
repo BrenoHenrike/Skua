@@ -11,6 +11,6 @@ public partial class ScriptLoaderView : UserControl
     public ScriptLoaderView()
     {
         InitializeComponent();
-        DataContext = Ioc.Default.GetService<ScriptLoaderViewModel>()!;
+        DataContext = Ioc.Default.GetRequiredService<ScriptLoaderViewModel>();
     }
 }

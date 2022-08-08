@@ -53,6 +53,10 @@ public sealed partial class App : Application
     private async void Dispatcher_ShutdownStarted(object? sender, EventArgs e)
     {
         Services.GetRequiredService<ICaptureProxy>().Stop();
+
+        Services.GetRequiredService<PacketInterceptorViewModel>().Dispose();
+        Services.GetRequiredService<RegisteredQuestsViewModel>().Dispose();
+        Services.GetRequiredService<ToPickupDropsViewModel>().Dispose();
         
         await ((IAsyncDisposable)Services.GetRequiredService<IScriptBoost>()).DisposeAsync();
         await ((IAsyncDisposable)Services.GetRequiredService<IScriptBotStats>()).DisposeAsync();
