@@ -1,7 +1,6 @@
 ﻿using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
 using CommunityToolkit.Mvvm.Messaging;
-using Skua.Core.Interfaces;
 using Skua.Core.Messaging;
 
 namespace Skua.Core.ViewModels;
@@ -11,8 +10,6 @@ public partial class FastTravelItemViewModel : ObservableRecipient
     public FastTravelItemViewModel(IRelayCommand<object> travel)
     {
         TravelCommand = travel;
-        EditCommand = new RelayCommand(EditTravel);
-        RemoveCommand = new RelayCommand(RemoveTravel);
     }
     public FastTravelItemViewModel(string descriptionName, string mapName, string cell, string pad, IRelayCommand<object> travel)
     {
@@ -21,27 +18,6 @@ public partial class FastTravelItemViewModel : ObservableRecipient
         Cell = cell;
         Pad = pad;
         TravelCommand = travel;
-        EditCommand = new RelayCommand(EditTravel);
-        RemoveCommand = new RelayCommand(RemoveTravel);
-    }
-
-    public bool Validate()
-    {
-        return 
-            !string.IsNullOrWhiteSpace(Cell)
-            && !string.IsNullOrWhiteSpace(Pad)
-            && !string.IsNullOrWhiteSpace(MapName)
-            && !string.IsNullOrWhiteSpace(DescriptionName);
-    }
-
-    private void RemoveTravel()
-    {
-        Messenger.Send<RemoveFastTravelMessage>(new(this));
-    }
-
-    private void EditTravel()
-    {
-        Messenger.Send<EditFastTravelMessage>(new(this));
     }
 
     [ObservableProperty]
@@ -53,12 +29,31 @@ public partial class FastTravelItemViewModel : ObservableRecipient
     [ObservableProperty]
     private string _pad = "Spawn";
 
+    public IRelayCommand<object> TravelCommand { get; }
+
+    [RelayCommand]
+    private void Remove()
+    {
+        Messenger.Send<RemoveFastTravelMessage>(new(this));
+    }
+
+    [RelayCommand]
+    private void Edit()
+    {
+        Messenger.Send<EditFastTravelMessage>(new(this));
+    }
+
+    public bool Validate()
+    {
+        return
+            !string.IsNullOrWhiteSpace(Cell)
+            && !string.IsNullOrWhiteSpace(Pad)
+            && !string.IsNullOrWhiteSpace(MapName)
+            && !string.IsNullOrWhiteSpace(DescriptionName);
+    }
+
     public override string ToString()
     {
         return $"{_descriptionName},{_mapName},{_cell},{_pad}";
     }
-
-    public IRelayCommand<object> TravelCommand { get; }
-    public IRelayCommand RemoveCommand { get; }
-    public IRelayCommand EditCommand { get; }
 }

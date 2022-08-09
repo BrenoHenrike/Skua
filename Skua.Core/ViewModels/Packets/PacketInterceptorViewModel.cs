@@ -1,21 +1,22 @@
 ﻿using System.Net;
+using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
+using CommunityToolkit.Mvvm.Messaging.Messages;
+using CommunityToolkit.Mvvm.Messaging;
 using Skua.Core.Interfaces;
 using Skua.Core.Models;
 using Skua.Core.Models.Servers;
 using Skua.Core.Utils;
 
 namespace Skua.Core.ViewModels;
-public class PacketInterceptorViewModel : BotControlViewModelBase, IDisposable
+public partial class PacketInterceptorViewModel : BotControlViewModelBase
 {
     public PacketInterceptorViewModel(ICaptureProxy gameProxy, IScriptServers server)
         : base("Packet Interceptor")
     {
+        Messenger.Register<PacketInterceptorViewModel, PropertyChangedMessage<bool>>(this, RunningChanged);
         _gameProxy = gameProxy;
         _server = server;
-        _server.PropertyChanged += _server_PropertyChanged;
-        _gameProxy.PropertyChanged += _gameProxy_PropertyChanged;
-        ConnectInterceptorCommand = new RelayCommand(Connect);
         ClearPacketsCommand = new RelayCommand(Packets.Clear);
         SynchronizationContext? context = SynchronizationContext.Current;
         void addFunc(InterceptedPacketViewModel st) => context?.Send(obj => Packets.Add((InterceptedPacketViewModel)obj!), st);
@@ -26,8 +27,11 @@ public class PacketInterceptorViewModel : BotControlViewModelBase, IDisposable
     private readonly ICaptureProxy _gameProxy;
     private readonly IScriptServers _server;
     private readonly InterceptorLogger _logger;
+    [ObservableProperty]
+    private Server? _selectedServer;
+    [ObservableProperty]
+    private RangedObservableCollection<InterceptedPacketViewModel> _packets = new();
 
-    public bool Running => _gameProxy.Running;
     private bool _isLogging;
     public bool IsLogging
     {
@@ -43,25 +47,13 @@ public class PacketInterceptorViewModel : BotControlViewModelBase, IDisposable
             }
         }
     }
-    private Server? _selectedServer;
-    public Server? SelectedServer
-    {
-        get { return _selectedServer; }
-        set { SetProperty(ref _selectedServer, value); }
-    }
+    public bool Running => _gameProxy.Running;
     public List<Server> ServerList => _server.ServerList;
-    private RangedObservableCollection<InterceptedPacketViewModel> _packets = new();
-
-    public RangedObservableCollection<InterceptedPacketViewModel> Packets
-    {
-        get { return _packets; }
-        set { SetProperty(ref _packets, value); }
-    }
-
-    public IRelayCommand ConnectInterceptorCommand { get; }
     public IRelayCommand ClearPacketsCommand { get; }
 
-    private void Connect()
+
+    [RelayCommand]
+    private void ConnectInterceptor()
     {
         if (_gameProxy.Running)
         {
@@ -82,27 +74,14 @@ public class PacketInterceptorViewModel : BotControlViewModelBase, IDisposable
         OnPropertyChanged(nameof(Running));
     }
 
-    private void _gameProxy_PropertyChanged(object? sender, System.ComponentModel.PropertyChangedEventArgs e)
+    private void RunningChanged(PacketInterceptorViewModel recipient, PropertyChangedMessage<bool> message)
     {
-        if (e.PropertyName == nameof(ICaptureProxy.Running))
-            OnPropertyChanged(nameof(Running));
-    }
-
-    private void _server_PropertyChanged(object? sender, System.ComponentModel.PropertyChangedEventArgs e)
-    {
-        if (e.PropertyName == nameof(_server.ServerList))
-            OnPropertyChanged(nameof(ServerList));
-    }
-    public void Dispose()
-    {
-        GC.SuppressFinalize(this);
-        _gameProxy.Stop();
-        _gameProxy.PropertyChanged -= _gameProxy_PropertyChanged;
-        _server.PropertyChanged -= _server_PropertyChanged;
+        if (message.PropertyName == nameof(ICaptureProxy.Running))
+            recipient.OnPropertyChanged(nameof(recipient.Running));
     }
 }
 
-public partial class InterceptorLogger : IInterceptor
+public class InterceptorLogger : IInterceptor
 {
     private readonly Action<InterceptedPacketViewModel> _addFunc;
 
@@ -111,6 +90,7 @@ public partial class InterceptorLogger : IInterceptor
     {
         _addFunc = addFunc;
     }
+
     public void Intercept(MessageInfo message, bool outbound)
     {
         _addFunc(new(message.Content, message.Send ? outbound : null));

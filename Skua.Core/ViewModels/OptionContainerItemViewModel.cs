@@ -3,7 +3,7 @@ using Skua.Core.Interfaces;
 using Skua.Core.Options;
 
 namespace Skua.Core.ViewModels;
-public class OptionContainerItemViewModel : ObservableObject
+public partial class OptionContainerItemViewModel : ObservableObject
 {
     public OptionContainerItemViewModel(IOptionContainer container, IOption option)
     {
@@ -20,30 +20,17 @@ public class OptionContainerItemViewModel : ObservableObject
         Category = option.Category;
     }
 
+    [ObservableProperty]
+    private object _value;
+    [ObservableProperty]
+    private List<string>? _enumValues;
+    [ObservableProperty]
+    private string? _selectedValue;
+
     public IOptionContainer Container { get; }
     public IOption Option { get; }
     public Type Type { get; }
     public string Category { get; }
-
-    private object _value;
-    public object Value
-    {
-        get { return _value; }
-        set { SetProperty(ref _value, value); }
-    }
-    private List<string>? _enumValues;
-    public List<string>? EnumValues
-    {
-        get { return _enumValues; }
-        set { SetProperty(ref _enumValues, value); }
-    }
-
-    private string? _selectedValue;
-    public string? SelectedValue
-    {
-        get { return _selectedValue; }
-        set { SetProperty(ref _selectedValue, value); }
-    }
 
     private object GetValue()
     {

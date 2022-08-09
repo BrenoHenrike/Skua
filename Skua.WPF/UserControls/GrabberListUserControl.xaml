@@ -99,7 +99,7 @@
                         <DataTemplate>
                             <Button
                                 Margin="3,3,0,3"
-                                Command="{Binding Command}"
+                                Command="{Binding GrabberTaskCommand}"
                                 CommandParameter="{Binding ElementName=GrabberListBox, Path=SelectedItems}"
                                 Content="{Binding Content}"
                                 Style="{StaticResource MaterialDesignPaperButton}" />

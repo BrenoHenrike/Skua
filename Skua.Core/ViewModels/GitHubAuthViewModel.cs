@@ -6,6 +6,7 @@ using Skua.Core.Models.GitHub;
 using Skua.Core.Utils;
 
 namespace Skua.Core.ViewModels;
+// TODO move to different project.
 public partial class GitHubAuthViewModel : BotControlViewModelBase
 {
     public GitHubAuthViewModel(IClipboardService clipboard, IProcessStartService processService, ISettingsService settingsService)

@@ -40,17 +40,13 @@ public partial class ScriptServers : ObservableRecipient, IScriptServers
     private IScriptBotStats Stats => _lazyStats.Value;
     private IScriptManager Manager => _lazyManager.Value;
 
-    public string LastIP { get; set; } = default!;
-    public string LastName { get; set; } = default!;
+    public string LastIP { get; set; } = string.Empty;
+    public string LastName { get; set; } = string.Empty;
     [ObjectBinding("serialCmd.servers")]
     private List<Server> _serverList = new();
-
-    private List<Server> _CachedServers = new();
-    public List<Server> CachedServers
-    {
-        get { return _CachedServers; }
-        set { SetProperty(ref _CachedServers, value, true); }
-    }
+    [ObservableProperty]
+    [NotifyPropertyChangedRecipients]
+    private List<Server> _cachedServers = new();
 
     public async ValueTask<List<Server>> GetServers(bool forceUpdate = false)
     {

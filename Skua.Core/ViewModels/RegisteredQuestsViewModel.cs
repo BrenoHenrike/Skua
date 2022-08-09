@@ -1,30 +1,29 @@
 ﻿using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
+using CommunityToolkit.Mvvm.Messaging;
+using CommunityToolkit.Mvvm.Messaging.Messages;
 using Skua.Core.Interfaces;
 
 namespace Skua.Core.ViewModels;
-public class RegisteredQuestsViewModel : ObservableObject, IDisposable
+public partial class RegisteredQuestsViewModel : ObservableObject
 {
     private readonly char[] _questsSeparator = { '|', ',', ' ' };
     public RegisteredQuestsViewModel(IScriptQuest quests)
     {
+        WeakReferenceMessenger.Default.Register<RegisteredQuestsViewModel, PropertyChangedMessage<IEnumerable<int>>>(this, RegisteredChanged);
+
         _quests = quests;
-        _quests.PropertyChanged += Quests_PropertyChanged;
-        AddQuestCommand = new RelayCommand(AddQuest);
-        RemoveQuestsCommand = new RelayCommand<IList<object>>(RemoveQuests);
         RemoveAllQuestsCommand = new RelayCommand(_quests.UnregisterAllQuests);
     }
+
     private readonly IScriptQuest _quests;
+    [ObservableProperty]
     private string _addQuestInput = string.Empty;
-    public string AddQuestInput
-    {
-        get { return _addQuestInput; }
-        set { SetProperty(ref _addQuestInput, value); }
-    }
+
     public List<int> CurrentAutoQuests => _quests.Registered.ToList();
-    public IRelayCommand AddQuestCommand { get; }
     public IRelayCommand RemoveAllQuestsCommand { get; }
-    public IRelayCommand RemoveQuestsCommand { get; }
+
+    [RelayCommand]
     private void RemoveQuests(IList<object>? items)
     {
         if (items is null)
@@ -34,6 +33,7 @@ public class RegisteredQuestsViewModel : ObservableObject, IDisposable
             _quests.UnregisterQuests(quests.ToArray());
     }
 
+    [RelayCommand]
     private void AddQuest()
     {
         if (string.IsNullOrWhiteSpace(AddQuestInput))
@@ -48,15 +48,9 @@ public class RegisteredQuestsViewModel : ObservableObject, IDisposable
         AddQuestInput = string.Empty;
     }
 
-    private void Quests_PropertyChanged(object? sender, System.ComponentModel.PropertyChangedEventArgs e)
+    private void RegisteredChanged(RegisteredQuestsViewModel recipient, PropertyChangedMessage<IEnumerable<int>> message)
     {
-        if (e.PropertyName == nameof(IScriptQuest.Registered))
-            OnPropertyChanged(nameof(CurrentAutoQuests));
-    }
-
-    public void Dispose()
-    {
-        GC.SuppressFinalize(this);
-        _quests.PropertyChanged -= Quests_PropertyChanged;
+        if (message.PropertyName == nameof(IScriptQuest.Registered))
+            recipient.OnPropertyChanged(nameof(recipient.CurrentAutoQuests));
     }
 }

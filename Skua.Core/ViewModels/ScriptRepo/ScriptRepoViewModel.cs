@@ -14,24 +14,11 @@ public partial class ScriptRepoViewModel : BotControlViewModelBase
     {
         _getScriptsService = getScripts;
         _processService = processService;
-        RefreshScriptsCommand = new AsyncRelayCommand(Refresh);
-        DownloadAllCommand = new AsyncRelayCommand(DownloadAll);
-        UpdateAllCommand = new AsyncRelayCommand(UpdateAll);
-        DownloadCommand = new AsyncRelayCommand(Download);
-        DeleteCommand = new AsyncRelayCommand(Delete);
-        CancelTaskCommand = new RelayCommand(CancelTask);
-        LoadScriptCommand = new RelayCommand(LoadScript);
-        OpenScriptCommand = new RelayCommand(OpenScript);
-        StartScriptCommand = new RelayCommand(StartScriptAsync);
         OpenScriptFolderCommand = new RelayCommand(_processService.OpenVSC);
     }
 
     private readonly IGetScriptsService _getScriptsService;
     private readonly IProcessStartService _processService;
-
-    public int DownloadedQuantity => _getScriptsService.Downloaded;
-    public int OutdatedQuantity => _getScriptsService.Outdated;
-    public int ScriptQuantity => _scripts.Count;
     [ObservableProperty]
     [NotifyPropertyChangedFor(nameof(DownloadedQuantity), nameof(OutdatedQuantity), nameof(ScriptQuantity))]
     private RangedObservableCollection<ScriptInfoViewModel> _scripts = new();
@@ -43,18 +30,13 @@ public partial class ScriptRepoViewModel : BotControlViewModelBase
     [ObservableProperty]
     private string _progressReportMessage = string.Empty;
 
-    public IAsyncRelayCommand UpdateAllCommand { get; }
-    public IAsyncRelayCommand DownloadAllCommand { get; }
-    public IAsyncRelayCommand DownloadCommand { get; }
-    public IAsyncRelayCommand DeleteCommand { get; }
-    public IAsyncRelayCommand RefreshScriptsCommand { get; }
-    public IRelayCommand CancelTaskCommand { get; }
-    public IRelayCommand LoadScriptCommand { get; }
-    public IRelayCommand OpenScriptCommand { get; }
-    public IRelayCommand StartScriptCommand { get; }
+    public int DownloadedQuantity => _getScriptsService.Downloaded;
+    public int OutdatedQuantity => _getScriptsService.Outdated;
+    public int ScriptQuantity => _scripts.Count;
     public IRelayCommand OpenScriptFolderCommand { get; }
 
-    private void StartScriptAsync()
+    [RelayCommand]
+    private void StartScript()
     {
         if (SelectedItem is null || !SelectedItem.Downloaded)
             return;
@@ -62,6 +44,7 @@ public partial class ScriptRepoViewModel : BotControlViewModelBase
         StrongReferenceMessenger.Default.Send<StartScriptMessage, int>(new(SelectedItem.LocalFile), (int)MessageChannels.ScriptStatus);
     }
 
+    [RelayCommand]
     private void OpenScript()
     {
         if (SelectedItem is null || !SelectedItem.Downloaded)
@@ -70,6 +53,7 @@ public partial class ScriptRepoViewModel : BotControlViewModelBase
         StrongReferenceMessenger.Default.Send<EditScriptMessage, int>(new(SelectedItem.LocalFile), (int)MessageChannels.ScriptStatus);
     }
 
+    [RelayCommand]
     private void LoadScript()
     {
         if (SelectedItem is null || !SelectedItem.Downloaded)
@@ -78,7 +62,8 @@ public partial class ScriptRepoViewModel : BotControlViewModelBase
         StrongReferenceMessenger.Default.Send<LoadScriptMessage, int>(new(SelectedItem.LocalFile), (int)MessageChannels.ScriptStatus);
     }
 
-    private async Task Refresh(CancellationToken token)
+    [RelayCommand]
+    private async Task RefreshScripts(CancellationToken token)
     {
         IsBusy = true;
         try
@@ -92,7 +77,6 @@ public partial class ScriptRepoViewModel : BotControlViewModelBase
         catch { }
         RefreshScriptsList();
     }
-
     private void RefreshScriptsList()
     {
         _scripts.Clear();
@@ -101,12 +85,12 @@ public partial class ScriptRepoViewModel : BotControlViewModelBase
         OnPropertyChanged(nameof(Scripts));
         IsBusy = false;
     }
-
     public void ProgressHandler(string message)
     {
         ProgressReportMessage = message;
     }
 
+    [RelayCommand]
     private async Task Delete()
     {
         IsBusy = true;
@@ -122,6 +106,7 @@ public partial class ScriptRepoViewModel : BotControlViewModelBase
         IsBusy = false;
     }
 
+    [RelayCommand]
     private async Task Download()
     {
         IsBusy = true;
@@ -137,6 +122,7 @@ public partial class ScriptRepoViewModel : BotControlViewModelBase
         IsBusy = false;
     }
 
+    [RelayCommand]
     private async Task UpdateAll()
     {
         IsBusy = true;
@@ -146,6 +132,7 @@ public partial class ScriptRepoViewModel : BotControlViewModelBase
         RefreshScriptsList();
     }
 
+    [RelayCommand]
     private async Task DownloadAll()
     {
         IsBusy = true;
@@ -155,6 +142,7 @@ public partial class ScriptRepoViewModel : BotControlViewModelBase
         RefreshScriptsList();
     }
 
+    [RelayCommand]
     public void CancelTask()
     {
         if (RefreshScriptsCommand.IsRunning)

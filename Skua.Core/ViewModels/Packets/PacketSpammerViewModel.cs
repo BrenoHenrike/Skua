@@ -1,74 +1,37 @@
-﻿using CommunityToolkit.Mvvm.Input;
+﻿using CommunityToolkit.Mvvm.ComponentModel;
+using CommunityToolkit.Mvvm.Input;
 using Skua.Core.Interfaces;
 using Skua.Core.Utils;
 
 namespace Skua.Core.ViewModels;
-public class PacketSpammerViewModel : BotControlViewModelBase
+public partial class PacketSpammerViewModel : BotControlViewModelBase
 {
     public PacketSpammerViewModel(IScriptSend send, IFileDialogService fileDialog)
         : base("Packet Spammer", 700, 400)
     {
         _send = send;
         _fileDialog = fileDialog;
-        AddPacketCommand = new RelayCommand(AddPacket);
-        RemovePacketCommand = new RelayCommand(RemovePacket);
-        ClearPacketsCommand = new RelayCommand(() => Packets.Clear());
-        SendPacketCommand = new RelayCommand(SendPacket);
-        ToggleSpammerCommand = new RelayCommand(ToggleSpammer);
-        SpammerCommand = new AsyncRelayCommand(Spammer);
-        LoadSpammerCommand = new RelayCommand(LoadSpammer);
-        SaveSpammerCommand = new RelayCommand(SaveSpammer);
+        ClearPacketsCommand = new RelayCommand(Packets.Clear);
     }
 
     private readonly IScriptSend _send;
     private readonly IFileDialogService _fileDialog;
+    [ObservableProperty]
     private RangedObservableCollection<string> _packets = new();
-    public RangedObservableCollection<string> Packets
-    {
-        get { return _packets; }
-        set { SetProperty(ref _packets, value); }
-    }
+    [ObservableProperty]
     private bool _sendToClient;
-    public bool SendToClient
-    {
-        get { return _sendToClient; }
-        set { SetProperty(ref _sendToClient, value); }
-    }
+    [ObservableProperty]
     private int _spamDelay = 1000;
-    public int SpamDelay
-    {
-        get { return _spamDelay; }
-        set { SetProperty(ref _spamDelay, value); }
-    }
+    [ObservableProperty]
     private string _packetText = string.Empty;
-    public string PacketText
-    {
-        get { return _packetText; }
-        set { SetProperty(ref _packetText, value); }
-    }
+    [ObservableProperty]
     private int _sendTimes = 1;
-    public int SendTimes
-    {
-        get { return _sendTimes; }
-        set { SetProperty(ref _sendTimes, value); }
-    }
+    [ObservableProperty]
     private int _selectedIndex = -1;
 
-    public int SelectedIndex
-    {
-        get { return _selectedIndex; }
-        set { SetProperty(ref _selectedIndex, value); }
-    }
-
-    public IRelayCommand AddPacketCommand { get; }
-    public IRelayCommand RemovePacketCommand { get; }
     public IRelayCommand ClearPacketsCommand { get; }
-    public IRelayCommand LoadSpammerCommand { get; }
-    public IRelayCommand SaveSpammerCommand { get; }
-    public IRelayCommand SendPacketCommand { get; }
-    public IRelayCommand ToggleSpammerCommand { get; }
-    public IAsyncRelayCommand SpammerCommand { get; }
 
+    [RelayCommand]
     private void ToggleSpammer()
     {
         if (SpammerCommand.IsRunning)
@@ -77,6 +40,7 @@ public class PacketSpammerViewModel : BotControlViewModelBase
             SpammerCommand.ExecuteAsync(null);
     }
 
+    [RelayCommand]
     private async Task Spammer(CancellationToken token)
     {
         while (!token.IsCancellationRequested)
@@ -90,27 +54,7 @@ public class PacketSpammerViewModel : BotControlViewModelBase
         }
     }
 
-    private void SendPacket()
-    {
-        if (string.IsNullOrWhiteSpace(PacketText))
-            return;
-
-        Send(PacketText);
-    }
-
-    private void Send(string packet)
-    {
-        bool json = packet.StartsWith("{");
-        if (SendToClient)
-        {
-            _send.ClientPacket(packet, json ? "json" : "str");
-        }
-        else
-        {
-            _send.Packet(packet, json ? "Json" : "String");
-        }
-    }
-
+    [RelayCommand]
     private void RemovePacket()
     {
         if (SelectedIndex < 0)
@@ -119,6 +63,7 @@ public class PacketSpammerViewModel : BotControlViewModelBase
         Packets.RemoveAt(SelectedIndex);
     }
 
+    [RelayCommand]
     private void AddPacket()
     {
         if (string.IsNullOrWhiteSpace(PacketText))
@@ -127,11 +72,13 @@ public class PacketSpammerViewModel : BotControlViewModelBase
         Packets.Add(PacketText);
     }
 
+    [RelayCommand]
     private void SaveSpammer()
     {
         _fileDialog.SaveText(_packets);
     }
 
+    [RelayCommand]
     private void LoadSpammer()
     {
         IEnumerable<string>? packets = _fileDialog.OpenText();
@@ -139,5 +86,25 @@ public class PacketSpammerViewModel : BotControlViewModelBase
             return;
         Packets.Clear();
         Packets.AddRange(packets);
+    }
+
+    [RelayCommand]
+    private void SendPacket()
+    {
+        if (string.IsNullOrWhiteSpace(PacketText))
+            return;
+
+        Send(PacketText);
+    }
+    private void Send(string packet)
+    {
+        bool json = packet.StartsWith("{");
+        if (SendToClient)
+        {
+            _send.ClientPacket(packet, json ? "json" : "str");
+            return;
+        }
+
+        _send.Packet(packet, json ? "Json" : "String");
     }
 }

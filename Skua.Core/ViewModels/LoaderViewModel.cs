@@ -1,10 +1,11 @@
-﻿using CommunityToolkit.Mvvm.Input;
+﻿using CommunityToolkit.Mvvm.ComponentModel;
+using CommunityToolkit.Mvvm.Input;
 using Skua.Core.Interfaces;
 using Skua.Core.Models.Quests;
 using Skua.Core.Utils;
 
 namespace Skua.Core.ViewModels;
-public class LoaderViewModel : BotControlViewModelBase, IManagedWindow
+public partial class LoaderViewModel : BotControlViewModelBase, IManagedWindow
 {
     public LoaderViewModel(IScriptShop shops, IScriptQuest quests, IQuestDataLoaderService questLoader, IClipboardService clipboardService)
         : base("Loader", 550, 270)
@@ -13,12 +14,6 @@ public class LoaderViewModel : BotControlViewModelBase, IManagedWindow
         Quests = quests;
         _questLoader = questLoader;
         _clipboardService = clipboardService;
-        LoadCommand = new RelayCommand(Load, AllDigits);
-        LoadQuestsCommand = new RelayCommand<IList<object>>(LoadQuests);
-        CopyQuestsIDsCommand = new RelayCommand<IList<object>>(CopyQuestIDs);
-        CopyQuestsNamesCommand = new RelayCommand<IList<object>>(CopyQuestNames);
-        UpdateQuestsCommand = new AsyncRelayCommand<bool>(UpdateQuests);
-        GetQuestsCommand = new AsyncRelayCommand(GetQuests);
         CancelQuestLoadCommand = new RelayCommand(() =>
         {
             if(_loaderCTS is not null)
@@ -34,49 +29,21 @@ public class LoaderViewModel : BotControlViewModelBase, IManagedWindow
     private readonly IScriptQuest Quests;
     private readonly IQuestDataLoaderService _questLoader;
     private readonly IClipboardService _clipboardService;
+    [ObservableProperty]
     private string _progressReport = string.Empty;
-    public string ProgressReport
-    {
-        get { return _progressReport; }
-        set { SetProperty(ref _progressReport, value); }
-    }
+    [ObservableProperty]
     private bool _isLoading;
-    public bool IsLoading
-    {
-        get { return _isLoading; }
-        set { SetProperty(ref _isLoading, value); }
-    }
+    [ObservableProperty]
+    [NotifyCanExecuteChangedFor(nameof(LoadCommand))]
     private string _inputIDs = string.Empty;
-    public string InputIDs
-    {
-        get { return _inputIDs; }
-        set
-        {
-            SetProperty(ref _inputIDs, value);
-            LoadCommand.NotifyCanExecuteChanged();
-        }
-    }
+    [ObservableProperty]
     private int _selectedIndex;
-    public int SelectedIndex
-    {
-        get { return _selectedIndex; }
-        set { SetProperty(ref _selectedIndex, value); }
-    }
+    [ObservableProperty]
     private RangedObservableCollection<QuestData> _questIDs = new();
-    public RangedObservableCollection<QuestData> QuestIDs
-    {
-        get { return _questIDs; }
-        set { SetProperty(ref _questIDs, value); }
-    }
 
-    public IRelayCommand LoadCommand { get; }
-    public IRelayCommand LoadQuestsCommand { get; }
-    public IRelayCommand CopyQuestsIDsCommand { get; }
-    public IRelayCommand CopyQuestsNamesCommand { get; }
-    public IAsyncRelayCommand UpdateQuestsCommand { get; }
-    public IAsyncRelayCommand GetQuestsCommand { get; }
     public IRelayCommand CancelQuestLoadCommand { get; }
 
+    [RelayCommand(CanExecute = nameof(AllDigits))]
     private void Load()
     {
         if (SelectedIndex == 0 && int.TryParse(InputIDs, out int id))
@@ -93,6 +60,8 @@ public class LoaderViewModel : BotControlViewModelBase, IManagedWindow
     {
         return InputIDs.Replace(",", "").Replace(" ", "").All(c => int.TryParse(c + "", out int i));
     }
+
+    [RelayCommand]
     private void LoadQuests(IList<object>? items)
     {
         if (items is null)
@@ -100,7 +69,9 @@ public class LoaderViewModel : BotControlViewModelBase, IManagedWindow
         IEnumerable<QuestData> quests = items.Cast<QuestData>();
         Quests.Load(quests.Select(q => q.ID).ToArray());
     }
-    private void CopyQuestNames(IList<object>? items)
+
+    [RelayCommand]
+    private void CopyQuestsNames(IList<object>? items)
     {
         if (items is null)
             return;
@@ -109,7 +80,8 @@ public class LoaderViewModel : BotControlViewModelBase, IManagedWindow
         _clipboardService.SetText(string.Join(",", quests.Select(q => q.Name)));
     }
 
-    private void CopyQuestIDs(IList<object>? items)
+    [RelayCommand]
+    private void CopyQuestsIDs(IList<object>? items)
     {
         if (items is null)
             return;
@@ -118,6 +90,7 @@ public class LoaderViewModel : BotControlViewModelBase, IManagedWindow
         _clipboardService.SetText(string.Join(",", quests.Select(q => q.ID)));
     }
 
+    [RelayCommand]
     private async Task UpdateQuests(bool getAll)
     {
         _loaderCTS = new();
@@ -136,6 +109,7 @@ public class LoaderViewModel : BotControlViewModelBase, IManagedWindow
         _loaderCTS = null;
     }
 
+    [RelayCommand]
     private async Task GetQuests()
     {
         QuestIDs.Clear();

@@ -12,9 +12,6 @@ public partial class JumpViewModel : BotControlViewModelBase
     {
         _mapService = mapService;
         Pads = _mapService.Pads;
-        JumpToCommand = new RelayCommand(JumpTo);
-        GetCurrentCommand = new RelayCommand(GetCurrent);
-        UpdateCellsCommand = new RelayCommand(UpdateCells);
     }
 
     private readonly IMapService _mapService;
@@ -26,20 +23,19 @@ public partial class JumpViewModel : BotControlViewModelBase
     private RangedObservableCollection<string> _cells = new();
     public ImmutableList<string> Pads { get; }
 
-    public IRelayCommand JumpToCommand { get; }
-    public IRelayCommand GetCurrentCommand { get; }
-    public IRelayCommand UpdateCellsCommand { get; }
-
+    [RelayCommand]
     private void GetCurrent()
     {
         (SelectedCell, SelectedPad) = _mapService.GetCurrentCell();
     }
 
+    [RelayCommand]
     private void JumpTo()
     {
         _mapService.Jump(SelectedCell, SelectedPad);
     }
 
+    [RelayCommand]
     public void UpdateCells()
     {
         Cells.ReplaceRange(_mapService.Cells);

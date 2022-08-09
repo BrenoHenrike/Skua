@@ -4,45 +4,35 @@ using CommunityToolkit.Mvvm.Messaging;
 using CommunityToolkit.Mvvm.Input;
 using Skua.Core.Interfaces;
 using Skua.Core.Messaging;
-using CommunityToolkit.Mvvm.DependencyInjection;
 
 namespace Skua.Core.ViewModels;
-public class MainMenuViewModel : ObservableRecipient
+public partial class MainMenuViewModel : ObservableRecipient
 {
-    private readonly IWindowService _windowService;
-
     public MainMenuViewModel(IEnumerable<MainMenuItemViewModel> mainMenuItems, AutoViewModel auto, JumpViewModel jump, IWindowService windowService)
     {
         StrongReferenceMessenger.Default.Register<MainMenuViewModel, AddPluginMenuItemMessage, int>(this, (int)MessageChannels.Plugins, AddPluginMenuItem);
         StrongReferenceMessenger.Default.Register<MainMenuViewModel, RemovePluginMenuItemMessage, int>(this, (int)MessageChannels.Plugins, RemovePluginMenuItem);
+
         AutoViewModel = auto;
         JumpViewModel = jump;
         _windowService = windowService;
-        ShowBotWindowCommand = new RelayCommand(ShowBotWindow);
 
         _plugins = new(new[] { new MainMenuItemViewModel("View Plugins", new RelayCommand(ShowPlugins)) });
 
         MainMenuItems = new(mainMenuItems);
     }
 
+    private readonly IWindowService _windowService;
+    [ObservableProperty]
     private ObservableCollection<MainMenuItemViewModel> _mainMenuItems = new();
-    public ObservableCollection<MainMenuItemViewModel> MainMenuItems
-    {
-        get { return _mainMenuItems; }
-        set { SetProperty(ref _mainMenuItems, value); }
-    }
+    [ObservableProperty]
     private ObservableCollection<MainMenuItemViewModel> _plugins;
-    public ObservableCollection<MainMenuItemViewModel> Plugins
-    {
-        get { return _plugins; }
-        set { SetProperty(ref _plugins, value); }
-    }
+
 
     public AutoViewModel AutoViewModel { get; }
     public JumpViewModel JumpViewModel { get; }
 
-    public IRelayCommand ShowBotWindowCommand { get; }
-
+    [RelayCommand]
     public void ShowBotWindow()
     {
         _windowService.ShowWindow<BotWindowViewModel>();

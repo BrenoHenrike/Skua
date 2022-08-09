@@ -7,27 +7,24 @@ using Skua.Core.Models;
 using Skua.Core.Utils;
 
 namespace Skua.Core.GameProxy;
-public class CaptureProxy : ObservableObject, ICaptureProxy
+public partial class CaptureProxy : ObservableRecipient, ICaptureProxy
 {
-    private CancellationTokenSource? CaptureProxyCTS;
+    private CancellationTokenSource? _captureProxyCTS;
     /// <summary>
     /// The default port for the capture proxy to run on.
     /// </summary>
     public const int DefaultPort = 5588;
     public IPEndPoint? Destination { get; set; }
     public List<IInterceptor> Interceptors { get; } = new();
-    private bool _running;
-    public bool Running
-    {
-        get { return _running; }
-        set { SetProperty(ref _running, value); }
-    }
 
 
     private Thread? _thread;
     private readonly TcpListener _listener;
     private TcpClient? _forwarder;
     private TcpClient? _client;
+    [ObservableProperty]
+    [NotifyPropertyChangedRecipients]
+    private bool _running;
 
     public CaptureProxy()
     {
@@ -41,10 +38,10 @@ public class CaptureProxy : ObservableObject, ICaptureProxy
         Running = true;
         _thread = new(() =>
         {
-            CaptureProxyCTS = new();
-            _Listen(CaptureProxyCTS.Token);
-            CaptureProxyCTS.Dispose();
-            CaptureProxyCTS = null;
+            _captureProxyCTS = new();
+            _Listen(_captureProxyCTS.Token);
+            _captureProxyCTS.Dispose();
+            _captureProxyCTS = null;
         });
         _thread.Name = "Capture Proxy";
         _thread.Start();
@@ -63,7 +60,7 @@ public class CaptureProxy : ObservableObject, ICaptureProxy
             _client.Close();
             _client.Dispose();
         }
-        CaptureProxyCTS?.Cancel();
+        _captureProxyCTS?.Cancel();
         Running = false;
     }
 

@@ -3,11 +3,8 @@ using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
 
 namespace Skua.Core.ViewModels;
-public class BotWindowViewModel : ObservableRecipient
+public partial class BotWindowViewModel : ObservableRecipient
 {
-    private BotControlViewModelBase _selectedItem;
-    private int _selectedIndex;
-
     public BotWindowViewModel(IEnumerable<BotControlViewModelBase> views)
     {
         BotViews = new(views);
@@ -17,33 +14,15 @@ public class BotWindowViewModel : ObservableRecipient
         _selectedItem = BotViews[0];
     }
 
-    public BotControlViewModelBase SelectedItem
-    {
-        get { return _selectedItem; }
-        set
-        {
-            SetProperty(ref _selectedItem, value);
-            MoveNextCommand.NotifyCanExecuteChanged();
-            MovePrevCommand.NotifyCanExecuteChanged();
-        }
-    }
-
-    public int SelectedIndex
-    {
-        get { return _selectedIndex; }
-        set
-        {
-            SetProperty(ref _selectedIndex, value);
-            MoveNextCommand.NotifyCanExecuteChanged();
-            MovePrevCommand.NotifyCanExecuteChanged();
-        }
-    }
+    [ObservableProperty]
+    [NotifyCanExecuteChangedFor(nameof(MoveNextCommand), nameof(MovePrevCommand))]
+    private BotControlViewModelBase _selectedItem;
+    [ObservableProperty]
+    [NotifyCanExecuteChangedFor(nameof(MoveNextCommand), nameof(MovePrevCommand))]
+    private int _selectedIndex;
 
     public ObservableCollection<BotControlViewModelBase> BotViews { get; set; }
-
     public IRelayCommand HomeCommand { get; }
-
     public IRelayCommand MovePrevCommand { get; }
-
     public IRelayCommand MoveNextCommand { get; }
 }

@@ -19,7 +19,6 @@ public partial class GrabberListViewModel : ObservableRecipient
         _grabberService = grabberService;
         _grabType = grabType;
         _grabberCommands = new(commands);
-        GrabCommand = new AsyncRelayCommand(Grab);
         CancelTaskCommand = new RelayCommand(() => WeakReferenceMessenger.Default.Send<CancelGrabberTaskMessage>());
     }
 
@@ -31,7 +30,6 @@ public partial class GrabberListViewModel : ObservableRecipient
         _grabberService = grabberService;
         _grabType = grabType;
         _grabberCommands = new() { command };
-        GrabCommand = new AsyncRelayCommand(Grab);
         CancelTaskCommand = new RelayCommand(() => WeakReferenceMessenger.Default.Send<CancelGrabberTaskMessage>());
     }
     public GrabberListViewModel(string title, IGrabberService grabberService, GrabberTypes grabType, bool selectMultiple = false)
@@ -42,11 +40,9 @@ public partial class GrabberListViewModel : ObservableRecipient
         _grabberService = grabberService;
         _grabType = grabType;
         _grabberCommands = new();
-        GrabCommand = new AsyncRelayCommand(Grab);
         CancelTaskCommand = new RelayCommand(() => WeakReferenceMessenger.Default.Send<CancelGrabberTaskMessage>());
     }
 
-    public IRelayCommand CancelTaskCommand { get; }
     private readonly GrabberTypes _grabType;
     private readonly IGrabberService _grabberService;
     public string Title { get; }
@@ -66,7 +62,9 @@ public partial class GrabberListViewModel : ObservableRecipient
     [ObservableProperty]
     private object? _selectedItem;
 
-    public IAsyncRelayCommand GrabCommand { get; }
+    public IRelayCommand CancelTaskCommand { get; }
+
+    [RelayCommand]
     private Task Grab()
     {
         IsBusy = true;
@@ -85,18 +83,18 @@ public partial class GrabberListViewModel : ObservableRecipient
 
     private void RegisterMessages()
     {
-        Messenger.Register<GrabberListViewModel, PropertyChangedMessage<bool>>(this, Receive);
-        Messenger.Register<GrabberListViewModel, PropertyChangedMessage<string>>(this, Receive);
+        Messenger.Register<GrabberListViewModel, PropertyChangedMessage<bool>>(this, IsBusyChanged);
+        Messenger.Register<GrabberListViewModel, PropertyChangedMessage<string>>(this, ProgressReportMessageChanged);
     }
 
-    public void Receive(GrabberListViewModel receiver, PropertyChangedMessage<bool> message)
+    public void IsBusyChanged(GrabberListViewModel receiver, PropertyChangedMessage<bool> message)
     {
         if (message.Sender.GetType() == typeof(GrabberTaskViewModel)
             && message.PropertyName == nameof(GrabberTaskViewModel.IsBusy))
             receiver.IsBusy = message.NewValue;
     }
 
-    public void Receive(GrabberListViewModel receiver, PropertyChangedMessage<string> message)
+    public void ProgressReportMessageChanged(GrabberListViewModel receiver, PropertyChangedMessage<string> message)
     {
         if (message.Sender.GetType() == typeof(GrabberTaskViewModel)
             && message.PropertyName == nameof(GrabberTaskViewModel.ProgressReportMessage))

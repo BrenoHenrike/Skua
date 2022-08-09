@@ -1,31 +1,31 @@
 ﻿using CommunityToolkit.Mvvm.ComponentModel;
+using CommunityToolkit.Mvvm.Messaging.Messages;
+using CommunityToolkit.Mvvm.Messaging;
 using CommunityToolkit.Mvvm.Input;
 using Skua.Core.Interfaces;
 
 namespace Skua.Core.ViewModels;
-public partial class ToPickupDropsViewModel : ObservableObject, IDisposable
+public partial class ToPickupDropsViewModel : ObservableObject
 {
     private readonly char[] _dropsSeparator = { '|' };
     public ToPickupDropsViewModel(IScriptDrop drops, IScriptOption options)
     {
+        WeakReferenceMessenger.Default.Register<ToPickupDropsViewModel, PropertyChangedMessage<IEnumerable<string>>>(this, ToPickupChanged);
+
         Drops = drops;
         Options = options;
-        Drops.PropertyChanged += Drops_PropertyChanged;
-        ToggleDropsCommand = new AsyncRelayCommand(ToggleDrops);
-        RemoveDropsCommand = new RelayCommand<IList<object>>(RemoveDrops);
         RemoveAllDropsCommand = new RelayCommand(Drops.Clear);
-        AddDropCommand = new RelayCommand(AddDrop);
     }
+
     [ObservableProperty]
     private string _addDropInput = string.Empty;
+
     public List<string> ToPickup => Drops.ToPickup.ToList();
     public IScriptDrop Drops { get; }
     public IScriptOption Options { get; }
-    public IRelayCommand ToggleDropsCommand { get; }
-    public IRelayCommand AddDropCommand { get; }
     public IRelayCommand RemoveAllDropsCommand { get; }
-    public IRelayCommand RemoveDropsCommand { get; }
 
+    [RelayCommand]
     private void RemoveDrops(IList<object>? items)
     {
         if (items is null)
@@ -35,6 +35,7 @@ public partial class ToPickupDropsViewModel : ObservableObject, IDisposable
             Drops.Remove(drops.ToArray());
     }
 
+    [RelayCommand]
     private async Task ToggleDrops()
     {
         if (Drops.Enabled)
@@ -43,6 +44,7 @@ public partial class ToPickupDropsViewModel : ObservableObject, IDisposable
             Drops.Start();
     }
 
+    [RelayCommand]
     private void AddDrop()
     {
         if (string.IsNullOrWhiteSpace(AddDropInput))
@@ -55,15 +57,9 @@ public partial class ToPickupDropsViewModel : ObservableObject, IDisposable
         AddDropInput = string.Empty;
     }
 
-    private void Drops_PropertyChanged(object? sender, System.ComponentModel.PropertyChangedEventArgs e)
+    private void ToPickupChanged(ToPickupDropsViewModel recipient, PropertyChangedMessage<IEnumerable<string>> message)
     {
-        if (e.PropertyName == nameof(IScriptDrop.ToPickup))
-            OnPropertyChanged(nameof(ToPickup));
-    }
-
-    public void Dispose()
-    {
-        GC.SuppressFinalize(this);
-        Drops.PropertyChanged -= Drops_PropertyChanged;
+        if (message.PropertyName == nameof(IScriptDrop.ToPickup))
+            recipient.OnPropertyChanged(nameof(recipient.ToPickup));
     }
 }

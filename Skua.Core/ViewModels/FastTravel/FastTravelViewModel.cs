@@ -28,25 +28,19 @@ public partial class FastTravelViewModel : BotControlViewModelBase
             DefaultFastTravels.Add(new FastTravelItemViewModel(values[0], values[1], values[2], values[3], _travelCommand));
         }
         FastTravelItems = new(DefaultFastTravels);
-        AddFastTravelCommand = new RelayCommand(AddFastTravel);
-        SaveFastTravelsCommand = new RelayCommand(SaveFastTravels);
-        ClearFastTravelsCommand = new RelayCommand(ClearFastTravels);
     }
 
-    public IMapService MapService { get; }
     private readonly ISettingsService _settings;
     private readonly IDialogService _dialogService;
     private readonly IRelayCommand<object> _travelCommand;
-
     [ObservableProperty]
     private int _selectedIndex = 0;
+
+    public IMapService MapService { get; }
     public FastTravelEditorViewModel Editor { get; }
     public ObservableCollection<FastTravelItemViewModel> FastTravelItems { get; }
 
-    public IRelayCommand AddFastTravelCommand { get; }
-    public IRelayCommand SaveFastTravelsCommand { get; }
-    public IRelayCommand ClearFastTravelsCommand { get; }
-
+    [RelayCommand]
     private void AddFastTravel()
     {
         if (!Editor.Travel.Validate())
@@ -58,6 +52,21 @@ public partial class FastTravelViewModel : BotControlViewModelBase
             Editor.Travel.Cell,
             Editor.Travel.Pad,
             _travelCommand));
+    }
+
+    [RelayCommand]
+    private void SaveFastTravels()
+    {
+        StringCollection values = new();
+        values.AddRange(FastTravelItems.Select(i => i.ToString()).ToArray());
+        _settings.Set("FastTravels", values);
+    }
+
+    [RelayCommand]
+    private void ClearFastTravels()
+    {
+        if (_dialogService.ShowMessageBox("This will clear all fast travels from the list. Continue?", "Clear Fast Travels", true) == true)
+            FastTravelItems.Clear();
     }
 
     private void RemoveFastTravel(FastTravelViewModel recipient, RemoveFastTravelMessage message)
@@ -77,18 +86,5 @@ public partial class FastTravelViewModel : BotControlViewModelBase
         FastTravelEditorDialogViewModel dialog = new(new(MapService, message.FastTravel));
         if(_dialogService.ShowDialog(dialog) == true)
             recipient.FastTravelItems[index] = dialog.Editor.Travel;
-    }
-
-    private void ClearFastTravels()
-    {
-        if(_dialogService.ShowMessageBox("This will clear all fast travels from the list. Continue?", "Clear Fast Travels", true) == true)
-            FastTravelItems.Clear();
-    }
-
-    private void SaveFastTravels()
-    {
-        StringCollection values = new();
-        values.AddRange(FastTravelItems.Select(i => i.ToString()).ToArray());
-        _settings.Set("FastTravels", values);
     }
 }

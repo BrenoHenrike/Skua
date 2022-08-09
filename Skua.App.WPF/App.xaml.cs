@@ -54,10 +54,6 @@ public sealed partial class App : Application
     {
         Services.GetRequiredService<ICaptureProxy>().Stop();
 
-        Services.GetRequiredService<PacketInterceptorViewModel>().Dispose();
-        Services.GetRequiredService<RegisteredQuestsViewModel>().Dispose();
-        Services.GetRequiredService<ToPickupDropsViewModel>().Dispose();
-        
         await ((IAsyncDisposable)Services.GetRequiredService<IScriptBoost>()).DisposeAsync();
         await ((IAsyncDisposable)Services.GetRequiredService<IScriptBotStats>()).DisposeAsync();
         await ((IAsyncDisposable)Services.GetRequiredService<IScriptDrop>()).DisposeAsync();

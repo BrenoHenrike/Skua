@@ -15,20 +15,16 @@ public partial class SavedAdvancedSkillsViewModel : ObservableRecipient
         Messenger.Register<SavedAdvancedSkillsViewModel, PropertyChangedMessage<List<AdvancedSkill>>>(this, AdvancedSkillsChanged);
         _advancedSkillContainer = advancedSkillContainer;
         RefreshSkillsCommand = new RelayCommand(_advancedSkillContainer.LoadSkills);
-        EditSelectedCommand = new RelayCommand(EditSelected);
-        RemoveSelectedCommand = new RelayCommand(RemoveSelected);
     }
 
     private readonly IAdvancedSkillContainer _advancedSkillContainer;
-
-    public List<AdvancedSkill> LoadedSkills => _advancedSkillContainer.LoadedSkills;
     [ObservableProperty]
     private AdvancedSkill? _selectedSkill;
 
+    public List<AdvancedSkill> LoadedSkills => _advancedSkillContainer.LoadedSkills;
     public IRelayCommand RefreshSkillsCommand { get; }
-    public IRelayCommand EditSelectedCommand { get; }
-    public IRelayCommand RemoveSelectedCommand { get; }
 
+    [RelayCommand]
     private void RemoveSelected()
     {
         if (SelectedSkill is null)
@@ -37,6 +33,7 @@ public partial class SavedAdvancedSkillsViewModel : ObservableRecipient
         _advancedSkillContainer.Remove(SelectedSkill);
     }
 
+    [RelayCommand]
     private void EditSelected()
     {
         if (SelectedSkill is null)

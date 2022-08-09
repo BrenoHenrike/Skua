@@ -4,10 +4,8 @@ using CommunityToolkit.Mvvm.Input;
 namespace Skua.Core.ViewModels;
 public partial class SkillRulesViewModel : ObservableRecipient
 {
-    public SkillRulesViewModel()
-    {
-        ResetUseRulesCommand = new RelayCommand(ResetUseRules);
-    }
+    public SkillRulesViewModel() { }
+
     public SkillRulesViewModel(SkillRulesViewModel rules)
     {
         _useRuleBool = rules.UseRuleBool;
@@ -17,11 +15,10 @@ public partial class SkillRulesViewModel : ObservableRecipient
         _manaGreaterThanBool = rules.ManaGreaterThanBool;
         _manaUseValue = rules.ManaUseValue;
         _skipUseBool = rules.SkipUseBool;
-
-        ResetUseRulesCommand = new RelayCommand(ResetUseRules);
     }
     [ObservableProperty]
     private bool _useRuleBool;
+
     [ObservableProperty]
     private bool _healthGreaterThanBool = true;
     private int _healthUseValue;
@@ -35,6 +32,7 @@ public partial class SkillRulesViewModel : ObservableRecipient
             SetProperty(ref _healthUseValue, value);
         }
     }
+
     [ObservableProperty]
     private bool _manaGreaterThanBool = true;
     private int _manaUseValue;
@@ -53,8 +51,7 @@ public partial class SkillRulesViewModel : ObservableRecipient
     [ObservableProperty]
     private bool _skipUseBool;
 
-    public IRelayCommand ResetUseRulesCommand { get; }
-
+    [RelayCommand]
     private void ResetUseRules()
     {
         UseRuleBool = false;

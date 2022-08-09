@@ -13,12 +13,34 @@ public partial class PluginsViewModel : BotControlViewModelBase
     {
         StrongReferenceMessenger.Default.Register<PluginsViewModel, PluginLoadedMessage, int>(this, (int)MessageChannels.Plugins, PluginLoaded);
         StrongReferenceMessenger.Default.Register<PluginsViewModel, PluginUnloadedMessage, int>(this, (int)MessageChannels.Plugins, PluginUnLoaded);
+        
         PluginManager = pluginManager;
         _fileService = fileService;
-        LoadPluginCommand = new RelayCommand(LoadPlugin);
-        UnloadAllPluginsCommand = new RelayCommand(UnloadAll);
         foreach(var container in PluginManager.Containers)
             _plugins.Add(new(container, container.OptionContainer.Options.Count > 0));
+    }
+
+    private readonly IFileDialogService _fileService;
+    [ObservableProperty]
+    private RangedObservableCollection<PluginItemViewModel> _plugins = new();
+
+    public IPluginManager PluginManager { get; }
+
+    [RelayCommand]
+    private void UnloadAllPlugins()
+    {
+        PluginManager.Containers.ToList().ForEach(c => PluginManager.Unload(c.Plugin));
+    }
+
+    [RelayCommand]
+    private void LoadPlugin()
+    {
+        string? file = _fileService.Open("DLL files |*.dll");
+
+        if (string.IsNullOrEmpty(file))
+            return;
+
+        PluginManager.Load(file);
     }
 
     private void PluginUnLoaded(PluginsViewModel recipient, PluginUnloadedMessage message)
@@ -34,28 +56,4 @@ public partial class PluginsViewModel : BotControlViewModelBase
     {
         recipient.Plugins.Add(new(message.Container, message.Container.OptionContainer.Options.Count > 0));
     }
-
-    private void UnloadAll()
-    {
-        PluginManager.Containers.ToList().ForEach(c => PluginManager.Unload(c.Plugin));
-    }
-
-    private void LoadPlugin()
-    {
-        string? file = _fileService.Open("DLL files |*.dll");
-
-        if (string.IsNullOrEmpty(file))
-            return;
-
-        PluginManager.Load(file);
-    }
-
-    [ObservableProperty]
-    private RangedObservableCollection<PluginItemViewModel> _plugins = new();
-    private readonly IFileDialogService _fileService;
-
-    public IPluginManager PluginManager { get; }
-
-    public IRelayCommand LoadPluginCommand { get; }
-    public IRelayCommand UnloadAllPluginsCommand { get; }
 }

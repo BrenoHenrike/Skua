@@ -13,17 +13,19 @@ public partial class AutoViewModel : BotControlViewModelBase
         Auto = auto;
         _inventory = inventory;
         _advancedSkills = advancedSkills;
-        StartAutoAttackCommand = new AsyncRelayCommand(StartAutoAttack);
-        StartAutoHuntCommand = new AsyncRelayCommand(StartAutoHunt);
         StopAutoAsyncCommand = new AsyncRelayCommand(async () => await Auto.StopAsync());
-        ReloadClassesCommand = new RelayCommand(ReloadClasses);
     }
 
     private readonly IScriptInventory _inventory;
     private readonly IAdvancedSkillContainer _advancedSkills;
-    public IScriptAuto Auto { get; }
+    [ObservableProperty]
+    private ClassUseMode? _selectedClassMode;
+    [ObservableProperty]
+    private bool _useSelectedClass;
 
+    public IScriptAuto Auto { get; }
     public List<string>? PlayerClasses => _inventory.Items?.Where(i => i.Category == ItemCategory.Class).Select(i => i.Name).ToList();
+
     private string? _selectedClass;
     public string? SelectedClass
     {
@@ -40,17 +42,9 @@ public partial class AutoViewModel : BotControlViewModelBase
     }
 
     public List<ClassUseMode>? CurrentClassModes { get; private set; }
-    [ObservableProperty]
-    private ClassUseMode? _selectedClassMode;
-
-    [ObservableProperty]
-    private bool _useSelectedClass;
-
-    public IAsyncRelayCommand StartAutoAttackCommand { get; }
-    public IAsyncRelayCommand StartAutoHuntCommand { get; }
     public IAsyncRelayCommand StopAutoAsyncCommand { get; }
-    public IRelayCommand ReloadClassesCommand { get; }
 
+    [RelayCommand]
     private void ReloadClasses()
     {
         OnPropertyChanged(nameof(PlayerClasses));
@@ -60,6 +54,7 @@ public partial class AutoViewModel : BotControlViewModelBase
         SelectedClassMode = null;
     }
 
+    [RelayCommand]
     private async Task StartAutoHunt()
     {
         if (UseSelectedClass && _selectedClass is not null && _selectedClassMode is not null)
@@ -71,6 +66,7 @@ public partial class AutoViewModel : BotControlViewModelBase
         Auto.StartAutoHunt();
     }
 
+    [RelayCommand]
     private async Task StartAutoAttack()
     {
         if (UseSelectedClass && _selectedClass is not null && _selectedClassMode is not null)

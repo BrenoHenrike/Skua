@@ -1,9 +1,10 @@
 ﻿using System.Collections.ObjectModel;
+using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
 using Skua.Core.Interfaces;
 
 namespace Skua.Core.ViewModels;
-public class PacketLoggerViewModel : BotControlViewModelBase
+public partial class PacketLoggerViewModel : BotControlViewModelBase
 {
     public PacketLoggerViewModel(IEnumerable<PacketLogFilterViewModel> filters, IFlashUtil flash, IFileDialogService fileDialog)
         : base("Packet Logger")
@@ -12,24 +13,15 @@ public class PacketLoggerViewModel : BotControlViewModelBase
         _fileDialog = fileDialog;
         _packetFilters = filters.ToList();
         ClearPacketLogsCommand = new RelayCommand(PacketLogs.Clear);
-        ClearFiltersCommand = new RelayCommand(ClearFilters);
-        SavePacketLogsCommand = new RelayCommand(SavePacketLogs);
     }
 
     private readonly IFlashUtil _flash;
     private readonly IFileDialogService _fileDialog;
+    [ObservableProperty]
     private ObservableCollection<string> _packetLogs = new();
-    public ObservableCollection<string> PacketLogs
-    {
-        get { return _packetLogs; }
-        set { SetProperty(ref _packetLogs, value); }
-    }
+    [ObservableProperty]
     private List<PacketLogFilterViewModel> _packetFilters;
-    public List<PacketLogFilterViewModel> PacketFilters
-    {
-        get { return _packetFilters; }
-        set { SetProperty(ref _packetFilters, value); }
-    }
+
     private bool _isReceivingPackets;
     public bool IsReceivingPackets
     {
@@ -42,8 +34,18 @@ public class PacketLoggerViewModel : BotControlViewModelBase
     }
 
     public IRelayCommand ClearPacketLogsCommand { get; }
-    public IRelayCommand SavePacketLogsCommand { get; }
-    public IRelayCommand ClearFiltersCommand { get; }
+
+    [RelayCommand]
+    private void SavePacketLogs()
+    {
+        _fileDialog.SaveText(_packetLogs);
+    }
+
+    [RelayCommand]
+    private void ClearFilters()
+    {
+        _packetFilters.ForEach(f => f.IsChecked = false);
+    }
 
     private void ToggleLogger()
     {
@@ -74,15 +76,5 @@ public class PacketLoggerViewModel : BotControlViewModelBase
         }
 
         PacketLogs.Add(args[0].ToString()!);
-    }
-
-    private void SavePacketLogs()
-    {
-        _fileDialog.SaveText(_packetLogs);
-    }
-
-    private void ClearFilters()
-    {
-        _packetFilters.ForEach(f => f.IsChecked = false);
     }
 }

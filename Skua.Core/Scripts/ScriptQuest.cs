@@ -259,7 +259,7 @@ public partial class ScriptQuest : ObservableObject, IScriptQuest
             {
                 QuestsCTS = new();
                 await _Poll(QuestsCTS.Token);
-                QuestsCTS.Dispose();
+                QuestsCTS?.Dispose();
                 QuestsCTS = null;
             })
             {
@@ -272,6 +272,7 @@ public partial class ScriptQuest : ObservableObject, IScriptQuest
     public void UnregisterQuests(params int[] ids)
     {
         _registered.Remove(ids.Contains);
+        OnPropertyChanged(nameof(Registered));
     }
 
     public void UnregisterAllQuests()

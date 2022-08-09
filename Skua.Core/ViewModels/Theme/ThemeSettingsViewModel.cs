@@ -8,17 +8,16 @@ public partial class ThemeSettingsViewModel : ObservableObject
     public ThemeSettingsViewModel(IThemeService themeService)
     {
         ThemeService = themeService;
-        SaveThemeCommand = new RelayCommand(SaveTheme);
-    }
-
-    private void SaveTheme()
-    {
-        ThemeService.SaveTheme(ThemeName);
     }
 
     [ObservableProperty]
     private string _themeName = string.Empty;
     public IThemeService ThemeService { get; }
 
-    public IRelayCommand SaveThemeCommand { get; }
+    [RelayCommand]
+    private void SaveTheme()
+    {
+        ThemeService.SaveTheme(ThemeName);
+    }
+
 }

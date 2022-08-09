@@ -9,8 +9,7 @@ public class CustomDialogViewModel : DialogViewModelBase
         Message = message;
     }
 
-    public List<string> Buttons { get; }
-
-    public DialogResult? Result { get; set; }
     public string Message { get; }
+    public List<string> Buttons { get; }
+    public DialogResult? Result { get; set; }
 }

@@ -9,7 +9,6 @@ public partial class FastTravelEditorViewModel : ObservableObject
     {
         _mapService = mapService;
         _travel = new(travel);
-        GetCurrentCommand = new RelayCommand(GetCurrentLocation);
     }
     public FastTravelEditorViewModel(IMapService mapService, FastTravelItemViewModel fastTravel)
     {
@@ -20,15 +19,14 @@ public partial class FastTravelEditorViewModel : ObservableObject
             fastTravel.Cell,
             fastTravel.Pad,
             fastTravel.TravelCommand);
-        GetCurrentCommand = new RelayCommand(GetCurrentLocation);
     }
 
     private readonly IMapService _mapService;
     [ObservableProperty]
     private FastTravelItemViewModel _travel;
-    public IRelayCommand GetCurrentCommand { get; }
 
-    private void GetCurrentLocation()
+    [RelayCommand]
+    private void GetCurrent()
     {
         (Travel.MapName, Travel.Cell, Travel.Pad) = _mapService.GetCurrentLocation();
     }

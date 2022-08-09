@@ -82,7 +82,7 @@
                 Grid.Column="0"
                 Grid.ColumnSpan="2"
                 Margin="0,3,0,0"
-                Command="{Binding ToggleScriptAsyncCommand}"
+                Command="{Binding ToggleScriptCommand}"
                 IsEnabled="{Binding ToggleScriptEnabled, UpdateSourceTrigger=PropertyChanged}">
                 <Button.Style>
                     <Style BasedOn="{StaticResource MaterialDesignRaisedButton}" TargetType="Button">

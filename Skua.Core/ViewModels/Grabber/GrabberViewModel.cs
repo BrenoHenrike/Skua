@@ -1,8 +1,8 @@
-﻿using Skua.Core.Interfaces;
+﻿using CommunityToolkit.Mvvm.ComponentModel;
 using System.Collections.ObjectModel;
 
 namespace Skua.Core.ViewModels;
-public class GrabberViewModel : BotControlViewModelBase
+public partial class GrabberViewModel : BotControlViewModelBase
 {
     public GrabberViewModel(IEnumerable<GrabberListViewModel> grabberTabs)
         : base("Grabber", 600, 450)
@@ -10,16 +10,9 @@ public class GrabberViewModel : BotControlViewModelBase
         _grabberTabs = new(grabberTabs);
         _selectedTab = _grabberTabs[0];
     }
+
+    [ObservableProperty]
     private ObservableCollection<GrabberListViewModel> _grabberTabs;
-    public ObservableCollection<GrabberListViewModel> GrabberTabs
-    {
-        get { return _grabberTabs; }
-        set { SetProperty(ref _grabberTabs, value); }
-    }
+    [ObservableProperty]
     private GrabberListViewModel _selectedTab;
-    public GrabberListViewModel SelectedTab
-    {
-        get { return _selectedTab; }
-        set { SetProperty(ref _selectedTab, value); }
-    }
 }

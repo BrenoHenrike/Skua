@@ -7,29 +7,11 @@ using System.Text;
 namespace Skua.Core.ViewModels;
 public partial class CBOClassEquipmentViewModel : ObservableObject, IManageCBOptions
 {
-
     public CBOClassEquipmentViewModel(IScriptInventory inventory)
     {
         _inventory = inventory;
-        RefreshInventoryCommand = new RelayCommand(RefreshInventory);
     }
 
-    private void RefreshInventory()
-    {
-        Helms = _inventory.Items?.Where(i => i.Category == ItemCategory.Helm && i.EnhancementLevel > 0).Select(i => i.Name).ToList() ?? new();
-        Armors= _inventory.Items?.Where(i => i.Category == ItemCategory.Armor).Select(i => i.Name).ToList() ?? new();
-        Capes= _inventory.Items?.Where(i => i.Category == ItemCategory.Cape && i.EnhancementLevel > 0).Select(i => i.Name).ToList() ?? new();
-        Weapons= _inventory.Items?.Where(i => i.ItemGroup == "Weapon" && i.EnhancementLevel > 0).Select(i => i.Name).ToList() ?? new();
-        Pets= _inventory.Items?.Where(i => i.Category == ItemCategory.Pet).Select(i => i.Name).ToList() ?? new();
-        GroundItems = _inventory.Items?.Where(i => i.Category == ItemCategory.Misc).Select(i => i.Name).ToList() ?? new();
-
-        OnPropertyChanged(nameof(Helms));
-        OnPropertyChanged(nameof(Armors));
-        OnPropertyChanged(nameof(Capes));
-        OnPropertyChanged(nameof(Weapons));
-        OnPropertyChanged(nameof(Pets));
-        OnPropertyChanged(nameof(GroundItems));
-    }
     private readonly IScriptInventory _inventory;
 
     public List<string> Helms {get; private set; } = new();
@@ -65,7 +47,23 @@ public partial class CBOClassEquipmentViewModel : ObservableObject, IManageCBOpt
     [ObservableProperty]
     private string? _selectedSoloGroundItem;
 
-    public IRelayCommand RefreshInventoryCommand { get; }
+    [RelayCommand]
+    private void RefreshInventory()
+    {
+        Helms = _inventory.Items?.Where(i => i.Category == ItemCategory.Helm && i.EnhancementLevel > 0).Select(i => i.Name).ToList() ?? new();
+        Armors = _inventory.Items?.Where(i => i.Category == ItemCategory.Armor).Select(i => i.Name).ToList() ?? new();
+        Capes = _inventory.Items?.Where(i => i.Category == ItemCategory.Cape && i.EnhancementLevel > 0).Select(i => i.Name).ToList() ?? new();
+        Weapons = _inventory.Items?.Where(i => i.ItemGroup == "Weapon" && i.EnhancementLevel > 0).Select(i => i.Name).ToList() ?? new();
+        Pets = _inventory.Items?.Where(i => i.Category == ItemCategory.Pet).Select(i => i.Name).ToList() ?? new();
+        GroundItems = _inventory.Items?.Where(i => i.Category == ItemCategory.Misc).Select(i => i.Name).ToList() ?? new();
+
+        OnPropertyChanged(nameof(Helms));
+        OnPropertyChanged(nameof(Armors));
+        OnPropertyChanged(nameof(Capes));
+        OnPropertyChanged(nameof(Weapons));
+        OnPropertyChanged(nameof(Pets));
+        OnPropertyChanged(nameof(GroundItems));
+    }
 
     public StringBuilder Save(StringBuilder builder)
     {

@@ -10,35 +10,39 @@ public partial class LogTabViewModel : ObservableRecipient
 {
     public LogTabViewModel(string title, ILogService logService, IClipboardService clipBoard, IFileDialogService fileDialog, LogType logType)
     {
-        Messenger.Register<LogTabViewModel, LogsChangedMessage>(this, Receive);
+        Messenger.Register<LogTabViewModel, LogsChangedMessage>(this, LogsChanged);
+
         Title = title;
         _logService = logService;
+        _clipBoard = clipBoard;
         _fileDialog = fileDialog;
         _logType = logType;
-        CopyLogCommand = new RelayCommand(() => clipBoard.SetText(LogsToString()));
-        ClearLogCommand = new RelayCommand(ClearLog);
-        SaveLogCommand = new RelayCommand(Save);
     }
 
     private readonly ILogService _logService;
+    private readonly IClipboardService _clipBoard;
     private readonly IFileDialogService _fileDialog;
     private readonly LogType _logType;
 
     public string Title { get; }
     public List<string> Logs => _logService.GetLogs(_logType);
 
-    public IRelayCommand ClearLogCommand { get; }
-    public IRelayCommand CopyLogCommand { get; }
-    public IRelayCommand SaveLogCommand { get; }
-
-    private void Save()
+    [RelayCommand]
+    private void SaveLog()
     {
         _fileDialog.SaveText(LogsToString());
     }
 
+    [RelayCommand]
     private void ClearLog()
     {
         _logService.ClearLog(_logType);
+    }
+
+    [RelayCommand]
+    private void CopyLog()
+    {
+        _clipBoard.SetText(LogsToString());
     }
 
     private string LogsToString()
@@ -46,7 +50,7 @@ public partial class LogTabViewModel : ObservableRecipient
         return string.Join(Environment.NewLine, Logs);
     }
 
-    private void Receive(LogTabViewModel recipient, LogsChangedMessage message)
+    private void LogsChanged(LogTabViewModel recipient, LogsChangedMessage message)
     {
         if (message.LogType == recipient._logType)
             recipient.OnPropertyChanged(nameof(recipient.Logs));

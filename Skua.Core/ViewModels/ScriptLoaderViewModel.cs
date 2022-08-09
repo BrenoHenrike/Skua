@@ -17,9 +17,9 @@ public partial class ScriptLoaderViewModel : BotControlViewModelBase
         IEnumerable<LogTabViewModel> logs) 
         : base("Load Script", 350, 450)
     {
-        StrongReferenceMessenger.Default.Register<ScriptLoaderViewModel, LoadScriptMessage, int>(this, (int)MessageChannels.ScriptStatus, ReceiveLoadScript);
-        StrongReferenceMessenger.Default.Register<ScriptLoaderViewModel, EditScriptMessage, int>(this, (int)MessageChannels.ScriptStatus, ReceiveEditScript);
-        StrongReferenceMessenger.Default.Register<ScriptLoaderViewModel, StartScriptMessage, int>(this, (int)MessageChannels.ScriptStatus, ReceiveToggleScript);
+        StrongReferenceMessenger.Default.Register<ScriptLoaderViewModel, LoadScriptMessage, int>(this, (int)MessageChannels.ScriptStatus, LoadScript);
+        StrongReferenceMessenger.Default.Register<ScriptLoaderViewModel, EditScriptMessage, int>(this, (int)MessageChannels.ScriptStatus, EditScript);
+        StrongReferenceMessenger.Default.Register<ScriptLoaderViewModel, StartScriptMessage, int>(this, (int)MessageChannels.ScriptStatus, ToggleScript);
         StrongReferenceMessenger.Default.Register<ScriptLoaderViewModel, ScriptStartedMessage, int>(this, (int)MessageChannels.ScriptStatus, ScriptStarted);
         StrongReferenceMessenger.Default.Register<ScriptLoaderViewModel, ScriptStoppedMessage, int>(this, (int)MessageChannels.ScriptStatus, ScriptStopped);
         StrongReferenceMessenger.Default.Register<ScriptLoaderViewModel, ScriptStoppingMessage, int>(this, (int)MessageChannels.ScriptStatus, ScriptStopping);
@@ -31,30 +31,6 @@ public partial class ScriptLoaderViewModel : BotControlViewModelBase
         _processService = processService;
         _dialogService = dialogService;
         _fileDialog = fileDialog;
-        LoadScriptCommand = new RelayCommand(() => LoadScript());
-        OpenVSCodeCommand = new RelayCommand(_processService.OpenVSC);
-        EditScriptCommand = new RelayCommand(() => EditScript());
-        EditScriptConfigCommand = new RelayCommand(EditScriptConfig);
-        OpenScriptRepoCommand = new RelayCommand(_windowService.ShowWindow<ScriptRepoViewModel>);
-        OpenBrowserFormCommand = new RelayCommand(() => _processService.OpenLink(@"https://forms.gle/sbp57LBQP5WvCH2B9"));
-        ToggleScriptAsyncCommand = new AsyncRelayCommand(ToggleScriptAsync);
-    }
-
-    private void ScriptStopping(ScriptLoaderViewModel recipient, ScriptStoppingMessage message)
-    {
-        recipient.ToggleScriptEnabled = false;
-        recipient.ScriptStatus = "Stopping...";
-    }
-
-    private void ScriptStopped(ScriptLoaderViewModel recipient, ScriptStoppedMessage message)
-    {
-        recipient.ToggleScriptEnabled = true;
-        recipient.ScriptStatus = "[Stopped]";
-    }
-
-    private void ScriptStarted(ScriptLoaderViewModel recipient, ScriptStartedMessage message)
-    {
-        recipient.ToggleScriptEnabled = true;
     }
 
     public IScriptManager ScriptManager { get; }
@@ -66,21 +42,31 @@ public partial class ScriptLoaderViewModel : BotControlViewModelBase
     public LogTabViewModel ScriptLogs { get; }
 
     [ObservableProperty]
-    private string _ScriptErrorToolTip = string.Empty;
+    private string _scriptErrorToolTip = string.Empty;
     [ObservableProperty]
-    private bool _ToggleScriptEnabled = true;
+    private bool _toggleScriptEnabled = true;
     [ObservableProperty]
     private string _scriptStatus = "[No Script Loaded]";
     [ObservableProperty]
     private string _loadedScript = string.Empty;
 
-    public IRelayCommand LoadScriptCommand { get; }
-    public IRelayCommand EditScriptCommand { get; }
-    public IRelayCommand EditScriptConfigCommand { get; }
-    public IRelayCommand OpenScriptRepoCommand { get; }
-    public IRelayCommand OpenBrowserFormCommand { get; }
-    public IRelayCommand OpenVSCodeCommand { get; }
-    public IAsyncRelayCommand ToggleScriptAsyncCommand { get; }
+    [RelayCommand]
+    private void OpenBrowserForm()
+    {
+        _processService.OpenLink(@"https://forms.gle/sbp57LBQP5WvCH2B9");
+    }
+
+    [RelayCommand]
+    private void OpenScriptRepo()
+    {
+        _windowService.ShowWindow<ScriptRepoViewModel>();
+    }
+
+    [RelayCommand]
+    private void OpenVSCode()
+    {
+        _processService.OpenVSC();
+    }
 
     private async Task StartScriptAsync(string? path = null)
     {
@@ -94,7 +80,8 @@ public partial class ScriptLoaderViewModel : BotControlViewModelBase
         await StartScript();
     }
 
-    private async Task ToggleScriptAsync()
+    [RelayCommand]
+    private async Task ToggleScript()
     {
         ToggleScriptEnabled = false;
         if (string.IsNullOrWhiteSpace(ScriptManager.LoadedScript))
@@ -131,6 +118,7 @@ public partial class ScriptLoaderViewModel : BotControlViewModelBase
         });
     }
 
+    [RelayCommand]
     private void LoadScript(string? path = null)
     {
         if (string.IsNullOrWhiteSpace(path))
@@ -145,6 +133,7 @@ public partial class ScriptLoaderViewModel : BotControlViewModelBase
         ScriptStatus = "[Script loaded]";
     }
 
+    [RelayCommand]
     private void EditScript(string? path = null)
     {
         if (path is null && string.IsNullOrEmpty(ScriptManager.LoadedScript))
@@ -159,6 +148,7 @@ public partial class ScriptLoaderViewModel : BotControlViewModelBase
         _processService.OpenVSC(ScriptManager.LoadedScript);
     }
 
+    [RelayCommand]
     private void EditScriptConfig()
     {
         if (string.IsNullOrWhiteSpace(ScriptManager.LoadedScript))
@@ -182,18 +172,35 @@ public partial class ScriptLoaderViewModel : BotControlViewModelBase
         }
     }
 
-    private async void ReceiveToggleScript(ScriptLoaderViewModel recipient, StartScriptMessage message)
+    private async void ToggleScript(ScriptLoaderViewModel recipient, StartScriptMessage message)
     {
         await recipient.StartScriptAsync(message.Path);
     }
 
-    private void ReceiveEditScript(ScriptLoaderViewModel recipient, EditScriptMessage message)
+    private void EditScript(ScriptLoaderViewModel recipient, EditScriptMessage message)
     {
         recipient.EditScript(message.Path);
     }
 
-    private void ReceiveLoadScript(ScriptLoaderViewModel recipient, LoadScriptMessage message)
+    private void LoadScript(ScriptLoaderViewModel recipient, LoadScriptMessage message)
     {
         recipient.LoadScript(message.Path);
+    }
+
+    private void ScriptStopping(ScriptLoaderViewModel recipient, ScriptStoppingMessage message)
+    {
+        recipient.ToggleScriptEnabled = false;
+        recipient.ScriptStatus = "Stopping...";
+    }
+
+    private void ScriptStopped(ScriptLoaderViewModel recipient, ScriptStoppedMessage message)
+    {
+        recipient.ToggleScriptEnabled = true;
+        recipient.ScriptStatus = "[Stopped]";
+    }
+
+    private void ScriptStarted(ScriptLoaderViewModel recipient, ScriptStartedMessage message)
+    {
+        recipient.ToggleScriptEnabled = true;
     }
 }

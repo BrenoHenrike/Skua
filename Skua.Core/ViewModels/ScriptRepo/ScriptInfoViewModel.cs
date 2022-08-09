@@ -2,8 +2,8 @@
 using Skua.Core.Models.GitHub;
 
 namespace Skua.Core.ViewModels;
-[ObservableObject]
-public partial class ScriptInfoViewModel
+
+public partial class ScriptInfoViewModel : ObservableObject
 {
     public ScriptInfoViewModel(ScriptInfo info)
     {

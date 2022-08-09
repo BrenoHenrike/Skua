@@ -11,20 +11,19 @@ public partial class GrabberTaskViewModel : ObservableRecipient
         Messenger.Register<GrabberTaskViewModel, CancelGrabberTaskMessage>(this, CancelTask);
         Content = content;
         _command = command;
-        Command = new AsyncRelayCommand<IList<object>>(GrabberTask);
     }
-    private readonly Func<IList<object>?, IProgress<string>, CancellationToken, Task> _command;
-    public string Content { get; }
-    public IAsyncRelayCommand Command { get; set; }
 
+    private readonly Func<IList<object>?, IProgress<string>, CancellationToken, Task> _command;
     [ObservableProperty]
     [NotifyPropertyChangedRecipients]
     private string _progressReportMessage = string.Empty;
-
     [ObservableProperty]
     [NotifyPropertyChangedRecipients]
     private bool _isBusy;
 
+    public string Content { get; }
+
+    [RelayCommand]
     private async Task GrabberTask(IList<object>? items, CancellationToken token)
     {
         IsBusy = true;
@@ -42,6 +41,6 @@ public partial class GrabberTaskViewModel : ObservableRecipient
 
     private void CancelTask(GrabberTaskViewModel receiver, CancelGrabberTaskMessage message)
     {
-        receiver.Command.Cancel();
+        receiver.GrabberTaskCommand.Cancel();
     }
 }

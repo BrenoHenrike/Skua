@@ -1,29 +1,23 @@
-﻿using CommunityToolkit.Mvvm.Input;
+﻿using CommunityToolkit.Mvvm.ComponentModel;
+using CommunityToolkit.Mvvm.Input;
 using Skua.Core.Interfaces;
 
 namespace Skua.Core.ViewModels;
-public class ConsoleViewModel : BotControlViewModelBase
+public partial class ConsoleViewModel : BotControlViewModelBase
 {
     public ConsoleViewModel(IDialogService dialogService, IScriptManager scriptManager)
         : base("Console", 700, 400)
     {
         _dialogService = dialogService;
         _scriptManager = scriptManager;
-
-        RunCommand = new AsyncRelayCommand(Run);
     }
+
     private readonly IDialogService _dialogService;
     private readonly IScriptManager _scriptManager;
+    [ObservableProperty]
     private string _snippetText = "bot.Log(\"Test\");";
 
-    public string SnippetText
-    {
-        get { return _snippetText; }
-        set { SetProperty(ref _snippetText, value); }
-    }
-
-    public IAsyncRelayCommand RunCommand { get; }
-
+    [RelayCommand]
     private async Task Run()
     {
         await Task.Run(() =>

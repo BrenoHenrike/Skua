@@ -1,6 +1,5 @@
 ﻿using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Messaging;
-using CommunityToolkit.Mvvm.Messaging.Messages;
 using CommunityToolkit.Mvvm.Input;
 using Skua.Core.Interfaces;
 using Skua.Core.Models.Items;
@@ -13,12 +12,11 @@ public partial class CurrentDropsViewModel : BotControlViewModelBase
         : base("Current Drops", 500, 400)
     {
         StrongReferenceMessenger.Default.Register<CurrentDropsViewModel, ItemDroppedMessage, int>(this, (int)MessageChannels.GameEvents, CurrentDropsChanged);
+
         _drops = drops;
         _player = player;
-        PickupCommand = new RelayCommand(Pickup);
         PickupAllCommand = new RelayCommand(() => drops.PickupAll(true));
         PickupACCommand = new RelayCommand(_drops.PickupACItems);
-        PickupSelectedCommand = new RelayCommand<IList<object>>(PickupSelected);
     }
 
     private readonly IScriptPlayer _player;
@@ -28,10 +26,10 @@ public partial class CurrentDropsViewModel : BotControlViewModelBase
 
     public List<ItemBase> CurrentDrops => _drops.CurrentDropInfos.ToList();
 
-    public IRelayCommand PickupCommand { get; }
     public IRelayCommand PickupAllCommand { get; }
     public IRelayCommand PickupACCommand { get; }
-    public IRelayCommand PickupSelectedCommand { get; }
+
+    [RelayCommand]
     private void Pickup()
     {
         if (SelectedDrop is null || !_player.Playing)
@@ -40,6 +38,7 @@ public partial class CurrentDropsViewModel : BotControlViewModelBase
         _drops.Pickup(SelectedDrop.ID);
     }
 
+    [RelayCommand]
     private void PickupSelected(IList<object>? items)
     {
         if (items is null || !_player.Playing)

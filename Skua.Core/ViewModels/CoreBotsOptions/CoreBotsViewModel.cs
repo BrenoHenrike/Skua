@@ -13,21 +13,17 @@ public partial class CoreBotsViewModel : BotControlViewModelBase
         _selectedTab = CoreBotsTabs[0];
         _player = player;
         _dialogService = dialogService;
-        SaveCommand = new RelayCommand(Save);
-        LoadCommand = new RelayCommand(Load);
     }
+
     private readonly IScriptPlayer _player;
     private readonly IDialogService _dialogService;
     private Dictionary<string, Dictionary<string, string>> _readValues = new(); 
-
-    public List<TabItemViewModel> CoreBotsTabs { get; }
-
     [ObservableProperty]
     private TabItemViewModel _selectedTab;
 
-    public IRelayCommand SaveCommand { get; }
-    public IRelayCommand LoadCommand { get; }
+    public List<TabItemViewModel> CoreBotsTabs { get; }
 
+    [RelayCommand]
     private void Save()
     {
         if (string.IsNullOrEmpty(_player.Username))
@@ -48,6 +44,7 @@ public partial class CoreBotsViewModel : BotControlViewModelBase
         _readValues[_player.Username] = ReadValues(File.ReadAllLines(AppContext.BaseDirectory + $@"\options\CBO_Storage({_player.Username}).txt"));
     }
 
+    [RelayCommand]
     private void Load()
     {
         if (string.IsNullOrEmpty(_player.Username))
@@ -77,7 +74,7 @@ public partial class CoreBotsViewModel : BotControlViewModelBase
         Dictionary<string, string> optionsDict = new();
         foreach (string option in lines)
         {
-            ReadOnlySpan<string> value = option.Split(separator, StringSplitOptions.RemoveEmptyEntries | StringSplitOptions.TrimEntries);
+            ReadOnlySpan<string> value = option.Split(_separator, StringSplitOptions.RemoveEmptyEntries | StringSplitOptions.TrimEntries);
             if (value.Length == 2)
                 optionsDict.Add(value[0], value[1]);
         }
@@ -93,7 +90,7 @@ public partial class CoreBotsViewModel : BotControlViewModelBase
         }
     }
 
-    private readonly char separator = ':';
+    private readonly char _separator = ':';
 }
 
 internal interface IManageCBOptions

@@ -18,8 +18,7 @@ public partial class OptionContainerViewModel : ObservableRecipient
         }
     }
 
-    public string Title => "Options";
-
+    public string Title { get; } = "Options";
     public IOptionContainer Container { get; set; }
 
     public List<OptionContainerItemViewModel> Options { get; }

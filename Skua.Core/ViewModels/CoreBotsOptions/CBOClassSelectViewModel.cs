@@ -12,7 +12,6 @@ public partial class CBOClassSelectViewModel : ObservableObject, IManageCBOption
     {
         _inventory = inventory;
         _advancedSkills = advancedSkills;
-        ReloadClassesCommand = new RelayCommand(ReloadClasses);
     }
 
     public List<string> PlayerClasses { get; private set; } = new();
@@ -60,7 +59,7 @@ public partial class CBOClassSelectViewModel : ObservableObject, IManageCBOption
     private readonly IScriptInventory _inventory;
     private readonly IAdvancedSkillContainer _advancedSkills;
 
-    public IRelayCommand ReloadClassesCommand { get; }
+    [RelayCommand]
     private void ReloadClasses()
     {
         PlayerClasses = _inventory.Items?.Where(i => i.Category == ItemCategory.Class).Select(i => i.Name).ToList() ?? new();
@@ -119,18 +118,10 @@ public partial class CBOClassSelectViewModel : ObservableObject, IManageCBOption
             PlayerClasses.Add(values["FarmClassSelect"]);
             OnPropertyChanged(nameof(PlayerClasses));
             SelectedFarmClass = values["FarmClassSelect"];
-            if(values.TryGetValue("FarmEquipCheck", out string? check))
-            {
-                UseFarmEquipment = Convert.ToBoolean(check);
-            }
-            else
-                UseFarmEquipment = false;
-            if (values.TryGetValue("FarmModeSelect", out string? mode) && !string.IsNullOrWhiteSpace(mode))
-            {
-                SelectedFarmUseMode = Enum.TryParse(typeof(ClassUseMode), mode, true, out object? result) ? (ClassUseMode)result! : ClassUseMode.Base;
-            }
-            else
-                SelectedFarmUseMode = ClassUseMode.Base;
+            UseFarmEquipment = values.TryGetValue("FarmEquipCheck", out string? check) && Convert.ToBoolean(check);
+            SelectedFarmUseMode = values.TryGetValue("FarmModeSelect", out string? mode) && !string.IsNullOrWhiteSpace(mode)
+                ? Enum.TryParse(typeof(ClassUseMode), mode, true, out object? result) ? (ClassUseMode)result! : ClassUseMode.Base
+                : ClassUseMode.Base;
         }
         else
         {

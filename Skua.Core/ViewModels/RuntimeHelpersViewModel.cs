@@ -1,5 +1,5 @@
 ﻿namespace Skua.Core.ViewModels;
-public partial class RuntimeHelpersViewModel : BotControlViewModelBase
+public class RuntimeHelpersViewModel : BotControlViewModelBase
 {
     public RuntimeHelpersViewModel(ToPickupDropsViewModel toPickupDropsViewModel, RegisteredQuestsViewModel registeredQuestsViewModel, BoostsViewModel boostsViewModel)
         : base("Runtime")
