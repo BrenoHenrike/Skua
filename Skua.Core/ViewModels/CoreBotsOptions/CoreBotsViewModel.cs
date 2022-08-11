@@ -15,11 +15,19 @@ public partial class CoreBotsViewModel : BotControlViewModelBase
         _dialogService = dialogService;
     }
 
+    protected override void OnActivated()
+    {
+        base.OnActivated();
+        Load();
+    }
+
     private readonly IScriptPlayer _player;
     private readonly IDialogService _dialogService;
     private Dictionary<string, Dictionary<string, string>> _readValues = new(); 
     [ObservableProperty]
     private TabItemViewModel _selectedTab;
+    [ObservableProperty]
+    private string _currentPlayer = string.Empty;
 
     public List<TabItemViewModel> CoreBotsTabs { get; }
 
@@ -29,6 +37,7 @@ public partial class CoreBotsViewModel : BotControlViewModelBase
         if (string.IsNullOrEmpty(_player.Username))
         {
             _dialogService.ShowMessageBox("Login first so that we can fetch your username for the save file", "Save");
+            CurrentPlayer = string.Empty;
             return;
         }
 
@@ -49,10 +58,12 @@ public partial class CoreBotsViewModel : BotControlViewModelBase
     {
         if (string.IsNullOrEmpty(_player.Username))
         {
-            _dialogService.ShowMessageBox("Login first so that we can fetch your username to load file", "Load");
+            _dialogService.ShowMessageBox("Login first so that we can fetch your username to load the options file.", "Load");
+            CurrentPlayer = string.Empty;
             return;
         }
 
+        CurrentPlayer =_player.Username;
         if (_readValues.ContainsKey(_player.Username))
         {
             SetValues(_readValues[_player.Username]);

@@ -19,6 +19,7 @@
                 <ColumnDefinition />
                 <ColumnDefinition Width="auto" />
                 <ColumnDefinition Width="auto" />
+                <ColumnDefinition Width="auto" />
             </Grid.ColumnDefinitions>
             <ListBox
                 Grid.Column="0"
@@ -45,13 +46,19 @@
                     </ItemsPanelTemplate>
                 </ListBox.ItemsPanel>
             </ListBox>
-            <Button
+            <TextBlock
                 Grid.Column="1"
+                Margin="0,0,10,0"
+                VerticalAlignment="Center"
+                FontSize="16"
+                Text="{Binding CurrentPlayer}" />
+            <Button
+                Grid.Column="2"
                 Margin="6,0"
                 Command="{Binding LoadCommand}"
                 Content="Load" />
             <Button
-                Grid.Column="2"
+                Grid.Column="3"
                 Margin="0,0,6,0"
                 Command="{Binding SaveCommand}"
                 Content="Save" />
