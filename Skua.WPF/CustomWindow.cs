@@ -1,4 +1,5 @@
-﻿using System;
+﻿using CommunityToolkit.Mvvm.ComponentModel;
+using System;
 using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Interop;
@@ -66,10 +67,18 @@ public partial class CustomWindow : Window
                 btnClose.Click += (s, e) => Close();
             else
             {
-                Closing += (s, e) => e.Cancel = true;
+                Closing += (s, e) =>
+                {
+                    e.Cancel = true;
+                    Hide();
+                    if (DataContext is ObservableRecipient recipient)
+                        recipient.IsActive = false;
+                };
                 btnClose.Click += (s, e) =>
                 {
                     Hide();
+                    if (DataContext is ObservableRecipient recipient)
+                        recipient.IsActive = false;
                 };
             }
             btnMinimize.Click += BtnMinimize_Click;

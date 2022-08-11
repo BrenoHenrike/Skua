@@ -4,6 +4,7 @@ using Skua.Core.Interfaces;
 using Skua.Core.ViewModels;
 using System;
 using System.Collections.Generic;
+using CommunityToolkit.Mvvm.ComponentModel;
 
 namespace Skua.WPF.Services;
 public class WindowService : IWindowService
@@ -45,22 +46,28 @@ public class WindowService : IWindowService
         if (!_managedWindows.ContainsKey(key))
             return;
 
-        if (_managedWindows[key].IsVisible)
+        var window = _managedWindows[key];
+        if (window.IsVisible)
         {
-            _managedWindows[key].Activate();
+            window.Activate();
             return;
         }
 
-        _managedWindows[key].Show();
+        window.Show();
+        if(window.DataContext is ObservableRecipient recipient)
+            recipient.IsActive = true;
     }
 
     public void RegisterManagedWindow<TViewModel>(string key, TViewModel viewModel) where TViewModel : class, IManagedWindow
     {
         if (_managedWindows.ContainsKey(key))
             return;
-        HostWindow window = new();
-        window.DataContext = viewModel;
-        window.WindowStartupLocation = System.Windows.WindowStartupLocation.CenterScreen;
+
+        HostWindow window = new()
+        {
+            DataContext = viewModel,
+            WindowStartupLocation = System.Windows.WindowStartupLocation.CenterScreen
+        };
         _managedWindows.Add(key, window);
     }
 }
