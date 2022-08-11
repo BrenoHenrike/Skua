@@ -121,7 +121,10 @@ public partial class ScriptSkill : IScriptSkill
         }
 
         if (autoEquip)
+        {
             Inventory.EquipItem(className);
+            Wait.ForItemEquip(className);
+        }
 
         List<AdvancedSkill> skills = AdvancedSkillContainer.LoadedSkills.Where(s => s.ClassName.ToLower() == className.ToLower()).ToList();
         if (skills is null || skills.Count == 0)

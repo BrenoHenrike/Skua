@@ -52,7 +52,7 @@ public partial class ScriptAuto : ObservableObject, IScriptAuto
     private IScriptWait _wait => _lazyWait.Value;
 
     [ObservableProperty]
-    private bool _IsRunning;
+    private bool _isRunning;
 
     public void StartAutoAttack(string? className = null, ClassUseMode classUseMode = ClassUseMode.Base)
     {
@@ -118,7 +118,7 @@ public partial class ScriptAuto : ObservableObject, IScriptAuto
             _drops.Stop();
             _skills.Stop();
             _boosts.Stop();
-            _ctsAuto.Dispose();
+            _ctsAuto?.Dispose();
             _ctsAuto = null;
         });
         _autoThread.Name = "Auto Thread";
