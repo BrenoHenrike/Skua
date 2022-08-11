@@ -5,12 +5,12 @@ namespace Skua.Core.Skills;
 
 public class AdvancedSkillProvider : ISkillProvider
 {
-    private readonly IScriptPlayer Player;
-    private readonly IScriptCombat Combat;
+    private readonly IScriptPlayer _player;
+    private readonly IScriptCombat _combat;
     public AdvancedSkillProvider(IScriptPlayer player, IScriptCombat combat)
     {
-        Player = player;
-        Combat = combat;
+        _player = player;
+        _combat = combat;
     }
     public AdvancedSkillCommand Root { get; set; } = new AdvancedSkillCommand();
     public bool ResetOnTarget { get; set; } = false;
@@ -66,18 +66,18 @@ public class AdvancedSkillProvider : ISkillProvider
 
     public void OnTargetReset()
     {
-        if (ResetOnTarget && !Player.HasTarget)
+        if (ResetOnTarget && !_player.HasTarget)
             Root.Reset();
     }
     public bool? ShouldUseSkill()
     {
-        return Root.ShouldUse(Player);
+        return Root.ShouldUse(_player);
     }
 
     public void Stop()
     {
-        Combat.CancelAutoAttack();
-        Combat.CancelTarget();
+        _combat.CancelAutoAttack();
+        _combat.CancelTarget();
         Root.Reset();
     }
 }

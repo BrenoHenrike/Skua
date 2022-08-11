@@ -9,21 +9,8 @@ using Newtonsoft.Json;
 
 namespace Skua.Core.Scripts;
 
-public partial class ScriptQuest : ObservableObject, IScriptQuest
+public partial class ScriptQuest : ObservableRecipient, IScriptQuest
 {
-    private readonly Lazy<IFlashUtil> _lazyFlash;
-    private readonly Lazy<IScriptWait> _lazyWait;
-    private readonly Lazy<IScriptOption> _lazyOptions;
-    private readonly Lazy<IScriptPlayer> _lazyPlayer;
-    private readonly Lazy<IScriptSend> _lazySend;
-    private readonly Lazy<IScriptInventory> _lazyInventory;
-    private IFlashUtil Flash => _lazyFlash.Value;
-    private IScriptWait Wait => _lazyWait.Value;
-    private IScriptOption Options => _lazyOptions.Value;
-    private IScriptPlayer Player => _lazyPlayer.Value;
-    private IScriptSend Send => _lazySend.Value;
-    private IScriptInventory Inventory => _lazyInventory.Value;
-
     public ScriptQuest(
         Lazy<IFlashUtil> flash,
         Lazy<IScriptWait> wait,
@@ -40,8 +27,21 @@ public partial class ScriptQuest : ObservableObject, IScriptQuest
         _lazyInventory = inventory;
     }
 
-    private Thread? QuestThread;
-    private CancellationTokenSource? QuestsCTS;
+    private readonly Lazy<IFlashUtil> _lazyFlash;
+    private readonly Lazy<IScriptWait> _lazyWait;
+    private readonly Lazy<IScriptOption> _lazyOptions;
+    private readonly Lazy<IScriptPlayer> _lazyPlayer;
+    private readonly Lazy<IScriptSend> _lazySend;
+    private readonly Lazy<IScriptInventory> _lazyInventory;
+    private IFlashUtil Flash => _lazyFlash.Value;
+    private IScriptWait Wait => _lazyWait.Value;
+    private IScriptOption Options => _lazyOptions.Value;
+    private IScriptPlayer Player => _lazyPlayer.Value;
+    private IScriptSend Send => _lazySend.Value;
+    private IScriptInventory Inventory => _lazyInventory.Value;
+
+    private Thread? _questThread;
+    private CancellationTokenSource? _questsCTS;
 
     public int RegisterCompleteInterval { get; set; } = 2000;
     [ObjectBinding("world.questTree", Default = "new()")]
@@ -253,19 +253,24 @@ public partial class ScriptQuest : ObservableObject, IScriptQuest
             return;
         _registered.AddRange(ids.Except(_registered.Items));
         OnPropertyChanged(nameof(Registered));
-        if (!QuestThread?.IsAlive ?? true)
+        Broadcast(null, Registered, nameof(Registered));
+        if (!_questThread?.IsAlive ?? true)
         {
-            QuestThread = new(async () =>
+            _questThread = new(async () =>
             {
-                QuestsCTS = new();
-                await _Poll(QuestsCTS.Token);
-                QuestsCTS?.Dispose();
-                QuestsCTS = null;
+                _questsCTS = new();
+                try
+                {
+                    await _Poll(_questsCTS.Token);
+                }
+                catch { }
+                _questsCTS?.Dispose();
+                _questsCTS = null;
             })
             {
                 Name = "Quest Thread"
             };
-            QuestThread.Start();
+            _questThread.Start();
         }
     }
 
@@ -273,21 +278,24 @@ public partial class ScriptQuest : ObservableObject, IScriptQuest
     {
         _registered.Remove(ids.Contains);
         OnPropertyChanged(nameof(Registered));
+        Broadcast(null, Registered, nameof(Registered));
     }
 
     public void UnregisterAllQuests()
     {
         _registered.Clear();
         OnPropertyChanged(nameof(Registered));
-        if (QuestThread?.IsAlive ?? false)
+        Broadcast(null, Registered, nameof(Registered));
+        if (_questThread?.IsAlive ?? false)
         {
-            QuestsCTS?.Cancel();
-            Wait.ForTrue(() => QuestsCTS is null, 20);
+            _questsCTS?.Cancel();
+            Wait.ForTrue(() => _questsCTS is null, 20);
         }
     }
 
     private async Task _Poll(CancellationToken token)
     {
+        _lastComplete = Environment.TickCount;
         while (!token.IsCancellationRequested)
         {
             if (Player.Playing)
@@ -296,19 +304,28 @@ public partial class ScriptQuest : ObservableObject, IScriptQuest
         }
     }
 
+    private int _lastComplete;
     private async Task _CompleteQuest(IEnumerable<int> registered, CancellationToken token)
     {
         foreach (int quest in registered)
         {
             Accept(quest);
             if (!CanComplete(quest))
+            {
+                if (Environment.TickCount - _lastComplete > 10000 && CanCompleteFullCheck(quest))
+                {
+                    EnsureAccept(quest);
+                    _lastComplete = Environment.TickCount;
+                }
                 continue;
+            }
             if (Options.SafeTimings)
                 Wait.ForActionCooldown(GameActions.TryQuestComplete);
             Flash.CallGameFunction("world.tryQuestComplete", quest, -1, false);
             if (Options.SafeTimings)
                 Wait.ForQuestComplete(quest);
             EnsureAccept(quest);
+            _lastComplete = Environment.TickCount;
             await Task.Delay(Options.ActionDelay, token);
         }
     }

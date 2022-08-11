@@ -27,6 +27,7 @@ Base = BladeMaster Assassin = 2 | 3 | 1 | 4 = 250
 Base = Blaze Binder = 1 | 2 | 4 | 1 | 3 | 2 | 1 | 4 | 1 | 2 | 1 | 3 | 1 | 2 | 4 | 1 | 2 | 1 | 3 | 1 | 2 = 250
 Base = Blood Ancient = 4 | 3 | 2 | 1 = 250
 Base = Blood Sorceress = 4 | 4 | 4 | 2 | 1 | 3 = 250
+Solo = Blood Sorceress = 4 | 2 | 1 | 3 = Use if Available
 Base = Blood Titan = 2 | 4 | 3 | 2 = 250
 Base = CardClasher = 4 | 3 | 1 | 2 = 250
 Base = Chaos Avenger = 4 | 3 | 1 | 2 = 250
@@ -156,7 +157,7 @@ Base = MindBreaker = 1 | 2 | 3 | 4 = Use if Available
 Base = Mystical Dark Caster = 1 | 2 | 3 | 4 = Use if Available
 Base = Naval Commander = 3 WW10000 | 4 | 2 | 1 = 250
 Base = Nechronomancer = 1 | 2 | 3S | 4 = Use if Available
-Base = Necromancer = 1 | 2 | 4 | 1 | 2 | 1 | 3 | 1 | 1 | 3 = Use if Available
+Base = Necromancer = 1 | 2 | 4 | 2 | 4 | 3 | 2 | 3 | 4 | 2 | 3 = 250
 Base = Necrotic Chronomancer = 1 | 2 | 4 | 1 | 2 | 1 | 3 | 1 | 1 | 3 = Use if Available
 Base = Ninja = 1 | 2 | 3 | 4 = Use if Available
 Base = Ninja Warrior = 1 | 2 | 3 | 4 = Use if Available
@@ -174,7 +175,8 @@ Base = Prismatic ClawSuit = 1 | 2 | 3 | 4 = Use if Available
 Base = ProtoSartorium = 1 | 2 | 3 | 4 = Use if Available
 Base = Psionic MindBreaker = 1 | 2 M<25 | 3 | 1 | 4 = 250
 Base = Pumpkin Lord = 1 | 2 | 3 | 4 = Use if Available
-Base = Pyromancer = 2 WW20000 | 1 | 4 | 1 | 2 = 250
+Base = Pyromancer = 2 | 1 | 4 | 1 | 2 = 250
+Solo = Pyromancer = 1 | 4 | 1 | 2 | 3 = Use if Available
 Base = Renegade = 1 | 2 | 3 | 4 = Use if Available
 Base = Rogue = 2 | 3 | 1 | 4 = Use if Available
 Base = Rogue (Rare) = 2 | 3 | 1 | 4 = Use if Available
@@ -209,7 +211,7 @@ Solo = StoneCrusher = 4 M>50S | 2S | 3 H<50S | 2S | 3 H<50S | 1 | 1 = Use if Ava
 Base = StoneCrusher = 2 | 3 | 1 | 4 = 250
 Base = SwordMaster = 1 | 2 | 3 | 4 = Use if Available
 Base = SwordMaster Assassin = 1 | 2 | 3 | 4 = Use if Available
-Base = The Collector = 1 WW20000 | 3 | 4 | 1 = 250
+Base = The Collector = 1 | 3 | 4 | 1 = 250
 Base = Thief of Hours = 4 | 1 | 3 | 2 = 250
 Base = TimeKeeper = 2 | 4 | 1 | 1 | 1 | 4 | 3 | 1 | 2 | 4 | 1 | 1 | 1 | 4 | 3 = 250
 Base = TimeKiller = 2 | 4 | 1 | 1 | 1 | 4 | 3 | 1 | 2 | 4 | 1 | 1 | 1 | 4 | 3 = 250
@@ -230,17 +232,17 @@ Base = Underworld Chronomancer = 5 | 2 | 3 | 1 | 1 | 1 | 3 | 1 | 4 | 3 | 1 | 1 |
 Base = Unlucky Leperchaun = 1 | 2 | 3 | 4 = Use if Available
 Base = Vampire = 2 | 4 | 3 | 1 = 250
 Base = Vampire Lord = 2 | 4 | 3 | 1 | 1 | 3 = 250
-Base = Vindicator Of They = 1 WW20000 | 3 | 4 | 1 = 250
+Base = Vindicator Of They = 1 | 3 | 4 | 1 = 250
 Atk = Void Highlord = 3 H>25S | 4 | 2 | 1 H>25S | 3 H>25S | 2 | 1 H>25S | 3 H>25S | 2 | 1 H>25S = 250
-Def = Void Highlord = 4 | 2 | 1 = Use if Available
+Def = Void Highlord = 4 | 2 H>30S | 1 = Use if Available
 Atk = Void Highlord (IoDA) = 3 H>25S | 4 | 2 | 1 H>25S | 3 H>25S | 2 | 1 H>25S | 3 H>25S | 2 | 1 H>25S = 250
-Def = Void Highlord (IoDA) = 4 | 2 | 1 = Use if Available
+Def = Void Highlord (IoDA) = 4 | 2 | 1 H>30S = Use if Available
 Base = Void Highlord Tester = 3 | 2 | 4 | 3 | 2 | 1 | 3 | 2 | 1 = 250
-Def = Void Highlord Tester = 4 | 2 | 1 = Use if Available
+Def = Void Highlord Tester = 4 | 2 | 1 H>30S = Use if Available
 Base = Warlord = 1 | 2 | 3 | 4 = Use if Available
 Base = Warrior = 1 | 2 | 3 | 4 = Use if Available
 Base = Warrior (Rare) = 1 | 2 | 3 | 4 = Use if Available
 Base = WarriorScythe General = 1 | 2 | 3 | 4 = Use if Available
 Base = Witch = 1 | 2 | 3 | 4 = Use if Available
-Def = Yami no Ronin = 2 | 1 | 1 | 2 | 1 | 4M>50 = 250
+Def = Yami no Ronin = 1 | 2 | 4 = Use if Available
 Atk = Yami no Ronin = 3 | 2 | 3 | 3 | 1 | 3 | 1 | 4 = 250

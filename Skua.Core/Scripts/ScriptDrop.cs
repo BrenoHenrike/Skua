@@ -181,12 +181,14 @@ public partial class ScriptDrop : ObservableRecipient, IScriptDrop, IAsyncDispos
     {
         _toPickup.AddRange(names.Except(_toPickup.Items));
         OnPropertyChanged(nameof(ToPickup));
+        Broadcast(null, ToPickup, nameof(ToPickup));
     }
 
     public void Add(params int[] ids)
     {
         _toPickupIDs.AddRange(ids.Except(_toPickupIDs.Items));
         OnPropertyChanged(nameof(ToPickupIDs));
+        Broadcast(null, ToPickup, nameof(ToPickupIDs));
     }
 
     public void Clear()
@@ -194,7 +196,9 @@ public partial class ScriptDrop : ObservableRecipient, IScriptDrop, IAsyncDispos
         _toPickupIDs.Clear();
         _toPickup.Clear();
         OnPropertyChanged(nameof(ToPickupIDs));
+        Broadcast(null, ToPickup, nameof(ToPickupIDs));
         OnPropertyChanged(nameof(ToPickup));
+        Broadcast(null, ToPickup, nameof(ToPickup));
     }
 
     public void Remove(params string[] names)

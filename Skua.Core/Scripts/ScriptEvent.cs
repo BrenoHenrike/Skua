@@ -11,7 +11,6 @@ public class ScriptEvent : IScriptEvent
         _messenger.Register<ScriptEvent, ScriptStoppingRequestMessage, int>(this, (int)MessageChannels.ScriptStatus, OnScriptStopping);
         _messenger.Register<ScriptEvent, ScriptStartedMessage, int>(this, (int)MessageChannels.ScriptStatus, ScriptStarted);
         _messenger.Register<ScriptEvent, ScriptStoppedMessage, int>(this, (int)MessageChannels.ScriptStatus, ScriptStopped);
-        RegisterGameEvents();
     }
 
     private void RegisterGameEvents()

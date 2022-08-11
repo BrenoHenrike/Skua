@@ -1,10 +1,8 @@
 ﻿using Skua.Core.Interfaces;
 using Skua.Core.Flash;
 using CommunityToolkit.Mvvm.Messaging;
-using CommunityToolkit.Mvvm.Messaging;
 using Skua.Core.Messaging;
 using Skua.Core.Models.Monsters;
-using CommunityToolkit.Mvvm.Messaging;
 
 namespace Skua.Core.Scripts;
 public partial class ScriptCombat : IScriptCombat
@@ -75,14 +73,20 @@ public partial class ScriptCombat : IScriptCombat
     private void _attack(string name)
     {
         if (StopAttacking)
+        {
+            CancelTarget();
             return;
+        }
     }
 
     [MethodCallBinding("attackMonsterID", RunMethodPre = true)]
     private void _attack(int id)
     {
         if (StopAttacking)
+        {
+            CancelTarget();
             return;
+        }
     }
 
     [MethodCallBinding("attackPlayer")]
@@ -105,7 +109,7 @@ public partial class ScriptCombat : IScriptCombat
         {
             recipient.StopAttacking = false;
             if (recipient._target is not null)
-                recipient.Attack(recipient._target.ID);
+                recipient.Attack(recipient._target.MapID);
             recipient._target = null;
             return;
         }

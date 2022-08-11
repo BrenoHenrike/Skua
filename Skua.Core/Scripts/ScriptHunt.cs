@@ -33,8 +33,6 @@ public class ScriptHunt : IScriptHunt
         _lazyKill = kill;
         _logger = logger;
         _lastHuntTick = Environment.TickCount;
-
-        StrongReferenceMessenger.Default.Register<ScriptHunt, ScriptStoppedMessage, int>(this, (int)MessageChannels.ScriptStatus, ScriptStopped);
     }
 
     private readonly Lazy<IScriptOption> _lazyOptions;
@@ -83,7 +81,7 @@ public class ScriptHunt : IScriptHunt
     private void _Hunt(string name, CancellationToken? token)
     {
         string[] names = name.Split('|');
-        while (!token?.IsCancellationRequested ?? !Manager.ShouldExit)
+        while ((!token?.IsCancellationRequested ?? true) && !Manager.ShouldExit)
         {
             List<string> cells = names.SelectMany(n => Monsters.GetLivingMonsterCells(n)).Distinct().ToList();
             foreach (string cell in cells)
@@ -113,7 +111,7 @@ public class ScriptHunt : IScriptHunt
     }
     private void _Hunt(int id, CancellationToken? token)
     {
-        while (!token?.IsCancellationRequested ?? !Manager.ShouldExit)
+        while ((!token?.IsCancellationRequested ?? true) && !Manager.ShouldExit)
         {
             List<string> cells = Monsters.GetLivingMonsterCells(id);
             foreach (string cell in cells)
@@ -145,7 +143,7 @@ public class ScriptHunt : IScriptHunt
             _Hunt(name, token);
             return;
         }
-        while (!token?.IsCancellationRequested ?? !Manager.ShouldExit)
+        while ((!token?.IsCancellationRequested ?? true) && !Manager.ShouldExit)
         {
             string[] names = name.Split('|').Select(x => x.ToLower()).ToArray();
             IOrderedEnumerable<Monster> ordered = Monsters.MapMonsters.OrderBy(x => 0);
@@ -184,7 +182,7 @@ public class ScriptHunt : IScriptHunt
             _Hunt(id, token);
             return;
         }
-        while (!token?.IsCancellationRequested ?? !Manager.ShouldExit)
+        while ((!token?.IsCancellationRequested ?? true) && !Manager.ShouldExit)
         {
             IOrderedEnumerable<Monster> ordered = Monsters.MapMonsters.OrderBy(x => 0);
             if (priority.HasFlag(HuntPriorities.HighHP))
@@ -223,19 +221,25 @@ public class ScriptHunt : IScriptHunt
     {
         _ctsHunt = new();
         _item = (item, quantity, tempItem);
-        StrongReferenceMessenger.Default.Register<ScriptHunt, ItemDroppedMessage, int>(this, (int)MessageChannels.GameEvents, ItemHunted);
-        while (!Manager.ShouldExit
-            && (tempItem || !Inventory.Contains(item, quantity))
-            && (!tempItem || !TempInv.Contains(item, quantity)))
+        try
         {
-            if (_ctsHunt.IsCancellationRequested)
-                break;
-            _HuntWithPriority(name, Options.HuntPriority, _ctsHunt.Token);
-            Drops.Pickup(item);
+            StrongReferenceMessenger.Default.Register<ScriptHunt, ItemDroppedMessage, int>(this, (int)MessageChannels.GameEvents, ItemHunted);
+            while (!Manager.ShouldExit
+                && (tempItem || !Inventory.Contains(item, quantity))
+                && (!tempItem || !TempInv.Contains(item, quantity)))
+            {
+                if (_ctsHunt.IsCancellationRequested)
+                    break;
+                _HuntWithPriority(name, Options.HuntPriority, _ctsHunt.Token);
+                Drops.Pickup(item);
+            }
         }
-        StrongReferenceMessenger.Default.Unregister<ItemDroppedMessage, int>(this, (int)MessageChannels.GameEvents);
-        _ctsHunt?.Dispose();
-        _ctsHunt = null;
+        finally
+        {
+            StrongReferenceMessenger.Default.Unregister<ItemDroppedMessage, int>(this, (int)MessageChannels.GameEvents);
+            _ctsHunt?.Dispose();
+            _ctsHunt = null;
+        }
     }
 
     private void ItemHunted(ScriptHunt recipient, ItemDroppedMessage message)
@@ -293,12 +297,5 @@ public class ScriptHunt : IScriptHunt
     private bool CanJumpForHunt()
     {
         return Environment.TickCount - _lastHuntTick >= Options.HuntDelay;
-    }
-
-    private void ScriptStopped(ScriptHunt recipient, ScriptStoppedMessage message)
-    {
-        StrongReferenceMessenger.Default.Unregister<ItemDroppedMessage, int>(recipient, (int)MessageChannels.GameEvents);
-        recipient._ctsHunt?.Dispose();
-        recipient._ctsHunt = null;
     }
 }

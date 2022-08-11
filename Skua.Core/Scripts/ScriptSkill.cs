@@ -42,8 +42,6 @@ public partial class ScriptSkill : IScriptSkill
         _lazyOptions = options;
         _lazyInventory = inventory;
         AdvancedSkillContainer = advContainer;
-
-        StrongReferenceMessenger.Default.Register<ScriptSkill, CounterAttackMessage, int>(this, (int)MessageChannels.GameEvents, CounterAttack);
     }
 
     private ISkillProvider? _provider;
@@ -58,7 +56,7 @@ public partial class ScriptSkill : IScriptSkill
 
     public ISkillProvider? OverrideProvider { get; set; } = null;
     public ISkillProvider BaseProvider { get; private set; }
-    public bool TimerRunning => _skillThread?.IsAlive ?? false;
+    public bool TimerRunning { get; private set; } = false;
     public int SkillInterval { get; set; } = 100;
     public int SkillTimeout { get; set; } = -1;
     public SkillUseMode SkillUseMode { get; set; } = SkillUseMode.UseIfAvailable;
@@ -72,7 +70,7 @@ public partial class ScriptSkill : IScriptSkill
             _provider = BaseProvider;
         }
         _provider = OverrideProvider ?? BaseProvider;
-        if (_skillThread?.IsAlive ?? false)
+        if (TimerRunning)
             return;
         _skillThread = new(async () =>
         {
@@ -82,11 +80,16 @@ public partial class ScriptSkill : IScriptSkill
                 await _Timer(_skillsCTS.Token);
             }
             catch { }
-            _skillsCTS?.Dispose();
-            _skillsCTS = null;
+            finally
+            {
+                _skillsCTS?.Dispose();
+                _skillsCTS = null;
+                TimerRunning = false;
+            }
         });
         _skillThread.Name = "Skill Timer";
         _skillThread.Start();
+        TimerRunning = true;
     }
 
     public void Stop()
@@ -143,6 +146,9 @@ public partial class ScriptSkill : IScriptSkill
 
     private async Task _Timer(CancellationToken token)
     {
+        SkillInfo[]? playerSkills = Player.Skills;
+        if (playerSkills is not null && playerSkills.Length > 0)
+            _lastSkills = playerSkills;
         while (!token.IsCancellationRequested)
         {
             if (Combat.StopAttacking)
@@ -165,6 +171,9 @@ public partial class ScriptSkill : IScriptSkill
         int rank = Player.CurrentClassRank;
         if (_lastSkills is not null && rank > _lastRank)
         {
+            SkillInfo[]? playerSkills = Player.Skills;
+            if (playerSkills is not null && playerSkills.Length > 0)
+                _lastSkills = playerSkills;
             using FlashArray<object> skills = (FlashArray<object>)Flash.CreateFlashObject<object>("world.actions.active").ToArray();
             int k = 0;
             foreach (FlashObject<object> skill in skills)
@@ -174,9 +183,6 @@ public partial class ScriptSkill : IScriptSkill
             }
         }
         _lastRank = rank;
-        SkillInfo[]? playerSkills = Player.Skills;
-        if (playerSkills is not null && playerSkills.Length > 0)
-            _lastSkills = playerSkills;
         if (token.IsCancellationRequested)
             return;
         switch (_provider?.ShouldUseSkill())

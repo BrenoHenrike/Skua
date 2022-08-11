@@ -17,16 +17,12 @@ public partial class ScriptManager : ObservableObject, IScriptManager
         ILogService logger,
         Lazy<IScriptInterface> scriptInterface,
         Lazy<IScriptHandlers> handlers,
-        Lazy<IScriptOption> options,
-        Lazy<IScriptEvent> events,
         Lazy<IScriptSkill> skills,
         Lazy<IScriptDrop> drops,
         Lazy<IScriptWait> wait)
     {
         _lazyBot = scriptInterface;
         _lazyHandlers = handlers;
-        _lazyOptions = options;
-        _lazyEvents = events;
         _lazySkills = skills;
         _lazyDrops = drops;
         _lazyWait = wait;
@@ -35,23 +31,20 @@ public partial class ScriptManager : ObservableObject, IScriptManager
 
     private readonly Lazy<IScriptInterface> _lazyBot;
     private readonly Lazy<IScriptHandlers> _lazyHandlers;
-    private readonly Lazy<IScriptOption> _lazyOptions;
-    private readonly Lazy<IScriptEvent> _lazyEvents;
     private readonly Lazy<IScriptSkill> _lazySkills;
     private readonly Lazy<IScriptDrop> _lazyDrops;
     private readonly Lazy<IScriptWait> _lazyWait;
     private readonly ILogService _logger;
     private readonly Dictionary<string, bool> _configured = new();
     private IScriptHandlers Handlers => _lazyHandlers.Value;
-    private IScriptOption Options => _lazyOptions.Value;
-    private IScriptEvent Events => _lazyEvents.Value;
     private IScriptSkill Skills => _lazySkills.Value;
     private IScriptDrop Drops => _lazyDrops.Value;
     private IScriptWait Wait => _lazyWait.Value;
     private Thread? _currentScriptThread;
     public CancellationTokenSource? ScriptCTS { get; private set; }
-
-    public bool ScriptRunning => _currentScriptThread?.IsAlive ?? false;
+    
+    [ObservableProperty]
+    private bool _scriptRunning = false;
     [ObservableProperty]
     private string _loadedScript = string.Empty;
     [ObservableProperty]
@@ -105,7 +98,7 @@ public partial class ScriptManager : ObservableObject, IScriptManager
                         StrongReferenceMessenger.Default.Send<ScriptStoppingMessage, int>((int)MessageChannels.ScriptStatus);
                         try
                         {
-                            switch (await Task.Run(async () => await WeakReferenceMessenger.Default.Send<ScriptStoppingRequestMessage, int>(new(exception), (int)MessageChannels.ScriptStatus)))
+                            switch (await Task.Run(async () => await StrongReferenceMessenger.Default.Send<ScriptStoppingRequestMessage, int>(new(exception), (int)MessageChannels.ScriptStatus)))
                             {
                                 case true:
                                     Trace.WriteLine("Script finished succesfully.");
@@ -123,13 +116,13 @@ public partial class ScriptManager : ObservableObject, IScriptManager
                     Drops.Stop();
                     ScriptCTS.Dispose();
                     ScriptCTS = null;
-                    OnPropertyChanged(nameof(ScriptRunning));
                     StrongReferenceMessenger.Default.Send<ScriptStoppedMessage, int>((int)MessageChannels.ScriptStatus);
+                    ScriptRunning = false;
                 }
             });
             _currentScriptThread.Name = "Script Thread";
             _currentScriptThread.Start();
-            OnPropertyChanged(nameof(ScriptRunning));
+            ScriptRunning = true;
             StrongReferenceMessenger.Default.Send<ScriptStartedMessage, int>((int)MessageChannels.ScriptStatus);
             return null;
         }

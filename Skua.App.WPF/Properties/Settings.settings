@@ -71,7 +71,7 @@
       <Value Profile="(Default)">False</Value>
     </Setting>
     <Setting Name="ApplicationVersion" Type="System.String" Scope="Application">
-      <Value Profile="(Default)">0.3.0.0</Value>
+      <Value Profile="(Default)">0.4.0.0</Value>
     </Setting>
     <Setting Name="UseLocalVSC" Type="System.Boolean" Scope="User">
       <Value Profile="(Default)">True</Value>

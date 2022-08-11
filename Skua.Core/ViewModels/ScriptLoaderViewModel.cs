@@ -139,13 +139,7 @@ public partial class ScriptLoaderViewModel : BotControlViewModelBase
         if (path is null && string.IsNullOrEmpty(ScriptManager.LoadedScript))
             return;
 
-        if(!string.IsNullOrWhiteSpace(path))
-        {
-            _processService.OpenVSC(path);
-            return;
-        }
-
-        _processService.OpenVSC(ScriptManager.LoadedScript);
+        _processService.OpenVSC(path ?? ScriptManager.LoadedScript);
     }
 
     [RelayCommand]

@@ -64,7 +64,7 @@
                 ItemsSource="{Binding QuestIDs, UpdateSourceTrigger=PropertyChanged}"
                 SelectionMode="Multiple"
                 VirtualizingPanel.IsVirtualizing="True"
-                VirtualizingPanel.VirtualizationMode="Standard">
+                VirtualizingPanel.VirtualizationMode="Recycling">
                 <ListBox.InputBindings>
                     <KeyBinding
                         Key="L"

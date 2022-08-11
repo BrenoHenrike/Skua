@@ -10,23 +10,6 @@ using Skua.Core.Flash;
 namespace Skua.Core.Scripts;
 public partial class ScriptMap : IScriptMap
 {
-    private Dictionary<string, List<MapItem>> _savedMapItems = new();
-
-    private readonly Lazy<IFlashUtil> _lazyFlash;
-    private readonly Lazy<IScriptPlayer> _lazyPlayer;
-    private readonly Lazy<IScriptOption> _lazyOptions;
-    private readonly Lazy<IScriptWait> _lazyWait;
-    private readonly Lazy<IScriptManager> _lazyManager;
-    private readonly IDialogService _dialogService;
-    private readonly Lazy<IScriptSend> _lazySend;
-
-    private IFlashUtil Flash => _lazyFlash.Value;
-    private IScriptPlayer Player => _lazyPlayer.Value;
-    private IScriptOption Options => _lazyOptions.Value;
-    private IScriptWait Wait => _lazyWait.Value;
-    private IScriptManager Manager => _lazyManager.Value;
-    private IScriptSend Send => _lazySend.Value;
-
     public ScriptMap(
         Lazy<IFlashUtil> flash,
         Lazy<IScriptPlayer> player,
@@ -45,6 +28,23 @@ public partial class ScriptMap : IScriptMap
         _dialogService = dialogService;
         LoadSavedMapItems();
     }
+
+    private Dictionary<string, List<MapItem>> _savedMapItems = new();
+
+    private readonly Lazy<IFlashUtil> _lazyFlash;
+    private readonly Lazy<IScriptPlayer> _lazyPlayer;
+    private readonly Lazy<IScriptOption> _lazyOptions;
+    private readonly Lazy<IScriptWait> _lazyWait;
+    private readonly Lazy<IScriptManager> _lazyManager;
+    private readonly IDialogService _dialogService;
+    private readonly Lazy<IScriptSend> _lazySend;
+
+    private IFlashUtil Flash => _lazyFlash.Value;
+    private IScriptPlayer Player => _lazyPlayer.Value;
+    private IScriptOption Options => _lazyOptions.Value;
+    private IScriptWait Wait => _lazyWait.Value;
+    private IScriptManager Manager => _lazyManager.Value;
+    private IScriptSend Send => _lazySend.Value;
 
     public string LastMap { get; set; } = string.Empty;
     public string FilePath { get; set; } = string.Empty;
@@ -145,10 +145,14 @@ public partial class ScriptMap : IScriptMap
             Directory.CreateDirectory(_cachePath);
 
         if (!Directory.Exists(Path.Combine(AppContext.BaseDirectory, "FFDec")))
+        {
+            _dialogService.ShowMessageBox("FFDec folder not found.", "FFDec");
             return null;
+        }
 
         if (_savedMapItems.ContainsKey(FileName))
             return _savedMapItems[FileName];
+
         List<string> files = new();
         files = Directory.GetFiles(_cachePath).ToList();
         var sw = Stopwatch.StartNew();
@@ -260,7 +264,7 @@ public partial class ScriptMap : IScriptMap
             sw.Restart();
             Task.Run(async () =>
             {
-                byte[] fileBytes = await HttpClients.GetGHClient().GetByteArrayAsync($"https://game.aq.com/game/gamefiles/maps/{FilePath}");
+                byte[] fileBytes = await HttpClients.GetMapClient.GetByteArrayAsync($"https://game.aq.com/game/gamefiles/maps/{FilePath}");
                 await File.WriteAllBytesAsync(Path.Combine(_cachePath, fileName), fileBytes);
             }).Wait();
             Trace.WriteLine($"Download of \"{fileName}\" took {sw.Elapsed:s\\.ff}s");

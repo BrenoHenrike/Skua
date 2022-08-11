@@ -1,19 +1,15 @@
-﻿using System.Drawing;
-using Skua.Core.Interfaces;
+﻿using Skua.Core.Interfaces;
 using Skua.Core.Models.Monsters;
 using Skua.Core.Models.Skills;
 using Skua.Core.Models.Items;
 using Skua.Core.Models.Players;
 using Skua.Core.Flash;
 using Skua.Core.Models;
-using CommunityToolkit.Mvvm.Messaging;
-using Skua.Core.Messaging;
 
 namespace Skua.Core.Scripts;
 public partial class ScriptPlayer : IScriptPlayer
 {
     private readonly Lazy<IFlashUtil> _lazyFlash;
-    private readonly Lazy<IScriptEvent> _lazyEvents;
     private readonly Lazy<IScriptOption> _lazyOptions;
     private readonly Lazy<IScriptWait> _lazyWait;
     private readonly Lazy<IScriptInventory> _lazyInventory;
@@ -24,13 +20,11 @@ public partial class ScriptPlayer : IScriptPlayer
 
     public ScriptPlayer(
         Lazy<IFlashUtil> flash,
-        Lazy<IScriptEvent> events,
         Lazy<IScriptOption> options,
         Lazy<IScriptWait> wait,
         Lazy<IScriptInventory> inventory)
     {
         _lazyFlash = flash;
-        _lazyEvents = events;
         _lazyOptions = options;
         _lazyWait = wait;
         _lazyInventory = inventory;

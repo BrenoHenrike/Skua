@@ -1,24 +1,24 @@
 ﻿using System.Dynamic;
+using CommunityToolkit.Mvvm.Messaging;
 using Newtonsoft.Json;
 using Skua.Core.Interfaces;
+using Skua.Core.Messaging;
 using Skua.Core.Models.Quests;
 using static System.Collections.Generic.Dictionary<int, Skua.Core.Models.Quests.Quest>;
 
 namespace Skua.Core.Services;
 public class QuestDataLoaderService : IQuestDataLoaderService
 {
-    public QuestDataLoaderService(IScriptQuest quests, IScriptPlayer player, IFlashUtil flash, IScriptEvent events)
+    public QuestDataLoaderService(IScriptQuest quests, IScriptPlayer player, IFlashUtil flash)
     {
         _quests = quests;
         _flash = flash;
         _player = player;
-        _events = events;
     }
 
     private readonly IScriptQuest _quests;
     private readonly IFlashUtil _flash;
     private readonly IScriptPlayer _player;
-    private readonly IScriptEvent _events;
     private readonly Dictionary<string, List<QuestData>?> _cachedQuests = new();
 
     public async Task<List<QuestData>> GetFromFileAsync(string fileName)
@@ -49,20 +49,11 @@ public class QuestDataLoaderService : IQuestDataLoaderService
                     break;
                 _flash.SetGameObject("world.questTree", new ExpandoObject());
                 progress?.Report($"Loading Quests {i}-{i + 29}...");
-                _quests.Load(Enumerable.Range(i, 29).ToArray());
                 List<Quest> currQuests = new();
-                void packetListener(dynamic packet)
-                {
-                    if (packet["params"].type == "json" && packet["params"].dataObj.cmd == "getQuests")
-                    {
-                        ValueCollection col = JsonConvert.DeserializeObject<Dictionary<int, Quest>>(JsonConvert.SerializeObject(packet["params"].dataObj.quests)).Values;
-                        currQuests = col.ToList();
-                        wait.Set();
-                    }
-                }
-                _events.ExtensionPacketReceived += packetListener;
-                wait.WaitOne(5000);
-                _events.ExtensionPacketReceived -= packetListener;
+                StrongReferenceMessenger.Default.Register<QuestDataLoaderService, ExtensionPacketMessage, int>(this, (int)MessageChannels.GameEvents, packetListener);
+                _quests.Load(Enumerable.Range(i, 29).ToArray());
+                wait.WaitOne(10000);
+                StrongReferenceMessenger.Default.Unregister<ExtensionPacketMessage, int>(this, (int)MessageChannels.GameEvents);
                 if (currQuests.Count == 0)
                 {
                     progress?.Report("No more quests found.");
@@ -71,6 +62,16 @@ public class QuestDataLoaderService : IQuestDataLoaderService
                 quests.AddRange(currQuests.Select(q => ConvertToQuestData(q)));
                 if (!token.IsCancellationRequested)
                     await Task.Delay(1500);
+
+                void packetListener(QuestDataLoaderService recipient, ExtensionPacketMessage message)
+                {
+                    if (message.Packet["params"].type == "json" && message.Packet["params"].dataObj.cmd == "getQuests")
+                    {
+                        ValueCollection col = JsonConvert.DeserializeObject<Dictionary<int, Quest>>(JsonConvert.SerializeObject(message.Packet["params"].dataObj.quests)).Values;
+                        currQuests = col.ToList();
+                        wait.Set();
+                    }
+                }
             }
             quests.AddRange(_quests.Cached);
             await File.WriteAllTextAsync(fileName, JsonConvert.SerializeObject(quests.Distinct().OrderBy(q => q.ID), Formatting.Indented));

@@ -18,8 +18,7 @@ public partial class GitHubAuthViewModel : BotControlViewModelBase
         OpenBrowserCommand = new RelayCommand(OpenBrowser);
         GetUserCodeCommand = new AsyncRelayCommand(GetUserCode);
         AuthorizeGHCommand = new AsyncRelayCommand(AuthorizeGH);
-        if(HttpClients.UserGitHubClient is not null)
-            HintStatus = "GitHub Authentication already done.";
+        HintStatus = HttpClients.UserGitHubClient is not null ? "GitHub Authentication already done." : "Click \"Get User Code\".";
     }
 
     private readonly IProcessStartService _processService;
@@ -43,7 +42,7 @@ public partial class GitHubAuthViewModel : BotControlViewModelBase
         {
             UserCode = _deviceCode.UserCode;
             _clipboard.SetText(_deviceCode.UserCode);
-            HintStatus = "Copied. Click Open Browser.";
+            HintStatus = "Copied. Click \"Open Browser\".";
             IsBusy = false;
             return;
         }

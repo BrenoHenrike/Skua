@@ -129,7 +129,7 @@ public class ScriptInterface : IScriptInterface, IScriptInterfaceManager
         {
             ScriptInterfaceCTS = new();
             ScriptTimer(ScriptInterfaceCTS.Token);
-            ScriptInterfaceCTS.Dispose();
+            ScriptInterfaceCTS?.Dispose();
             ScriptInterfaceCTS = null;
         })
         {
@@ -212,8 +212,8 @@ public class ScriptInterface : IScriptInterface, IScriptInterfaceManager
                 {
                     Servers.LastIP = Player.ServerIP ?? Servers.LastIP;
 
-                    if (Options.RestPackets && !Player.InCombat && (Player.Health < Player.MaxHealth || Player.Mana < Player.MaxMana))
-                        _limit.LimitedRun("rest", 1000, () => Send.Packet("%xt%zm%restRequest%1%%"));
+                    if (Options.RestPackets && !Player.InCombat)
+                        _limit.LimitedRun("rest", 1200, () => Send.Packet("%xt%zm%restRequest%1%%"));
 
                     if (!catching)
                     {
@@ -380,12 +380,12 @@ public class ScriptInterface : IScriptInterface, IScriptInterfaceManager
                             }
                             if (data.a is not null)
                             {
-                                for (int i = 0; i < data.a?.Count ?? 5; i++)
+                                foreach (var a in data.a)
                                 {
-                                    dynamic a = data.a?[i]!;
                                     if (a is null)
                                         continue;
-                                    if (a.aura is not null && (string)a.aura["nam"] == "Counter Attack")
+
+                                    if (a.aura is not null && (string)a.aura["nam"] is "Counter Attack")
                                     {
                                         Messenger.Send<CounterAttackMessage, int>(new(true), (int)MessageChannels.GameEvents);
                                         break;
@@ -452,6 +452,10 @@ public class ScriptInterface : IScriptInterface, IScriptInterfaceManager
                     string cmd = data[0];
                     switch (cmd)
                     {
+                        case "popup":
+                            string b = Convert.ToString(packet);
+                            Debug.WriteLine(b);
+                            break;
                         case "uotls":
                             if (Player.Username == (string)data[2] && data[3] == "afk:true")
                                 Messenger.Send<PlayerAFKMessage, int>((int)MessageChannels.GameEvents);

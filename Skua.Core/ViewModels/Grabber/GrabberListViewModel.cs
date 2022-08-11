@@ -65,20 +65,23 @@ public partial class GrabberListViewModel : ObservableRecipient
     public IRelayCommand CancelTaskCommand { get; }
 
     [RelayCommand]
-    private Task Grab()
+    private async Task Grab()
     {
         IsBusy = true;
+        ProgressReportMessage = "Working...";
         try
         {
-            IEnumerable<object> items = _grabberService.Grab(_grabType);
+            IEnumerable<object> items = await Task.Run(() => _grabberService.Grab(_grabType));
             if (items.Any())
                 GrabbedItems.ReplaceRange(items);
         }
         finally
         {
             IsBusy = false;
+            ProgressReportMessage = "Finished.";
+            await Task.Delay(1000);
+            ProgressReportMessage = string.Empty;
         }
-        return Task.CompletedTask;
     }
 
     private void RegisterMessages()

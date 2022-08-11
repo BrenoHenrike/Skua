@@ -28,8 +28,6 @@ public class ScriptKill : IScriptKill
         _lazyManager = manager;
         _lazyMap = map;
         _logger = logger;
-
-        StrongReferenceMessenger.Default.Register<ScriptKill, ScriptStoppedMessage, int>(this, (int)MessageChannels.ScriptStatus, ScriptStopped);
     }
 
     internal string _saveCell = "Enter", _savePad = "Spawn";
@@ -99,16 +97,22 @@ public class ScriptKill : IScriptKill
     {
         _saveCell = _player.Cell;
         _savePad = _player.Pad;
-        StrongReferenceMessenger.Default.Register<ScriptKill, CellChangedMessage, int>(this, (int)MessageChannels.GameEvents, CellChanged);
-        while (!Manager.ShouldExit
-            && (tempItem || !Inventory.Contains(item, quantity))
-            && (!tempItem || !TempInv.Contains(item, quantity)))
+        try
         {
-            Combat.Attack(name);
-            Drops.Pickup(item);
+            StrongReferenceMessenger.Default.Register<ScriptKill, CellChangedMessage, int>(this, (int)MessageChannels.GameEvents, CellChanged);
+            while (!Manager.ShouldExit
+                && (tempItem || !Inventory.Contains(item, quantity))
+                && (!tempItem || !TempInv.Contains(item, quantity)))
+            {
+                Combat.Attack(name);
+                Drops.Pickup(item);
+            }
         }
-        _saveCell = _savePad = string.Empty;
-        StrongReferenceMessenger.Default.Unregister<CellChangedMessage, int>(this, (int)MessageChannels.GameEvents);
+        finally
+        {
+            _saveCell = _savePad = string.Empty;
+            StrongReferenceMessenger.Default.Unregister<CellChangedMessage, int>(this, (int)MessageChannels.GameEvents);
+        }
 
         void CellChanged(ScriptKill recipient, CellChangedMessage message)
         {
@@ -156,10 +160,5 @@ public class ScriptKill : IScriptKill
     private void WaitMonsterDeathOrCancellation(CancellationToken token)
     {
         Wait.ForTrue(() => !_player.Playing || !_player.HasTarget, () => Combat.UntargetSelf(), -1, token);
-    }
-
-    private void ScriptStopped(ScriptKill recipient, ScriptStoppedMessage message)
-    {
-        StrongReferenceMessenger.Default.Unregister<CellChangedMessage, int>(recipient, (int)MessageChannels.GameEvents);
     }
 }
