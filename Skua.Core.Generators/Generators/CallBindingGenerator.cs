@@ -68,7 +68,7 @@ public class CallBindingGenerator : GenericFieldAttributeGenerator<CallBindingPr
         bool isNullable = fieldSymbol.Type.NullableAnnotation == NullableAnnotation.Annotated;
         string fieldName = fieldSymbol.Name;
         string propertyName = Execute.GetGeneratedPropertyName(fieldSymbol);
-        bool notifyProp = Execute.HasNotifyPropertyChanged(fieldSymbol);
+        bool notifyProp = Execute.HasNotifyPropertyChanged(fieldSymbol.ContainingType);
 
         // Check for name collisions
         if (fieldName == propertyName)

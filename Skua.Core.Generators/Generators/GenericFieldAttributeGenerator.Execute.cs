@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Collections.Immutable;
 using System.Globalization;
+using System.Xml.Linq;
 using Microsoft.CodeAnalysis;
 using Skua.Core.Generators.Extensions;
 
@@ -31,11 +32,23 @@ public partial class GenericFieldAttributeGenerator<TInfo>
             return $"{char.ToUpper(propertyName[0], CultureInfo.InvariantCulture)}{propertyName.Substring(1)}";
         }
 
-        public static bool HasNotifyPropertyChanged(IFieldSymbol fieldSymbol)
+        public static bool HasNotifyPropertyChanged(ITypeSymbol typeSymbol)
         {
-            return (fieldSymbol.ContainingType.BaseType?.HasFullyQualifiedName("CommunityToolkit.Mvvm.ComponentModel.ObservableObject") ?? false)
-                || (fieldSymbol.ContainingType.BaseType?.HasFullyQualifiedName("CommunityToolkit.Mvvm.ComponentModel.ObservableRecipient") ?? false)
-                || (fieldSymbol.ContainingType.BaseType?.HasFullyQualifiedName("CommunityToolkit.Mvvm.ComponentModel.ObservableValidator") ?? false);
+            INamedTypeSymbol? baseType = typeSymbol.BaseType;
+
+            while (baseType != null)
+            {
+                if (baseType.HasFullyQualifiedName("CommunityToolkit.Mvvm.ComponentModel.ObservableObject")
+                    || baseType.HasFullyQualifiedName("CommunityToolkit.Mvvm.ComponentModel.ObservableRecipient")
+                    || baseType.HasFullyQualifiedName("CommunityToolkit.Mvvm.ComponentModel.ObservableValidator"))
+                {
+                    return true;
+                }
+
+                baseType = baseType.BaseType;
+            }
+
+            return false;
         }
 
         /// <summary>

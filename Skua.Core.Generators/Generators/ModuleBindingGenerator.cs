@@ -37,7 +37,7 @@ public class ModuleBindingGenerator : GenericFieldAttributeGenerator<ModuleBindi
         string typeNameWithNullabilityAnnotations = fieldSymbol.Type.GetFullyQualifiedNameWithNullabilityAnnotations();
         string fieldName = fieldSymbol.Name;
         string propertyName = Execute.GetGeneratedPropertyName(fieldSymbol);
-        bool notifyProp = Execute.HasNotifyPropertyChanged(fieldSymbol);
+        bool notifyProp = Execute.HasNotifyPropertyChanged(fieldSymbol.ContainingType);
 
         // Check for name collisions
         if (fieldName == propertyName)
