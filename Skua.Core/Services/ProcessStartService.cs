@@ -33,7 +33,7 @@ public class ProcessStartService : IProcessStartService
         }
         try
         {
-            Process.Start("code", _scriptsPath);
+            VSCode(string.Empty);
         }
         catch
         {
@@ -50,11 +50,22 @@ public class ProcessStartService : IProcessStartService
         }
         try
         {
-            Process.Start("code", new[] { _scriptsPath, path, "--reuse-window" });
+            VSCode(path);
         }
         catch
         {
             Process.Start("notepad", path);
         }
+    }
+
+    private void VSCode(string path)
+    {
+        ProcessStartInfo psi = new("code", $"{_scriptsPath} {path}")
+        {
+            UseShellExecute = true,
+            CreateNoWindow = true
+        };
+
+        Process.Start(psi);
     }
 }
