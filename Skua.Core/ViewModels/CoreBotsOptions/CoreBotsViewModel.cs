@@ -17,7 +17,6 @@ public partial class CoreBotsViewModel : BotControlViewModelBase
 
     protected override void OnActivated()
     {
-        base.OnActivated();
         Load();
     }
 

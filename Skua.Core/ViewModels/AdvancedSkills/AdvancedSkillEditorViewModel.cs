@@ -11,7 +11,6 @@ public partial class AdvancedSkillEditorViewModel : ObservableRecipient
 {
     public AdvancedSkillEditorViewModel(IDialogService dialogService)
     {
-        Messenger.Register<AdvancedSkillEditorViewModel, EditAdvancedSkillMessage>(this, EditSkill);
         ClassUseModes = new[]
         {
             "Base",
@@ -24,6 +23,11 @@ public partial class AdvancedSkillEditorViewModel : ObservableRecipient
         UseRules = new();
         ClearSkillsCommand = new RelayCommand(CurrentSkillsList.Clear);
         _dialogService = dialogService;
+    }
+
+    protected override void OnActivated()
+    {
+        Messenger.Register<AdvancedSkillEditorViewModel, EditAdvancedSkillMessage>(this, EditSkill);
     }
 
     private readonly IDialogService _dialogService;

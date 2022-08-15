@@ -43,7 +43,7 @@ public interface IScriptMonster
     /// </summary>
     List<string> GetLivingMonsterCells(string name)
     {
-        return MapMonsters.Where(m => m.Alive && (name == "*" || m.Name.Trim() == name)).Select(m => m.Cell).Distinct().ToList();
+        return MapMonsters.Where(m => m.Alive && (name == "*" || m.Name.Trim() == name.Trim())).Select(m => m.Cell).Distinct().ToList();
     }
     /// <summary>
     /// Gets all of the cells with a living monster of the specified <paramref name="id"/>.

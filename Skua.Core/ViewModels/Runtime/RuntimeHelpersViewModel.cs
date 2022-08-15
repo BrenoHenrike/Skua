@@ -9,6 +9,18 @@ public class RuntimeHelpersViewModel : BotControlViewModelBase
         BoostsViewModel = boostsViewModel;
     }
 
+    protected override void OnActivated()
+    {
+        RegisteredQuestsViewModel.IsActive = true;
+        ToPickupDropsViewModel.IsActive = true;
+    }
+
+    protected override void OnDeactivated()
+    {
+        RegisteredQuestsViewModel.IsActive = false;
+        ToPickupDropsViewModel.IsActive = false;
+    }
+
     public ToPickupDropsViewModel ToPickupDropsViewModel { get; }
     public RegisteredQuestsViewModel RegisteredQuestsViewModel { get; }
     public BoostsViewModel BoostsViewModel { get; }

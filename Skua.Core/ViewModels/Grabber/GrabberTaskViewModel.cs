@@ -8,9 +8,13 @@ public partial class GrabberTaskViewModel : ObservableRecipient
 {
     public GrabberTaskViewModel(string content, Func<IList<object>?, IProgress<string>, CancellationToken, Task> command)
     {
-        Messenger.Register<GrabberTaskViewModel, CancelGrabberTaskMessage>(this, CancelTask);
         Content = content;
         _command = command;
+    }
+
+    protected override void OnActivated()
+    {
+        Messenger.Register<GrabberTaskViewModel, CancelGrabberTaskMessage>(this, CancelTask);
     }
 
     private readonly Func<IList<object>?, IProgress<string>, CancellationToken, Task> _command;

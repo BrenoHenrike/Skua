@@ -12,8 +12,6 @@ public partial class FastTravelViewModel : BotControlViewModelBase
     public FastTravelViewModel(IMapService mapService, ISettingsService settings, IDialogService dialogService) 
         : base("Fast Travel")
     {
-        Messenger.Register<FastTravelViewModel, RemoveFastTravelMessage>(this, RemoveFastTravel);
-        Messenger.Register<FastTravelViewModel, EditFastTravelMessage>(this, EditFastTravel);
         MapService = mapService;
         _settings = settings;
         _dialogService = dialogService;
@@ -28,6 +26,12 @@ public partial class FastTravelViewModel : BotControlViewModelBase
             DefaultFastTravels.Add(new FastTravelItemViewModel(values[0], values[1], values[2], values[3], _travelCommand));
         }
         FastTravelItems = new(DefaultFastTravels);
+    }
+
+    protected override void OnActivated()
+    {
+        Messenger.Register<FastTravelViewModel, RemoveFastTravelMessage>(this, RemoveFastTravel);
+        Messenger.Register<FastTravelViewModel, EditFastTravelMessage>(this, EditFastTravel);
     }
 
     private readonly ISettingsService _settings;
@@ -83,8 +87,8 @@ public partial class FastTravelViewModel : BotControlViewModelBase
             return;
 
         int index = recipient.FastTravelItems.IndexOf(message.FastTravel);
-        FastTravelEditorDialogViewModel dialog = new(new(MapService, message.FastTravel));
-        if(_dialogService.ShowDialog(dialog) == true)
+        FastTravelEditorDialogViewModel dialog = new(new(recipient.MapService, message.FastTravel));
+        if(recipient._dialogService.ShowDialog(dialog) == true)
             recipient.FastTravelItems[index] = dialog.Editor.Travel;
     }
 }

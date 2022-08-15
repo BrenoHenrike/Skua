@@ -8,9 +8,22 @@ public partial class AdvancedSkillsViewModel : BotControlViewModelBase
     public AdvancedSkillsViewModel(AdvancedSkillEditorViewModel editor, SavedAdvancedSkillsViewModel savedViewModel)
         : base("Advanced Skills", 700, 530)
     {
-        Messenger.Register<AdvancedSkillsViewModel, EditAdvancedSkillMessage>(this, EditSkill);
         EditViewModel = editor;
         SavedViewModel = savedViewModel;
+    }
+
+    protected override void OnActivated()
+    {
+        SavedViewModel.IsActive = true;
+        EditViewModel.IsActive = true;
+        Messenger.Register<AdvancedSkillsViewModel, EditAdvancedSkillMessage>(this, EditSkill);
+    }
+
+    protected override void OnDeactivated()
+    {
+        SavedViewModel.IsActive = false;
+        EditViewModel.IsActive = false;
+        base.OnDeactivated();
     }
 
     public AdvancedSkillEditorViewModel EditViewModel { get; }

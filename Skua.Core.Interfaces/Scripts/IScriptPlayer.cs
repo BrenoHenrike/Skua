@@ -118,10 +118,6 @@ public interface IScriptPlayer
     /// </summary>
     bool Loaded { get; }
     /// <summary>
-    /// Gets/sets whether the player has member active.
-    /// </summary>
-    bool Upgrade { get; set; }
-    /// <summary>
     /// Gets an array containing information about the player's current skills.
     /// </summary>
     SkillInfo[]? Skills { get; }

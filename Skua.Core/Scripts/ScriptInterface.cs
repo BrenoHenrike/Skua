@@ -276,6 +276,8 @@ public class ScriptInterface : IScriptInterface, IScriptInterfaceManager
         string connDetail = Flash.IsNull("mcConnDetail.stage") ? "null" : Flash.GetGameObject("mcConnDetail.txtDetail.text", "null")!;
         if (connDetail == "null")
             return (Environment.TickCount, connDetail);
+        if (connDetail.Contains("has been lost") && !_waitForLogin)
+            OnLogout();
         if (Environment.TickCount - lastConnChange >= Options.LoadTimeout && connDetail == lastConnDetail)
         {
             if (connDetail.Contains("loading map") && !_waitForLogin)
@@ -501,7 +503,7 @@ public class ScriptInterface : IScriptInterface, IScriptInterfaceManager
         if (!Options.AutoRelogin || _waitForLogin)
             return;
 
-        if (_reloginTask is not null)
+        if (_reloginTask is not null && !_waitForLogin)
         {
             Log("Relogin task already running.");
             _waitForLogin = true;
@@ -516,23 +518,22 @@ public class ScriptInterface : IScriptInterface, IScriptInterfaceManager
         Messenger.Send<ReloginTriggeredMessage, int>(new(kicked), (int)MessageChannels.GameEvents);
 
         Relogin((!Options.SafeRelogin && !kicked) ? 5000 : 70000, wasRunning);
-
-        void Relogin(int delay, bool startScript)
+    }
+    private void Relogin(int delay, bool startScript)
+    {
+        Log($"Waiting {delay}ms for relogin.");
+        _reloginCTS = new CancellationTokenSource();
+        _reloginTask = Schedule(delay, async _ =>
         {
-            Log($"Waiting {delay}ms for relogin.");
-            _reloginCTS = new CancellationTokenSource();
-            _reloginTask = Schedule(delay, async _ =>
-            {
-                Stats.Relogins++;
-                bool relogged = await Servers.EnsureRelogin(_reloginCTS.Token);
-                if (startScript)
-                    await Ioc.Default.GetService<IScriptManager>()!.StartScriptAsync();
-                Log($"Relogin was {(relogged ? "successful" : "cancelled or unsuccessful")}.");
-                _reloginCTS.Dispose();
-                _reloginCTS = null;
-                _reloginTask = null;
-                _waitForLogin = false;
-            });
-        }
+            Stats.Relogins++;
+            bool relogged = await Servers.EnsureRelogin(_reloginCTS.Token);
+            if (startScript)
+                await Ioc.Default.GetService<IScriptManager>()!.StartScriptAsync();
+            Log($"Relogin was {(relogged ? "successful" : "cancelled or unsuccessful")}.");
+            _reloginCTS.Dispose();
+            _reloginCTS = null;
+            _reloginTask = null;
+            _waitForLogin = false;
+        });
     }
 }

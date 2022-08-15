@@ -6,7 +6,7 @@ public interface IScriptFaction
     /// <summary>
     /// Get a list of all factions the player has atleast 1 point in Reputation.
     /// </summary>
-    List<Faction>? FactionList { get; }
+    List<Faction> FactionList { get; }
     /// <summary>
     /// Get the rank of the faction with specified <paramref name="name"/>.
     /// </summary>

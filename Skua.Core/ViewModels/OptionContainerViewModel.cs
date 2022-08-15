@@ -2,7 +2,7 @@
 using Skua.Core.Interfaces;
 
 namespace Skua.Core.ViewModels;
-public partial class OptionContainerViewModel : ObservableRecipient
+public partial class OptionContainerViewModel : ObservableObject
 {
     public OptionContainerViewModel(IOptionContainer container)
     {

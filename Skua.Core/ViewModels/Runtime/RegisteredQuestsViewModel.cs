@@ -5,15 +5,18 @@ using CommunityToolkit.Mvvm.Messaging.Messages;
 using Skua.Core.Interfaces;
 
 namespace Skua.Core.ViewModels;
-public partial class RegisteredQuestsViewModel : ObservableObject
+public partial class RegisteredQuestsViewModel : ObservableRecipient
 {
     private readonly char[] _questsSeparator = { '|', ',', ' ' };
     public RegisteredQuestsViewModel(IScriptQuest quests)
     {
-        WeakReferenceMessenger.Default.Register<RegisteredQuestsViewModel, PropertyChangedMessage<IEnumerable<int>>>(this, RegisteredChanged);
-
         _quests = quests;
-        RemoveAllQuestsCommand = new RelayCommand(_quests.UnregisterAllQuests);
+    }
+
+    protected override void OnActivated()
+    {
+        Messenger.Register<RegisteredQuestsViewModel, PropertyChangedMessage<IEnumerable<int>>>(this, RegisteredChanged);
+        OnPropertyChanged(nameof(CurrentAutoQuests));
     }
 
     private readonly IScriptQuest _quests;
@@ -21,7 +24,12 @@ public partial class RegisteredQuestsViewModel : ObservableObject
     private string _addQuestInput = string.Empty;
 
     public List<int> CurrentAutoQuests => _quests.Registered.ToList();
-    public IRelayCommand RemoveAllQuestsCommand { get; }
+
+    [RelayCommand]
+    private void RemoveAllQuests()
+    {
+        _quests.UnregisterAllQuests();
+    }
 
     [RelayCommand]
     private void RemoveQuests(IList<object>? items)

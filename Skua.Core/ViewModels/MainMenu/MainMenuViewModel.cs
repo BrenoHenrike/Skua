@@ -28,7 +28,6 @@ public partial class MainMenuViewModel : ObservableRecipient
     [ObservableProperty]
     private ObservableCollection<MainMenuItemViewModel> _plugins;
 
-
     public AutoViewModel AutoViewModel { get; }
     public JumpViewModel JumpViewModel { get; }
 

@@ -13,14 +13,18 @@ public class GameOptionsViewModel : BotControlViewModelBase
     public GameOptionsViewModel(List<DisplayOptionItemViewModelBase> gameOptions, IScriptServers servers, IScriptOption options)
         : base("Game Options", 420, 500)
     {
-        Messenger.Register<GameOptionsViewModel, PropertyChangedMessage<List<Server>>>(this, ServersChanged);
-        Messenger.Register<GameOptionsViewModel, PropertyChangedMessage<string>>(this, OptionServerChanged);
         _servers = servers;
         _options = options;
         GameOptions = gameOptions;
         ResetOptionsCommand = new RelayCommand(_options.Reset);
         ResetDefaultOptionsCommand = new RelayCommand(_options.ResetToDefault);
         SaveOptionsCommand = new RelayCommand(_options.Save);
+    }
+
+    protected override void OnActivated()
+    {
+        Messenger.Register<GameOptionsViewModel, PropertyChangedMessage<List<Server>>>(this, ServersChanged);
+        Messenger.Register<GameOptionsViewModel, PropertyChangedMessage<string>>(this, OptionServerChanged);
     }
 
     public List<DisplayOptionItemViewModelBase> GameOptions { get; }

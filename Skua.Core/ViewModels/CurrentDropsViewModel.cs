@@ -11,12 +11,19 @@ public partial class CurrentDropsViewModel : BotControlViewModelBase
     public CurrentDropsViewModel(IScriptDrop drops, IScriptPlayer player)
         : base("Current Drops", 500, 400)
     {
-        StrongReferenceMessenger.Default.Register<CurrentDropsViewModel, ItemDroppedMessage, int>(this, (int)MessageChannels.GameEvents, CurrentDropsChanged);
-
         _drops = drops;
         _player = player;
-        PickupAllCommand = new RelayCommand(() => drops.PickupAll(true));
-        PickupACCommand = new RelayCommand(_drops.PickupACItems);
+    }
+
+    protected override void OnActivated()
+    {
+        StrongReferenceMessenger.Default.Register<CurrentDropsViewModel, ItemDroppedMessage, int>(this, (int)MessageChannels.GameEvents, CurrentDropsChanged);
+        OnPropertyChanged(nameof(CurrentDrops));
+    }
+
+    protected override void OnDeactivated()
+    {
+        StrongReferenceMessenger.Default.UnregisterAll(this);
     }
 
     private readonly IScriptPlayer _player;
@@ -25,9 +32,6 @@ public partial class CurrentDropsViewModel : BotControlViewModelBase
     private ItemBase? _selectedDrop;
 
     public List<ItemBase> CurrentDrops => _drops.CurrentDropInfos.ToList();
-
-    public IRelayCommand PickupAllCommand { get; }
-    public IRelayCommand PickupACCommand { get; }
 
     [RelayCommand]
     private void Pickup()
@@ -46,6 +50,18 @@ public partial class CurrentDropsViewModel : BotControlViewModelBase
 
         IEnumerable<ItemBase> drops = items.Cast<ItemBase>();
         _drops.Pickup(drops.Select(d => d.ID).ToArray());
+    }
+
+    [RelayCommand]
+    private void PickupAll()
+    {
+        _drops.PickupAll(true);
+    }
+
+    [RelayCommand]
+    private void PickupAC()
+    {
+        _drops.PickupACItems();
     }
 
     private void CurrentDropsChanged(CurrentDropsViewModel recipient, ItemDroppedMessage message)

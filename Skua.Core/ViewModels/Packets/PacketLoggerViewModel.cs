@@ -12,7 +12,6 @@ public partial class PacketLoggerViewModel : BotControlViewModelBase
         _flash = flash;
         _fileDialog = fileDialog;
         _packetFilters = filters.ToList();
-        ClearPacketLogsCommand = new RelayCommand(PacketLogs.Clear);
     }
 
     private readonly IFlashUtil _flash;
@@ -33,8 +32,6 @@ public partial class PacketLoggerViewModel : BotControlViewModelBase
         }
     }
 
-    public IRelayCommand ClearPacketLogsCommand { get; }
-
     [RelayCommand]
     private void SavePacketLogs()
     {
@@ -45,6 +42,12 @@ public partial class PacketLoggerViewModel : BotControlViewModelBase
     private void ClearFilters()
     {
         _packetFilters.ForEach(f => f.IsChecked = false);
+    }
+
+    [RelayCommand]
+    private void ClearPacketLogs()
+    {
+        PacketLogs.Clear();
     }
 
     private void ToggleLogger()

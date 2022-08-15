@@ -240,7 +240,7 @@ public partial class ScriptQuest : ObservableRecipient, IScriptQuest
         return quest is not null
                && !IsDailyComplete(quest.ID)
                && IsUnlocked(quest.ID)
-               && (!quest.Upgrade || Player.Upgrade)
+               && (!quest.Upgrade || Player.IsMember)
                && Player.Level >= quest.Level
                && (quest.RequiredClassID <= 0 || Flash.CallGameFunction<int>("world.myAvatar.getCPByID", quest.RequiredClassID) >= quest.RequiredClassPoints)
                && (quest.RequiredFactionId <= 1 || Flash.CallGameFunction<int>("world.myAvatar.getRep", quest.RequiredFactionId) >= quest.RequiredFactionRep)
@@ -309,7 +309,9 @@ public partial class ScriptQuest : ObservableRecipient, IScriptQuest
     {
         foreach (int quest in registered)
         {
-            Accept(quest);
+            if(!IsInProgress(quest))
+                Accept(quest);
+            await Task.Delay(Options.ActionDelay, token);
             if (!CanComplete(quest))
             {
                 if (Environment.TickCount - _lastComplete > 10000 && CanCompleteFullCheck(quest))

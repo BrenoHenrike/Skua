@@ -90,7 +90,7 @@ public interface IFlashUtil : IDisposable
     {
         try
         {
-            return JsonConvert.DeserializeObject<T>(GetGameObject(path)!);
+            return JsonConvert.DeserializeObject<T>(GetGameObject(path)!) ?? def;
         }
         catch
         {

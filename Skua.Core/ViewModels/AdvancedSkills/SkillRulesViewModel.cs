@@ -16,6 +16,7 @@ public partial class SkillRulesViewModel : ObservableRecipient
         _manaUseValue = rules.ManaUseValue;
         _skipUseBool = rules.SkipUseBool;
     }
+
     [ObservableProperty]
     private bool _useRuleBool;
 

@@ -11,10 +11,14 @@ public partial class SavedAdvancedSkillsViewModel : ObservableRecipient
 {
     public SavedAdvancedSkillsViewModel(IAdvancedSkillContainer advancedSkillContainer)
     {
-        Messenger.Register<SavedAdvancedSkillsViewModel, SaveAdvancedSkillMessage>(this, SaveSkill);
-        Messenger.Register<SavedAdvancedSkillsViewModel, PropertyChangedMessage<List<AdvancedSkill>>>(this, AdvancedSkillsChanged);
         _advancedSkillContainer = advancedSkillContainer;
         RefreshSkillsCommand = new RelayCommand(_advancedSkillContainer.LoadSkills);
+    }
+
+    protected override void OnActivated()
+    {
+        Messenger.Register<SavedAdvancedSkillsViewModel, SaveAdvancedSkillMessage>(this, SaveSkill);
+        Messenger.Register<SavedAdvancedSkillsViewModel, PropertyChangedMessage<List<AdvancedSkill>>>(this, AdvancedSkillsChanged);
     }
 
     private readonly IAdvancedSkillContainer _advancedSkillContainer;
@@ -50,6 +54,6 @@ public partial class SavedAdvancedSkillsViewModel : ObservableRecipient
     private void AdvancedSkillsChanged(SavedAdvancedSkillsViewModel recipient, PropertyChangedMessage<List<AdvancedSkill>> message)
     {
         if (message.PropertyName == nameof(IAdvancedSkillContainer.LoadedSkills))
-            recipient.OnPropertyChanged(nameof(LoadedSkills));
+            recipient.OnPropertyChanged(nameof(recipient.LoadedSkills));
     }
 }

@@ -5,6 +5,21 @@ using Skua.Core.Interfaces;
 namespace Skua.Core.ViewModels;
 public partial class ConsoleViewModel : BotControlViewModelBase
 {
+    private const string _source =
+        @"using Skua.Core;
+using Skua.Core.Interfaces;
+using Skua.Core.Utils;
+using Skua.Core.Models;
+using Skua.Core.Models.Items;
+using Skua.Core.Models.Monsters;
+using Skua.Core.Models.Players;
+using Skua.Core.Models.Quests;
+using Skua.Core.Models.Servers;
+using Skua.Core.Models.Shops;
+using Skua.Core.Models.Skills;
+using Newtonsoft.Json;
+public class Script{ public void ScriptMain(IScriptInterface bot){";
+
     public ConsoleViewModel(IDialogService dialogService, IScriptManager scriptManager)
         : base("Console", 700, 400)
     {
@@ -24,21 +39,7 @@ public partial class ConsoleViewModel : BotControlViewModelBase
         {
             try
             {
-                string source = 
-                $@"
-using Skua.Core;
-using Skua.Core.Interfaces;
-using Skua.Core.Utils;
-using Skua.Core.Models;
-using Skua.Core.Models.Items;
-using Skua.Core.Models.Monsters;
-using Skua.Core.Models.Players;
-using Skua.Core.Models.Quests;
-using Skua.Core.Models.Servers;
-using Skua.Core.Models.Shops;
-using Skua.Core.Models.Skills;
-public class Script{{ public void ScriptMain(IScriptInterface bot){{{_snippetText}}}}}";
-                object? o = _scriptManager.Compile(source);
+                object? o = _scriptManager.Compile($"{_source}{_snippetText}}}}}");
                 o!.GetType().GetMethod("ScriptMain")!.Invoke(o, new[] { IScriptInterface.Instance });
             }
             catch (Exception e)

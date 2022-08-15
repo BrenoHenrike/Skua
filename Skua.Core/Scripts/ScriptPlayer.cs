@@ -85,18 +85,6 @@ public partial class ScriptPlayer : IScriptPlayer
                         && Flash.CallGameFunction<bool>("world.myAvatar.pMC.artLoaded");
     [ObjectBinding("world.myAvatar.objData.intAccessLevel", HasSetter = true)]
     private int _accessLevel;
-    public bool Upgrade
-    {
-        get
-        {
-            return Flash.GetGameObject<int>("world.myAvatar.objData.iUpgDays") > 0;
-        }
-        set
-        {
-            Flash.SetGameObject("world.myAvatar.objData.iUpg", value ? 1000 : 0);
-            Flash.SetGameObject("world.myAvatar.objData.iUpgDays", value ? 1000 : 0);
-        }
-    }
     [ObjectBinding("world.actions.active", Default = "Array.Empty<Skua.Core.Models.Skills.SkillInfo>()")]
     private SkillInfo[] _skills;
     [ObjectBinding("world.myAvatar.dataLeaf.afk")]

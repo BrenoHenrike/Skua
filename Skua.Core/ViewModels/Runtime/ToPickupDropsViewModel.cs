@@ -5,16 +5,20 @@ using CommunityToolkit.Mvvm.Input;
 using Skua.Core.Interfaces;
 
 namespace Skua.Core.ViewModels;
-public partial class ToPickupDropsViewModel : ObservableObject
+public partial class ToPickupDropsViewModel : ObservableRecipient
 {
     private readonly char[] _dropsSeparator = { '|' };
     public ToPickupDropsViewModel(IScriptDrop drops, IScriptOption options)
     {
-        WeakReferenceMessenger.Default.Register<ToPickupDropsViewModel, PropertyChangedMessage<IEnumerable<string>>>(this, ToPickupChanged);
-
         Drops = drops;
         Options = options;
         RemoveAllDropsCommand = new RelayCommand(Drops.Clear);
+    }
+
+    protected override void OnActivated()
+    {
+        Messenger.Register<ToPickupDropsViewModel, PropertyChangedMessage<IEnumerable<string>>>(this, ToPickupChanged);
+        OnPropertyChanged(nameof(ToPickup));
     }
 
     [ObservableProperty]

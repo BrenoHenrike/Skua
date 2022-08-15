@@ -14,7 +14,6 @@ public partial class PacketInterceptorViewModel : BotControlViewModelBase
     public PacketInterceptorViewModel(ICaptureProxy gameProxy, IScriptServers server)
         : base("Packet Interceptor")
     {
-        Messenger.Register<PacketInterceptorViewModel, PropertyChangedMessage<bool>>(this, RunningChanged);
         _gameProxy = gameProxy;
         _server = server;
         ClearPacketsCommand = new RelayCommand(Packets.Clear);
@@ -22,6 +21,12 @@ public partial class PacketInterceptorViewModel : BotControlViewModelBase
         void addFunc(InterceptedPacketViewModel st) => context?.Send(obj => Packets.Add((InterceptedPacketViewModel)obj!), st);
         _logger = new InterceptorLogger(addFunc);
         IsLogging = true;
+    }
+
+    protected override void OnActivated()
+    {
+        Messenger.Register<PacketInterceptorViewModel, PropertyChangedMessage<bool>>(this, RunningChanged);
+        OnPropertyChanged(nameof(Running));
     }
 
     private readonly ICaptureProxy _gameProxy;
@@ -48,7 +53,7 @@ public partial class PacketInterceptorViewModel : BotControlViewModelBase
         }
     }
     public bool Running => _gameProxy.Running;
-    public List<Server> ServerList => _server.ServerList;
+    public List<Server> ServerList => _server.CachedServers;
     public IRelayCommand ClearPacketsCommand { get; }
 
 

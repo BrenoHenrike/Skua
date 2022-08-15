@@ -11,7 +11,6 @@ public partial class PacketSpammerViewModel : BotControlViewModelBase
     {
         _send = send;
         _fileDialog = fileDialog;
-        ClearPacketsCommand = new RelayCommand(Packets.Clear);
     }
 
     private readonly IScriptSend _send;
@@ -29,7 +28,11 @@ public partial class PacketSpammerViewModel : BotControlViewModelBase
     [ObservableProperty]
     private int _selectedIndex = -1;
 
-    public IRelayCommand ClearPacketsCommand { get; }
+    [RelayCommand]
+    private void ClearPackets()
+    {
+        Packets.Clear();
+    }
 
     [RelayCommand]
     private void ToggleSpammer()

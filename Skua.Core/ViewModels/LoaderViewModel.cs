@@ -10,23 +10,15 @@ public partial class LoaderViewModel : BotControlViewModelBase, IManagedWindow
     public LoaderViewModel(IScriptShop shops, IScriptQuest quests, IQuestDataLoaderService questLoader, IClipboardService clipboardService)
         : base("Loader", 550, 270)
     {
-        Shops = shops;
-        Quests = quests;
+        _shops = shops;
+        _quests = quests;
         _questLoader = questLoader;
         _clipboardService = clipboardService;
-        CancelQuestLoadCommand = new RelayCommand(() =>
-        {
-            if(_loaderCTS is not null)
-            {
-                _loaderCTS.Cancel();
-                ProgressReport = "Cancelling task...";
-            }
-        });
     }
 
     private CancellationTokenSource? _loaderCTS;
-    private readonly IScriptShop Shops;
-    private readonly IScriptQuest Quests;
+    private readonly IScriptShop _shops;
+    private readonly IScriptQuest _quests;
     private readonly IQuestDataLoaderService _questLoader;
     private readonly IClipboardService _clipboardService;
     [ObservableProperty]
@@ -41,19 +33,17 @@ public partial class LoaderViewModel : BotControlViewModelBase, IManagedWindow
     [ObservableProperty]
     private RangedObservableCollection<QuestData> _questIDs = new();
 
-    public IRelayCommand CancelQuestLoadCommand { get; }
-
     [RelayCommand(CanExecute = nameof(AllDigits))]
     private void Load()
     {
         if (SelectedIndex == 0 && int.TryParse(InputIDs, out int id))
         {
-            Shops.Load(id);
+            _shops.Load(id);
             return;
         }
         if (SelectedIndex == 1)
         {
-            Quests.Load(InputIDs.Split(new char[] { ',', ' ' }, StringSplitOptions.RemoveEmptyEntries).Select(x => int.Parse(x)).ToArray());
+            _quests.Load(InputIDs.Split(new char[] { ',', ' ' }, StringSplitOptions.RemoveEmptyEntries).Select(x => int.Parse(x)).ToArray());
         }
     }
     private bool AllDigits()
@@ -67,7 +57,7 @@ public partial class LoaderViewModel : BotControlViewModelBase, IManagedWindow
         if (items is null)
             return;
         IEnumerable<QuestData> quests = items.Cast<QuestData>();
-        Quests.Load(quests.Select(q => q.ID).ToArray());
+        _quests.Load(quests.Select(q => q.ID).ToArray());
     }
 
     [RelayCommand]
@@ -112,9 +102,21 @@ public partial class LoaderViewModel : BotControlViewModelBase, IManagedWindow
     [RelayCommand]
     private async Task GetQuests()
     {
-        QuestIDs.Clear();
+        IsLoading = true;
         ProgressReport = "Getting quests";
+        QuestIDs.Clear();
         QuestIDs.AddRange(await _questLoader.GetFromFileAsync("Quests.txt"));
         ProgressReport = string.Empty;
+        IsLoading = false;
+    }
+
+    [RelayCommand]
+    private void CancelQuestLoad()
+    {
+        if (_loaderCTS is not null)
+        {
+            _loaderCTS.Cancel();
+            ProgressReport = "Cancelling task...";
+        }
     }
 }

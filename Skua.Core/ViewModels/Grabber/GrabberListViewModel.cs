@@ -13,34 +13,28 @@ public partial class GrabberListViewModel : ObservableRecipient
 {
     public GrabberListViewModel(string title, IGrabberService grabberService, GrabberTypes grabType, IEnumerable<GrabberTaskViewModel> commands, bool selectMultiple = false)
     {
-        RegisterMessages();
         Title = title;
         SelectMultiple = selectMultiple;
         _grabberService = grabberService;
         _grabType = grabType;
         _grabberCommands = new(commands);
-        CancelTaskCommand = new RelayCommand(() => WeakReferenceMessenger.Default.Send<CancelGrabberTaskMessage>());
     }
 
     public GrabberListViewModel(string title, IGrabberService grabberService, GrabberTypes grabType, GrabberTaskViewModel command, bool selectMultiple = false)
     {
-        RegisterMessages();
         Title = title;
         SelectMultiple = selectMultiple;
         _grabberService = grabberService;
         _grabType = grabType;
         _grabberCommands = new() { command };
-        CancelTaskCommand = new RelayCommand(() => WeakReferenceMessenger.Default.Send<CancelGrabberTaskMessage>());
     }
     public GrabberListViewModel(string title, IGrabberService grabberService, GrabberTypes grabType, bool selectMultiple = false)
     {
-        RegisterMessages();
         Title = title;
         SelectMultiple = selectMultiple;
         _grabberService = grabberService;
         _grabType = grabType;
         _grabberCommands = new();
-        CancelTaskCommand = new RelayCommand(() => WeakReferenceMessenger.Default.Send<CancelGrabberTaskMessage>());
     }
 
     private readonly GrabberTypes _grabType;
@@ -62,8 +56,6 @@ public partial class GrabberListViewModel : ObservableRecipient
     [ObservableProperty]
     private object? _selectedItem;
 
-    public IRelayCommand CancelTaskCommand { get; }
-
     [RelayCommand]
     private async Task Grab()
     {
@@ -84,10 +76,27 @@ public partial class GrabberListViewModel : ObservableRecipient
         }
     }
 
-    private void RegisterMessages()
+    [RelayCommand]
+    private void CancelTask()
     {
+        WeakReferenceMessenger.Default.Send<CancelGrabberTaskMessage>();
+    }
+
+    protected override void OnActivated()
+    {
+        foreach(var task in GrabberCommands)
+            task.IsActive = true;
+
         Messenger.Register<GrabberListViewModel, PropertyChangedMessage<bool>>(this, IsBusyChanged);
         Messenger.Register<GrabberListViewModel, PropertyChangedMessage<string>>(this, ProgressReportMessageChanged);
+    }
+
+    protected override void OnDeactivated()
+    {
+        foreach (var task in GrabberCommands)
+            task.IsActive = false;
+
+        base.OnDeactivated();
     }
 
     public void IsBusyChanged(GrabberListViewModel receiver, PropertyChangedMessage<bool> message)

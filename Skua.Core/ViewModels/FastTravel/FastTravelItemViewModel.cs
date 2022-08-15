@@ -5,7 +5,7 @@ using Skua.Core.Messaging;
 
 namespace Skua.Core.ViewModels;
 
-public partial class FastTravelItemViewModel : ObservableRecipient
+public partial class FastTravelItemViewModel : ObservableObject
 {
     public FastTravelItemViewModel(IRelayCommand<object> travel)
     {
@@ -34,13 +34,13 @@ public partial class FastTravelItemViewModel : ObservableRecipient
     [RelayCommand]
     private void Remove()
     {
-        Messenger.Send<RemoveFastTravelMessage>(new(this));
+        WeakReferenceMessenger.Default.Send<RemoveFastTravelMessage>(new(this));
     }
 
     [RelayCommand]
     private void Edit()
     {
-        Messenger.Send<EditFastTravelMessage>(new(this));
+        WeakReferenceMessenger.Default.Send<EditFastTravelMessage>(new(this));
     }
 
     public bool Validate()

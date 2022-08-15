@@ -13,6 +13,19 @@ public partial class GrabberViewModel : BotControlViewModelBase
 
     [ObservableProperty]
     private ObservableCollection<GrabberListViewModel> _grabberTabs;
-    [ObservableProperty]
+
     private GrabberListViewModel _selectedTab;
+    public GrabberListViewModel SelectedTab
+    {
+        get { return _selectedTab; }
+        set
+        {
+            var lastTab = _selectedTab;
+            if (SetProperty(ref _selectedTab, value))
+            {
+                lastTab.IsActive = false;
+                _selectedTab.IsActive = true;
+            }
+        }
+    }
 }

@@ -8,10 +8,9 @@ public partial class BoostsViewModel : ObservableObject
     public BoostsViewModel(IScriptBoost boosts)
     {
         Boosts = boosts;
-        SetBoostIDsCommand = new AsyncRelayCommand<bool>(async b => await Task.Run(() => Boosts.SetAllBoostsIDs(b)));
     }
+
     public IScriptBoost Boosts { get; }
-    public IAsyncRelayCommand SetBoostIDsCommand { get; }
 
     [RelayCommand]
     private async Task ToggleBoosts()
@@ -22,5 +21,11 @@ public partial class BoostsViewModel : ObservableObject
             return;
         }
         await Boosts.StopAsync();
+    }
+
+    [RelayCommand]
+    private async Task SetBoostIDs(bool searchBank)
+    {
+        await Task.Run(() => Boosts.SetAllBoostsIDs(searchBank));
     }
 }
