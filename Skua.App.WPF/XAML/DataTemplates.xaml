@@ -109,4 +109,13 @@
     <DataTemplate DataType="{x:Type vms:CBOptionsViewModel}">
         <usercontrols:CBOptionsUserControl />
     </DataTemplate>
+    <DataTemplate DataType="{x:Type vms:HotKeysViewModel}">
+        <views:HotKeysView />
+    </DataTemplate>
+    <DataTemplate DataType="{x:Type vms:HotKeyItemViewModel}">
+        <usercontrols:HotKeyItemUserControl />
+    </DataTemplate>
+    <DataTemplate DataType="{x:Type vms:AssignHotKeyDialogViewModel}">
+        <usercontrols:AssignHotKeyDialog />
+    </DataTemplate>
 </ResourceDictionary>

@@ -21,6 +21,8 @@ internal class ManagedWindows
         windowService.RegisterManagedWindow("Game", s.GetRequiredService<GameOptionsViewModel>());
         windowService.RegisterManagedWindow("Application", s.GetRequiredService<ApplicationOptionsViewModel>());
         windowService.RegisterManagedWindow("CoreBots", s.GetRequiredService<CoreBotsViewModel>());
+        windowService.RegisterManagedWindow("Application Themes", s.GetRequiredService<ApplicationThemesViewModel>());
+        windowService.RegisterManagedWindow("HotKeys", s.GetRequiredService<HotKeysViewModel>());
 
         windowService.RegisterManagedWindow("Runtime", s.GetRequiredService<RuntimeHelpersViewModel>());
         windowService.RegisterManagedWindow("Fast Travel", s.GetRequiredService<FastTravelViewModel>());
@@ -40,7 +42,5 @@ internal class ManagedWindows
         windowService.RegisterManagedWindow("Logs", s.GetRequiredService<LogsViewModel>());
 
         windowService.RegisterManagedWindow("Plugins", s.GetRequiredService<PluginsViewModel>());
-
-        windowService.RegisterManagedWindow("Application Themes", s.GetRequiredService<ApplicationThemesViewModel>());
     }
 }

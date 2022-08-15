@@ -20,16 +20,8 @@ internal class Options
 
         List<DisplayOptionItemViewModelBase> options = new()
         {
-            new CommandOptionItemViewModel<bool>("Upgrade", "1", CreateBoolCommand(b =>
-            {
-                Ioc.Default.GetRequiredService<IScriptPlayer>().Upgrade = b;
-                Ioc.Default.GetRequiredService<IFlashUtil>().SetGameObject("world.myAvatar.pMC.pname.ti.textColor", b ? 0x8CD5FF : 0xFFFFFF);
-            })),
-            new CommandOptionItemViewModel<bool>("Staff", "1", CreateBoolCommand(b =>
-            {
-                Ioc.Default.GetRequiredService<IScriptPlayer>().AccessLevel = b ? 100 : 10;
-                Ioc.Default.GetRequiredService<IFlashUtil>().SetGameObject("world.myAvatar.pMC.pname.ti.textColor", b ? 0xFECB38 : 0xFFFFFF);
-            })),
+            new CommandOptionItemViewModel<bool>("Upgrade", "1", CreateBoolCommand(b => Ioc.Default.GetRequiredService<IFlashUtil>().SetGameObject("world.myAvatar.pMC.pname.ti.textColor", b ? 0x8CD5FF : 0xFFFFFF))),
+            new CommandOptionItemViewModel<bool>("Staff", "1", CreateBoolCommand(b => Ioc.Default.GetRequiredService<IFlashUtil>().SetGameObject("world.myAvatar.pMC.pname.ti.textColor", b ? 0xFECB38 : 0xFFFFFF))),
             new CommandOptionItemViewModel<IRelayCommand>("Reload Map", "4", new RelayCommand(Ioc.Default.GetRequiredService<IScriptMap>().Reload))
         };
 

@@ -1,6 +1,8 @@
 ﻿using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
+using CommunityToolkit.Mvvm.Messaging;
 using Skua.Core.Interfaces;
+using Skua.Core.Messaging;
 using Skua.Core.Models.Items;
 using Skua.Core.Models.Skills;
 
@@ -10,10 +12,14 @@ public partial class AutoViewModel : BotControlViewModelBase
     public AutoViewModel(IScriptAuto auto, IScriptInventory inventory, IAdvancedSkillContainer advancedSkills)
         : base("Auto Attack")
     {
+        StrongReferenceMessenger.Default.Register<AutoViewModel, StopAutoMessage>(this, async (r, m) => await r.StopAutoAsync());
+        StrongReferenceMessenger.Default.Register<AutoViewModel, StartAutoAttackMessage>(this, async (r, m) => await r.StartAutoAttack());
+        StrongReferenceMessenger.Default.Register<AutoViewModel, StartAutoHuntMessage>(this, async (r, m) => await r.StartAutoHunt());
+
         Auto = auto;
         _inventory = inventory;
         _advancedSkills = advancedSkills;
-        StopAutoAsyncCommand = new AsyncRelayCommand(async () => await Auto.StopAsync());
+        StopAutoAsyncCommand = new AsyncRelayCommand(StopAutoAsync);
     }
 
     private readonly IScriptInventory _inventory;
@@ -76,5 +82,10 @@ public partial class AutoViewModel : BotControlViewModelBase
         }
 
         Auto.StartAutoAttack();
+    }
+
+    private async Task StopAutoAsync()
+    {
+        await Auto.StopAsync();
     }
 }

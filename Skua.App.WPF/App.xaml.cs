@@ -37,12 +37,17 @@ public sealed partial class App : Application
     public App()
     {
         InitializeComponent();
+
         Services = ConfigureServices();
+
         _bot = Services.GetRequiredService<IScriptInterface>();
         _bot.Flash.FlashCall += Flash_FlashCall;
+
         _ = Services.GetRequiredService<ILogService>();
         _ = Services.GetRequiredService<IThemeService>();
+
         RoslynLifetimeManager.WarmupRoslyn();
+
         Dispatcher.ShutdownStarted += Dispatcher_ShutdownStarted;
         Timeline.DesiredFrameRateProperty.OverrideMetadata(typeof(Timeline), new FrameworkPropertyMetadata { DefaultValue = Services.GetRequiredService<ISettingsService>().Get<int>("AnimationFrameRate") });
     }
@@ -53,7 +58,11 @@ public sealed partial class App : Application
 
         await ((IAsyncDisposable)Services.GetRequiredService<IScriptBoost>()).DisposeAsync();
         await ((IAsyncDisposable)Services.GetRequiredService<IScriptBotStats>()).DisposeAsync();
-        await ((IAsyncDisposable)Services.GetRequiredService<IScriptDrop>()).DisposeAsync();
+        await ((IAsyncDisposable)Services.GetRequiredService<IScriptDrop>()).DisposeAsync(); await Ioc.Default.GetRequiredService<IScriptManager>().StopScriptAsync();
+        await ((IScriptInterfaceManager)_bot).StopTimerAsync();
+
+        Ioc.Default.GetRequiredService<IFlashUtil>().Dispose();
+
         WeakReferenceMessenger.Default.Cleanup();
         WeakReferenceMessenger.Default.Reset();
         StrongReferenceMessenger.Default.Reset();
@@ -77,11 +86,8 @@ public sealed partial class App : Application
 
         IDialogService dialogService = Services.GetRequiredService<IDialogService>();
         string? token = Settings.Default.UserGitHubToken;
-        if (string.IsNullOrWhiteSpace(token))
+        if (string.IsNullOrWhiteSpace(token) && !Settings.Default.IgnoreGHAuth)
         {
-            if (Settings.Default.IgnoreGHAuth)
-                return;
-
             dialogService.ShowDialog(Services.GetRequiredService<GitHubAuthViewModel>());
 
             token = Settings.Default.UserGitHubToken;
@@ -185,6 +191,7 @@ public sealed partial class App : Application
         services.AddSingleton<IGetScriptsService, GetScriptsService>();
         services.AddSingleton<IFileDialogService, FileDialogService>();
         services.AddSingleton<IProcessStartService, ProcessStartService>();
+        services.AddSingleton<IHotKeyService, HotKeyService>();
         services.AddSingleton<IThemeService, ThemeService>();
         services.AddSingleton<ThemeUserSettingsService>();
 
@@ -213,6 +220,7 @@ public sealed partial class App : Application
                 s.GetRequiredService<PacketSpammerViewModel>(),
                 s.GetRequiredService<PacketLoggerViewModel>(),
                 s.GetRequiredService<ApplicationThemesViewModel>(),
+                s.GetRequiredService<HotKeysViewModel>(),
                 s.GetRequiredService<GitHubAuthViewModel>(),
                 s.GetRequiredService<PluginsViewModel>(),
             };
@@ -250,6 +258,8 @@ public sealed partial class App : Application
         services.AddSingleton<ThemeSettingsViewModel>();
         services.AddSingleton<ColorSchemeEditorViewModel>();
         services.AddSingleton<PluginsViewModel>();
+        services.AddSingleton<HotKeysViewModel>();
+        services.AddSingleton(HotKeys.CreateHotKeys);
 
         services.AddSingleton(CoreBots.CreateViewModel);
         services.AddSingleton(CoreBots.CreateOptions);

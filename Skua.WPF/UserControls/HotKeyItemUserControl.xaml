@@ -1,0 +1,32 @@
+﻿<UserControl
+    x:Class="Skua.WPF.UserControls.HotKeyItemUserControl"
+    xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+    xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+    xmlns:local="clr-namespace:Skua.WPF.UserControls"
+    xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+    xmlns:vms="clr-namespace:Skua.Core.ViewModels;assembly=Skua.Core"
+    d:DataContext="{d:DesignInstance vms:HotKeyItemViewModel}"
+    d:DesignHeight="450"
+    d:DesignWidth="800"
+    mc:Ignorable="d">
+    <Grid Margin="3">
+        <Grid.ColumnDefinitions>
+            <ColumnDefinition SharedSizeGroup="Title" />
+            <ColumnDefinition />
+        </Grid.ColumnDefinitions>
+        <TextBlock
+            Grid.Column="0"
+            Margin="3,0,6,0"
+            HorizontalAlignment="Stretch"
+            VerticalAlignment="Center"
+            FontSize="16"
+            FontWeight="Bold"
+            Text="{Binding Title, FallbackValue=HotKey, StringFormat={}{0}:}"
+            TextAlignment="Right" />
+        <Button
+            Grid.Column="1"
+            Command="{Binding EditHotKeyCommand}"
+            Content="{Binding KeyGesture}" />
+    </Grid>
+</UserControl>

@@ -21,7 +21,8 @@ internal class MainMenu
                 new("Game"),
                 new("Application"),
                 new("CoreBots"),
-                new("Application Themes")
+                new("Application Themes"),
+                new("HotKeys")
             }),
             new("Helpers", new List<MainMenuItemViewModel>()
             {
@@ -34,7 +35,7 @@ internal class MainMenu
                 new("Loader"),
                 new("Grabber"),
                 new("Stats"),
-                new("Console"),
+                new("Console")
             }),
             new("Skills"),
             new("Packets", new List<MainMenuItemViewModel>()

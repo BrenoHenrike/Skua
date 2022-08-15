@@ -76,5 +76,16 @@
     <Setting Name="UseLocalVSC" Type="System.Boolean" Scope="User">
       <Value Profile="(Default)">True</Value>
     </Setting>
+    <Setting Name="HotKeys" Type="System.Collections.Specialized.StringCollection" Scope="User">
+      <Value Profile="(Default)">&lt;?xml version="1.0" encoding="utf-16"?&gt;
+&lt;ArrayOfString xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"&gt;
+  &lt;string&gt;ToggleScript|F10&lt;/string&gt;
+  &lt;string&gt;LoadScript|F9&lt;/string&gt;
+  &lt;string&gt;OpenBank|F2&lt;/string&gt;
+  &lt;string&gt;OpenConsole|F3&lt;/string&gt;
+  &lt;string&gt;ToggleAutoAttack|F4&lt;/string&gt;
+  &lt;string&gt;ToggleAutoHunt|F5&lt;/string&gt;
+&lt;/ArrayOfString&gt;</Value>
+    </Setting>
   </Settings>
 </SettingsFile>

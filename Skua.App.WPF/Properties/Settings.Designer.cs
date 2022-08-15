@@ -220,5 +220,25 @@ namespace Skua.App.WPF.Properties {
                 this["UseLocalVSC"] = value;
             }
         }
+        
+        [global::System.Configuration.UserScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute(@"<?xml version=""1.0"" encoding=""utf-16""?>
+<ArrayOfString xmlns:xsd=""http://www.w3.org/2001/XMLSchema"" xmlns:xsi=""http://www.w3.org/2001/XMLSchema-instance"">
+  <string>ToggleScript|F10</string>
+  <string>LoadScript|F9</string>
+  <string>OpenBank|F2</string>
+  <string>OpenConsole|F3</string>
+  <string>ToggleAutoAttack|F4</string>
+  <string>ToggleAutoHunt|F5</string>
+</ArrayOfString>")]
+        public global::System.Collections.Specialized.StringCollection HotKeys {
+            get {
+                return ((global::System.Collections.Specialized.StringCollection)(this["HotKeys"]));
+            }
+            set {
+                this["HotKeys"] = value;
+            }
+        }
     }
 }

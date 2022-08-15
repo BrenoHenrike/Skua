@@ -19,7 +19,8 @@ public partial class ScriptLoaderViewModel : BotControlViewModelBase
     {
         StrongReferenceMessenger.Default.Register<ScriptLoaderViewModel, LoadScriptMessage, int>(this, (int)MessageChannels.ScriptStatus, LoadScript);
         StrongReferenceMessenger.Default.Register<ScriptLoaderViewModel, EditScriptMessage, int>(this, (int)MessageChannels.ScriptStatus, EditScript);
-        StrongReferenceMessenger.Default.Register<ScriptLoaderViewModel, StartScriptMessage, int>(this, (int)MessageChannels.ScriptStatus, ToggleScript);
+        StrongReferenceMessenger.Default.Register<ScriptLoaderViewModel, StartScriptMessage, int>(this, (int)MessageChannels.ScriptStatus, StartScript);
+        StrongReferenceMessenger.Default.Register<ScriptLoaderViewModel, ToggleScriptMessage, int>(this, (int)MessageChannels.ScriptStatus, ToggleScript);
         StrongReferenceMessenger.Default.Register<ScriptLoaderViewModel, ScriptStartedMessage, int>(this, (int)MessageChannels.ScriptStatus, ScriptStarted);
         StrongReferenceMessenger.Default.Register<ScriptLoaderViewModel, ScriptStoppedMessage, int>(this, (int)MessageChannels.ScriptStatus, ScriptStopped);
         StrongReferenceMessenger.Default.Register<ScriptLoaderViewModel, ScriptStoppingMessage, int>(this, (int)MessageChannels.ScriptStatus, ScriptStopping);
@@ -166,7 +167,12 @@ public partial class ScriptLoaderViewModel : BotControlViewModelBase
         }
     }
 
-    private async void ToggleScript(ScriptLoaderViewModel recipient, StartScriptMessage message)
+    private async void ToggleScript(ScriptLoaderViewModel recipient, ToggleScriptMessage message)
+    {
+        await recipient.ToggleScript();
+    }
+
+    private async void StartScript(ScriptLoaderViewModel recipient, StartScriptMessage message)
     {
         await recipient.StartScriptAsync(message.Path);
     }
