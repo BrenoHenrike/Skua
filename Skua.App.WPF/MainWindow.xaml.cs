@@ -24,14 +24,6 @@ public partial class MainWindow : CustomWindow
         gameContainer.Visibility = Visibility.Hidden;
         WeakReferenceMessenger.Default.Register<MainWindow, FlashChangedMessage<AxShockwaveFlash>>(this, FlashChanged);
         Loaded += MainWindow_Loaded;
-        Closing += MainWindow_Closing;
-    }
-
-    private async void MainWindow_Closing(object? sender, System.ComponentModel.CancelEventArgs e)
-    {
-        await Ioc.Default.GetRequiredService<IScriptManager>().StopScriptAsync();
-        await ((IScriptInterfaceManager)Bot).StopTimerAsync();
-        Ioc.Default.GetRequiredService<IFlashUtil>().Dispose();
     }
 
     private void FlashChanged(MainWindow recipient, FlashChangedMessage<AxShockwaveFlash> message)
@@ -54,15 +46,5 @@ public partial class MainWindow : CustomWindow
             gameContainer.Visibility = Visibility.Visible;
             Bot.Flash.FlashCall -= LoadingFlash;
         }
-    }
-
-    private void MenuItem_Click(object sender, RoutedEventArgs e)
-    {
-        Bot.Flash.InitializeFlash();
-    }
-
-    private void MenuItem_Click_1(object sender, RoutedEventArgs e)
-    {
-        Title = "Suco";
     }
 }
