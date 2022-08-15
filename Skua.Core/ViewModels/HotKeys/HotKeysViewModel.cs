@@ -37,7 +37,7 @@ public partial class HotKeysViewModel : BotControlViewModelBase, IManagedWindow
     private void Save()
     {
         StringCollection hotkeys = new();
-        foreach(var hk in HotKeys)
+        foreach (var hk in HotKeys)
             hotkeys.Add($"{hk.Binding}|{hk.KeyGesture}");
 
         _settingsService.Set("HotKeys", hotkeys);

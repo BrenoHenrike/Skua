@@ -27,14 +27,9 @@
             </ItemsControl.ItemTemplate>
             <ItemsControl.ItemsPanel>
                 <ItemsPanelTemplate>
-                    <UniformGrid HorizontalAlignment="Stretch" Columns="3" />
+                    <WrapPanel Orientation="Horizontal" />
                 </ItemsPanelTemplate>
             </ItemsControl.ItemsPanel>
         </ItemsControl>
-        <Button
-            Margin="6,3,6,6"
-            Click="Button_Click"
-            Content="Cancel"
-            IsCancel="True" />
     </StackPanel>
 </UserControl>
