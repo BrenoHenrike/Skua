@@ -1,8 +1,11 @@
-﻿using Skua.Core.Interfaces;
+﻿using CommunityToolkit.Mvvm.Messaging;
+using Skua.Core.Interfaces;
+using Skua.Core.Messaging;
 using Skua.Core.Models;
 using Skua.Core.Utils;
 using System.Collections.Generic;
 using System.Collections.Specialized;
+using System.Globalization;
 using System.Windows;
 using System.Windows.Input;
 
@@ -11,7 +14,6 @@ public class HotKeyService : IHotKeyService
 {
     public HotKeyService(Dictionary<string, ICommand> hotKeys, ISettingsService settingsService, IDecamelizer decamelizer)
     {
-        _converter = new();
         _hotKeys = hotKeys;
         _settingsService = settingsService;
         _decamelizer = decamelizer;
@@ -20,7 +22,6 @@ public class HotKeyService : IHotKeyService
     private readonly Dictionary<string, ICommand> _hotKeys;
     private readonly ISettingsService _settingsService;
     private readonly IDecamelizer _decamelizer;
-    private KeyGestureConverter _converter;
 
     public void Reload()
     {
@@ -35,7 +36,16 @@ public class HotKeyService : IHotKeyService
 
             var split = hk.Split('|');
             if(_hotKeys.ContainsKey(split[0]))
-                Application.Current.MainWindow.InputBindings.Add(new KeyBinding(_hotKeys[split[0]], _converter.ConvertFromString(split[1]) as KeyGesture));
+            {
+                KeyBinding? kb = ParseToKeyBinding(split[1]);
+                if(kb is null)
+                {
+                    StrongReferenceMessenger.Default.Send<HotKeyErrorMessage>(new(split[0]));
+                    continue;
+                }
+                kb.Command = _hotKeys[split[0]];
+                Application.Current.MainWindow.InputBindings.Add(kb);
+            }
         }
     }
 
@@ -57,11 +67,43 @@ public class HotKeyService : IHotKeyService
         return parsed;
     }
 
-    public HotKey? Parse(string keyGesture)
+    public HotKey? ParseToHotKey(string keyGesture)
     {
-        if (_converter.ConvertFromString(keyGesture) is not KeyGesture kg)
+        KeyBinding? kb = ParseToKeyBinding(keyGesture);
+        if (kb is null)
+            return null;
+        return new HotKey(kb.Key.ToString(), kb.Modifiers.HasFlag(ModifierKeys.Control), kb.Modifiers.HasFlag(ModifierKeys.Alt), kb.Modifiers.HasFlag(ModifierKeys.Shift));
+    }
+
+    private KeyBinding? ParseToKeyBinding(string keyGesture)
+    {
+        string ksc = keyGesture.ToLower();
+        KeyBinding kb = new();
+
+        if (ksc.Contains("alt"))
+            kb.Modifiers = ModifierKeys.Alt;
+        if (ksc.Contains("shift"))
+            kb.Modifiers |= ModifierKeys.Shift;
+        if (ksc.Contains("ctrl") || ksc.Contains("ctl"))
+            kb.Modifiers |= ModifierKeys.Control;
+
+        string key =
+            ksc.Replace("+", string.Empty)
+               .Replace("alt", string.Empty)
+               .Replace("shift", string.Empty)
+               .Replace("ctrl", string.Empty)
+               .Replace("ctl", string.Empty);
+
+        key = CultureInfo.CurrentCulture.TextInfo.ToTitleCase(key);
+        if (!string.IsNullOrEmpty(key))
+        {
+            KeyConverter k = new();
+            kb.Key = (Key)k.ConvertFromString(key);
+        }
+
+        if (kb.Key == Key.None)
             return null;
 
-        return new HotKey(kg.Key.ToString(), kg.Modifiers.HasFlag(ModifierKeys.Control), kg.Modifiers.HasFlag(ModifierKeys.Alt), kg.Modifiers.HasFlag(ModifierKeys.Shift));
+        return kb;
     }
 }

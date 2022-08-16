@@ -4,15 +4,6 @@ using Skua.Core.Models;
 namespace Skua.Core.ViewModels;
 public partial class AssignHotKeyDialogViewModel : DialogViewModelBase
 {
-    public AssignHotKeyDialogViewModel(string title, string key, bool ctrl, bool alt, bool shift)
-        : base(title)
-    {
-        _keyInput = key;
-        _ctrlCheck = ctrl;
-        _altCheck = alt;
-        _shiftCheck = shift;
-    }
-
     public AssignHotKeyDialogViewModel(string title, HotKey hotKey)
         : base(title)
     {
@@ -20,6 +11,12 @@ public partial class AssignHotKeyDialogViewModel : DialogViewModelBase
         _ctrlCheck = hotKey.Ctrl;
         _altCheck = hotKey.Alt;
         _shiftCheck = hotKey.Shift;
+    }
+
+    public AssignHotKeyDialogViewModel(string title)
+        : base(title)
+    {
+        _keyInput = string.Empty;
     }
 
     [ObservableProperty]

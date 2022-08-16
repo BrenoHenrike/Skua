@@ -7,5 +7,5 @@ public interface IHotKeyService
     List<T> GetHotKeys<T>()
         where T : IHotKey, new();
 
-    HotKey? Parse(string keyGesture);
+    HotKey? ParseToHotKey(string keyGesture);
 }

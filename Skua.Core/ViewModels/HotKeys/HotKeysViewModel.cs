@@ -24,12 +24,22 @@ public partial class HotKeysViewModel : BotControlViewModelBase, IManagedWindow
     protected override void OnActivated()
     {
         StrongReferenceMessenger.Default.Register<HotKeysViewModel, EditHotKeyMessage>(this, EditHotKey);
+        foreach (var hk in HotKeys)
+            StrongReferenceMessenger.Default.Register<HotKeyItemViewModel, HotKeyErrorMessage>(hk, HandleError);
+    }
+
+    private void HandleError(HotKeyItemViewModel recipient, HotKeyErrorMessage message)
+    {
+        if (message.Binding == recipient.Binding)
+            recipient.KeyGesture = "Failed to bind";
     }
 
     protected override void OnDeactivated()
     {
-        StrongReferenceMessenger.Default.UnregisterAll(this);
         base.OnDeactivated();
+        StrongReferenceMessenger.Default.UnregisterAll(this);
+        foreach (var hk in HotKeys)
+            StrongReferenceMessenger.Default.UnregisterAll(hk);
     }
 
     public List<HotKeyItemViewModel> HotKeys { get; }
@@ -45,10 +55,8 @@ public partial class HotKeysViewModel : BotControlViewModelBase, IManagedWindow
 
     private void EditHotKey(HotKeysViewModel recipient, EditHotKeyMessage message)
     {
-        HotKey? hotKey = recipient._hotKeyService.Parse(message.KeyGesture);
-        if (hotKey == null)
-            return;
-        var diag = new AssignHotKeyDialogViewModel(message.Title, hotKey);
+        HotKey? hotKey = recipient._hotKeyService.ParseToHotKey(message.KeyGesture);
+        AssignHotKeyDialogViewModel diag = hotKey is null ? new(message.Title) : new(message.Title, hotKey);
         if (recipient._dialogService.ShowDialog(diag) == true)
         {
             var hk = recipient.HotKeys.Find(hk => hk.Title == message.Title);
