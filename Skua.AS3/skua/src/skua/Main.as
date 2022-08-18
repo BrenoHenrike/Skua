@@ -1,5 +1,7 @@
 package skua
 {
+	import flash.events.KeyboardEvent;
+	import flash.text.TextField;
 	import skua.Externalizer;
 	import skua.ExtractedFuncs;
     import adobe.utils.ProductManager;
@@ -123,7 +125,9 @@ package skua
             
             Modules.init();
             this.stg.addEventListener(Event.ENTER_FRAME, Modules.handleFrame);
-            
+			
+            this.game.stage.addEventListener(KeyboardEvent.KEY_DOWN, this.key_StageGame);
+			
             this.external.call("loaded");
         }
         
@@ -131,6 +135,20 @@ package skua
         {
             this.external.call("pext", JSON.stringify(packet));
         }
+		
+		public function key_StageGame(kbArgs:KeyboardEvent):void
+		{
+			if (!(kbArgs.target is TextField || kbArgs.currentTarget is TextField))
+			{
+				if(kbArgs.keyCode == this.game.litePreference.data.keys["Bank"])
+				{
+					if(this.game.stage.focus == null || (this.game.stage.focus != null && !("text" in this.game.stage.focus)))
+					{
+						this.game.world.toggleBank();
+					}
+				}
+			}
+		}
         
         public function getGame():*
         {
@@ -253,6 +271,11 @@ package skua
             }
             return "true";
         }
+		
+		public static function chatFocus():void 
+		{
+			
+		}
         
         public static function isLoggedIn():String
         {

@@ -14,15 +14,20 @@ internal class HotKeys
     {
         Dictionary<string, ICommand> hotKeys = new()
         {
-            { "ToggleScript", new RelayCommand(ToggleScript) },
-            { "LoadScript", new RelayCommand(LoadScript) },
-            { "OpenBank", new RelayCommand(Ioc.Default.GetRequiredService<IScriptBank>().Open) },
-            { "OpenConsole", new RelayCommand(OpenConsole) },
-            { "ToggleAutoAttack", new RelayCommand(ToggleAutoAttack) },
-            { "ToggleAutoHunt", new RelayCommand(ToggleAutoHunt) }
+            { "ToggleScript", new RelayCommand(ToggleScript, CanExecuteHotKey) },
+            { "LoadScript", new RelayCommand(LoadScript, CanExecuteHotKey) },
+            { "OpenBank", new RelayCommand(Ioc.Default.GetRequiredService<IScriptBank>().Open, CanExecuteHotKey) },
+            { "OpenConsole", new RelayCommand(OpenConsole, CanExecuteHotKey) },
+            { "ToggleAutoAttack", new RelayCommand(ToggleAutoAttack, CanExecuteHotKey) },
+            { "ToggleAutoHunt", new RelayCommand(ToggleAutoHunt, CanExecuteHotKey) }
         };
 
         return hotKeys;
+    }
+
+    private static bool CanExecuteHotKey()
+    {
+        return Ioc.Default.GetRequiredService<IFlashUtil>().GetGameObject("stage.focus") == "null";
     }
 
     private static void ToggleAutoHunt()
