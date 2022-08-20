@@ -1,4 +1,5 @@
-﻿using CommunityToolkit.Mvvm.Messaging;
+﻿using CommunityToolkit.Mvvm.Input;
+using CommunityToolkit.Mvvm.Messaging;
 using Skua.Core.Interfaces;
 using Skua.Core.Messaging;
 using Skua.Core.Models;
@@ -12,14 +13,14 @@ using System.Windows.Input;
 namespace Skua.WPF.Services;
 public class HotKeyService : IHotKeyService
 {
-    public HotKeyService(Dictionary<string, ICommand> hotKeys, ISettingsService settingsService, IDecamelizer decamelizer)
+    public HotKeyService(Dictionary<string, IRelayCommand> hotKeys, ISettingsService settingsService, IDecamelizer decamelizer)
     {
         _hotKeys = hotKeys;
         _settingsService = settingsService;
         _decamelizer = decamelizer;
     }
 
-    private readonly Dictionary<string, ICommand> _hotKeys;
+    private readonly Dictionary<string, IRelayCommand> _hotKeys;
     private readonly ISettingsService _settingsService;
     private readonly IDecamelizer _decamelizer;
 

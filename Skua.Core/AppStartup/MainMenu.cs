@@ -3,10 +3,8 @@ using CommunityToolkit.Mvvm.DependencyInjection;
 using CommunityToolkit.Mvvm.Input;
 using Skua.Core.Interfaces;
 using Skua.Core.ViewModels;
-using System;
-using System.Collections.Generic;
 
-namespace Skua.App.WPF.AppStartup;
+namespace Skua.Core.AppStartup;
 internal class MainMenu
 {
     internal static MainMenuViewModel CreateViewModel(IServiceProvider s)

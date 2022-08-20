@@ -2,17 +2,14 @@
 using Skua.Core.Interfaces;
 using Skua.Core.Models;
 using Skua.Core.ViewModels;
-using System;
-using System.Collections.Generic;
 
-namespace Skua.App.WPF.AppStartup;
+namespace Skua.Core.AppStartup;
 internal static class LogTabs
 {
     internal static IEnumerable<LogTabViewModel> CreateViewModels(IServiceProvider s)
     {
-        ILogService logService = s.GetService<ILogService>()!;
-        IClipboardService clipBoard = s.GetService<IClipboardService>()!;
-        IFileDialogService fileDialog = s.GetService<IFileDialogService>()!;
+        ILogService logService = s.GetRequiredService<ILogService>();
+        IDispatcherService dispatcherService = s.GetRequiredService<IDispatcherService>();
         return new[]
         {
             Create("Debug", LogType.Debug),
@@ -20,6 +17,6 @@ internal static class LogTabs
             Create("Flash", LogType.Flash)
         };
 
-        LogTabViewModel Create(string title, LogType logType) => new(title, logService, clipBoard, fileDialog, logType);
+        LogTabViewModel Create(string title, LogType logType) => new(title, logService, dispatcherService, logType);
     }
 }

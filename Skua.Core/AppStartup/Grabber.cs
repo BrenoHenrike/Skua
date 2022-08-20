@@ -7,13 +7,8 @@ using Skua.Core.Models.Monsters;
 using Skua.Core.Models.Quests;
 using Skua.Core.Models.Shops;
 using Skua.Core.ViewModels;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading;
-using System.Threading.Tasks;
 
-namespace Skua.App.WPF.AppStartup;
+namespace Skua.Core.AppStartup;
 internal class Grabber
 {
     internal static GrabberViewModel CreateViewModel(IServiceProvider s)
@@ -37,7 +32,9 @@ internal class Grabber
             new("Register", RegisterQuests),
             new("Unregister All", async (i, p, t) =>
             {
+                p.Report("Working...");
                 await Task.Run(() => Ioc.Default.GetService<IScriptQuest>()!.UnregisterAllQuests(), t);
+                p.Report("Finished.");
             })
         };
         List<GrabberTaskViewModel> inventoryCommands = new()

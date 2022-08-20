@@ -1,8 +1,8 @@
 ﻿<ResourceDictionary
     xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
     xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
-    xmlns:usercontrols="clr-namespace:Skua.WPF.UserControls;assembly=Skua.WPF"
-    xmlns:views="clr-namespace:Skua.WPF.Views;assembly=Skua.WPF"
+    xmlns:usercontrols="clr-namespace:Skua.WPF.UserControls"
+    xmlns:views="clr-namespace:Skua.WPF.Views"
     xmlns:vms="clr-namespace:Skua.Core.ViewModels;assembly=Skua.Core">
     <DataTemplate DataType="{x:Type vms:BotControlViewModelBase}">
         <views:AboutView />

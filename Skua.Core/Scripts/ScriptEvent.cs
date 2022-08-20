@@ -100,7 +100,7 @@ public class ScriptEvent : IScriptEvent
 
     public void OnScriptStopping(ScriptEvent recipient, ScriptStoppingRequestMessage message)
     {
-        message.Reply(Task.Run(() => recipient.ScriptStopping?.Invoke()));
+        message.Reply(Task.Run(() => recipient.ScriptStopping?.Invoke(message.Exception)));
     }
 
     public void OnItemDropped(ScriptEvent recipient, ItemDroppedMessage message)

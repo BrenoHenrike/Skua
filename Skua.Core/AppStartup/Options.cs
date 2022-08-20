@@ -11,7 +11,7 @@ using System.Collections.Generic;
 using System.IO;
 using System.Reflection;
 
-namespace Skua.App.WPF.AppStartup;
+namespace Skua.Core.AppStartup;
 internal class Options
 {
     internal static GameOptionsViewModel CreateGameOptions(IServiceProvider s)

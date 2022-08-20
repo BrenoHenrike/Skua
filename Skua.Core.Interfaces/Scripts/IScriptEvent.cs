@@ -18,7 +18,7 @@ public delegate void ItemDroppedHandler(ItemBase item, bool addedToInv, int quan
 public delegate void ItemBoughtHandler(int CharItemID);
 public delegate void ItemSoldHandler(int CharItemID, int QuantitySold, int CurrentQuantity, int Cost, bool IsAC);
 public delegate void ItemAddedToBankHandler(ItemBase item, int quantityNow);
-public delegate bool ScriptStoppingHandler();
+public delegate bool ScriptStoppingHandler(Exception? exception);
 public delegate void RunToAreaHandler(string zone);
 
 public interface IScriptEvent

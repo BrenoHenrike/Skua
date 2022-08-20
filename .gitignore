@@ -368,3 +368,6 @@ FodyWeavers.xsd
 /VSCode-x64/VSCode
 /VSCode-x86/VSCode
 /Skua.App.WPF/App.config
+/Skua.App.WPF.Follower
+/Skua.gRPC.Protos
+/Skua.gRPC.Server

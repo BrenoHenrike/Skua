@@ -4,55 +4,55 @@ using CommunityToolkit.Mvvm.Messaging;
 using Skua.Core.Interfaces;
 using Skua.Core.Messaging;
 using Skua.Core.Models;
+using Skua.Core.Utils;
 
 namespace Skua.Core.ViewModels;
 public partial class LogTabViewModel : ObservableRecipient
 {
-    public LogTabViewModel(string title, ILogService logService, IClipboardService clipBoard, IFileDialogService fileDialog, LogType logType)
+    public LogTabViewModel(string title, ILogService logService, IDispatcherService dispatcherService, LogType logType)
     {
-        Messenger.Register<LogTabViewModel, LogsChangedMessage>(this, LogsChanged);
+        Messenger.Register<LogTabViewModel, AddLogMessage>(this, AddLog);
 
         Title = title;
         _logService = logService;
-        _clipBoard = clipBoard;
-        _fileDialog = fileDialog;
+        _dispatcherService = dispatcherService;
         _logType = logType;
     }
 
     private readonly ILogService _logService;
-    private readonly IClipboardService _clipBoard;
-    private readonly IFileDialogService _fileDialog;
+    private readonly IDispatcherService _dispatcherService;
     private readonly LogType _logType;
 
     public string Title { get; }
-    public List<string> Logs => _logService.GetLogs(_logType);
+    public RangedObservableCollection<string> Logs { get; } = new();
 
     [RelayCommand]
     private void SaveLog()
     {
-        _fileDialog.SaveText(LogsToString());
+        Messenger.Send<SaveLogsMessage>(new(Logs));
     }
 
     [RelayCommand]
     private void ClearLog()
     {
         _logService.ClearLog(_logType);
+        Logs.Clear();
     }
 
     [RelayCommand]
     private void CopyLog()
     {
-        _clipBoard.SetText(LogsToString());
+        Messenger.Send<CopyLogsMessage>(new(Logs));
     }
 
-    private string LogsToString()
+    private void AddLog(LogTabViewModel recipient, AddLogMessage message)
     {
-        return string.Join(Environment.NewLine, Logs);
-    }
+        if (message.LogType != recipient._logType)
+            return;
 
-    private void LogsChanged(LogTabViewModel recipient, LogsChangedMessage message)
-    {
-        if (message.LogType == recipient._logType)
-            recipient.OnPropertyChanged(nameof(recipient.Logs));
+        _dispatcherService.Invoke(() =>
+        {
+            recipient.Logs.Add(message.Text);
+        });
     }
 }

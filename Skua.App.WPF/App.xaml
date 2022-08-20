@@ -17,9 +17,9 @@
                     SecondaryColor="Red" />
                 <ResourceDictionary Source="pack://application:,,,/MaterialDesignThemes.Wpf;component/Themes/MaterialDesignTheme.Defaults.xaml" />
                 <ResourceDictionary Source="pack://application:,,,/Skua.WPF;component/Themes/CustomWindowTheme.xaml" />
-                <ResourceDictionary Source="pack://application:,,,/Skua.App.WPF;component/XAML/DataTemplates.xaml" />
-                <ResourceDictionary Source="pack://application:,,,/Skua.App.WPF;component/XAML/Converters.xaml" />
-                <ResourceDictionary Source="pack://application:,,,/Skua.App.WPF;component/XAML/Styles.xaml" />
+                <ResourceDictionary Source="pack://application:,,,/Skua.WPF;component/XAML/DataTemplates.xaml" />
+                <ResourceDictionary Source="pack://application:,,,/Skua.WPF;component/XAML/Converters.xaml" />
+                <ResourceDictionary Source="pack://application:,,,/Skua.WPF;component/XAML/Styles.xaml" />
             </ResourceDictionary.MergedDictionaries>
 
             <sys:Boolean x:Key="TrueValue">True</sys:Boolean>

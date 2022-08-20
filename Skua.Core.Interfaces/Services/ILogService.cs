@@ -1,8 +1,9 @@
 ﻿using System.ComponentModel;
 using Skua.Core.Models;
+using Skua.Core.Utils;
 
 namespace Skua.Core.Interfaces;
-public interface ILogService : INotifyPropertyChanged
+public interface ILogService
 {
     void DebugLog(string message);
     void ScriptLog(string message);

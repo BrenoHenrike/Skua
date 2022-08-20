@@ -7,7 +7,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace Skua.App.WPF.AppStartup;
+namespace Skua.Core.AppStartup;
 internal class ManagedWindows
 {
     internal static void Register(IServiceProvider s)

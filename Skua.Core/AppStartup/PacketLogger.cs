@@ -4,7 +4,7 @@ using Skua.Core.ViewModels;
 using System;
 using System.Collections.Generic;
 
-namespace Skua.App.WPF.AppStartup;
+namespace Skua.Core.AppStartup;
 internal static class PacketLogger
 {
     internal static PacketLoggerViewModel CreateViewModel(IServiceProvider s)

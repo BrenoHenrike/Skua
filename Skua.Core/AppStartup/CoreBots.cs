@@ -4,7 +4,7 @@ using Skua.Core.ViewModels;
 using System;
 using System.Collections.Generic;
 
-namespace Skua.App.WPF.AppStartup;
+namespace Skua.Core.AppStartup;
 internal class CoreBots
 {
     internal static CoreBotsViewModel CreateViewModel(IServiceProvider s)

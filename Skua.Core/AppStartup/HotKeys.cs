@@ -7,12 +7,12 @@ using System;
 using System.Collections.Generic;
 using System.Windows.Input;
 
-namespace Skua.App.WPF.AppStartup;
+namespace Skua.Core.AppStartup;
 internal class HotKeys
 {
-    internal static Dictionary<string, ICommand> CreateHotKeys(IServiceProvider s)
+    internal static Dictionary<string, IRelayCommand> CreateHotKeys(IServiceProvider s)
     {
-        Dictionary<string, ICommand> hotKeys = new()
+        Dictionary<string, IRelayCommand> hotKeys = new()
         {
             { "ToggleScript", new RelayCommand(ToggleScript, CanExecuteHotKey) },
             { "LoadScript", new RelayCommand(LoadScript, CanExecuteHotKey) },
@@ -32,7 +32,7 @@ internal class HotKeys
 
     private static void ToggleAutoHunt()
     {
-        if(Ioc.Default.GetRequiredService<IScriptAuto>().IsRunning)
+        if (Ioc.Default.GetRequiredService<IScriptAuto>().IsRunning)
         {
             StrongReferenceMessenger.Default.Send<StopAutoMessage>();
             return;

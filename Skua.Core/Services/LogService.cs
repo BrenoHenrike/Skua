@@ -8,7 +8,7 @@ using Skua.Core.Models;
 namespace Skua.Core.Services;
 public class LogService : ObservableRecipient, ILogService
 {
-    public LogService(IFlashUtil flash)
+    public LogService()
     {
         Trace.Listeners.Add(new DebugListener(this));
         Messenger.Register<LogService, FlashErrorMessage>(this, LogFlashError);
@@ -19,14 +19,15 @@ public class LogService : ObservableRecipient, ILogService
         recipient.FlashLog($"{message.Function} Args[{message.Args.Length}] {(message.Args.Length > 0 ? $"= {{{string.Join(",", message.Args.Select(a => a?.ToString()))}}}" : string.Empty)}");
     }
 
-    private List<string> _debugLogs = new();
-    private List<string> _scriptLogs = new();
-    private List<string> _flashLogs = new();
+    private readonly List<string> _debugLogs = new();
+    private readonly List<string> _scriptLogs = new();
+    private readonly List<string> _flashLogs = new();
 
     public void DebugLog(string message)
     {
         _debugLogs.Add(message);
         Messenger.Send(new LogsChangedMessage(LogType.Debug));
+        Messenger.Send(new AddLogMessage(LogType.Debug, message));
     }
 
     public void FlashLog(string? message)
@@ -35,6 +36,7 @@ public class LogService : ObservableRecipient, ILogService
             return;
         _flashLogs.Add(message);
         Messenger.Send(new LogsChangedMessage(LogType.Flash));
+        Messenger.Send(new AddLogMessage(LogType.Flash, message));
     }
 
     public void ScriptLog(string? message)
@@ -43,6 +45,7 @@ public class LogService : ObservableRecipient, ILogService
             return;
         _scriptLogs.Add(message);
         Messenger.Send(new LogsChangedMessage(LogType.Script));
+        Messenger.Send(new AddLogMessage(LogType.Script, message));
     }
 
     public void ClearLog(LogType logType)
@@ -64,20 +67,13 @@ public class LogService : ObservableRecipient, ILogService
 
     public List<string> GetLogs(LogType logType)
     {
-        List<string> logs = new();
-        switch (logType)
+        return logType switch
         {
-            case LogType.Debug:
-                logs = _debugLogs.ToList();
-                break;
-            case LogType.Script:
-                logs = _scriptLogs.ToList();
-                break;
-            case LogType.Flash:
-                logs = _flashLogs.ToList();
-                break;
-        }
-        return logs;
+            LogType.Debug => _debugLogs,
+            LogType.Script => _scriptLogs,
+            LogType.Flash => _flashLogs,
+            _ => new()
+        };
     }
 }
 
