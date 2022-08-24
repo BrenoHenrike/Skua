@@ -38,7 +38,7 @@ public interface IScriptFaction
     /// <summary>
     /// Checks if the player has the desired <paramref name="rank"/> for the specified faction <paramref name="id"/>.
     /// </summary>
-    /// <param name="name">ID of the faction to check.</param>
+    /// <param name="id">ID of the faction to check.</param>
     /// <param name="rank">Desired rank for that faction.</param>
     /// <returns><see langword="true"/> if the rank is equal or greater than the desired <paramref name="rank"/>.</returns>
     bool HasRank(int id, int rank = 1)

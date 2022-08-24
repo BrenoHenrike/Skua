@@ -5,19 +5,6 @@ using Skua.Core.Models.Items;
 namespace Skua.Core.Scripts;
 public partial class ScriptBoost : ObservableObject, IScriptBoost, IAsyncDisposable
 {
-    private readonly Lazy<IScriptInventory> _lazyInventory;
-    private readonly Lazy<IScriptBank> _lazyBank;
-    private readonly Lazy<IScriptPlayer> _lazyPlayer;
-    private readonly Lazy<IScriptSend> _lazySend;
-    private readonly Lazy<IScriptWait> _lazyWait;
-    private readonly Lazy<IScriptMap> _lazyMap;
-    private readonly Lazy<IFlashUtil> _lazyFlash;
-    private IScriptInventory Inventory => _lazyInventory.Value;
-    private IScriptBank Bank => _lazyBank.Value;
-    private IScriptSend Send => _lazySend.Value;
-    private IScriptWait Wait => _lazyWait.Value;
-    private IScriptMap Map => _lazyMap.Value;
-    private IFlashUtil Flash => _lazyFlash.Value;
     public ScriptBoost(
         Lazy<IFlashUtil> flash,
         Lazy<IScriptSend> send,
@@ -37,27 +24,49 @@ public partial class ScriptBoost : ObservableObject, IScriptBoost, IAsyncDisposa
         _timerBoosts = new PeriodicTimer(TimeSpan.FromSeconds(30));
     }
 
-    private PeriodicTimer _timerBoosts;
+    private readonly Lazy<IScriptInventory> _lazyInventory;
+    private readonly Lazy<IScriptBank> _lazyBank;
+    private readonly Lazy<IScriptPlayer> _lazyPlayer;
+    private readonly Lazy<IScriptSend> _lazySend;
+    private readonly Lazy<IScriptWait> _lazyWait;
+    private readonly Lazy<IScriptMap> _lazyMap;
+    private readonly Lazy<IFlashUtil> _lazyFlash;
+    private IScriptInventory Inventory => _lazyInventory.Value;
+    private IScriptBank Bank => _lazyBank.Value;
+    private IScriptSend Send => _lazySend.Value;
+    private IScriptWait Wait => _lazyWait.Value;
+    private IScriptMap Map => _lazyMap.Value;
+    private IFlashUtil Flash => _lazyFlash.Value;
+
+    private readonly PeriodicTimer _timerBoosts;
     private Task? _taskBoosts;
     private CancellationTokenSource? _ctsBoosts;
 
     public bool Enabled => _taskBoosts is not null;
+    /// <inheritdoc cref="IScriptBoost.UseClassBoost"/>
     [ObservableProperty]
-    private bool _UseClassBoost = false;
+    private bool _useClassBoost = false;
+    /// <inheritdoc cref="IScriptBoost.ClassBoostID"/>
     [ObservableProperty]
-    private int _ClassBoostID;
+    private int _classBoostID;
+    /// <inheritdoc cref="IScriptBoost.UseExperienceBoost"/>
     [ObservableProperty]
-    private bool _UseExperienceBoost = false;
+    private bool _useExperienceBoost = false;
+    /// <inheritdoc cref="IScriptBoost.ExperienceBoostID"/>
     [ObservableProperty]
-    private int _ExperienceBoostID;
+    private int _experienceBoostID;
+    /// <inheritdoc cref="IScriptBoost.UseGoldBoost"/>
     [ObservableProperty]
-    private bool _UseGoldBoost = false;
+    private bool _useGoldBoost = false;
+    /// <inheritdoc cref="IScriptBoost.GoldBoostID"/>
     [ObservableProperty]
-    private int _GoldBoostID;
+    private int _goldBoostID;
+    /// <inheritdoc cref="IScriptBoost.UseReputationBoost"/>
     [ObservableProperty]
-    private bool _UseReputationBoost = false;
+    private bool _useReputationBoost = false;
+    /// <inheritdoc cref="IScriptBoost.ReputationBoostID"/>
     [ObservableProperty]
-    private int _ReputationBoostID;
+    private int _reputationBoostID;
 
     public bool IsBoostActive(BoostType boost)
     {

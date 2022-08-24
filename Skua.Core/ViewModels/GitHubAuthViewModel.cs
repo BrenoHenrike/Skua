@@ -79,7 +79,7 @@ public partial class GitHubAuthViewModel : BotControlViewModelBase
             { "grant_type", "urn:ietf:params:oauth:grant-type:device_code" }
         };
         FormUrlEncodedContent? encodedContent = new(content);
-        HttpResponseMessage? response = await HttpClients.GetGHClient().PostAsync("https://github.com/login/oauth/access_token", encodedContent);
+        HttpResponseMessage? response = await HttpClients.GitHubClient2.PostAsync("https://github.com/login/oauth/access_token", encodedContent);
         return response?.IsSuccessStatusCode ?? false
             ? _token = JsonConvert.DeserializeObject<TokenResponse>(await response.Content.ReadAsStringAsync())
             : null;
@@ -102,6 +102,7 @@ public partial class GitHubAuthViewModel : BotControlViewModelBase
             HintStatus = $"Error. Please, wait {i} seconds";
             await Task.Delay(1000);
         }
+        HintStatus = "Try again.";
     }
 
     public void OpenBrowser()

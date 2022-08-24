@@ -12,25 +12,26 @@ public partial class ScriptBotStats : ObservableObject, IScriptBotStats, IAsyncD
         _timer = new(TimeSpan.FromMilliseconds(1000));
         _taskTimer = HandleTimerAsync(_timer, _ctsTimer.Token);
     }
+
     private readonly Stopwatch _sw;
     private readonly PeriodicTimer _timer;
-    private Task _taskTimer;
-    private CancellationTokenSource _ctsTimer;
+    private readonly Task _taskTimer;
+    private readonly CancellationTokenSource _ctsTimer;
 
     [ObservableProperty]
-    private int _Kills;
+    private int _kills;
     [ObservableProperty]
-    private int _QuestsAccepted;
+    private int _questsAccepted;
     [ObservableProperty]
-    private int _QuestsCompleted;
+    private int _questsCompleted;
     [ObservableProperty]
-    private int _Deaths;
+    private int _deaths;
     [ObservableProperty]
-    private int _Relogins;
+    private int _relogins;
     [ObservableProperty]
-    private int _Drops;
+    private int _drops;
     [ObservableProperty]
-    private TimeSpan _Time;
+    private TimeSpan _time;
 
     public void Reset()
     {

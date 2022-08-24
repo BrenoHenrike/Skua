@@ -3,13 +3,16 @@
 namespace Skua.Core.Scripts;
 public class ScriptSend : IScriptSend
 {
-    private readonly Lazy<IFlashUtil> _lazyFlash;
-    private IFlashUtil Flash => _lazyFlash.Value;
-
-    public ScriptSend(Lazy<IFlashUtil> flash)
+    public ScriptSend(Lazy<IFlashUtil> flash, Lazy<IScriptManager> manager)
     {
         _lazyFlash = flash;
+        _lazyManager = manager;
     }
+
+    private readonly Lazy<IFlashUtil> _lazyFlash;
+    private readonly Lazy<IScriptManager> _lazyManager;
+    private IFlashUtil Flash => _lazyFlash.Value;
+    private IScriptManager Manager => _lazyManager.Value;
 
     public void Packet(string packet, string type = "String")
     {
@@ -20,7 +23,7 @@ public class ScriptSend : IScriptSend
     {
         return Task.Factory.StartNew(async () =>
         {
-            while (!token.IsCancellationRequested)
+            while (!token.IsCancellationRequested && !Manager.ShouldExit)
             {
                 Packet(packet, type);
                 await Task.Delay(delay, token);
@@ -37,7 +40,7 @@ public class ScriptSend : IScriptSend
     {
         return Task.Factory.StartNew(async () =>
         {
-            while (!token.IsCancellationRequested)
+            while (!token.IsCancellationRequested && !Manager.ShouldExit)
             {
                 ClientPacket(packet, type);
                 await Task.Delay(delay, token);

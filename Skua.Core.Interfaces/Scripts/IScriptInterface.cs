@@ -9,36 +9,129 @@ public interface IScriptInterfaceManager
 }
 public interface IScriptInterface
 {
+    /// <summary>
+    /// Static instance of the current <see cref="IScriptInterface"/>.
+    /// </summary>
     static IScriptInterface Instance { get; protected set; }
+    /// <summary>
+    /// Class for Flash operations.
+    /// </summary>
     IFlashUtil Flash { get; }
+    /// <summary>
+    /// Class to manage the status of the current script.
+    /// </summary>
     IScriptStatus Manager { get; }
+    /// <summary>
+    /// Class to manage the state of the Auto Attack/Hunt functions.
+    /// </summary>
     IScriptAuto Auto { get; }
+    /// <summary>
+    /// Class to control consumable Boosts.
+    /// </summary>
     IScriptBoost Boosts { get; }
+    /// <summary>
+    /// Stats of the current application runtime.
+    /// </summary>
     IScriptBotStats Stats { get; }
+    /// <summary>
+    /// Class to control combat mechanics.
+    /// </summary>
     IScriptCombat Combat { get; }
+    /// <summary>
+    /// Class with methods for killing monsters/players.
+    /// </summary>
     IScriptKill Kill { get; }
+    /// <summary>
+    /// Class with methods for hunting (teleport while killing) monsters.
+    /// </summary>
     IScriptHunt Hunt { get; }
+    /// <summary>
+    /// Class to manage drops.
+    /// </summary>
     IScriptDrop Drops { get; }
+    /// <summary>
+    /// Class with events that trigger with in-game events.
+    /// </summary>
     IScriptEvent Events { get; }
+    /// <summary>
+    /// Class to manage the reputation list.
+    /// </summary>
     IScriptFaction Reputation { get; }
+    /// <summary>
+    /// Class to manage the House inventory.
+    /// </summary>
     IScriptHouseInv House { get; }
+    /// <summary>
+    /// Class to manage the Player Inventory.
+    /// </summary>
     IScriptInventory Inventory { get; }
+    /// <summary>
+    /// Class to manage the player Temporary Inventory.
+    /// </summary>
     IScriptTempInv TempInv { get; }
+    /// <summary>
+    /// Class to manage the player Bank.
+    /// </summary>
     IScriptBank Bank { get; }
+    /// <summary>
+    /// Class to help inventory management.
+    /// </summary>
     IScriptInventoryHelper InvHelper { get; }
+    /// <summary>
+    /// Class with options that reflect the in-game Advanced Options.
+    /// </summary>
     IScriptLite Lite { get; }
+    /// <summary>
+    /// Class with options to customize the runtime of the bot.
+    /// </summary>
     IScriptOption Options { get; }
+    /// <summary>
+    /// Class with properties of the current map and methods to travel to/in them.
+    /// </summary>
     IScriptMap Map { get; }
+    /// <summary>
+    /// Class to manage the Monsters in the current map.
+    /// </summary>
     IScriptMonster Monsters { get; }
+    /// <summary>
+    /// Class with properties of the current player.
+    /// </summary>
     IScriptPlayer Player { get; }
+    /// <summary>
+    /// Class to manage Quests.
+    /// </summary>
     IScriptQuest Quests { get; }
+    /// <summary>
+    /// Class with methods to send messages/packets.
+    /// </summary>
     IScriptSend Send { get; }
+    /// <summary>
+    /// Class with properties of the current shop and methods to load, buy and sell items.
+    /// </summary>
     IScriptShop Shops { get; }
+    /// <summary>
+    /// Class to control how the bot will use skills.
+    /// </summary>
     IScriptSkill Skills { get; }
+    /// <summary>
+    /// Class with methods to wait certain actions of the game.
+    /// </summary>
     IScriptWait Wait { get; }
+    /// <summary>
+    /// Class with properties of servers and methods to connect to them.
+    /// </summary>
     IScriptServers Servers { get; }
+    /// <summary>
+    /// Class to control handlers which run in specific timings.
+    /// </summary>
     IScriptHandlers Handlers { get; }
+    /// <summary>
+    /// Class to connect to a proxy and get packets sent between client and server.
+    /// </summary>
     ICaptureProxy GameProxy { get; }
+    /// <summary>
+    /// Options within the compiled script.
+    /// </summary>
     IScriptOptionContainer? Config { get; }
 
     /// <summary>

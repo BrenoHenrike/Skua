@@ -38,7 +38,7 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Skua.gRPC.Server", "Skua.gR
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Skua.gRPC.Protos", "Skua.gRPC.Protos\Skua.gRPC.Protos.csproj", "{FB268C28-1B74-438E-8980-A1A770762190}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Skua.App.WPF.Follower", "Skua.App.WPF.Follower\Skua.App.WPF.Follower.csproj", "{1D7BE19B-9F94-4A45-8177-0584BAFAC3D2}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Skua.App.WPF.Follower", "Skua.App.WPF.Follower\Skua.App.WPF.Follower.csproj", "{1D7BE19B-9F94-4A45-8177-0584BAFAC3D2}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -192,9 +192,7 @@ Global
 		{533BAE7D-720F-4E61-9872-CA9285753DBC}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{533BAE7D-720F-4E61-9872-CA9285753DBC}.Release|Any CPU.Build.0 = Release|Any CPU
 		{533BAE7D-720F-4E61-9872-CA9285753DBC}.Release|x64.ActiveCfg = Release|Any CPU
-		{533BAE7D-720F-4E61-9872-CA9285753DBC}.Release|x64.Build.0 = Release|Any CPU
 		{533BAE7D-720F-4E61-9872-CA9285753DBC}.Release|x86.ActiveCfg = Release|Any CPU
-		{533BAE7D-720F-4E61-9872-CA9285753DBC}.Release|x86.Build.0 = Release|Any CPU
 		{FB268C28-1B74-438E-8980-A1A770762190}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
 		{FB268C28-1B74-438E-8980-A1A770762190}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{FB268C28-1B74-438E-8980-A1A770762190}.Debug|x64.ActiveCfg = Debug|Any CPU
@@ -204,9 +202,7 @@ Global
 		{FB268C28-1B74-438E-8980-A1A770762190}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{FB268C28-1B74-438E-8980-A1A770762190}.Release|Any CPU.Build.0 = Release|Any CPU
 		{FB268C28-1B74-438E-8980-A1A770762190}.Release|x64.ActiveCfg = Release|Any CPU
-		{FB268C28-1B74-438E-8980-A1A770762190}.Release|x64.Build.0 = Release|Any CPU
 		{FB268C28-1B74-438E-8980-A1A770762190}.Release|x86.ActiveCfg = Release|Any CPU
-		{FB268C28-1B74-438E-8980-A1A770762190}.Release|x86.Build.0 = Release|Any CPU
 		{1D7BE19B-9F94-4A45-8177-0584BAFAC3D2}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
 		{1D7BE19B-9F94-4A45-8177-0584BAFAC3D2}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{1D7BE19B-9F94-4A45-8177-0584BAFAC3D2}.Debug|x64.ActiveCfg = Debug|Any CPU

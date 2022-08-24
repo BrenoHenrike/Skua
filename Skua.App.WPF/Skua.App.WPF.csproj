@@ -14,8 +14,9 @@
     <Platforms>AnyCPU;x64;x86</Platforms>
     <Company>Skua</Company>
     <Description>Scriptable C# bot for AdventureQuest Worlds</Description>
-    <AssemblyVersion>1.0.0.0</AssemblyVersion>
+    <AssemblyVersion>1.0.1.0</AssemblyVersion>
     <ApplicationIcon>SkuaIcon.ico</ApplicationIcon>
+    <GenerateDocumentationFile>False</GenerateDocumentationFile>
   </PropertyGroup>
 
   <ItemGroup>
@@ -35,7 +36,7 @@
 
   <ItemGroup>
     <None Include="..\Skua.AS3\skua\bin\skua.swf" Link="skua.swf">
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </None>
   </ItemGroup>
 

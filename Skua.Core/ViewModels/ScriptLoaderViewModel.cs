@@ -60,7 +60,7 @@ public partial class ScriptLoaderViewModel : BotControlViewModelBase
     [RelayCommand]
     private void OpenScriptRepo()
     {
-        _windowService.ShowWindow<ScriptRepoViewModel>();
+        _windowService.ShowManagedWindow("Script Repo");
     }
 
     [RelayCommand]

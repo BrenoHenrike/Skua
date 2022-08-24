@@ -126,6 +126,12 @@ public interface IScriptQuest : INotifyPropertyChanged
     /// <returns><see langword="true"/> if the specified quest is a daily quest that the player has already completed.</returns>
     bool IsDailyComplete(int id);
     /// <summary>
+    /// Checks if the specified quest is a completed daily quest.
+    /// </summary>
+    /// <param name="quest">Quest object to check for.</param>
+    /// <returns><see langword="true"/> if the specified quest is a daily quest that the player has already completed.</returns>
+    bool IsDailyComplete(Quest quest);
+    /// <summary>
     /// Checks if the specified quest is currently in progress.
     /// </summary>
     /// <param name="id">ID of the quest.</param>
@@ -138,11 +144,23 @@ public interface IScriptQuest : INotifyPropertyChanged
     /// <returns><see langword="true"/> if the quest is unlocked.</returns>
     bool IsUnlocked(int id);
     /// <summary>
+    /// Checks if a storyline quest is unlocked.
+    /// </summary>
+    /// <param name="quest">Quest object to check for.</param>
+    /// <returns><see langword="true"/> if the quest is unlocked.</returns>
+    bool IsUnlocked(Quest quest);
+    /// <summary>
     /// Checks if a quest has been completed before in a questline.
     /// </summary>
     /// <param name="id">ID of the quest.</param>
     /// <returns><see langword="true"/> if the quest has been completed before.</returns>
     bool HasBeenCompleted(int id);
+    /// <summary>
+    /// Checks if a quest has been completed before in a questline.
+    /// </summary>
+    /// <param name="quest">Quest object to check for.</param>
+    /// <returns><see langword="true"/> if the quest has been completed before.</returns>
+    bool HasBeenCompleted(Quest quest);
     /// <summary>
     /// Loads the quests with specified <paramref name="ids"/>.
     /// </summary>
@@ -153,7 +171,7 @@ public interface IScriptQuest : INotifyPropertyChanged
     /// </summary>
     /// <param name="id">ID of the quest to load.</param>
     /// <returns>The <see cref="Quest"/> with the given ID.</returns>
-    Quest EnsureLoad(int id);
+    Quest? EnsureLoad(int id);
     /// <summary>
     /// Tries to get the quest with the given ID if it is loaded.
     /// </summary>

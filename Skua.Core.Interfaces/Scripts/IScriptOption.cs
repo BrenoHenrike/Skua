@@ -74,7 +74,7 @@ public interface IScriptOption : INotifyPropertyChanged
     /// </summary>
     bool DisableFX { get; set; }
     /// <summary>
-    /// Maximum tries for Ensure (like <see cref="IScriptInventory.EnsureToBank(int)"/>) methods.
+    /// Maximum tries for Ensure (like <see cref="IScriptBank.EnsureToInventory(string, bool)"/>) methods.
     /// </summary>
     int MaximumTries { get; set; }
     /// <summary>

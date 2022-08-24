@@ -88,6 +88,7 @@ public partial class ScriptManager : ObservableObject, IScriptManager
                         exception = e;
                         Trace.WriteLine($"Error while running script:\r\nMessage: {e.Message}\r\n{(e.InnerException is not null ? $"Inner Exception Message: {e.InnerException.Message}" : string.Empty)}StackTrace: {e.StackTrace}");
                         StrongReferenceMessenger.Default.Send<ScriptErrorMessage, int>(new(e), (int)MessageChannels.ScriptStatus);
+                        _runScriptStoppingBool = true;
                     }
                 }
                 finally

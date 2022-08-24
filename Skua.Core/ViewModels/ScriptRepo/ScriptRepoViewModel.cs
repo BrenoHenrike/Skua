@@ -17,6 +17,11 @@ public partial class ScriptRepoViewModel : BotControlViewModelBase
         OpenScriptFolderCommand = new RelayCommand(_processService.OpenVSC);
     }
 
+    protected override void OnActivated()
+    {
+        RefreshScriptsList();
+    }
+
     private readonly IGetScriptsService _getScriptsService;
     private readonly IProcessStartService _processService;
     [ObservableProperty]
@@ -83,6 +88,9 @@ public partial class ScriptRepoViewModel : BotControlViewModelBase
         foreach (ScriptInfo script in _getScriptsService.Scripts)
             _scripts.Add(new(script));
         OnPropertyChanged(nameof(Scripts));
+        OnPropertyChanged(nameof(DownloadedQuantity));
+        OnPropertyChanged(nameof(OutdatedQuantity));
+        OnPropertyChanged(nameof(ScriptQuantity));
         IsBusy = false;
     }
     public void ProgressHandler(string message)

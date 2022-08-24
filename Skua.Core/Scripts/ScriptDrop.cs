@@ -10,18 +10,6 @@ namespace Skua.Core.Scripts;
 
 public partial class ScriptDrop : ObservableRecipient, IScriptDrop, IAsyncDisposable
 {
-    private readonly Lazy<IScriptSend> _lazySend;
-    private readonly Lazy<IScriptWait> _lazyWait;
-    private readonly Lazy<IScriptMap> _lazyMap;
-    private readonly Lazy<IScriptOption> _lazyOptions;
-    private readonly Lazy<IScriptPlayer> _lazyPlayer;
-    private readonly Lazy<IFlashUtil> _lazyFlash;
-    private IScriptSend Send => _lazySend.Value;
-    private IScriptWait Wait => _lazyWait.Value;
-    private IScriptMap Map => _lazyMap.Value;
-    private IScriptOption Options => _lazyOptions.Value;
-    private IScriptPlayer Player => _lazyPlayer.Value;
-    private IFlashUtil Flash => _lazyFlash.Value;
     public ScriptDrop(
         Lazy<IFlashUtil> flash,
         Lazy<IScriptSend> send,
@@ -44,6 +32,19 @@ public partial class ScriptDrop : ObservableRecipient, IScriptDrop, IAsyncDispos
 
         _timerDrops = new(TimeSpan.FromMilliseconds(1000));
     }
+
+    private readonly Lazy<IScriptSend> _lazySend;
+    private readonly Lazy<IScriptWait> _lazyWait;
+    private readonly Lazy<IScriptMap> _lazyMap;
+    private readonly Lazy<IScriptOption> _lazyOptions;
+    private readonly Lazy<IScriptPlayer> _lazyPlayer;
+    private readonly Lazy<IFlashUtil> _lazyFlash;
+    private IScriptSend Send => _lazySend.Value;
+    private IScriptWait Wait => _lazyWait.Value;
+    private IScriptMap Map => _lazyMap.Value;
+    private IScriptOption Options => _lazyOptions.Value;
+    private IScriptPlayer Player => _lazyPlayer.Value;
+    private IFlashUtil Flash => _lazyFlash.Value;
 
     private readonly PeriodicTimer _timerDrops;
     private Task? _taskDrops;

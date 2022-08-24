@@ -10,19 +10,19 @@ public interface IScriptBoost : INotifyPropertyChanged
     /// </summary>
     bool Enabled { get; }
     /// <summary>
-    /// The Class Boost ID to be used.
+    /// The Class Boost ID to be used. You can get an ID by using <see cref="GetBoostID(BoostType, bool)"/>.
     /// </summary>
     int ClassBoostID { get; set; }
     /// <summary>
-    /// The XP Boost ID to be used.
+    /// The XP Boost ID to be used. You can get an ID by using <see cref="GetBoostID(BoostType, bool)"/>.
     /// </summary>
     int ExperienceBoostID { get; set; }
     /// <summary>
-    /// The Gold Boost ID to be used.
+    /// The Gold Boost ID to be used. You can get an ID by using <see cref="GetBoostID(BoostType, bool)"/>.
     /// </summary>
     int GoldBoostID { get; set; }
     /// <summary>
-    /// The REP Boost ID to be used.
+    /// The REP Boost ID to be used. You can get an ID by using <see cref="GetBoostID(BoostType, bool)"/>.
     /// </summary>
     int ReputationBoostID { get; set; }
     /// <summary>
@@ -120,7 +120,7 @@ public interface IScriptBoost : INotifyPropertyChanged
     /// </summary>
     void Stop();
     /// <summary>
-    /// Stops the boost timer asynchronously.
+    /// Stops the boost timer asynchronously. Use for UI elements or when possible to use.
     /// </summary>
     ValueTask StopAsync();
     /// <summary>

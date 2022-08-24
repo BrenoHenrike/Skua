@@ -122,9 +122,12 @@ public partial class ScriptServers : ObservableRecipient, IScriptServers
 
     public bool EnsureRelogin(string serverName)
     {
-        Server s = ServerList.Find(x => x.Name.Contains(serverName))!;
+        Server? s = CachedServers.Find(x => x.Name.Contains(serverName));
+        if (s is null)
+            s = Options.AutoReloginAny ? ServerList.Find(x => x.IP != LastIP)! : CachedServers.First(s => s.Name == Options.ReloginServer) ?? ServerList[0];
+
         int tries = 0;
-        while (!Relogin(s.IP) && !Manager.ShouldExit && !Player.Playing && ++tries < Options.ReloginTries)
+        while (!ReloginIP(s.IP) && !Manager.ShouldExit && !Player.Playing && ++tries < Options.ReloginTries)
             Thread.Sleep(Options.ReloginTryDelay);
         return Player.Playing;
     }

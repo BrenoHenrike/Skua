@@ -410,9 +410,16 @@ public class ScriptInterface : IScriptInterface, IScriptInterfaceManager
                         case "addItems":
                             string addItems = Convert.ToString(data["items"]);
                             Dictionary<int, dynamic> addedItem = JsonConvert.DeserializeObject<Dictionary<int, dynamic>>(addItems)!;
-                            ItemBase invItem = Inventory.GetItem(addedItem.Keys.First())!;
+                            int itemID = addedItem.Keys.First()!;
+                            ItemBase invItem = Inventory.GetItem(itemID)!;
                             if (invItem is null)
-                                invItem = TempInv.GetItem(addedItem.Keys.First())!;
+                                invItem = TempInv.GetItem(itemID)!;
+                            if(invItem is null)
+                            {
+                                invItem = Bank.GetItem(itemID)!;
+                                Messenger.Send<ItemAddedToBankMessage, int>(new(invItem, invItem.Quantity), (int)MessageChannels.GameEvents);
+                                break;
+                            }
                             if (!invItem.Temp)
                                 Stats.Drops++;
                             Messenger.Send<ItemDroppedMessage, int>(new(invItem, true, Convert.ToInt32(addedItem.Values.First().iQtyNow)), (int)MessageChannels.GameEvents);
@@ -525,6 +532,7 @@ public class ScriptInterface : IScriptInterface, IScriptInterfaceManager
         _reloginCTS = new CancellationTokenSource();
         _reloginTask = Schedule(delay, async _ =>
         {
+            Servers.Logout();
             Stats.Relogins++;
             bool relogged = await Servers.EnsureRelogin(_reloginCTS.Token);
             if (startScript)

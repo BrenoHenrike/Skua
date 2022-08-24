@@ -46,7 +46,8 @@ public sealed partial class App : Application
 
         await ((IAsyncDisposable)Services.GetRequiredService<IScriptBoost>()).DisposeAsync();
         await ((IAsyncDisposable)Services.GetRequiredService<IScriptBotStats>()).DisposeAsync();
-        await ((IAsyncDisposable)Services.GetRequiredService<IScriptDrop>()).DisposeAsync(); await Ioc.Default.GetRequiredService<IScriptManager>().StopScriptAsync();
+        await ((IAsyncDisposable)Services.GetRequiredService<IScriptDrop>()).DisposeAsync();
+        await Ioc.Default.GetRequiredService<IScriptManager>().StopScriptAsync();
         await ((IScriptInterfaceManager)_bot).StopTimerAsync();
 
         Ioc.Default.GetRequiredService<IFlashUtil>().Dispose();
@@ -93,7 +94,7 @@ public sealed partial class App : Application
             {
                 var getScripts = Ioc.Default.GetRequiredService<IGetScriptsService>();
                 await getScripts.GetScriptsAsync(null, default);
-                if (getScripts.Missing > 0 && (Settings.Default.AutoUpdateScripts || Ioc.Default.GetRequiredService<IDialogService>().ShowMessageBox("Would you like to update your scripts?", "Script Update", true) == true))
+                if ((getScripts.Missing > 0 || getScripts.Outdated > 0) && (Settings.Default.AutoUpdateScripts || Ioc.Default.GetRequiredService<IDialogService>().ShowMessageBox("Would you like to update your scripts?", "Script Update", true) == true))
                 {
                     int count = await getScripts.DownloadAllWhereAsync(s => !s.Downloaded || s.Outdated);
                     Ioc.Default.GetRequiredService<IDialogService>().ShowMessageBox($"Downloaded {count} scripts.\r\nYou can disable auto script updates in Options.", "Script Update");

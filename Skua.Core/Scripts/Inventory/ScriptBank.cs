@@ -65,6 +65,8 @@ public partial class ScriptBank : IScriptBank
 
     public void Load(bool waitForLoad = true)
     {
+        if (Flash.GetGameObject("ui.mcPopup.currentLabel") == "Bank")
+            return;
         Send.Packet($"%xt%zm%loadBank%{Map.RoomID}%All%");
         if (waitForLoad)
             Wait.ForBankLoad(20);

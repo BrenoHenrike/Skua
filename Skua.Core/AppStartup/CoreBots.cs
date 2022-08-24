@@ -44,7 +44,7 @@ internal class CoreBots
             new DisplayOptionItemViewModel<string>("Map after stopping the Bot", "StopLocationSelect", "Home"),
         };
 
-        return new(options);
+        return new(options, s.GetRequiredService<IDialogService>());
     }
 
     private static CBOOtherOptionsViewModel CreateOtherOptions(IServiceProvider s)

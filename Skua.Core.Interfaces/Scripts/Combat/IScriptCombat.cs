@@ -5,6 +5,9 @@ namespace Skua.Core.Interfaces;
 
 public interface IScriptCombat
 {
+    /// <summary>
+    /// Whether the player should stop using skills.
+    /// </summary>
     bool StopAttacking { get; set; }
     /// <summary>
     /// Walks towards (approaches) the currently selected target.

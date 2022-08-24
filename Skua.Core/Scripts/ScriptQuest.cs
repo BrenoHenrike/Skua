@@ -17,7 +17,9 @@ public partial class ScriptQuest : ObservableRecipient, IScriptQuest
         Lazy<IScriptOption> options,
         Lazy<IScriptPlayer> player,
         Lazy<IScriptSend> send,
-        Lazy<IScriptInventory> inventory)
+        Lazy<IScriptInventory> inventory,
+        Lazy<IScriptTempInv> tempInv,
+        Lazy<IScriptInventoryHelper> invHelper)
     {
         _lazyFlash = flash;
         _lazyWait = wait;
@@ -25,6 +27,7 @@ public partial class ScriptQuest : ObservableRecipient, IScriptQuest
         _lazyPlayer = player;
         _lazySend = send;
         _lazyInventory = inventory;
+        _lazyInvHelper = invHelper;
     }
 
     private readonly Lazy<IFlashUtil> _lazyFlash;
@@ -33,12 +36,14 @@ public partial class ScriptQuest : ObservableRecipient, IScriptQuest
     private readonly Lazy<IScriptPlayer> _lazyPlayer;
     private readonly Lazy<IScriptSend> _lazySend;
     private readonly Lazy<IScriptInventory> _lazyInventory;
+    private readonly Lazy<IScriptInventoryHelper> _lazyInvHelper;
     private IFlashUtil Flash => _lazyFlash.Value;
     private IScriptWait Wait => _lazyWait.Value;
     private IScriptOption Options => _lazyOptions.Value;
     private IScriptPlayer Player => _lazyPlayer.Value;
     private IScriptSend Send => _lazySend.Value;
     private IScriptInventory Inventory => _lazyInventory.Value;
+    private IScriptInventoryHelper InvHelper => _lazyInvHelper.Value;
 
     private Thread? _questThread;
     private CancellationTokenSource? _questsCTS;
@@ -68,15 +73,27 @@ public partial class ScriptQuest : ObservableRecipient, IScriptQuest
         }
     }
 
-    public Quest EnsureLoad(int id)
+    public Quest? EnsureLoad(int id)
     {
-        Wait.ForTrue(() => Tree.Contains(x => x.ID == id), () => Load(id), 20);
-        return Tree.Find(q => q.ID == id)!;
+        Dictionary<int, Quest> localTree = _quests;
+        if (localTree.ContainsKey(id))
+            return localTree[id];
+
+        for(int i = 0; i < 5; i++)
+        {
+            Load(id);
+            Thread.Sleep(1000);
+            localTree = _quests;
+            if (localTree.ContainsKey(id))
+                return localTree[id];
+        }
+
+        return null;
     }
 
     public bool TryGetQuest(int id, out Quest? quest)
     {
-        return (quest = Tree.Find(x => x.ID == id)) is not null;
+        return _quests.TryGetValue(id, out quest);
     }
 
     public bool Accept(int id)
@@ -193,7 +210,7 @@ public partial class ScriptQuest : ObservableRecipient, IScriptQuest
         if (CanComplete(id))
             return true;
 
-        Quest? quest = Tree.FirstOrDefault(q => q.ID == id);
+        _quests.TryGetValue(id, out Quest? quest);
         if (quest is null)
             return false;
         List<ItemBase> requirements = new();
@@ -203,7 +220,7 @@ public partial class ScriptQuest : ObservableRecipient, IScriptQuest
             return true;
         foreach (ItemBase item in requirements)
         {
-            if (Inventory.Contains(item.Name, item.Quantity))
+            if (InvHelper.Check(item.ID, item.Quantity, false))
                 continue;
             return false;
         }
@@ -215,7 +232,12 @@ public partial class ScriptQuest : ObservableRecipient, IScriptQuest
         Quest? quest = EnsureLoad(id);
         if (quest is null)
             return false;
-        return Flash.CallGameFunction<int>("world.getAchievement", quest.Field, quest.Index) != 0;
+        return IsDailyComplete(quest);
+    }
+
+    public bool IsDailyComplete(Quest quest)
+    {
+        return Flash.CallGameFunction<int>("world.getAchievement", quest.Field, quest.Index) > 0;
     }
 
     public bool IsUnlocked(int id)
@@ -223,6 +245,11 @@ public partial class ScriptQuest : ObservableRecipient, IScriptQuest
         Quest? quest = EnsureLoad(id);
         if (quest is null)
             return false;
+        return IsUnlocked(quest);
+    }
+
+    public bool IsUnlocked(Quest quest)
+    {
         return quest.Slot < 0 || Flash.CallGameFunction<int>("world.getQuestValue", quest.Slot) >= quest.Value - 1;
     }
 
@@ -231,6 +258,11 @@ public partial class ScriptQuest : ObservableRecipient, IScriptQuest
         Quest? quest = EnsureLoad(id);
         if (quest is null)
             return false;
+        return HasBeenCompleted(quest);
+    }
+
+    public bool HasBeenCompleted(Quest quest)
+    {
         return quest.Slot < 0 || Flash.CallGameFunction<int>("world.getQuestValue", quest.Slot) >= quest.Value;
     }
 
@@ -238,8 +270,8 @@ public partial class ScriptQuest : ObservableRecipient, IScriptQuest
     {
         Quest? quest = EnsureLoad(id);
         return quest is not null
-               && !IsDailyComplete(quest.ID)
-               && IsUnlocked(quest.ID)
+               && !IsDailyComplete(quest)
+               && IsUnlocked(quest)
                && (!quest.Upgrade || Player.IsMember)
                && Player.Level >= quest.Level
                && (quest.RequiredClassID <= 0 || Flash.CallGameFunction<int>("world.myAvatar.getCPByID", quest.RequiredClassID) >= quest.RequiredClassPoints)
