@@ -6,10 +6,9 @@ using Skua.Core.Models.GitHub;
 using Skua.Core.Utils;
 
 namespace Skua.Core.ViewModels;
-// TODO move to different project.
 public partial class GitHubAuthViewModel : BotControlViewModelBase
 {
-    public GitHubAuthViewModel(IClipboardService clipboard, IProcessStartService processService, ISettingsService settingsService)
+    public GitHubAuthViewModel(IClipboardService clipboard, IProcessService processService, ISettingsService settingsService)
         : base("GitHub Authentication")
     {
         _clipboard = clipboard;
@@ -21,7 +20,7 @@ public partial class GitHubAuthViewModel : BotControlViewModelBase
         HintStatus = HttpClients.UserGitHubClient is not null ? "GitHub Authentication already done." : "Click \"Get User Code\".";
     }
 
-    private readonly IProcessStartService _processService;
+    private readonly IProcessService _processService;
     private readonly ISettingsService _settingsService;
     private readonly IClipboardService _clipboard;
     private DeviceCodeResponse? _deviceCode;
@@ -79,7 +78,7 @@ public partial class GitHubAuthViewModel : BotControlViewModelBase
             { "grant_type", "urn:ietf:params:oauth:grant-type:device_code" }
         };
         FormUrlEncodedContent? encodedContent = new(content);
-        HttpResponseMessage? response = await HttpClients.GitHubClient2.PostAsync("https://github.com/login/oauth/access_token", encodedContent);
+        HttpResponseMessage? response = await HttpClients.GitHubClient.PostAsync("https://github.com/login/oauth/access_token", encodedContent);
         return response?.IsSuccessStatusCode ?? false
             ? _token = JsonConvert.DeserializeObject<TokenResponse>(await response.Content.ReadAsStringAsync())
             : null;

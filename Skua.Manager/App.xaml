@@ -3,7 +3,12 @@
     xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
     xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
     xmlns:local="clr-namespace:Skua.Manager"
+    xmlns:managerVMs="clr-namespace:Skua.Core.ViewModels.Manager;assembly=Skua.Core"
     xmlns:materialDesign="http://materialdesigninxaml.net/winfx/xaml/themes"
+    xmlns:usercontrols="clr-namespace:Skua.WPF.UserControls;assembly=Skua.WPF"
+    xmlns:vms="clr-namespace:Skua.Core.ViewModels;assembly=Skua.Core"
+    xmlns:wpf="clr-namespace:Skua.WPF;assembly=Skua.WPF"
+    ShutdownMode="OnMainWindowClose"
     StartupUri="MainWindow.xaml">
     <Application.Resources>
         <ResourceDictionary>
@@ -12,11 +17,14 @@
                     BaseTheme="Inherit"
                     ColorAdjustment="{materialDesign:ColorAdjustment}"
                     PrimaryColor="BlueGrey"
-                    SecondaryColor="LightBlue" />
+                    SecondaryColor="Red" />
                 <ResourceDictionary Source="pack://application:,,,/MaterialDesignThemes.Wpf;component/Themes/MaterialDesignTheme.Defaults.xaml" />
                 <ResourceDictionary Source="pack://application:,,,/Skua.WPF;component/Themes/CustomWindowTheme.xaml" />
+                <ResourceDictionary Source="pack://application:,,,/Skua.WPF;component/Xaml/DataTemplates.xaml" />
+                <ResourceDictionary Source="pack://application:,,,/Skua.WPF;component/Xaml/Converters.xaml" />
+                <ResourceDictionary Source="pack://application:,,,/Skua.WPF;component/XAML/Styles.xaml" />
             </ResourceDictionary.MergedDictionaries>
-            <Style BasedOn="{StaticResource CustomWindow}" TargetType="local:MainWindow" />
         </ResourceDictionary>
+
     </Application.Resources>
 </Application>

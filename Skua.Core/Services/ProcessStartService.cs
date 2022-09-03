@@ -1,7 +1,7 @@
 ﻿using System.Diagnostics;
 using Skua.Core.Interfaces;
 namespace Skua.Core.Services;
-public class ProcessStartService : IProcessStartService
+public class ProcessStartService : IProcessService
 {
     public ProcessStartService(ISettingsService settingsService, IDialogService dialogService)
     {
@@ -16,7 +16,7 @@ public class ProcessStartService : IProcessStartService
 
     public void OpenLink(string link)
     {
-        var ps = new ProcessStartInfo("explorer", link)
+        var ps = new ProcessStartInfo(link)
         {
             UseShellExecute = true,
             Verb = "open"

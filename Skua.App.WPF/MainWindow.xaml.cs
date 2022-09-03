@@ -1,10 +1,10 @@
-﻿using AxShockwaveFlashObjects;
-using CommunityToolkit.Mvvm.DependencyInjection;
+﻿using CommunityToolkit.Mvvm.DependencyInjection;
 using CommunityToolkit.Mvvm.Messaging;
 using Skua.Core.Interfaces;
 using Skua.Core.Messaging;
 using Skua.Core.ViewModels;
 using Skua.WPF;
+using Skua.WPF.UserControls;
 using System.Windows;
 
 namespace Skua.App.WPF;
@@ -14,37 +14,65 @@ namespace Skua.App.WPF;
 /// </summary>
 public partial class MainWindow : CustomWindow
 {
-    //public IScriptInterface Bot { get; }
-
-    public MainWindow(/*IScriptInterface bot*/)
+    private readonly IScriptPlayer _player;
+    public MainWindow()
     {
-        //Bot = bot;
         InitializeComponent();
         DataContext = Ioc.Default.GetService<MainViewModel>();
-        //gameContainer.Visibility = Visibility.Hidden;
-        //WeakReferenceMessenger.Default.Register<MainWindow, FlashChangedMessage<AxShockwaveFlash>>(this, FlashChanged);
-        //Loaded += MainWindow_Loaded;
+        _player = Ioc.Default.GetRequiredService<IScriptPlayer>();
+        StrongReferenceMessenger.Default.Register<MainWindow, ShowMainWindowMessage>(this, ShowMainWindow);
+        StrongReferenceMessenger.Default.Register<MainWindow, HideBalloonTipMessage>(this, HideBalloon);
+        StrongReferenceMessenger.Default.Register<MainWindow, ReloginTriggeredMessage, int>(this, (int)MessageChannels.GameEvents, NotifyRelogin);
+        StrongReferenceMessenger.Default.Register<MainWindow, ScriptStoppedMessage, int>(this, (int)MessageChannels.ScriptStatus, NotifyScriptStopped);
+        StrongReferenceMessenger.Default.Register<MainWindow, ScriptErrorMessage, int>(this, (int)MessageChannels.ScriptStatus, NotifyScriptError);
     }
 
-    //private void FlashChanged(MainWindow recipient, FlashChangedMessage<AxShockwaveFlash> message)
-    //{
-    //    recipient.gameContainer.Child = message.Flash;
-    //}
+    private void NotifyScriptError(MainWindow recipient, ScriptErrorMessage message)
+    {
+        recipient.ShowNotification("Script Error", string.Empty);
+    }
 
-    //private void MainWindow_Loaded(object sender, RoutedEventArgs e)
-    //{
-    //    Bot.Flash.FlashCall += LoadingFlash;
-    //    Bot.Flash.InitializeFlash();
-    //    Loaded -= MainWindow_Loaded;
-    //}
+    private void NotifyScriptStopped(MainWindow recipient, ScriptStoppedMessage message)
+    {
+        recipient.ShowNotification("Script Stopped", string.Empty, 5000);
+    }
 
-    //private void LoadingFlash(string function, params object[] args)
-    //{
-    //    if(function == "loaded")
-    //    {
-    //        LoadingBar.Visibility = Visibility.Hidden;
-    //        gameContainer.Visibility = Visibility.Visible;
-    //        Bot.Flash.FlashCall -= LoadingFlash;
-    //    }
-    //}
+    private void NotifyRelogin(MainWindow recipient, ReloginTriggeredMessage message)
+    {
+        recipient.ShowNotification("Relogin", $"Relogin triggered for {_player.Username}.", 5000);
+    }
+
+    private void ShowNotification(string title, string message, int? timeout = null)
+    {
+        if (!IsVisible)
+        {
+            BalloonTipUserControl diag = new(title, message);
+            NotifyIcon.ShowCustomBalloon(diag, System.Windows.Controls.Primitives.PopupAnimation.Slide, timeout);
+        }
+    }
+    private void HideBalloon(MainWindow recipient, HideBalloonTipMessage message)
+    {
+        NotifyIcon.CloseBalloon();
+    }
+
+    private void ShowMainWindow(MainWindow recipient, ShowMainWindowMessage message)
+    {
+        recipient.ShowWindow();
+    }
+
+    private void MenuItem_Click(object sender, RoutedEventArgs e)
+    {
+        ShowWindow();
+    }
+
+    private void ShowWindow()
+    {
+        if(IsVisible)
+        {
+            Hide();
+            return;
+        }
+
+        Show();
+    }
 }

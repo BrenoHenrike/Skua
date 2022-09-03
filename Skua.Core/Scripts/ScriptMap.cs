@@ -6,6 +6,7 @@ using Skua.Core.Models.Items;
 using Skua.Core.Models.Players;
 using Skua.Core.Utils;
 using Skua.Core.Flash;
+using CommunityToolkit.Mvvm.DependencyInjection;
 
 namespace Skua.Core.Scripts;
 public partial class ScriptMap : IScriptMap
@@ -122,7 +123,10 @@ public partial class ScriptMap : IScriptMap
     private void _getMapItem(int id)
     {
         if (Options.SafeTimings)
+        {
             Wait.ForActionCooldown(Skua.Core.Models.GameActions.GetMapItem);
+            Thread.Sleep(Options.ActionDelay);
+        }
     }
 
     private Dictionary<string, List<MapItem>>? LoadSavedMapItems()

@@ -278,9 +278,9 @@ public class ScriptInterface : IScriptInterface, IScriptInterfaceManager
             return (Environment.TickCount, connDetail);
         if (connDetail.Contains("has been lost") && !_waitForLogin)
             OnLogout();
-        if (Environment.TickCount - lastConnChange >= Options.LoadTimeout && connDetail == lastConnDetail)
+        else if (Environment.TickCount - lastConnChange >= Options.LoadTimeout && connDetail == lastConnDetail && !_waitForLogin)
         {
-            if (connDetail.Contains("loading map") && !_waitForLogin)
+            if (connDetail.Contains("loading map"))
             {
                 Map.Join("battleon");
                 Map.Reload();
@@ -288,7 +288,7 @@ public class ScriptInterface : IScriptInterface, IScriptInterfaceManager
                 {
                     if (Flash.GetGameObject("mcConnDetail.txtDetail.text") == "loading map")
                     {
-                        Logout();
+                        Servers.Logout();
                         return;
                     }
                     Map.Join(Map.LastMap);
@@ -296,20 +296,12 @@ public class ScriptInterface : IScriptInterface, IScriptInterfaceManager
             }
             else
             {
-                Logout();
+                Servers.Logout();
             }
         }
         if (connDetail == lastConnDetail)
             return (lastConnChange, connDetail);
         return (Environment.TickCount, connDetail);
-
-        void Logout()
-        {
-            _waitForLogin = false;
-            _reloginCTS?.Cancel();
-            Wait.ForTrue(() => _reloginTask == null, 20);
-            Servers.Logout();
-        }
     }
 
     /// <summary>
@@ -528,11 +520,11 @@ public class ScriptInterface : IScriptInterface, IScriptInterfaceManager
     }
     private void Relogin(int delay, bool startScript)
     {
+        Servers.Logout();
         Log($"Waiting {delay}ms for relogin.");
         _reloginCTS = new CancellationTokenSource();
         _reloginTask = Schedule(delay, async _ =>
         {
-            Servers.Logout();
             Stats.Relogins++;
             bool relogged = await Servers.EnsureRelogin(_reloginCTS.Token);
             if (startScript)

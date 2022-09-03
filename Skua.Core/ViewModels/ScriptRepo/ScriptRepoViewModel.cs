@@ -9,7 +9,7 @@ using Skua.Core.Utils;
 namespace Skua.Core.ViewModels;
 public partial class ScriptRepoViewModel : BotControlViewModelBase
 {
-    public ScriptRepoViewModel(IGetScriptsService getScripts, IProcessStartService processService)
+    public ScriptRepoViewModel(IGetScriptsService getScripts, IProcessService processService)
         : base("Get Scripts")
     {
         _getScriptsService = getScripts;
@@ -23,7 +23,7 @@ public partial class ScriptRepoViewModel : BotControlViewModelBase
     }
 
     private readonly IGetScriptsService _getScriptsService;
-    private readonly IProcessStartService _processService;
+    private readonly IProcessService _processService;
     [ObservableProperty]
     [NotifyPropertyChangedFor(nameof(DownloadedQuantity), nameof(OutdatedQuantity), nameof(ScriptQuantity))]
     private RangedObservableCollection<ScriptInfoViewModel> _scripts = new();
@@ -76,7 +76,7 @@ public partial class ScriptRepoViewModel : BotControlViewModelBase
             await Task.Run(async () =>
             {
                 Progress<string> progress = new(ProgressHandler);
-                await _getScriptsService.RefreshAsync(progress, token);
+                await _getScriptsService.RefreshScriptsAsync(progress, token);
             }, token);
         }
         catch { }

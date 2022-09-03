@@ -7,7 +7,7 @@
     <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
     <ProduceReferenceAssembly>True</ProduceReferenceAssembly>
     <Platforms>AnyCPU;x64;x86</Platforms>
-    <GenerateDocumentationFile>False</GenerateDocumentationFile>
+    <GenerateDocumentationFile>True</GenerateDocumentationFile>
   </PropertyGroup>
 
   <ItemGroup>
@@ -19,6 +19,7 @@
     <PackageReference Include="CliWrap" Version="3.4.4" />
     <PackageReference Include="CommunityToolkit.Mvvm" Version="8.0.0" />
     <PackageReference Include="CoreHook" Version="1.0.4" />
+    <PackageReference Include="Grpc.Net.Client" Version="2.48.0" />
     <PackageReference Include="Microsoft.Extensions.DependencyInjection" Version="6.0.0" />
     <PackageReference Include="Newtonsoft.Json" Version="13.0.1" />
     <PackageReference Include="Westwind.Scripting" Version="1.1.5" />
@@ -32,6 +33,7 @@
 
     <ItemGroup>
         <ProjectReference Include="..\Skua.Core.Generators\Skua.Core.Generators.csproj" OutputItemType="Analyzer" ReferenceOutputAssembly="false" />
+        <ProjectReference Include="..\Skua.gRPC.Protos\Skua.gRPC.Protos.csproj" />
     </ItemGroup>
 
 </Project>

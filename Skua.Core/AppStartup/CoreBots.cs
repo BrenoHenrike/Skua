@@ -1,8 +1,6 @@
 ﻿using Microsoft.Extensions.DependencyInjection;
 using Skua.Core.Interfaces;
 using Skua.Core.ViewModels;
-using System;
-using System.Collections.Generic;
 
 namespace Skua.Core.AppStartup;
 internal class CoreBots
@@ -51,12 +49,12 @@ internal class CoreBots
     {
         List<CBOOptionItemContainerViewModel> otherOptions = new()
         {
-            new("Hollowborn DoomKnight", new CBOBoolOptionItemViewModel("Pre Farm Dark-/Doom Fragments", "HBDK_PreFarm")),
-
-            new("Necrotic Sword of Doom", new List<DisplayOptionItemViewModelBase>()
+            new("Boosters", new List<DisplayOptionItemViewModelBase>()
             {
-                new CBOBoolOptionItemViewModel("Max Stack Essence in Retrieve Void Auras", "NSOD_MaxStack", true),
-                new CBOBoolOptionItemViewModel("Pre Farm Materials", "NSOD_PreFarm")
+                new CBOBoolOptionItemViewModel("Use Gold Boosts when farming gold", "doGoldBoost"),
+                new CBOBoolOptionItemViewModel("Use Class Boosts when ranking up a class", "doClassBoost"),
+                new CBOBoolOptionItemViewModel("Use Reputation Boosts when farming REP", "doRepBoost"),
+                new CBOBoolOptionItemViewModel("Use Experience Boosts when farming EXP", "doExpBoost")
             }),
 
             new("Nation Farms", new List<DisplayOptionItemViewModelBase>()
@@ -64,10 +62,6 @@ internal class CoreBots
                 new CBOBoolOptionItemViewModel("Sell Voucher of Nulgath if not needed", "Nation_SellMemVoucher", true),
                 new CBOBoolOptionItemViewModel("Do Swindles Return during Supplies", "Nation_ReturnPolicyDuringSupplies", true)
             }),
-
-            new("Void Highlord", new CBOBoolOptionItemViewModel("Use Sparrow's Blood Method", "If possible will use Sparrow's Blood and \"Assisting Crag and Bamboozlez\" to get an additional Elders' Blood per day.", "VHL_Sparrow", true)),
-
-            new("Sepulchure's DoomKnight Armor", new CBOBoolChoiceOptionItemViewModel("DSO Farm Method", "Which quest to farm Dark Spirit Orbs", "SDKA_Quest", "Dark Spirit Orbs", "A Penny for Your Foughts")),
 
             new("Bludrut Brawl (PvP)", new CBOBoolOptionItemViewModel("Kill ads before boss", "Whether to kill brawlers and restorers in the PvP before the boss.", "PvP_SoloPvPBoss")),
 

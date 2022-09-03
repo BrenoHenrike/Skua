@@ -14,6 +14,7 @@ using System.Windows.Forms;
 using CommunityToolkit.Mvvm.Messaging;
 using Skua.Core.Messaging;
 using System.Threading;
+using CommunityToolkit.Mvvm.DependencyInjection;
 
 namespace Skua.WPF.Flash;
 
@@ -33,32 +34,45 @@ public class FlashUtil : IFlashUtil
 
     public void InitializeFlash()
     {
-        if (!EoLHook.IsHooked)
-            EoLHook.Hook();
-
-        Flash?.Dispose();
-
-        AxShockwaveFlash flash = new();
-        flash.BeginInit();
-        flash.Name = "flash";
-        flash.Dock = DockStyle.Fill;
-        flash.TabIndex = 0;
-        flash.FlashCall += CallHandler;
-        _messenger.Send<FlashChangedMessage<AxShockwaveFlash>>(new(flash));
-        flash.EndInit();
-        Flash = flash;
-        byte[] swf = File.ReadAllBytes("skua.swf");
-        using (MemoryStream stream = new())
-        using (BinaryWriter writer = new(stream))
+        try
         {
-            writer.Write(8 + swf.Length);
-            writer.Write(1432769894);
-            writer.Write(swf.Length);
-            writer.Write(swf);
-            writer.Seek(0, SeekOrigin.Begin);
-            flash.OcxState = new AxHost.State(stream, 1, false, null);
+            if (!EoLHook.IsHooked)
+                EoLHook.Hook();
+
+            Flash?.Dispose();
+
+            AxShockwaveFlash flash = new();
+            flash.BeginInit();
+            flash.Name = "flash";
+            flash.Dock = DockStyle.Fill;
+            flash.TabIndex = 0;
+            flash.FlashCall += CallHandler;
+            _messenger.Send<FlashChangedMessage<AxShockwaveFlash>>(new(flash));
+            flash.EndInit();
+            Flash = flash;
+            byte[] swf = File.ReadAllBytes("skua.swf");
+            using (MemoryStream stream = new())
+            using (BinaryWriter writer = new(stream))
+            {
+                writer.Write(8 + swf.Length);
+                writer.Write(1432769894);
+                writer.Write(swf.Length);
+                writer.Write(swf);
+                writer.Seek(0, SeekOrigin.Begin);
+                flash.OcxState = new AxHost.State(stream, 1, false, null);
+            }
+
         }
-        EoLHook.Unhook();
+        catch
+        {
+            if (MessageBox.Show($"Please, reinstall Clean Flash using the link https://auqw.tk/ under Download Client > Issues\r\nDo you want to open the site?", "Clean Flash missing", MessageBoxButtons.YesNo, MessageBoxIcon.Exclamation) == DialogResult.Yes)
+                Ioc.Default.GetRequiredService<IProcessService>().OpenLink("https://auqw.tk/");
+            Environment.Exit(0);
+        }
+        finally
+        {
+            EoLHook.Unhook();
+        }
     }
 
     private void CallHandler(object sender, _IShockwaveFlashEvents_FlashCallEvent e)

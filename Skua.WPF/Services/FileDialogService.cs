@@ -1,24 +1,22 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 using Skua.Core.Interfaces;
 using Microsoft.Win32;
 using System.IO;
+using Ookii.Dialogs.Wpf;
 
 namespace Skua.WPF.Services;
 public class FileDialogService : IFileDialogService
 {
     private const string defaultFilter = "Text Files (*.txt)|*.txt";
-    public string? Open()
+    public string? OpenFile()
     {
         OpenFileDialog opf = new();
         opf.InitialDirectory = AppContext.BaseDirectory;
         return opf.ShowDialog() == true ? opf.FileName : null;
     }
 
-    public string? Open(string filter)
+    public string? OpenFile(string filter)
     {
         OpenFileDialog opf = new()
         {
@@ -28,7 +26,7 @@ public class FileDialogService : IFileDialogService
         return opf.ShowDialog() == true ? opf.FileName : null;
     }
 
-    public string? Open(string initialDirectory, string filter)
+    public string? OpenFile(string initialDirectory, string filter)
     {
         OpenFileDialog opf = new()
         {
@@ -36,6 +34,26 @@ public class FileDialogService : IFileDialogService
             Filter = filter
         };
         return opf.ShowDialog() == true ? opf.FileName : null;
+    }
+
+    public string? OpenFolder(string initialDirectory)
+    {
+        VistaFolderBrowserDialog fbd = new()
+        {
+            Description = "Select the download folder.",
+            Multiselect = false
+        };
+        return fbd.ShowDialog() == true ? fbd.SelectedPath : null;
+    }
+
+    public string? OpenFolder()
+    {
+        VistaFolderBrowserDialog fbd = new()
+        {
+            Description = "Select the download folder.",
+            Multiselect = false
+        };
+        return fbd.ShowDialog() == true ? fbd.SelectedPath : null;
     }
 
     public IEnumerable<string>? OpenText()

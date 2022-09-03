@@ -1,0 +1,36 @@
+﻿<UserControl
+    x:Class="Skua.WPF.UserControls.ClientUpdateItemUserControl"
+    xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+    xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+    xmlns:local="clr-namespace:Skua.WPF.UserControls"
+    xmlns:materialDesign="http://materialdesigninxaml.net/winfx/xaml/themes"
+    xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+    xmlns:vms="clr-namespace:Skua.Core.ViewModels.Manager;assembly=Skua.Core"
+    d:DataContext="{d:DesignInstance vms:ClientUpdateItemViewModel}"
+    d:DesignHeight="450"
+    d:DesignWidth="800"
+    mc:Ignorable="d">
+    <Button
+        Margin="0,0,0,6"
+        Command="{Binding DownloadCommand}"
+        Style="{StaticResource MaterialDesignPaperButton}">
+        <Button.Content>
+            <Grid>
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition SharedSizeGroup="Title" />
+                    <ColumnDefinition Width="auto" />
+                </Grid.ColumnDefinitions>
+                <TextBlock
+                    Grid.Column="0"
+                    FontSize="16"
+                    Text="{Binding Info.Name}" />
+                <materialDesign:PackIcon
+                    Grid.Column="1"
+                    Margin="10,0,0,0"
+                    VerticalAlignment="Center"
+                    Kind="Download" />
+            </Grid>
+        </Button.Content>
+    </Button>
+</UserControl>

@@ -11,7 +11,7 @@
     d:DesignHeight="450"
     d:DesignWidth="800"
     mc:Ignorable="d">
-    <DockPanel Background="{DynamicResource MaterialDesignPaper}">
+    <DockPanel Height="25" Background="{DynamicResource MaterialDesignPaper}">
         <Button
             Height="25"
             Command="{Binding ShowBotWindowCommand}"

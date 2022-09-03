@@ -7,6 +7,7 @@
     xmlns:local="clr-namespace:Skua.App.WPF"
     xmlns:materialdesign="http://materialdesigninxaml.net/winfx/xaml/themes"
     xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+    xmlns:tb="http://www.hardcodet.net/taskbar"
     xmlns:vms="clr-namespace:Skua.Core.ViewModels;assembly=Skua.Core"
     xmlns:wf="clr-namespace:System.Windows.Forms;assembly=System.Windows.Forms"
     xmlns:wpf="clr-namespace:Skua.WPF;assembly=Skua.WPF"
@@ -16,8 +17,23 @@
     d:DataContext="{d:DesignInstance vms:MainViewModel}"
     Style="{StaticResource CustomWindow}"
     mc:Ignorable="d">
-    <DockPanel>
-        <controls:MainMenuUserControl Panel.ZIndex="10" DockPanel.Dock="Top" />
-        <controls:GameContainerUserControl />
-    </DockPanel>
+    <Grid>
+        <DockPanel>
+            <controls:MainMenuUserControl Panel.ZIndex="10" DockPanel.Dock="Top" />
+            <controls:GameContainerUserControl />
+        </DockPanel>
+        <tb:TaskbarIcon
+            x:Name="NotifyIcon"
+            DoubleClickCommand="{Binding ShowMainWindowCommand}"
+            IconSource="SkuaIcon.ico"
+            MenuActivation="RightClick"
+            ToolTipText="Skua"
+            Visibility="Visible">
+            <tb:TaskbarIcon.ContextMenu>
+                <ContextMenu>
+                    <MenuItem Click="MenuItem_Click" Header="Toggle Main Window" />
+                </ContextMenu>
+            </tb:TaskbarIcon.ContextMenu>
+        </tb:TaskbarIcon>
+    </Grid>
 </wpf:CustomWindow>

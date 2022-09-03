@@ -60,11 +60,6 @@ internal class Options
     {
         List<DisplayOptionItemViewModelBase> appOptions = new()
         {
-            CreateSettingOptionItem<bool>("Auto Update Scripts", "AutoUpdateScripts"),
-            CreateSettingOptionItem<bool>("Check for Client Updates", "CheckClientUpdates"),
-            CreateSettingOptionItem<bool>("Check for Client Prereleases", "CheckClientPrereleases"),
-            CreateSettingOptionItem<bool>("Check for Script Updates", "CheckScriptUpdates"),
-            CreateSettingOptionItem<bool>("Ignore GH Authentication", "IgnoreGHAuth"),
             new CommandOptionItemViewModel<bool>("Use Local VSCode", "UseLocalVSC", new RelayCommand<bool>(b =>
             {
                 if(!Directory.Exists(Path.Combine(AppContext.BaseDirectory, "VSCode")))
@@ -83,14 +78,5 @@ internal class Options
         };
 
         return new ApplicationOptionsViewModel(appOptions);
-
-        static RelayCommand<T> CreateSettingCommand<T>(string key)
-        {
-            return new RelayCommand<T>(b => Ioc.Default.GetRequiredService<ISettingsService>().Set(key, b));
-        }
-        static CommandOptionItemViewModel<T> CreateSettingOptionItem<T>(string content, string key)
-        {
-            return new(content, key, CreateSettingCommand<T>(key), Ioc.Default.GetRequiredService<ISettingsService>().Get<T>(key));
-        }
     }
 }

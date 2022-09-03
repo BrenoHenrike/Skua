@@ -43,7 +43,7 @@ public partial class PluginsViewModel : BotControlViewModelBase
     [RelayCommand]
     private void LoadPlugin()
     {
-        string? file = _fileService.Open("DLL files |*.dll");
+        string? file = _fileService.OpenFile("DLL files |*.dll");
 
         if (string.IsNullOrEmpty(file))
             return;

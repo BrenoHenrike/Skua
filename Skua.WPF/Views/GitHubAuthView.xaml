@@ -15,23 +15,73 @@
         <Grid.RowDefinitions>
             <RowDefinition Height="auto" />
             <RowDefinition Height="auto" />
+            <RowDefinition Height="auto" />
             <RowDefinition Height="auto" MinHeight="100" />
             <RowDefinition Height="auto" />
         </Grid.RowDefinitions>
-        <TextBlock
+        <Expander
             Grid.Row="0"
-            Margin="0,0,0,3"
-            HorizontalAlignment="Center"
-            VerticalAlignment="Center"
-            FontSize="24"
-            Text="GitHub Authentication" />
-        <TextBox
+            Margin="0,0,0,6"
+            Header="What is this about?">
+            <ScrollViewer
+                MaxHeight="400"
+                HorizontalScrollBarVisibility="Disabled"
+                VerticalScrollBarVisibility="Auto">
+                <TextBlock
+                    Margin="6,0,6,6"
+                    TextAlignment="Justify"
+                    TextWrapping="Wrap">
+                    <Run>
+                        The scripts that &quot;come with&quot; the client are actually downloaded via GitHub using, at first, the application authentity,
+                        which do calls to the GitHub API so you can get updates of the scripts. You can see the GitHub repository in the links below.
+                    </Run><LineBreak /><LineBreak />
+                    <Run FontWeight="Bold">But there is a catch:</Run>
+                    <Run>
+                        everyone that uses the app will then be making use of the same &quot;account&quot; to access the information,
+                        and to prevent spam, the GitHub API is limited at 5000 requests per hour for account. It might look like its enough requests,
+                        but in busy hours it certainly is not.
+                    </Run><LineBreak /><LineBreak />
+                    <Run FontWeight="Bold">What can you do to prevent that possibility?</Run><LineBreak />
+                    By doing the GitHub authentication steps, it will give the Skua app a token which can be used to do those API requests in your behalf,
+                    giving to you the 5000 requests per hour, however those are not shared between all users, making it totally enough even in busy hours, and will allow me to make new additions that can use the GitHub API.</TextBlock>
+            </ScrollViewer>
+        </Expander>
+        <Expander
             Grid.Row="1"
-            Margin="0,3"
+            Margin="0,0,0,6"
+            Header="How to authenticate">
+            <ScrollViewer
+                MaxHeight="400"
+                HorizontalScrollBarVisibility="Disabled"
+                VerticalScrollBarVisibility="Auto">
+                <TextBlock
+                    Margin="6,0,6,6"
+                    TextAlignment="Justify"
+                    TextWrapping="Wrap">
+                    <Run FontWeight="Bold">Step 1:</Run><LineBreak />
+                    <Run>
+                        Click &quot;Get User Code&quot;. It will generate a unique code that you will use in the next step of the authentication.
+                    </Run><LineBreak /><LineBreak />
+                    <Run FontWeight="Bold">Step 2:</Run><LineBreak />
+                    <Run>
+                        After the code appearing in your screen, it will be automatically copied to your clipboard,
+                        click &quot;Open Browser&quot; and you will be redirected to &quot;https://github.com/login/device/code&quot;
+                        there you can paste the device code from the previous step, click &quot;Continue&quot;, then &quot;Authorize Skua Scripts&quot;, you will reach the &quot;Congratulations, you're all set!&quot; page.
+                    </Run><LineBreak /><LineBreak />
+                    <Run FontWeight="Bold">Step 3:</Run><LineBreak />
+                    <Run>
+                        Only after seeing the &quot;Congratulations, you're all set!&quot; page, you can go back to the GitHub Authentication window and click &quot;Authorize&quot;. After that it will generate a unique token which Skua will use to make calls to download and update scripts.
+                    </Run>
+                </TextBlock>
+            </ScrollViewer>
+        </Expander>
+        <TextBox
+            Grid.Row="2"
+            Margin="0,0,0,3"
             materialDesign:HintAssist.Hint="User Code"
             Text="{Binding UserCode, Mode=OneWay}" />
         <TextBlock
-            Grid.Row="2"
+            Grid.Row="3"
             Margin="0,3"
             HorizontalAlignment="Center"
             VerticalAlignment="Center"
@@ -39,7 +89,7 @@
             Text="{Binding HintStatus}"
             TextAlignment="Center"
             TextWrapping="Wrap" />
-        <StackPanel Grid.Row="3">
+        <StackPanel Grid.Row="4">
             <Button
                 Margin="0,3"
                 Command="{Binding GetUserCodeCommand}"
@@ -49,9 +99,13 @@
                 Command="{Binding OpenBrowserCommand}"
                 Content="Open Browser" />
             <Button
-                Margin="0,3,0,0"
+                Margin="0,3"
                 Command="{Binding AuthorizeGHCommand}"
                 Content="Authorize" />
+            <Button
+                Margin="0,3,0,0"
+                Click="Button_Click"
+                Content="Close" />
         </StackPanel>
     </Grid>
 </UserControl>

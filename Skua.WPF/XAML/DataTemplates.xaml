@@ -1,6 +1,7 @@
 ﻿<ResourceDictionary
     xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
     xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+    xmlns:managerVms="clr-namespace:Skua.Core.ViewModels.Manager;assembly=Skua.Core"
     xmlns:usercontrols="clr-namespace:Skua.WPF.UserControls"
     xmlns:views="clr-namespace:Skua.WPF.Views"
     xmlns:vms="clr-namespace:Skua.Core.ViewModels;assembly=Skua.Core">
@@ -117,5 +118,19 @@
     </DataTemplate>
     <DataTemplate DataType="{x:Type vms:AssignHotKeyDialogViewModel}">
         <usercontrols:AssignHotKeyDialog />
+    </DataTemplate>
+
+
+    <DataTemplate DataType="{x:Type managerVms:ClientUpdatesViewModel}">
+        <usercontrols:ClientUpdateUserControl />
+    </DataTemplate>
+    <DataTemplate DataType="{x:Type managerVms:ManagerOptionsViewModel}">
+        <usercontrols:ManagerOptionsUserControl />
+    </DataTemplate>
+    <DataTemplate DataType="{x:Type managerVms:GoalsViewModel}">
+        <usercontrols:GoalsUserControl />
+    </DataTemplate>
+    <DataTemplate DataType="{x:Type managerVms:LauncherViewModel}">
+        <usercontrols:LauncherUserControl />
     </DataTemplate>
 </ResourceDictionary>

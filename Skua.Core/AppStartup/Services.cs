@@ -1,10 +1,5 @@
 ﻿using Skua.Core.Interfaces;
 using Microsoft.Extensions.DependencyInjection;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 using Skua.Core.Scripts;
 using Skua.Core.Skills;
 using Skua.Core.Options;
@@ -16,16 +11,33 @@ using Skua.Core.ViewModels;
 using Microsoft.CodeAnalysis;
 using System.Reflection;
 using CommunityToolkit.Mvvm.Messaging;
+using Skua.Core.ViewModels.Manager;
 
 namespace Skua.Core.AppStartup;
 public static class Services
 {
-    public static IServiceCollection AddSkua(this IServiceCollection services)
+    public static IServiceCollection AddCommonServices(this IServiceCollection services)
     {
         services.AddTransient(typeof(Lazy<>), typeof(LazyInstance<>));
 
         services.AddSingleton(typeof(IMessenger), GetMessenger());
+        
+        services.AddSingleton<IDecamelizer, Decamelizer>();
+        services.AddSingleton<IGetScriptsService, GetScriptsService>();
+        services.AddSingleton<IProcessService, ProcessStartService>();
 
+        return services;
+    }
+
+    public static IServiceCollection AddCompiler(this IServiceCollection services)
+    {
+        services.AddTransient(CreateCompiler);
+
+        return services;
+    }
+
+    public static IServiceCollection AddScriptableObjects(this IServiceCollection services)
+    {
         services.AddSingleton<IScriptInterface, ScriptInterface>();
         services.AddSingleton<IScriptManager, ScriptManager>();
         services.AddSingleton<IScriptStatus, ScriptManager>();
@@ -72,13 +84,8 @@ public static class Services
 
         services.AddSingleton<IMapService, MapService>();
         services.AddSingleton<ILogService, LogService>();
-        services.AddSingleton<IDecamelizer, Decamelizer>();
         services.AddSingleton<IQuestDataLoaderService, QuestDataLoaderService>();
         services.AddSingleton<IGrabberService, GrabberService>();
-        services.AddSingleton<IGetScriptsService, GetScriptsService>();
-        services.AddSingleton<IProcessStartService, ProcessStartService>();
-
-        services.AddTransient(CreateCompiler);
 
         return services;
     }
@@ -111,43 +118,54 @@ public static class Services
                 s.GetRequiredService<PacketLoggerViewModel>(),
                 s.GetRequiredService<ApplicationThemesViewModel>(),
                 s.GetRequiredService<HotKeysViewModel>(),
-                s.GetRequiredService<GitHubAuthViewModel>(),
-                s.GetRequiredService<PluginsViewModel>(),
+                s.GetRequiredService<PluginsViewModel>()
             };
         });
+
         services.AddTransient<LoaderViewModel>();
+
         services.AddTransient(Grabber.CreateViewModel);
         services.AddSingleton(Grabber.CreateListViewModels);
+
         services.AddSingleton<JumpViewModel>();
+
         services.AddSingleton<FastTravelViewModel>();
         services.AddTransient<FastTravelEditorViewModel>();
         services.AddTransient<FastTravelEditorDialogViewModel>();
+
         services.AddSingleton<LogsViewModel>();
         services.AddSingleton(LogTabs.CreateViewModels);
+
         services.AddSingleton(Options.CreateGameOptions);
         services.AddSingleton(Options.CreateAppOptions);
+
         services.AddSingleton(PacketLogger.CreateViewModel);
         services.AddSingleton<PacketSpammerViewModel>();
+        services.AddSingleton<PacketInterceptorViewModel>();
+
         services.AddTransient<ConsoleViewModel>();
+
         services.AddSingleton<ScriptRepoViewModel>();
         services.AddSingleton<ScriptLoaderViewModel>();
-        services.AddSingleton<PacketInterceptorViewModel>();
+
         services.AddSingleton<AdvancedSkillsViewModel>();
         services.AddSingleton<AdvancedSkillEditorViewModel>();
         services.AddSingleton<SavedAdvancedSkillsViewModel>();
         services.AddTransient<SkillRulesViewModel>();
+
         services.AddSingleton<AutoViewModel>();
+
         services.AddSingleton<BoostsViewModel>();
         services.AddSingleton<ScriptStatsViewModel>();
         services.AddSingleton<RuntimeHelpersViewModel>();
         services.AddSingleton<ToPickupDropsViewModel>();
         services.AddSingleton<RegisteredQuestsViewModel>();
         services.AddSingleton<CurrentDropsViewModel>();
-        services.AddSingleton<GitHubAuthViewModel>();
-        services.AddSingleton<ApplicationThemesViewModel>();
-        services.AddSingleton<ThemeSettingsViewModel>();
-        services.AddSingleton<ColorSchemeEditorViewModel>();
+
+        services.AddThemeViewModels();
+
         services.AddSingleton<PluginsViewModel>();
+
         services.AddSingleton<HotKeysViewModel>();
         services.AddSingleton(HotKeys.CreateHotKeys);
 
@@ -160,17 +178,26 @@ public static class Services
         return services;
     }
 
-    public static IServiceCollection AddSkuaManagerViewModels(this IServiceCollection services)
+    public static IServiceCollection AddThemeViewModels(this IServiceCollection services)
     {
-        services.AddSingleton(SkuaManager.CreateViewModel);
+        services.AddSingleton<ApplicationThemesViewModel>();
+        services.AddSingleton<ThemeSettingsViewModel>();
+        services.AddSingleton<ColorSchemeEditorViewModel>();
 
         return services;
     }
 
-    public static IServiceCollection AddAllViewModels(this IServiceCollection services)
+    public static IServiceCollection AddSkuaManagerViewModels(this IServiceCollection services)
     {
-        services.AddSkuaMainAppViewModels();
-        services.AddSkuaManagerViewModels();
+        services.AddThemeViewModels();
+        services.AddSingleton<LauncherViewModel>();
+        services.AddSingleton<IClientUpdateService, ClientUpdateService>();
+        services.AddSingleton<ClientUpdatesViewModel>();
+        services.AddSingleton<GitHubAuthViewModel>();
+        services.AddSingleton<ScriptRepoViewModel>();
+        services.AddSingleton<GoalsViewModel>();
+        services.AddSingleton(SkuaManager.CreateViewModel);
+        services.AddSingleton(SkuaManager.CreateOptionsViewModel);
 
         return services;
     }

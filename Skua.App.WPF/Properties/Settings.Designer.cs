@@ -155,30 +155,6 @@ namespace Skua.App.WPF.Properties {
         [global::System.Configuration.UserScopedSettingAttribute()]
         [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
         [global::System.Configuration.DefaultSettingValueAttribute("True")]
-        public bool CheckClientUpdates {
-            get {
-                return ((bool)(this["CheckClientUpdates"]));
-            }
-            set {
-                this["CheckClientUpdates"] = value;
-            }
-        }
-        
-        [global::System.Configuration.UserScopedSettingAttribute()]
-        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
-        [global::System.Configuration.DefaultSettingValueAttribute("False")]
-        public bool CheckClientPrereleases {
-            get {
-                return ((bool)(this["CheckClientPrereleases"]));
-            }
-            set {
-                this["CheckClientPrereleases"] = value;
-            }
-        }
-        
-        [global::System.Configuration.UserScopedSettingAttribute()]
-        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
-        [global::System.Configuration.DefaultSettingValueAttribute("True")]
         public bool CheckScriptUpdates {
             get {
                 return ((bool)(this["CheckScriptUpdates"]));
@@ -202,7 +178,7 @@ namespace Skua.App.WPF.Properties {
         
         [global::System.Configuration.ApplicationScopedSettingAttribute()]
         [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
-        [global::System.Configuration.DefaultSettingValueAttribute("1.0.1.0")]
+        [global::System.Configuration.DefaultSettingValueAttribute("1.1.0.0")]
         public string ApplicationVersion {
             get {
                 return ((string)(this["ApplicationVersion"]));

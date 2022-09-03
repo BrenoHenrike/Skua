@@ -9,7 +9,7 @@ public partial class ScriptLoaderViewModel : BotControlViewModelBase
 {
     private readonly string _scriptPath;
     public ScriptLoaderViewModel(
-        IProcessStartService processService,
+        IProcessService processService,
         IFileDialogService fileDialog,
         IScriptManager scriptManager,
         IWindowService windowService,
@@ -37,7 +37,7 @@ public partial class ScriptLoaderViewModel : BotControlViewModelBase
     public IScriptManager ScriptManager { get; }
 
     private readonly IWindowService _windowService;
-    private readonly IProcessStartService _processService;
+    private readonly IProcessService _processService;
     private readonly IDialogService _dialogService;
     private readonly IFileDialogService _fileDialog;
     public LogTabViewModel ScriptLogs { get; }
@@ -124,7 +124,7 @@ public partial class ScriptLoaderViewModel : BotControlViewModelBase
     {
         if (string.IsNullOrWhiteSpace(path))
         {
-            path = _fileDialog.Open(_scriptPath, "Skua Scripts (*.cs)|*.cs");
+            path = _fileDialog.OpenFile(_scriptPath, "Skua Scripts (*.cs)|*.cs");
             if (path is null)
                 return;
         }

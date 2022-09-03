@@ -10,12 +10,12 @@ public partial class GetScriptsService : ObservableObject, IGetScriptsService
     public GetScriptsService(IDialogService dialogService)
     {
         _dialogService = dialogService;
-        _repos = new();
-        _repos.Add(new("BrenoHenrike", "Scripts", string.Empty, "Master Project", "Skua"));
     }
-    private const string BaseUrl = "https://raw.githubusercontent.com/brenohenrike/skua/master/repos";
+
+    private const string _reposUrl = "https://raw.githubusercontent.com/brenohenrike/skua/master/repos";
+
     private readonly IDialogService _dialogService;
-    private List<ScriptRepo>? _repos;
+    private List<ScriptRepo> _repos = new();
     [ObservableProperty]
     private RangedObservableCollection<ScriptInfo> _scripts = new();
 
@@ -23,23 +23,28 @@ public partial class GetScriptsService : ObservableObject, IGetScriptsService
     {
         if (_scripts.Any())
             return _scripts.ToList();
-        await RefreshAsync(progress, token);
+        await GetScripts(progress, false, token);
 
         return _scripts.ToList();
     }
 
-    public async Task RefreshAsync(IProgress<string>? progress, CancellationToken token)
+    public async Task RefreshScriptsAsync(IProgress<string>? progress, CancellationToken token)
+    {
+        await GetScripts(progress, true, token);
+    }
+
+    private async Task GetScripts(IProgress<string>? progress, bool refresh, CancellationToken token)
     {
         try
         {
             Scripts.Clear();
             progress?.Report("Fetching repos...");
-            List<ScriptRepo> repos = await GetRepos(token);
+            List<ScriptRepo> repos = await GetRepos(refresh, token);
             progress?.Report("Fetching scripts...");
             int total = 0;
             foreach (ScriptRepo repo in repos)
             {
-                List<ScriptInfo> scripts = await GetScriptsInfo(repo, token);
+                List<ScriptInfo> scripts = await GetScriptsInfo(repo, refresh, token);
                 progress?.Report($"Found {scripts.Count} scripts.");
                 _scripts.AddRange(scripts);
                 total += scripts.Count;
@@ -51,23 +56,29 @@ public partial class GetScriptsService : ObservableObject, IGetScriptsService
         {
             progress?.Report("Task Cancelled.");
         }
+        catch (Exception ex) when (ex.Message == "bad credentials")
+        {
+            _dialogService.ShowMessageBox("Something went wrong when retrieving the GitHub Token.\r\nPlease, redo the GitHub Authentication steps in the Manager > Options.", "Get Scripts Error");
+        }
         catch
         {
             _dialogService.ShowMessageBox("GitHub API limit reached", "Get Scripts Error");
-            progress?.Report("GitHub API limit reached.");
+            progress?.Report("GitHub API limit reached.\r\nIf you are seeing this even after doing the Authentication steps, try doing it again in the Manager > Options.");
         }
     }
 
-    private async ValueTask<List<ScriptRepo>> GetRepos(CancellationToken token)
+    private async ValueTask<List<ScriptRepo>> GetRepos(bool refresh, CancellationToken token)
     {
-        if (_repos is not null)
+        if (_repos.Count != 0 && !refresh)
             return _repos;
-        using HttpResponseMessage response = await HttpClients.Default.GetAsync(BaseUrl, token);
-        return _repos = (await response.Content.ReadAsStringAsync(token)).Split('\n').Select(l => l.Trim().Split('|')).Where(p => p.Length == 5).Select(p => new ScriptRepo(p[0], p[1], p[2], p[3], p[5])).ToList();
+        using HttpResponseMessage response = await HttpClients.Default.GetAsync(_reposUrl, token);
+        return _repos = (await response.Content.ReadAsStringAsync(token)).Split('\n').Select(l => l.Trim().Split('|')).Where(p => p.Length == 5).Select(p => new ScriptRepo(p[0], p[1], p[2], p[3], p[4])).ToList();
     }
 
-    private async Task<List<ScriptInfo>> GetScriptsInfo(ScriptRepo repo, CancellationToken token)
+    private async Task<List<ScriptInfo>> GetScriptsInfo(ScriptRepo repo, bool refresh, CancellationToken token)
     {
+        if (_scripts.Count != 0 && !refresh)
+            return _scripts.ToList();
         await GetLastCommitRecursiveTree(repo, token);
         if (string.IsNullOrEmpty(repo.RecursiveTreeUrl))
             return new();
@@ -83,6 +94,8 @@ public partial class GetScriptsService : ObservableObject, IGetScriptsService
         IEnumerable<Task<string>> contents = requests.Select(request => request.Result)
                                .Select(result => result.Content.ReadAsStringAsync());
         await Task.WhenAll(contents);
+        if (contents.Count() == 1 && contents.First().Result.Contains("Bad credentials"))
+            throw new Exception("bad credentials");
         return contents.Select(content => content.Result)
                        .Select(t => JsonConvert.DeserializeObject<List<ScriptInfo>>(t))
                        .SelectMany(l => l!)

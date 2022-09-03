@@ -98,7 +98,7 @@
                                     <Setter Property="Template">
                                         <Setter.Value>
                                             <ControlTemplate TargetType="GroupItem">
-                                                <Expander IsExpanded="True">
+                                                <Expander>
                                                     <Expander.Header>
                                                         <TextBlock>
                                                             <TextBlock.Style>
@@ -116,6 +116,16 @@
                                                     <Expander.Content>
                                                         <ItemsPresenter />
                                                     </Expander.Content>
+                                                    <Expander.Style>
+                                                        <Style BasedOn="{StaticResource MaterialDesignExpander}" TargetType="Expander">
+                                                            <Setter Property="IsExpanded" Value="False" />
+                                                            <Style.Triggers>
+                                                                <DataTrigger Binding="{Binding Path=Name.Length, FallbackValue=0, TargetNullValue=0}" Value="0">
+                                                                    <Setter Property="IsExpanded" Value="True" />
+                                                                </DataTrigger>
+                                                            </Style.Triggers>
+                                                        </Style>
+                                                    </Expander.Style>
                                                 </Expander>
                                             </ControlTemplate>
                                         </Setter.Value>

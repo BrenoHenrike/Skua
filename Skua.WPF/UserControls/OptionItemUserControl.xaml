@@ -57,7 +57,7 @@
             </DataTemplate>
 
             <DataTemplate x:Key="StringTemplate">
-                <DockPanel Height="32" Margin="6,0">
+                <DockPanel Height="32" Margin="6,3">
                     <Button
                         materialDesign:ButtonAssist.CornerRadius="0 16 16 0"
                         Command="{Binding Command}"

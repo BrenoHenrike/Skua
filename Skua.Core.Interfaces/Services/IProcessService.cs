@@ -1,5 +1,5 @@
 ﻿namespace Skua.Core.Interfaces;
-public interface IProcessStartService
+public interface IProcessService
 {
     void OpenLink(string link);
     void OpenVSC();

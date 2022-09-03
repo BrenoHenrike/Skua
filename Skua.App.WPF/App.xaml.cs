@@ -11,9 +11,9 @@ using Skua.App.WPF.Properties;
 using Skua.App.WPF.Services;
 using Skua.Core.Interfaces;
 using Skua.Core.Utils;
-using Skua.Core.ViewModels;
 using Westwind.Scripting;
 using Skua.Core.AppStartup;
+using Skua.WPF;
 
 namespace Skua.App.WPF;
 
@@ -32,7 +32,25 @@ public sealed partial class App : Application
         _bot.Flash.FlashCall += Flash_FlashCall;
 
         _ = Services.GetRequiredService<ILogService>();
-        _ = Services.GetRequiredService<IThemeService>();
+        var themes = Services.GetRequiredService<IThemeService>();
+
+        var args = Environment.GetCommandLineArgs();
+
+        for(int i = 0; i < args.Length; i++)
+        {
+            switch(args[i])
+            {
+                case "--use-theme":
+                    string theme = args[++i];
+                    if(!string.IsNullOrWhiteSpace(theme) && theme != "no-theme")
+                        themes.SetCurrentTheme(ThemeItem.FromString(theme));
+                    break;
+                case "--gh-token":
+                    if(string.IsNullOrEmpty(Settings.Default.UserGitHubToken))
+                        Settings.Default.UserGitHubToken = args[++i];
+                    break;
+            }
+        }
 
         RoslynLifetimeManager.WarmupRoslyn();
 
@@ -75,15 +93,7 @@ public sealed partial class App : Application
 
         IDialogService dialogService = Services.GetRequiredService<IDialogService>();
         string? token = Settings.Default.UserGitHubToken;
-        if (string.IsNullOrWhiteSpace(token) && !Settings.Default.IgnoreGHAuth)
-        {
-            dialogService.ShowDialog(Services.GetRequiredService<GitHubAuthViewModel>());
-
-            token = Settings.Default.UserGitHubToken;
-            if (!string.IsNullOrWhiteSpace(token))
-                HttpClients.UserGitHubClient = new(token);
-        }
-        else
+        if (!string.IsNullOrWhiteSpace(token))
             HttpClients.UserGitHubClient = new(token);
 
         main.Show();
@@ -123,7 +133,11 @@ public sealed partial class App : Application
 
         services.AddWindowsServices();
 
-        services.AddSkua();
+        services.AddCommonServices();
+
+        services.AddScriptableObjects();
+
+        services.AddCompiler();
 
         services.AddSkuaMainAppViewModels();
 

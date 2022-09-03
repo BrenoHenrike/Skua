@@ -18,6 +18,11 @@ public class CommandOptionItemViewModel<TDisplay> : CommandOptionItemViewModel
         Value = defaultValue;
     }
 
+    public CommandOptionItemViewModel(string content, string description, string tag, IRelayCommand command, TDisplay? defaultValue) : base(content, description, tag, command, typeof(TDisplay))
+    {
+        Value = defaultValue;
+    }
+
     public CommandOptionItemViewModel(string content, string description, string tag, IRelayCommand command) : base(content, description, tag, command, typeof(TDisplay))
     {
         Value = default(TDisplay);

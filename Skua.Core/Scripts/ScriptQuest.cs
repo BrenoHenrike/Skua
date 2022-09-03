@@ -70,30 +70,19 @@ public partial class ScriptQuest : ObservableRecipient, IScriptQuest
         foreach(int[] idchunk in ids.Chunk(30))
         {
             Flash.CallGameFunction("world.showQuests", idchunk.Select(id => id.ToString()).Join(','), "q");
+            Thread.Sleep(Options.ActionDelay);
         }
     }
 
     public Quest? EnsureLoad(int id)
     {
-        Dictionary<int, Quest> localTree = _quests;
-        if (localTree.ContainsKey(id))
-            return localTree[id];
-
-        for(int i = 0; i < 5; i++)
-        {
-            Load(id);
-            Thread.Sleep(1000);
-            localTree = _quests;
-            if (localTree.ContainsKey(id))
-                return localTree[id];
-        }
-
-        return null;
+        Wait.ForTrue(() => Tree.Contains(x => x.ID == id), () => Load(id), 20, 1000);
+        return Tree.Find(q => q.ID == id)!;
     }
 
     public bool TryGetQuest(int id, out Quest? quest)
     {
-        return _quests.TryGetValue(id, out quest);
+        return (quest = Tree.Find(x => x.ID == id)) != null;
     }
 
     public bool Accept(int id)

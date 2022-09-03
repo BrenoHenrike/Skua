@@ -86,7 +86,7 @@ public partial class ScriptManager : ObservableObject, IScriptManager
                     if (e is not TargetInvocationException || !_stoppedByScript)
                     {
                         exception = e;
-                        Trace.WriteLine($"Error while running script:\r\nMessage: {e.Message}\r\n{(e.InnerException is not null ? $"Inner Exception Message: {e.InnerException.Message}" : string.Empty)}StackTrace: {e.StackTrace}");
+                        Trace.WriteLine($"Error while running script:\r\nMessage: {e.Message}\r\n{(e.InnerException is not null ? $"Inner Exception Message: {e.InnerException.Message}\r\n" : string.Empty)}StackTrace: {e.StackTrace}");
                         StrongReferenceMessenger.Default.Send<ScriptErrorMessage, int>(new(e), (int)MessageChannels.ScriptStatus);
                         _runScriptStoppingBool = true;
                     }
@@ -243,7 +243,7 @@ public partial class ScriptManager : ObservableObject, IScriptManager
 
         string final = string.Join('\n', sources);
         SyntaxTree tree = CSharpSyntaxTree.ParseText(final, encoding: Encoding.UTF8);
-        final = tree.GetRoot().NormalizeWhitespace().ToFullString();
+        CompiledScript = final = tree.GetRoot().NormalizeWhitespace().ToFullString();
         Compiler compiler = Ioc.Default.GetRequiredService<Compiler>();
         if (references.Count > 0)
             compiler.AddAssemblies(references.ToArray());

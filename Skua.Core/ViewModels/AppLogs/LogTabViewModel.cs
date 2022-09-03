@@ -1,4 +1,5 @@
 ﻿using CommunityToolkit.Mvvm.ComponentModel;
+using CommunityToolkit.Mvvm.DependencyInjection;
 using CommunityToolkit.Mvvm.Input;
 using CommunityToolkit.Mvvm.Messaging;
 using Skua.Core.Interfaces;
@@ -29,7 +30,7 @@ public partial class LogTabViewModel : ObservableRecipient
     [RelayCommand]
     private void SaveLog()
     {
-        Messenger.Send<SaveLogsMessage>(new(Logs));
+        Ioc.Default.GetRequiredService<IFileDialogService>().SaveText(LogsToString(Logs));
     }
 
     [RelayCommand]
@@ -42,7 +43,7 @@ public partial class LogTabViewModel : ObservableRecipient
     [RelayCommand]
     private void CopyLog()
     {
-        Messenger.Send<CopyLogsMessage>(new(Logs));
+        Ioc.Default.GetRequiredService<IClipboardService>().SetText(LogsToString(Logs));
     }
 
     private void AddLog(LogTabViewModel recipient, AddLogMessage message)
@@ -54,5 +55,10 @@ public partial class LogTabViewModel : ObservableRecipient
         {
             recipient.Logs.Add(message.Text);
         });
+    }
+
+    private static string LogsToString(IEnumerable<string> logs)
+    {
+        return string.Join(Environment.NewLine, logs);
     }
 }

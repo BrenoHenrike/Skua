@@ -7,6 +7,7 @@ using Skua.Core.Interfaces;
 using Skua.Core.Models;
 using Skua.Core.Models.Servers;
 using Skua.Core.Utils;
+using CommunityToolkit.Mvvm.DependencyInjection;
 
 namespace Skua.Core.ViewModels;
 public partial class PacketInterceptorViewModel : BotControlViewModelBase
@@ -70,6 +71,9 @@ public partial class PacketInterceptorViewModel : BotControlViewModelBase
         if (SelectedServer is null)
             return;
 
+        var options = Ioc.Default.GetRequiredService<IScriptOption>();
+        bool relogin = options.AutoRelogin;
+        options.AutoRelogin = false;
         IPAddress ip = IPAddress.TryParse(SelectedServer.IP, out IPAddress? addr) ? addr : Dns.GetHostEntry(SelectedServer.IP).AddressList[0];
         _gameProxy.Destination = new IPEndPoint(ip, 5588);
         _gameProxy.Start();
@@ -77,6 +81,7 @@ public partial class PacketInterceptorViewModel : BotControlViewModelBase
         _server.Login();
         _server.ConnectIP("127.0.0.1");
         OnPropertyChanged(nameof(Running));
+        options.AutoRelogin = relogin;
     }
 
     private void RunningChanged(PacketInterceptorViewModel recipient, PropertyChangedMessage<bool> message)

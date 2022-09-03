@@ -58,12 +58,6 @@
     <Setting Name="AutoUpdateScripts" Type="System.Boolean" Scope="User">
       <Value Profile="(Default)">True</Value>
     </Setting>
-    <Setting Name="CheckClientUpdates" Type="System.Boolean" Scope="User">
-      <Value Profile="(Default)">True</Value>
-    </Setting>
-    <Setting Name="CheckClientPrereleases" Type="System.Boolean" Scope="User">
-      <Value Profile="(Default)">False</Value>
-    </Setting>
     <Setting Name="CheckScriptUpdates" Type="System.Boolean" Scope="User">
       <Value Profile="(Default)">True</Value>
     </Setting>
@@ -71,7 +65,7 @@
       <Value Profile="(Default)">False</Value>
     </Setting>
     <Setting Name="ApplicationVersion" Type="System.String" Scope="Application">
-      <Value Profile="(Default)">1.0.1.0</Value>
+      <Value Profile="(Default)">1.1.0.0</Value>
     </Setting>
     <Setting Name="UseLocalVSC" Type="System.Boolean" Scope="User">
       <Value Profile="(Default)">True</Value>
