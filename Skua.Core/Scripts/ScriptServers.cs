@@ -39,6 +39,9 @@ public partial class ScriptServers : ObservableRecipient, IScriptServers
     private IScriptOption Options => _lazyOptions.Value;
     private IScriptBotStats Stats => _lazyStats.Value;
     private IScriptManager Manager => _lazyManager.Value;
+    private bool _loginInfoSetted = false;
+    private string _username;
+    private string _password;
 
     public string LastIP { get; set; } = string.Empty;
     public string LastName { get; set; } = string.Empty;
@@ -47,6 +50,13 @@ public partial class ScriptServers : ObservableRecipient, IScriptServers
     [ObservableProperty]
     [NotifyPropertyChangedRecipients]
     private List<Server> _cachedServers = new();
+
+    public void SetLoginInfo(string username, string password)
+    {
+        _username = username;
+        _password = password;
+        _loginInfoSetted = true;
+    }
 
     public async ValueTask<List<Server>> GetServers(bool forceUpdate = false)
     {
@@ -64,6 +74,13 @@ public partial class ScriptServers : ObservableRecipient, IScriptServers
 
     [MethodCallBinding("connectTo", RunMethodPost = true, GameFunction = true)]
     private bool _connectIP(string ip)
+    {
+        Wait.ForTrue(() => !Manager.ShouldExit && Player.Playing && Flash.IsWorldLoaded, 30);
+        return Player.Playing;
+    }
+
+    [MethodCallBinding("connectTo", RunMethodPost = true, GameFunction = true)]
+    private bool _connectIP(string ip, int port)
     {
         Wait.ForTrue(() => !Manager.ShouldExit && Player.Playing && Flash.IsWorldLoaded, 30);
         return Player.Playing;
@@ -103,7 +120,10 @@ public partial class ScriptServers : ObservableRecipient, IScriptServers
         Thread.Sleep(2000);
         Logout();
         Stats.Relogins++;
-        Login(Player.Username, Player.Password);
+        if(_loginInfoSetted)
+            Login(_username, _password);
+        else
+            Login(Player.Username, Player.Password);
         Thread.Sleep(2000);
         ConnectIP(ip);
         Wait.ForTrue(() => Player.Playing && Flash.IsWorldLoaded, 30);
@@ -113,21 +133,41 @@ public partial class ScriptServers : ObservableRecipient, IScriptServers
 
     public bool Relogin(string serverName)
     {
-        Server s = ServerList.Find(x => x.Name.Contains(serverName))!;
-        if (s is not null)
-            return ReloginIP(s.IP);
-        Trace.WriteLine($"Server with name \"{serverName}\" was not found.");
-        return false;
+        bool autoRelogSwitch = Options.AutoRelogin;
+        Options.AutoRelogin = false;
+        Thread.Sleep(2000);
+        Logout();
+        Stats.Relogins++;
+        if (_loginInfoSetted)
+            Login(_username, _password);
+        else
+            Login(Player.Username, Player.Password);
+        Thread.Sleep(2000);
+        if (Flash.Call<bool>("clickServer", serverName))
+            Wait.ForTrue(() => Player.Playing && Flash.IsWorldLoaded, 30);
+        else
+            Trace.WriteLine($"Server with name \"{serverName}\" was not found.");
+        Options.AutoRelogin = autoRelogSwitch;
+        return Player.Playing;
     }
+
+    //public bool Relogin(string serverName)
+    //{
+    //    Server s = ServerList.Find(x => x.Name.Contains(serverName)) ?? CachedServers.Find(x => x.Name.Contains(serverName));
+    //    if (s is not null)
+    //        return ReloginIP(s.IP);
+    //    Trace.WriteLine($"Server with name \"{serverName}\" was not found.");
+    //    return false;
+    //}
 
     public bool EnsureRelogin(string serverName)
     {
-        Server? s = CachedServers.Find(x => x.Name.Contains(serverName));
-        if (s is null)
-            s = Options.AutoReloginAny ? ServerList.Find(x => x.IP != LastIP)! : CachedServers.First(s => s.Name == Options.ReloginServer) ?? ServerList[0];
+        //Server? s = CachedServers.Find(x => x.Name.Contains(serverName));
+        //if (s is null)
+        //    s = Options.AutoReloginAny ? ServerList.Find(x => x.IP != LastIP)! : CachedServers.First(s => s.Name == Options.ReloginServer) ?? ServerList[0];
 
         int tries = 0;
-        while (!ReloginIP(s.IP) && !Manager.ShouldExit && !Player.Playing && ++tries < Options.ReloginTries)
+        while (!Relogin(serverName) && !Manager.ShouldExit && !Player.Playing && ++tries < Options.ReloginTries)
             Thread.Sleep(Options.ReloginTryDelay);
         return Player.Playing;
     }
@@ -143,7 +183,8 @@ public partial class ScriptServers : ObservableRecipient, IScriptServers
                 Login();
                 await Task.Delay(3000, token);
                 Server server = Options.AutoReloginAny ? ServerList.Find(x => x.IP != LastIP)! : CachedServers.FirstOrDefault(s => s.Name == Options.ReloginServer) ?? ServerList[0];
-                ConnectIP(server.IP);
+                if(!Flash.Call<bool>("clickServer", server.Name))
+                    ConnectIP(server.IP, server.Port);
                 using CancellationTokenSource waitLogin = new(Options.LoginTimeout);
                 try
                 {

@@ -144,7 +144,7 @@ public partial class ScriptLoaderViewModel : BotControlViewModelBase
     }
 
     [RelayCommand]
-    private void EditScriptConfig()
+    private async Task EditScriptConfig()
     {
         if (string.IsNullOrWhiteSpace(ScriptManager.LoadedScript))
         {
@@ -154,7 +154,7 @@ public partial class ScriptLoaderViewModel : BotControlViewModelBase
 
         try
         {
-            object compiled = ScriptManager.Compile(File.ReadAllText(ScriptManager.LoadedScript))!;
+            object compiled = await Task.Run(() => ScriptManager.Compile(File.ReadAllText(ScriptManager.LoadedScript))!);
             ScriptManager.LoadScriptConfig(compiled);
             if (ScriptManager.Config!.Options.Count > 0 || ScriptManager.Config.MultipleOptions.Count > 0)
                 ScriptManager.Config.Configure();

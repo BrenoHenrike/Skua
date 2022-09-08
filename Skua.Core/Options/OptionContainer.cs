@@ -47,7 +47,7 @@ public class OptionContainer : ObservableObject, IOptionContainer
         if (OptionValues.TryGetValue(option, out string? value))
         {
             if (typeof(T).IsEnum)
-                return (T)Enum.Parse(typeof(T), value);
+                return (T)Enum.Parse(typeof(T), value.Replace(' ', '_'));
             return (T)Convert.ChangeType(value, typeof(T));
         }
 

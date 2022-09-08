@@ -54,11 +54,11 @@ public sealed partial class App : Application
 
         RoslynLifetimeManager.WarmupRoslyn();
 
-        Dispatcher.ShutdownStarted += Dispatcher_ShutdownStarted;
+        Application.Current.Exit += App_Exit;
         Timeline.DesiredFrameRateProperty.OverrideMetadata(typeof(Timeline), new FrameworkPropertyMetadata { DefaultValue = Services.GetRequiredService<ISettingsService>().Get<int>("AnimationFrameRate") });
     }
 
-    private async void Dispatcher_ShutdownStarted(object? sender, EventArgs e)
+    private async void App_Exit(object? sender, EventArgs e)
     {
         Services.GetRequiredService<ICaptureProxy>().Stop();
 
@@ -76,7 +76,7 @@ public sealed partial class App : Application
 
         RoslynLifetimeManager.ShutdownRoslyn();
 
-        Dispatcher.ShutdownStarted -= Dispatcher_ShutdownStarted;
+        Application.Current.Exit -= App_Exit;
     }
 
     private readonly IScriptInterface _bot;

@@ -272,9 +272,20 @@ package skua
             return "true";
         }
 		
-		public static function chatFocus():void 
+		public static function clickServer(serverName:String):String
 		{
-			
+			var source:* = instance.game.mcLogin.sl.iList;
+			for (var i:int = 0; i < source.numChildren; i++)
+			{
+				var child:* = source.getChildAt(i);
+				
+				if (child.tName.ti.text.toLowerCase().indexOf(serverName.toLowerCase()) > -1)
+				{
+					child.dispatchEvent(new MouseEvent(MouseEvent.CLICK));
+					return true.toString();
+				}
+			}
+			return false.toString();
 		}
         
         public static function isLoggedIn():String
@@ -499,7 +510,7 @@ package skua
             if (instance.game.litePreference.data.bCustomDrops)
             {
                 var source:* = instance.game.cDropsUI.mcDraggable ? instance.game.cDropsUI.mcDraggable.menu : instance.game.cDropsUI;
-                for (var i: int = 0; i < source.numChildren; i++)
+                for (var i:int = 0; i < source.numChildren; i++)
                 {
                     var child:* = source.getChildAt(i);
                     if (child.itemObj)

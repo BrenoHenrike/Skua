@@ -27,6 +27,8 @@ package skua
 			this.addCallback("selectArrayObjects", Main.selectArrayObjects);
 			this.addCallback("isNull", Main.isNull);
 			
+			this.addCallback("clickServer", Main.clickServer);
+			
 			this.addCallback("isLoggedIn", Main.isLoggedIn);
 			this.addCallback("isKicked", Main.isKicked);
 			
