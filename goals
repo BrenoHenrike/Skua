@@ -1,13 +1,13 @@
 [
     {
         "title":"Follower/Synchronize Clients",
-        "desc":"3 new Client types: Main, Follower and Sync.\r\nMain and Follower would work together, where the Main account sends info to its Follower's accounts so them can battle alongside.\r\nSync would be a client with synchronizaation capabilities, designed for more complex actions and that can be controlled by command line.",
+        "desc":"3 new Client types: Main, Follower and Sync.\r\nMain and Follower would work together, where the Main account sends info/commands to its Follower's accounts so them can battle alongside.\r\nSync would be a client with synchronization capabilities, designed for more complex actions and that can be controlled by command line.",
         "cur_value":"25",
         "goal_value":"200"
     },
     {
         "title":"Account Manager",
-        "desc":"UI to ease the process of logging in multiple accounts",
+        "desc":"UI to ease the process of logging in multiple accounts, where accounts can be added and started in the available launchers.",
         "cur_value":"0",
         "goal_value":"100"
     },
