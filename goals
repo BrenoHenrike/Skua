@@ -1,8 +1,8 @@
 [
     {
-        "title":"Follower/Synchronize Clients",
+        "title":"Follower/Synchronize Clients - Completed",
         "desc":"3 new Client types: Main, Follower and Sync.\r\nMain and Follower would work together, where the Main account sends info/commands to its Follower's accounts so them can battle alongside.\r\nSync would be a client with synchronization capabilities, designed for more complex actions and that can be controlled by command line.",
-        "cur_value":"78",
+        "cur_value":"200",
         "goal_value":"200"
     },
     {
