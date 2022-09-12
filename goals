@@ -6,9 +6,9 @@
         "goal_value":"200"
     },
     {
-        "title":"Account Manager",
+        "title":"Account Manager - Completed",
         "desc":"UI to ease the process of logging in multiple accounts, where accounts can be added and started in the available launchers.",
-        "cur_value":"0",
+        "cur_value":"100",
         "goal_value":"100"
     },
     {
