@@ -311,7 +311,11 @@ public class ScriptWait : IScriptWait
         if (!Player.Playing)
             return false;
         long time = new DateTimeOffset(DateTime.Now).ToUnixTimeMilliseconds();
-        GameActionLock locked = JsonConvert.DeserializeObject<GameActionLock>(Flash.GetGameObject($"world.lock.{action}")!);
+        GameActionLock locked = JsonConvert.DeserializeObject<GameActionLock>(Flash.GetGameObject($"world.lock.{action}")!) ?? new GameActionLock();
+
+        if (locked == null) 
+            return false;
+        
         return time - locked.TS >= locked.CD;
     }
 
