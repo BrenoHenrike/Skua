@@ -1,0 +1,86 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <OutputType>WinExe</OutputType>
+    <TargetFramework>net6.0-windows</TargetFramework>
+      <UseWindowsForms>true</UseWindowsForms>
+      <UseWPF>true</UseWPF>
+    <Nullable>enable</Nullable>
+    <UseWPF>true</UseWPF>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <None Include="..\Skua.App.WPF\Assemblies\AxInterop.ShockwaveFlashObjects.dll" />
+    <None Include="..\Skua.App.WPF\Assemblies\corehook32.dll" />
+    <None Include="..\Skua.App.WPF\Assemblies\corehook64.dll" />
+    <None Include="..\Skua.App.WPF\Assemblies\coreload32.dll" />
+    <None Include="..\Skua.App.WPF\Assemblies\coreload64.dll" />
+    <None Include="..\Skua.App.WPF\Assemblies\Interop.ShockwaveFlashObjects.dll" />
+    <None Include="..\Skua.App.WPF\Assemblies\System.IO.FileSystem.Watcher.dll" />
+    <None Include="..\Skua.AS3\skua\bin\skua.swf" Link="skua.swf">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
+  </ItemGroup>
+
+    <ItemGroup>
+        <PackageReference Include="Caseless.Fody" Version="1.9.1" />
+        <PackageReference Include="CommunityToolkit.Mvvm" Version="8.0.0" />
+        <PackageReference Include="MaterialDesignThemes" Version="4.5.0" />
+        <PackageReference Include="Microsoft.Extensions.DependencyInjection" Version="6.0.0" />
+        <PackageReference Include="Microsoft.Xaml.Behaviors.Wpf" Version="1.1.39" />
+        <PackageReference Include="Newtonsoft.Json" Version="13.0.1" />
+        <PackageReference Include="Google.Protobuf" Version="3.21.5" />
+        <PackageReference Include="Grpc.Net.Client" Version="2.48.0" />
+        <PackageReference Include="Grpc.Tools" Version="2.48.0">
+            <PrivateAssets>all</PrivateAssets>
+            <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
+        </PackageReference>
+    </ItemGroup>
+
+    <ItemGroup>
+      <ProjectReference Include="..\Skua.Core.Interfaces\Skua.Core.Interfaces.csproj" />
+      <ProjectReference Include="..\Skua.Core.Models\Skua.Core.Models.csproj" />
+      <ProjectReference Include="..\Skua.Core.Utils\Skua.Core.Utils.csproj" />
+      <ProjectReference Include="..\Skua.Core\Skua.Core.csproj" />
+      <ProjectReference Include="..\Skua.gRPC.Protos\Skua.gRPC.Protos.csproj" />
+      <ProjectReference Include="..\Skua.WPF\Skua.WPF.csproj" />
+    </ItemGroup>
+
+    <ItemGroup>
+        <Reference Include="AxInterop.ShockwaveFlashObjects">
+            <HintPath>..\Skua.App.WPF\Assemblies\AxInterop.ShockwaveFlashObjects.dll</HintPath>
+        </Reference>
+        <Reference Include="Interop.ShockwaveFlashObjects">
+            <HintPath>..\Skua.App.WPF\Assemblies\Interop.ShockwaveFlashObjects.dll</HintPath>
+        </Reference>
+    </ItemGroup>
+
+    <ItemGroup>
+        <None Update="..\Skua.App.WPF\Assemblies\AxInterop.ShockwaveFlashObjects.dll" Link="Assemblies\AxInterop.ShockwaveFlashObjects.dll">
+            <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+        </None>
+        <None Update="..\Skua.App.WPF\Assemblies\corehook32.dll" Link="Assemblies\corehook32.dll">
+            <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+        </None>
+        <None Update="..\Skua.App.WPF\Assemblies\corehook64.dll" Link="Assemblies\corehook64.dll">
+            <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+        </None>
+        <None Update="..\Skua.App.WPF\Assemblies\coreload32.dll" Link="Assemblies\coreload32.dll">
+            <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+        </None>
+        <None Update="..\Skua.App.WPF\Assemblies\coreload64.dll" Link="Assemblies\coreload64.dll">
+            <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+        </None>
+        <None Update="..\Skua.App.WPF\Assemblies\Interop.ShockwaveFlashObjects.dll" Link="Assemblies\Interop.ShockwaveFlashObjects.dll">
+            <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+        </None>
+        <None Update="..\Skua.App.WPF\Assemblies\System.IO.FileSystem.Watcher.dll" Link="Assemblies\System.IO.FileSystem.Watcher.dll">
+            <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+        </None>
+    </ItemGroup>
+
+    <ItemGroup>
+      <Folder Include="Assemblies\" />
+    </ItemGroup>
+
+</Project>

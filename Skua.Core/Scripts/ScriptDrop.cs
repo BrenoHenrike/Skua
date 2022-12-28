@@ -56,12 +56,12 @@ public partial class ScriptDrop : ObservableRecipient, IScriptDrop, IAsyncDispos
     private bool _rejectElse;
     public bool Enabled => _taskDrops is not null;
     private readonly SynchronizedList<string> _toPickup = new();
-    public IEnumerable<string> ToPickup => _toPickup.Items;
+    public IEnumerable<string> ToPickup => _toPickup.Items ?? Enumerable.Empty<string>();
     private readonly SynchronizedList<int> _toPickupIDs = new();
-    public IEnumerable<int> ToPickupIDs => _toPickupIDs.Items;
+    public IEnumerable<int> ToPickupIDs => _toPickupIDs.Items ?? Enumerable.Empty<int>();
     private readonly SynchronizedList<ItemBase> _currentDropInfos = new();
-    public IEnumerable<ItemBase> CurrentDropInfos => _currentDropInfos.Items;
-    public IEnumerable<string> CurrentDrops => CurrentDropInfos.Select(x => x.Name.Trim()).ToList();
+    public IEnumerable<ItemBase> CurrentDropInfos => _currentDropInfos.Items ?? Enumerable.Empty<ItemBase>();
+    public IEnumerable<string> CurrentDrops => CurrentDropInfos.Select(x => x.Name.Trim()).ToList() ?? Enumerable.Empty<string>();
 
     public void Pickup(string name)
     {

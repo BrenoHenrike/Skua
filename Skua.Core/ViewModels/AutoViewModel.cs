@@ -81,11 +81,11 @@ public partial class AutoViewModel : BotControlViewModelBase
             return;
         }
 
-        Auto.StartAutoAttack();
+        await Task.Run(() => Auto.StartAutoAttack());
     }
 
     private async Task StopAutoAsync()
     {
-        await Auto.StopAsync();
+        await Task.Run(() => Auto.StopAsync());
     }
 }

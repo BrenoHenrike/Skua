@@ -1,0 +1,17 @@
+syntax = "proto3";
+
+option csharp_namespace = "Skua.gRPC.Server";
+
+package follower;
+
+service Follower {
+    rpc StartFollowing (FollowerRequest) returns (stream FollowerResponse);
+}
+
+message FollowerRequest {
+    string username = 1;
+}
+
+message FollowerResponse {
+    string command = 1;
+}

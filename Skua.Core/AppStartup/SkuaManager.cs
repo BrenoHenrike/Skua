@@ -12,6 +12,7 @@ internal class SkuaManager
     {
         List<TabItemViewModel> tabs = new()
         {
+            //new("Accounts", s.GetRequiredService<AccountManagerViewModel>()),
             new("Launcher", s.GetRequiredService<LauncherViewModel>()),
             new("Updates", s.GetRequiredService<ClientUpdatesViewModel>()),
             new("Options", s.GetRequiredService<ManagerOptionsViewModel>()),
@@ -26,10 +27,8 @@ internal class SkuaManager
         List<DisplayOptionItemViewModelBase> options = new()
         {
             CreateSettingOptionItem<bool>("Use Manager theme on Skua", "Whether to use, when launching from the Launcher tab, the same theme as the Manager in any launched App", "SyncThemes"),
-            CreateSettingOptionItem<bool>("Auto Update Scripts", "Whether to auto update scripts when launching the Manager, needs \"Check for Scripts updates\" to be true", "AutoUpdateScripts"),
             CreateSettingOptionItem<bool>("Check for Client Updates", "Whether to check for client updates when launching the Manager", "CheckClientUpdates"),
             CreateSettingOptionItem<bool>("Check for Client Prereleases", "Whether to check for pre-releases when checking updates", "CheckClientPrereleases"),
-            CreateSettingOptionItem<bool>("Check for Script Updates", "Whether to check for scripts updates when launching the Manager", "CheckScriptUpdates"),
             CreateSettingOptionItem<bool>("Delete .zip after Download", "Whether to delete the .zip folder after downloading and extracting the new version", "DeleteZipFileAfter")
         };
 

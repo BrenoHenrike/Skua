@@ -190,6 +190,7 @@ public static class Services
     public static IServiceCollection AddSkuaManagerViewModels(this IServiceCollection services)
     {
         services.AddThemeViewModels();
+        //services.AddSingleton<AccountManagerViewModel>();
         services.AddSingleton<LauncherViewModel>();
         services.AddSingleton<IClientUpdateService, ClientUpdateService>();
         services.AddSingleton<ClientUpdatesViewModel>();
@@ -244,5 +245,11 @@ public static class Services
         });
         compiler.SaveGeneratedCode = true;
         return compiler;
+    }
+
+    public static IServiceCollection AddSync(this IServiceCollection services, int id)
+    {
+        services.AddSingleton<IScriptSync, ScriptSync>(s => new(id, s.GetRequiredService<IScriptInterface>()));
+        return services;
     }
 }

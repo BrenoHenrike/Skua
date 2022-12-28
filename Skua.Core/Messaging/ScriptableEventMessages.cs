@@ -13,6 +13,7 @@ public sealed record MapChangedMessage(string Map);
 public sealed record CellChangedMessage(string Map, string Cell, string Pad);
 public sealed record ReloginTriggeredMessage(bool WasKicked);
 public sealed record ExtensionPacketMessage(dynamic Packet);
+public sealed record PacketMessage(string Packet);
 public sealed record PlayerAFKMessage();
 public sealed record TryBuyItemMessage(int ShopID, int ItemID, int ShopItemID);
 public sealed record CounterAttackMessage(bool Faded);

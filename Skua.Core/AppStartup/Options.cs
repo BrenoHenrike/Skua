@@ -60,15 +60,8 @@ internal class Options
     {
         List<DisplayOptionItemViewModelBase> appOptions = new()
         {
-            new CommandOptionItemViewModel<bool>("Use Local VSCode", "UseLocalVSC", new RelayCommand<bool>(b =>
-            {
-                if(!Directory.Exists(Path.Combine(AppContext.BaseDirectory, "VSCode")))
-                {
-                    Ioc.Default.GetRequiredService<ISettingsService>().Set("UseLocalVSC", false);
-                    return;
-                }
-                Ioc.Default.GetRequiredService<ISettingsService>().Set("UseLocalVSC", b);
-            })),
+            CreateSettingOptionItem<bool>("Auto Update Scripts", "Whether to auto update scripts when launching the Manager, needs \"Check for Scripts updates\" to be true", "AutoUpdateScripts"),
+            CreateSettingOptionItem<bool>("Check for Script Updates", "Whether to check for scripts updates when launching the Manager", "CheckScriptUpdates"),
             new CommandOptionItemViewModel<int>("* Client Animation Framerate", "ClientAnim", new RelayCommand<string>(value =>
             {
                 if (!int.TryParse(value, out int result) || result < 1)
@@ -78,5 +71,14 @@ internal class Options
         };
 
         return new ApplicationOptionsViewModel(appOptions);
+
+        static RelayCommand<T> CreateSettingCommand<T>(string key)
+        {
+            return new RelayCommand<T>(b => Ioc.Default.GetRequiredService<ISettingsService>().Set(key, b));
+        }
+        static CommandOptionItemViewModel<T> CreateSettingOptionItem<T>(string content, string description, string key)
+        {
+            return new(content, description, key, CreateSettingCommand<T>(key), Ioc.Default.GetRequiredService<ISettingsService>().Get<T>(key));
+        }
     }
 }

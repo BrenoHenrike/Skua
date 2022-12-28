@@ -15,11 +15,13 @@ namespace Skua.App.WPF;
 public partial class MainWindow : CustomWindow
 {
     private readonly IScriptPlayer _player;
+    private readonly IDispatcherService _dispatcherService;
     public MainWindow()
     {
         InitializeComponent();
         DataContext = Ioc.Default.GetService<MainViewModel>();
         _player = Ioc.Default.GetRequiredService<IScriptPlayer>();
+        _dispatcherService = Ioc.Default.GetRequiredService<IDispatcherService>();
         StrongReferenceMessenger.Default.Register<MainWindow, ShowMainWindowMessage>(this, ShowMainWindow);
         StrongReferenceMessenger.Default.Register<MainWindow, HideBalloonTipMessage>(this, HideBalloon);
         StrongReferenceMessenger.Default.Register<MainWindow, ReloginTriggeredMessage, int>(this, (int)MessageChannels.GameEvents, NotifyRelogin);
@@ -46,8 +48,11 @@ public partial class MainWindow : CustomWindow
     {
         if (!IsVisible)
         {
-            BalloonTipUserControl diag = new(title, message);
-            NotifyIcon.ShowCustomBalloon(diag, System.Windows.Controls.Primitives.PopupAnimation.Slide, timeout);
+            _dispatcherService.Invoke(() =>
+            {
+                BalloonTipUserControl diag = new(title, message);
+                NotifyIcon.ShowCustomBalloon(diag, System.Windows.Controls.Primitives.PopupAnimation.Slide, timeout);
+            });
         }
     }
     private void HideBalloon(MainWindow recipient, HideBalloonTipMessage message)

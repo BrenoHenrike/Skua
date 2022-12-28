@@ -3,6 +3,7 @@ using System;
 using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Interop;
+using System.Windows.Shell;
 
 namespace Skua.WPF;
 [TemplatePart(Name = "btnClose", Type = typeof(Button))]
@@ -63,8 +64,14 @@ public partial class CustomWindow : Window
             btnMaximize = (Button)Template.FindName("btnMaximize", this);
             btnMinimize = (Button)Template.FindName("btnMinimize", this);
 
-            if(!HideWindow)
-                btnClose.Click += (s, e) => Close();
+            if (!HideWindow)
+            {
+                btnClose.Click += (s, e) =>
+                {
+                    Close();
+                    WindowChrome.SetWindowChrome(this, null);
+                };
+            }
             else
             {
                 Closing += (s, e) =>

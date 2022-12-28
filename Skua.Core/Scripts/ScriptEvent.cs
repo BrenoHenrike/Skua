@@ -24,6 +24,7 @@ public class ScriptEvent : IScriptEvent
         _messenger.Register<ScriptEvent, CellChangedMessage, int>(this, (int)MessageChannels.GameEvents, OnCellChanged);
         _messenger.Register<ScriptEvent, ReloginTriggeredMessage, int>(this, (int)MessageChannels.GameEvents, OnReloginTriggered);
         _messenger.Register<ScriptEvent, ExtensionPacketMessage, int>(this, (int)MessageChannels.GameEvents, OnExtensionPacket);
+        _messenger.Register<ScriptEvent, PacketMessage, int>(this, (int)MessageChannels.GameEvents, OnPacketReceived);
         _messenger.Register<ScriptEvent, PlayerAFKMessage, int>(this, (int)MessageChannels.GameEvents, OnPlayerAFK);
         _messenger.Register<ScriptEvent, TryBuyItemMessage, int>(this, (int)MessageChannels.GameEvents, OnTryBuyItem);
         _messenger.Register<ScriptEvent, CounterAttackMessage, int>(this, (int)MessageChannels.GameEvents, OnCounterAttack);
@@ -33,6 +34,7 @@ public class ScriptEvent : IScriptEvent
         _messenger.Register<ScriptEvent, ItemAddedToBankMessage, int>(this, (int)MessageChannels.GameEvents, OnItemAddedToBank);
         _messenger.Register<ScriptEvent, RunToAreaMessage, int>(this, (int)MessageChannels.GameEvents, OnRunToArea);
     }
+
     private void UnregisterGameEvents()
     {
         _messenger.UnregisterAll(this, (int)MessageChannels.GameEvents);
@@ -49,6 +51,7 @@ public class ScriptEvent : IScriptEvent
     public event CellChangedEventHandler? CellChanged;
     public event ReloginTriggeredEventHandler? ReloginTriggered;
     public event ExtensionPacketEventHandler? ExtensionPacketReceived;
+    public event PacketEventHandler? PacketReceived;
     public event AFKEventHandler? PlayerAFK;
     public event TryBuyItemHandler? TryBuyItem;
     public event CounterAttackHandler? CounterAttack;
@@ -166,6 +169,11 @@ public class ScriptEvent : IScriptEvent
     public void OnExtensionPacket(ScriptEvent recipient, ExtensionPacketMessage message)
     {
         recipient.ExtensionPacketReceived?.Invoke(message.Packet);
+    }
+
+    private void OnPacketReceived(ScriptEvent recipient, PacketMessage message)
+    {
+        recipient.PacketReceived?.Invoke(message.Packet);
     }
 
     public void OnPlayerAFK(ScriptEvent recipient, PlayerAFKMessage message)

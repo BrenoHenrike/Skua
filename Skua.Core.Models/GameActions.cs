@@ -1,9 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using Newtonsoft.Json;
+﻿using Newtonsoft.Json;
 
 namespace Skua.Core.Models;
 
@@ -73,7 +68,7 @@ public enum GameActions
 public struct GameActionLock
 {
     [JsonProperty("cd")]
-    public long CD { get; }
+    public long? CD { get; }
     [JsonProperty("ts")]
-    public long TS { get; }
+    public long? TS { get; }
 }

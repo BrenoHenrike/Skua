@@ -1,0 +1,26 @@
+[
+    {
+        "title":"Follower/Synchronize Clients - Completed",
+        "desc":"3 new Client types: Main, Follower and Sync.\r\nMain and Follower would work together, where the Main account sends info/commands to its Follower's accounts so them can battle alongside.\r\nSync would be a client with synchronization capabilities, designed for more complex actions and that can be controlled by command line.",
+        "cur_value":"200",
+        "goal_value":"200"
+    },
+    {
+        "title":"Account Manager - Completed",
+        "desc":"UI to ease the process of logging in multiple accounts, where accounts can be added and started in the available launchers.",
+        "cur_value":"100",
+        "goal_value":"100"
+    },
+    {
+        "title":"Script Assistant",
+        "desc":"UI to assist the making of scripts, where you mostly fill in data and select command presets. Command presets would be like bulding blocks, an experience like using Scratch.",
+        "cur_value":"25",
+        "goal_value":"100"
+    },
+    {
+        "title":"Suggestions",
+        "desc":"Give me any idea, we can discuss about it and make it real.",
+        "cur_value":"0",
+        "goal_value":"0"
+    }
+]

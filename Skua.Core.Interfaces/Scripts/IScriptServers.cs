@@ -4,6 +4,7 @@ using Skua.Core.Models.Servers;
 namespace Skua.Core.Interfaces;
 public interface IScriptServers : INotifyPropertyChanged
 {
+    void SetLoginInfo(string username, string password);
     /// <summary>
     /// The IP of the last server the player was connected to.
     /// </summary>
@@ -37,7 +38,7 @@ public interface IScriptServers : INotifyPropertyChanged
     /// <summary>
     /// Connects to the game server with the specified <paramref name="serverName"/>.
     /// </summary>
-    /// <param name="name">Name of the server to connect to (e.g. Artix)</param>
+    /// <param name="serverName">Name of the server to connect to (e.g. Artix)</param>
     bool Connect(string serverName)
     {
         Server s = ServerList.Find(x => x.Name.Contains(serverName))!;

@@ -11,6 +11,7 @@ public delegate void MapChangedEventHandler(string map);
 public delegate void CellChangedEventHandler(string map, string cell, string pad);
 public delegate void ReloginTriggeredEventHandler(bool wasKicked);
 public delegate void ExtensionPacketEventHandler(dynamic packet);
+public delegate void PacketEventHandler(string packet);
 public delegate void AFKEventHandler();
 public delegate void TryBuyItemHandler(int shopId, int itemId, int shopItemId);
 public delegate void CounterAttackHandler(bool faded);

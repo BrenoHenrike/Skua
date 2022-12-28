@@ -133,4 +133,7 @@
     <DataTemplate DataType="{x:Type managerVms:LauncherViewModel}">
         <usercontrols:LauncherUserControl />
     </DataTemplate>
+    <DataTemplate DataType="{x:Type managerVms:AccountManagerViewModel}">
+        <views:AccountManagerView />
+    </DataTemplate>
 </ResourceDictionary>

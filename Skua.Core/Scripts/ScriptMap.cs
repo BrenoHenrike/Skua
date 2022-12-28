@@ -278,6 +278,7 @@ public partial class ScriptMap : IScriptMap
         bool DecompileSWF(string fileName)
         {
             sw.Restart();
+            fileName = fileName.EndsWith(".swf") ? fileName : fileName + ".swf";
             var decompile = new Process
             {
                 StartInfo = new ProcessStartInfo

@@ -108,10 +108,7 @@ public static class WindowChromePatch
         /// <summary>Return the HashCode for this struct (not garanteed to be unique)</summary>
         public override int GetHashCode()
         {
-            return left.GetHashCode()
-                   + top.GetHashCode()
-                   + right.GetHashCode()
-                   + bottom.GetHashCode();
+            return HashCode.Combine(left, top, right, bottom);
         }
 
         /// <summary> Determine if 2 RECT are equal (deep compare)</summary>

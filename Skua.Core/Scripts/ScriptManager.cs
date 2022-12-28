@@ -86,7 +86,7 @@ public partial class ScriptManager : ObservableObject, IScriptManager
                     if (e is not TargetInvocationException || !_stoppedByScript)
                     {
                         exception = e;
-                        Trace.WriteLine($"Error while running script:\r\nMessage: {e.Message}\r\n{(e.InnerException is not null ? $"Inner Exception Message: {e.InnerException.Message}\r\n" : string.Empty)}StackTrace: {e.StackTrace}");
+                        Trace.WriteLine($"Error while running script:\r\nMessage: {(e.InnerException is not null ? e.InnerException.Message : e.Message)}\r\nStackTrace: {(e.InnerException is not null ? e.InnerException.StackTrace : e.StackTrace)}");
                         StrongReferenceMessenger.Default.Send<ScriptErrorMessage, int>(new(e), (int)MessageChannels.ScriptStatus);
                         _runScriptStoppingBool = true;
                     }

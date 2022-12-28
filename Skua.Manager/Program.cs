@@ -25,7 +25,7 @@ public class Program
     private static void CurrentDomain_UnhandledException(object sender, UnhandledExceptionEventArgs e)
     {
         Exception ex = (Exception)e.ExceptionObject;
-        MessageBox.Show($"Manager 'Crash.\r\nVersion: {Settings.Default.ApplicationVersion}\r\nMessage: {ex.Message}\r\nInner Exception Message: {ex.InnerException?.Message}\r\nStackTrace: {ex.StackTrace}", "Application");
+        MessageBox.Show($"Manager Crash.\r\nVersion: {Settings.Default.ApplicationVersion}\r\nMessage: {ex.Message}\r\nInner Exception Message: {ex.InnerException?.Message}\r\nStackTrace: {ex.StackTrace}", "Application");
     }
 
     static Assembly? ResolveAssemblies(object? sender, ResolveEventArgs args)

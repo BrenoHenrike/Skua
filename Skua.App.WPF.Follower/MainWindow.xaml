@@ -1,0 +1,21 @@
+﻿<wpf:CustomWindow
+    x:Class="Skua.App.WPF.Follower.MainWindow"
+    xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+    xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+    xmlns:local="clr-namespace:Skua.App.WPF.Follower"
+    xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+    xmlns:usercontrols="clr-namespace:Skua.WPF.UserControls;assembly=Skua.WPF"
+    xmlns:wpf="clr-namespace:Skua.WPF;assembly=Skua.WPF"
+    Title="Skua - Follower"
+    Width="800"
+    Height="450"
+    Style="{StaticResource CustomWindow}"
+    mc:Ignorable="d">
+    <DockPanel>
+        <StackPanel DockPanel.Dock="Top">
+            <Button Click="Button_Click" Content="SendCommand" />
+        </StackPanel>
+        <usercontrols:GameContainerUserControl />
+    </DockPanel>
+</wpf:CustomWindow>

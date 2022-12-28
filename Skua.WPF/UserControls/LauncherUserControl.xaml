@@ -12,11 +12,11 @@
     d:DesignWidth="800"
     mc:Ignorable="d">
     <DockPanel>
-        <TextBlock
+        <!--<TextBlock
             Margin="6"
             HorizontalAlignment="Center"
             DockPanel.Dock="Bottom"
-            Text="*This will have more use after the Follower/Sync or Account Manager goal is met*" />
+            Text="*This will have more use after the Follower/Sync or Account Manager goal is met*" />-->
         <Button
             Margin="6"
             Command="{Binding LaunchSkuaCommand}"

@@ -312,7 +312,7 @@ public class ScriptInterface : IScriptInterface, IScriptInterfaceManager
         if (!Handlers.CurrentHandlers.Any())
             return;
         List<IHandler> rem = new();
-        foreach (IHandler handler in Handlers.CurrentHandlers)
+        foreach (IHandler handler in Handlers.CurrentHandlers.ToList())
         {
             _limit.LimitedRun("handler_" + handler.Name, handler.Ticks * _timerDelay, () =>
             {
@@ -490,6 +490,7 @@ public class ScriptInterface : IScriptInterface, IScriptInterfaceManager
                         }
                         break;
                 }
+                Messenger.Send<PacketMessage, int>(new((string)args[0]), (int)MessageChannels.GameEvents);
                 break;
         }
     }

@@ -73,7 +73,35 @@ public class ItemBase
 
     public override string ToString()
     {
-        return $"{Name} [{ID}] x {Quantity}";
+        var tag = string.Empty;
+        var itemGroup = string.Empty;
+
+        tag += Coins ? "AC " : string.Empty;
+        tag += Upgrade ? "Member" : string.Empty;
+
+        switch (ItemGroup)
+        {
+            case "co":
+                itemGroup = "(Armor)";
+                break;
+            case "ba":
+                itemGroup = "(Cape)";
+                break;
+            case "he":
+                itemGroup = "(Helm)";
+                break;
+            case "pe":
+                itemGroup = "(Pet)";
+                break;
+            case "Weapon":
+                itemGroup = "(Weapon)";
+                break;
+            default:
+                itemGroup = "(Item)";
+                break;
+        }
+
+        return $"[{ID}]\t({itemGroup})\t{Name} x{Quantity} {tag}";
     }
 
     public override bool Equals(object? obj)

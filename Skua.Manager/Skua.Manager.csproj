@@ -7,15 +7,12 @@
     <UseWPF>true</UseWPF>
     <Platforms>AnyCPU;x64;x86</Platforms>
     <StartupObject>Skua.Manager.Program</StartupObject>
+    <AssemblyVersion>1.1.2.0</AssemblyVersion>
     <SatelliteResourceLanguages>en</SatelliteResourceLanguages>
     <WithCulture>false</WithCulture>
     <NeutralLanguage>en</NeutralLanguage>
     <ApplicationIcon>SkuaIcon.ico</ApplicationIcon>
   </PropertyGroup>
-
-  <ItemGroup>
-    <Content Include="SkuaIcon.ico" />
-  </ItemGroup>
 
   <ItemGroup>
     <Resource Include="SkuaIcon.ico" />

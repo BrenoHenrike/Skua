@@ -27,6 +27,8 @@ package skua
 			this.addCallback("selectArrayObjects", Main.selectArrayObjects);
 			this.addCallback("isNull", Main.isNull);
 			
+			this.addCallback("clickServer", Main.clickServer);
+			
 			this.addCallback("isLoggedIn", Main.isLoggedIn);
 			this.addCallback("isKicked", Main.isKicked);
 			
@@ -56,6 +58,11 @@ package skua
 			this.addCallback("magnetize", Main.magnetize);
 			this.addCallback("disableFX", Main.disableFX);
 			this.addCallback("killLag", Main.killLag);
+			
+			this.addCallback("isAuraActive", Main.isAuraActive);
+			this.addCallback("auraComparison", Main.auraComparison);
+			this.addCallback("isAuraWithStrValActive", Main.isAuraWithStrValActive);
+			this.addCallback("isTrue", Main.isTrue);
 			
 			this.addCallback("injectScript", Main.injectScript);
 			
