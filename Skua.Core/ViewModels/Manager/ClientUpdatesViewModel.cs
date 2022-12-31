@@ -134,11 +134,11 @@ public partial class ClientUpdatesViewModel : BotControlViewModelBase
     public async Task ResetScripts(CancellationToken token)
     {
         IsBusy = true;
-        if (Directory.Exists("./Scripts"))
-            Directory.Delete("./Scripts", true);
+        if (Directory.Exists("./Skua_Modules/Scripts"))
+            Directory.Delete("./Skua_Modules/Scripts", true);
 
-        if (!Directory.Exists("./Scripts"))
-            Directory.CreateDirectory("./Scripts");
+        if (!Directory.Exists("./Skua_Modules/Scripts"))
+            Directory.CreateDirectory("./Skua_Modules/Scripts");
 
         await UpdateScripts(token);
     }
@@ -151,7 +151,7 @@ public partial class ClientUpdatesViewModel : BotControlViewModelBase
         {
             await _scriptsService.RefreshScriptsAsync(_progress, token);
 
-            int count = await Task.Run(async () => await _scriptsService.DownloadAllWhereAsync(s => !s.Downloaded || s.Outdated));
+            int count = await Task.Run(async () => await _scriptsService.ManagerDownloadAllWhereAsync(s => !s.Downloaded || s.Outdated));
             ProgressStatus = $"Downloaded {count} scripts.";
 
         }
