@@ -8,6 +8,9 @@ namespace Skua.Core.Skills;
 public class AdvancedSkillContainer : ObservableRecipient, IAdvancedSkillContainer
 {
     private List<AdvancedSkill> _loadedSkills = new();
+    private readonly string _defaultSkillsSetsPath;
+    private readonly string _userSkillsSetsPath;
+    
     public List<AdvancedSkill> LoadedSkills
     {
         get { return _loadedSkills; }
@@ -16,6 +19,9 @@ public class AdvancedSkillContainer : ObservableRecipient, IAdvancedSkillContain
 
     public AdvancedSkillContainer()
     {
+        _defaultSkillsSetsPath = Path.Combine(AppContext.BaseDirectory, "AdvancedSkills.txt");
+        _userSkillsSetsPath = Path.Combine(AppContext.BaseDirectory, "UserAdvancedSkills.txt");
+        _CopyDefaultSkills();
         LoadSkills();
     }
 
@@ -43,14 +49,24 @@ public class AdvancedSkillContainer : ObservableRecipient, IAdvancedSkillContain
         Save();
     }
 
+    private void _CopyDefaultSkills()
+    {
+        if (!File.Exists(_defaultSkillsSetsPath))
+            throw new FileNotFoundException("Default skills file not found.");
+
+        if (File.Exists(_userSkillsSetsPath))
+            File.Delete(_userSkillsSetsPath);
+
+        File.Copy(_defaultSkillsSetsPath, _userSkillsSetsPath);
+    }
+
     public void LoadSkills()
     {
-        string path = Path.Combine(AppContext.BaseDirectory, "AdvancedSkills.txt");
-        if (!File.Exists(path))
+        if (!File.Exists(_userSkillsSetsPath))
             return;
 
         LoadedSkills.Clear();
-        foreach (string line in File.ReadAllLines(path))
+        foreach (string line in File.ReadAllLines(_userSkillsSetsPath))
         {
             string[] parts = line.Split(new[] { '=' }, 4);
             if (parts.Length == 3)
@@ -61,14 +77,23 @@ public class AdvancedSkillContainer : ObservableRecipient, IAdvancedSkillContain
                 _loadedSkills.Add(new AdvancedSkill(parts[1].Trim(), parts[2].Trim(), waitForCooldown ? result : 250, parts[0].Trim(), waitForCooldown ? SkillUseMode.WaitForCooldown : SkillUseMode.UseIfAvailable));
             }
         }
+
         OnPropertyChanged(nameof(LoadedSkills));
         Broadcast(new(), _loadedSkills, nameof(LoadedSkills));
+    }
+    
+    public void ResetSkillsSets()
+    {
+        Task.Factory.StartNew(() =>
+        {
+            _CopyDefaultSkills();
+            LoadSkills();
+        });
     }
 
     public void Save()
     {
-        string path = Path.Combine(AppContext.BaseDirectory, "AdvancedSkills.txt");
-        File.WriteAllLines(path, _loadedSkills.OrderBy(s => s.ClassName).Select(s => s.SaveString));
+        File.WriteAllLines(_userSkillsSetsPath, _loadedSkills.OrderBy(s => s.ClassName).Select(s => s.SaveString));
         LoadSkills();
     }
 }

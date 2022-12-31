@@ -5,6 +5,7 @@
     xmlns:b="http://schemas.microsoft.com/xaml/behaviors"
     xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
     xmlns:local="clr-namespace:Skua.WPF.UserControls"
+    xmlns:fa="http://schemas.fontawesome.io/icons/"
     xmlns:materialDesign="http://materialdesigninxaml.net/winfx/xaml/themes"
     xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
     xmlns:vms="clr-namespace:Skua.Core.ViewModels;assembly=Skua.Core"
@@ -20,10 +21,14 @@
         </Grid.RowDefinitions>
         <DockPanel Grid.Row="0">
             <Button
-                Margin="3,6,6,3"
+                Margin="3,6,3,3"
+                Content="Reset Skills"
+                DockPanel.Dock="Right" Click="ResetSkillsSets" />
+            <Button
+                Margin="3,6,3,3"
                 Command="{Binding RefreshSkillsCommand}"
                 Content="{materialDesign:PackIcon Kind=Refresh}"
-                DockPanel.Dock="Right" />
+                DockPanel.Dock="Right" Click="RefreshSkillsSets" />
             <TextBox
                 x:Name="SearchBox"
                 Margin="6,6,3,3"

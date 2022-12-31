@@ -26,6 +26,10 @@ public interface IAdvancedSkillContainer : INotifyPropertyChanged
     /// </summary>
     void LoadSkills();
     /// <summary>
+    /// Resets the skills to the default ones.
+    /// </summary>
+    void ResetSkillsSets();
+    /// <summary>
     /// Removes an <see cref="AdvancedSkill"/> from the <see cref="LoadedSkills"/>
     /// </summary>
     /// <param name="skill">Skill to remove.</param>
