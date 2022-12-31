@@ -19,4 +19,7 @@ public interface IGetScriptsService : INotifyPropertyChanged
     public Task<int> DownloadAllWhereAsync(Func<ScriptInfo, bool> pred);
     public Task<int> ManagerDownloadAllWhereAsync(Func<ScriptInfo, bool> pred);
     public Task DeleteScriptAsync(ScriptInfo info);
+
+    public long GetSkillsSetsTextFileSize();
+    public Task<long> DownloadSkillSetsFile();
 }
