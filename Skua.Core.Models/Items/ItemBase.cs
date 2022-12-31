@@ -101,7 +101,7 @@ public class ItemBase
                 break;
         }
 
-        return $"[{ID}]\t{itemGroup}\t{Name} x{Quantity} {tag}";
+        return $"[{ID}]\t{itemGroup} {Name} x{Quantity} {tag}";
     }
 
     public override bool Equals(object? obj)

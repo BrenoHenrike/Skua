@@ -1,4 +1,5 @@
 ﻿using System.Diagnostics;
+using System.Diagnostics.Contracts;
 using CommunityToolkit.Mvvm.ComponentModel;
 using Skua.Core.Interfaces;
 using Skua.Core.Models.Skills;
@@ -53,15 +54,15 @@ public partial class ScriptAuto : ObservableObject, IScriptAuto
 
     [ObservableProperty]
     private bool _isRunning;
-
+    
     public void StartAutoAttack(string? className = null, ClassUseMode classUseMode = ClassUseMode.Base)
     {
-        StartAuto(false, className, classUseMode);
+        _DoActionAuto(hunt: false, className, classUseMode);
     }
-
+    
     public void StartAutoHunt(string? className = null, ClassUseMode classUseMode = ClassUseMode.Base)
     {
-        StartAuto(true, className, classUseMode);
+        _DoActionAuto(hunt: true, className, classUseMode);
     }
 
     public void Stop()
@@ -84,13 +85,13 @@ public partial class ScriptAuto : ObservableObject, IScriptAuto
             IsRunning = false;
             return;
         }
-
+        
         _ctsAuto?.Cancel();
         await _wait.ForTrueAsync(() => _ctsAuto is null, 20);
         IsRunning = false;
     }
 
-    private void StartAuto(bool hunt, string? className = null, ClassUseMode classUseMode = ClassUseMode.Base)
+    private void _DoActionAuto(bool hunt, string? className = null, ClassUseMode classUseMode = ClassUseMode.Base)
     {
         if (_autoThread?.IsAlive ?? false)
             return;
@@ -99,7 +100,7 @@ public partial class ScriptAuto : ObservableObject, IScriptAuto
             return;
 
         CheckDropsandBoosts();
-        if(className is not null)
+        if (className is not null)
             _skills.StartAdvanced(className, true, classUseMode);
         else
             _skills.StartAdvanced(_player.CurrentClass?.Name ?? "Generic", true);
@@ -125,7 +126,7 @@ public partial class ScriptAuto : ObservableObject, IScriptAuto
         _autoThread.Start();
         IsRunning = true;
     }
-
+    
     private string _target = "";
     private async Task _Attack(CancellationToken token)
     {

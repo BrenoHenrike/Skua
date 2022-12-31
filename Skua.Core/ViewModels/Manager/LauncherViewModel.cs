@@ -51,7 +51,7 @@ public partial class LauncherViewModel : BotControlViewModelBase
                 args.Add(token);
             }
 
-            var proc = Process.Start("./Skua.exe", args);
+            var proc = Process.Start("./skua_modules/skua-op.exe", args);
             if (proc != null)
                 _dispatcherService.Invoke(() => SkuaProcesses.Add(proc));
         });
