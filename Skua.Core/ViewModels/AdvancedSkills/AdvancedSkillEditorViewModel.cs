@@ -66,6 +66,7 @@ public partial class AdvancedSkillEditorViewModel : ObservableRecipient
         string skills = string.Join(" | ", _currentSkillsList.Select(s => s.Convert()));
         AdvancedSkill advSkill = new(CurrentClassName, skills, CurrentSkillTimeout, SelectedClassUseMode, UseWaitModeBool ? SkillUseMode.WaitForCooldown : SkillUseMode.UseIfAvailable);
         Messenger.Send<SaveAdvancedSkillMessage>(new(advSkill));
+        OnPropertyChanged(nameof(CurrentSkillsList));
     }
 
     [RelayCommand]

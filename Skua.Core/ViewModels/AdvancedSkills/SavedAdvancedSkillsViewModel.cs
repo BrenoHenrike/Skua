@@ -13,6 +13,7 @@ public partial class SavedAdvancedSkillsViewModel : ObservableRecipient
     {
         _advancedSkillContainer = advancedSkillContainer;
         RefreshSkillsCommand = new RelayCommand(_advancedSkillContainer.LoadSkills);
+        ResetSkillsSetCommand = new RelayCommand(_advancedSkillContainer.ResetSkillsSets);
     }
 
     protected override void OnActivated()
@@ -26,7 +27,9 @@ public partial class SavedAdvancedSkillsViewModel : ObservableRecipient
     private AdvancedSkill? _selectedSkill;
 
     public List<AdvancedSkill> LoadedSkills => _advancedSkillContainer.LoadedSkills;
+
     public IRelayCommand RefreshSkillsCommand { get; }
+    public IRelayCommand ResetSkillsSetCommand { get; }
 
     [RelayCommand]
     private void RemoveSelected()

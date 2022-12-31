@@ -1,4 +1,6 @@
 ﻿using System.ComponentModel;
+using System.Threading;
+using System.Threading.Tasks;
 using System.Windows.Controls;
 using System.Windows.Data;
 using CommunityToolkit.Mvvm.DependencyInjection;
@@ -30,6 +32,18 @@ public partial class SavedAdvancedSkillsUserControl : UserControl
 
     private void SearchBox_TextChanged(object sender, TextChangedEventArgs e)
     {
+        _collectionView.Refresh();
+    }
+
+    private void RefreshSkillsSets(object sender, System.Windows.RoutedEventArgs e)
+    {
+        _collectionView.Refresh();
+    }
+
+    private void ResetSkillsSets(object sender, System.Windows.RoutedEventArgs e)
+    {
+        ((SavedAdvancedSkillsViewModel)DataContext).ResetSkillsSetCommand.Execute(null);
+        Thread.Sleep(1000);
         _collectionView.Refresh();
     }
 }

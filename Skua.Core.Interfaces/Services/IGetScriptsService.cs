@@ -15,6 +15,11 @@ public interface IGetScriptsService : INotifyPropertyChanged
     public Task RefreshScriptsAsync(IProgress<string>? progress, CancellationToken token);
 
     public Task DownloadScriptAsync(ScriptInfo info);
+    public Task ManagerDownloadScriptAsync(ScriptInfo info);
     public Task<int> DownloadAllWhereAsync(Func<ScriptInfo, bool> pred);
+    public Task<int> ManagerDownloadAllWhereAsync(Func<ScriptInfo, bool> pred);
     public Task DeleteScriptAsync(ScriptInfo info);
+
+    public long GetSkillsSetsTextFileSize();
+    public Task<long> DownloadSkillSetsFile();
 }
