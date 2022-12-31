@@ -65,10 +65,10 @@ public enum GameActions
     Transfer
 }
 
-public class GameActionLock
+public struct GameActionLock
 {
     [JsonProperty("cd")]
-    public long? CD { get; }
+    public long CD { get; }
     [JsonProperty("ts")]
-    public long? TS { get; }
+    public long TS { get; }
 }

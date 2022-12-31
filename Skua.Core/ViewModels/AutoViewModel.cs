@@ -65,11 +65,11 @@ public partial class AutoViewModel : BotControlViewModelBase
     {
         if (UseSelectedClass && _selectedClass is not null && _selectedClassMode is not null)
         {
-            await Task.Run(() => Auto.StartAutoHunt(_selectedClass, (ClassUseMode)_selectedClassMode));
+            await Task.Factory.StartNew(() => Auto.StartAutoHunt(_selectedClass, (ClassUseMode)_selectedClassMode));
             return;
         }
 
-        Auto.StartAutoHunt();
+        await Task.Factory.StartNew(() => Auto.StartAutoHunt());
     }
 
     [RelayCommand]
@@ -77,15 +77,15 @@ public partial class AutoViewModel : BotControlViewModelBase
     {
         if (UseSelectedClass && _selectedClass is not null && _selectedClassMode is not null)
         {
-            await Task.Run(() => Auto.StartAutoAttack(_selectedClass, (ClassUseMode)_selectedClassMode));
+            await Task.Factory.StartNew(() => Auto.StartAutoAttack(_selectedClass, (ClassUseMode)_selectedClassMode));
             return;
         }
 
-        await Task.Run(() => Auto.StartAutoAttack());
+        await Task.Factory.StartNew(() => Auto.StartAutoAttack());
     }
 
     private async Task StopAutoAsync()
     {
-        await Task.Run(() => Auto.StopAsync());
+        await Auto.StopAsync();
     }
 }
