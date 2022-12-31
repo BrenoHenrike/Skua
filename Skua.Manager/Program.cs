@@ -38,7 +38,7 @@ public class Program
             return assembly;
 
         string assemblyName = new AssemblyName(args.Name).Name + ".dll";
-        string assemblyPath = Path.Combine(AppContext.BaseDirectory, "Assemblies", assemblyName);
+        string assemblyPath = Path.Combine(AppContext.BaseDirectory, "Skua_Modules/Assemblies", assemblyName);
         if (!File.Exists(assemblyPath))
         {
             assemblyPath = Path.Combine(AppContext.BaseDirectory, assemblyName);
