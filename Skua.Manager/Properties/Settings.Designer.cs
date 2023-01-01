@@ -134,7 +134,7 @@ namespace Skua.Manager.Properties {
         
         [global::System.Configuration.UserScopedSettingAttribute()]
         [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
-        [global::System.Configuration.DefaultSettingValueAttribute("1.1.2.2")]
+        [global::System.Configuration.DefaultSettingValueAttribute("1.1.3.0")]
         public string ApplicationVersion {
             get {
                 return ((string)(this["ApplicationVersion"]));
