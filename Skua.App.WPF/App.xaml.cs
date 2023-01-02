@@ -15,6 +15,8 @@ using Westwind.Scripting;
 using Skua.Core.AppStartup;
 using Skua.WPF;
 using Skua.Core.Skills;
+using Skua.Core.Messaging;
+using Skua.Core.ViewModels.Manager;
 
 namespace Skua.App.WPF;
 
@@ -77,7 +79,6 @@ public sealed partial class App : Application
         StrongReferenceMessenger.Default.Reset();
 
         RoslynLifetimeManager.ShutdownRoslyn();
-
         Application.Current.Exit -= App_Exit;
     }
 

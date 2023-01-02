@@ -4,7 +4,7 @@ using Skua.Core.Interfaces;
 using Skua.Core.Messaging;
 using Skua.Core.Utils;
 using System.Diagnostics;
-using System;
+using Timer = System.Timers.Timer;
 
 namespace Skua.Core.ViewModels.Manager;
 public partial class LauncherViewModel : BotControlViewModelBase
@@ -12,15 +12,20 @@ public partial class LauncherViewModel : BotControlViewModelBase
     private readonly ISettingsService _settingsService;
     private readonly IDispatcherService _dispatcherService;
     public RangedObservableCollection<Process> SkuaProcesses { get; } = new();
-    private int _processCount;
+    private Timer _timer;
 
     public LauncherViewModel(ISettingsService settingsService, IDispatcherService dispatcherService)
         : base("Launcher")
     {
         StrongReferenceMessenger.Default.Register<LauncherViewModel, UpdateStartedMessage>(this, TerminateProcesses);
-
         _settingsService = settingsService;
         _dispatcherService = dispatcherService;
+
+        _timer = new Timer();
+        _timer.Interval = 1000;
+        _timer.Elapsed += RemoveStoppedCurrentProcess!;
+        _timer.AutoReset = true;
+        _timer.Start();
     }
 
     private async void TerminateProcesses(LauncherViewModel recipient, UpdateStartedMessage message)
@@ -51,8 +56,7 @@ public partial class LauncherViewModel : BotControlViewModelBase
                 args.Add("--gh-token");
                 args.Add(token);
             }
-
-            _processCount++;
+            
             var proc = Process.Start("./Skua_Modules/skua-op.exe", args);
             if (proc != null)
                 _dispatcherService.Invoke(() => SkuaProcesses.Add(proc));
@@ -69,6 +73,17 @@ public partial class LauncherViewModel : BotControlViewModelBase
                 _dispatcherService.Invoke(() => SkuaProcesses.Remove(proc));
             }
         });
+    }
+
+    private void RemoveStoppedCurrentProcess(Object source, System.Timers.ElapsedEventArgs e)
+    {
+        foreach (var proc in SkuaProcesses)
+        {
+            if (proc.HasExited)
+            {
+                _dispatcherService.Invoke(() => SkuaProcesses.Remove(proc));
+            }
+        }
     }
 
     [RelayCommand]
