@@ -30,6 +30,10 @@ public interface IAdvancedSkillContainer : INotifyPropertyChanged
     /// </summary>
     void ResetSkillsSets();
     /// <summary>
+    /// Saves the current skills to the skills file.
+    /// </summary>
+    void SyncSkills();
+    /// <summary>
     /// Removes an <see cref="AdvancedSkill"/> from the <see cref="LoadedSkills"/>
     /// </summary>
     /// <param name="skill">Skill to remove.</param>
