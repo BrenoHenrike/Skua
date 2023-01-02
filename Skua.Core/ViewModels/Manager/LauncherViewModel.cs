@@ -10,6 +10,8 @@ public partial class LauncherViewModel : BotControlViewModelBase
 {
     private readonly ISettingsService _settingsService;
     private readonly IDispatcherService _dispatcherService;
+    public RangedObservableCollection<Process> SkuaProcesses { get; } = new();
+    private int _processCount;
 
     public LauncherViewModel(ISettingsService settingsService, IDispatcherService dispatcherService)
         : base("Launcher")
@@ -24,13 +26,11 @@ public partial class LauncherViewModel : BotControlViewModelBase
     {
         foreach(var proc in recipient.SkuaProcesses.ToList())
         {
-            await StopProcess(proc).ConfigureAwait(false);
+            await StopProcess(proc);
         }
 
         message.Reply(recipient.SkuaProcesses.Count == 0);
     }
-
-    public RangedObservableCollection<Process> SkuaProcesses { get; } = new();
 
     [RelayCommand]
     public async Task LaunchSkua()
@@ -51,10 +51,19 @@ public partial class LauncherViewModel : BotControlViewModelBase
                 args.Add(token);
             }
 
+            _processCount++;
             var proc = Process.Start("./Skua_Modules/skua-op.exe", args);
             if (proc != null)
                 _dispatcherService.Invoke(() => SkuaProcesses.Add(proc));
         });
+    }
+
+    public async void KillAllSkuaProcesses()
+    {
+        foreach (var proc in SkuaProcesses.ToList())
+        {
+            await StopProcess(proc);
+        }
     }
 
     [RelayCommand]
@@ -65,10 +74,8 @@ public partial class LauncherViewModel : BotControlViewModelBase
 
         await Task.Run(() =>
         {
-            process.CloseMainWindow();
-            process.Close();
+            process.Kill();
+            _dispatcherService.Invoke(() => SkuaProcesses.Remove(process));
         });
-
-        _dispatcherService.Invoke(() => SkuaProcesses.Remove(process));
     }
 }
