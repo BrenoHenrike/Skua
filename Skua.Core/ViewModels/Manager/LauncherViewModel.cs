@@ -4,6 +4,7 @@ using Skua.Core.Interfaces;
 using Skua.Core.Messaging;
 using Skua.Core.Utils;
 using System.Diagnostics;
+using System;
 
 namespace Skua.Core.ViewModels.Manager;
 public partial class LauncherViewModel : BotControlViewModelBase
@@ -58,12 +59,16 @@ public partial class LauncherViewModel : BotControlViewModelBase
         });
     }
 
-    public async void KillAllSkuaProcesses()
+    public void KillAllSkuaProcesses()
     {
-        foreach (var proc in SkuaProcesses.ToList())
+        Task.Factory.StartNew(() =>
         {
-            await StopProcess(proc);
-        }
+            foreach (var proc in SkuaProcesses)
+            {
+                proc.Kill();
+                _dispatcherService.Invoke(() => SkuaProcesses.Remove(proc));
+            }
+        });
     }
 
     [RelayCommand]

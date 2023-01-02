@@ -62,10 +62,13 @@ public class AdvancedSkillContainer : ObservableRecipient, IAdvancedSkillContain
         File.Copy(_defaultSkillsSetsPath, _userSkillsSetsPath);
     }
 
-    public void SyncSkills()
+    public async void SyncSkills()
     {
-        _CopyDefaultSkills();
-        LoadSkills();
+        await Task.Factory.StartNew(() =>
+        {
+            _CopyDefaultSkills();
+            LoadSkills();
+        });
     }
 
     public void LoadSkills()
