@@ -22,13 +22,14 @@
         <DockPanel Grid.Row="0">
             <Button
                 Margin="3,6,3,3"
+                Command="{Binding ResetSkillsSetCommand}"
                 Content="Reset Skills"
-                DockPanel.Dock="Right" Click="ResetSkillsSets" />
+                DockPanel.Dock="Right" />
             <Button
                 Margin="3,6,3,3"
                 Command="{Binding RefreshSkillsCommand}"
                 Content="{materialDesign:PackIcon Kind=Refresh}"
-                DockPanel.Dock="Right" Click="RefreshSkillsSets" />
+                DockPanel.Dock="Right" />
             <TextBox
                 x:Name="SearchBox"
                 Margin="6,6,3,3"
@@ -36,16 +37,17 @@
                 TextChanged="SearchBox_TextChanged" />
         </DockPanel>
         <ListBox
+            Name="SkillsList"
             Grid.Row="1"
             Margin="6,3,6,6"
             HorizontalContentAlignment="Stretch"
             ItemsSource="{Binding LoadedSkills, UpdateSourceTrigger=PropertyChanged}"
             SelectedItem="{Binding SelectedSkill}"
             VirtualizingPanel.IsVirtualizing="True"
-            VirtualizingPanel.VirtualizationMode="Recycling">
+            VirtualizingPanel.VirtualizationMode="Recycling">   
             <ListBox.ContextMenu>
                 <ContextMenu>
-                    <MenuItem Command="{Binding RemoveSelectedCommand}" Header="Remove Selected" />
+                    <MenuItem Command="{Binding SkillsSetsViewModel.RemoveSelectedCommand}" Header="Remove Selected" />
                 </ContextMenu>
             </ListBox.ContextMenu>
             <ListBox.ItemsPanel>

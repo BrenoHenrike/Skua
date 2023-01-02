@@ -8,7 +8,7 @@ namespace Skua.Core.Services;
 public partial class GetScriptsService : ObservableObject, IGetScriptsService
 {
     private const string _reposUrl = "https://raw.githubusercontent.com/brenohenrike/skua/master/repos";
-    private const string _skillsSetsRawUrl = "https://raw.githubusercontent.com/slypy/skua-skills-sets/main/AdvancedSkills.txt";
+    private const string _skillsSetsRawUrl = "https://raw.githubusercontent.com/BrenoHenrike/Scripts/Skua/Skills/AdvancedSkills.txt";
     private readonly IDialogService _dialogService;
     private List<ScriptRepo> _repos = new();
     

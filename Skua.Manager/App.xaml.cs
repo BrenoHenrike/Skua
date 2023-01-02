@@ -11,6 +11,7 @@ using Skua.Core.Messaging;
 using Skua.Manager.Properties;
 using System.Threading.Tasks;
 using Skua.Core.ViewModels.Manager;
+using System.Diagnostics;
 
 namespace Skua.Manager;
 
@@ -90,6 +91,14 @@ public partial class App : Application
     private void CloseManager(App recipient, UpdateFinishedMessage message)
     {
         Application.Current.Shutdown();
+    }
+
+    // app on exit event
+    protected override void OnExit(ExitEventArgs e)
+    {
+        base.OnExit(e);
+        var launcher = Ioc.Default.GetRequiredService<LauncherViewModel>();
+        launcher.KillAllSkuaProcesses();
     }
 
     public new static App Current => (App)Application.Current;

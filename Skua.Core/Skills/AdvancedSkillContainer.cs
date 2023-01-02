@@ -1,7 +1,9 @@
 ﻿using CommunityToolkit.Mvvm.ComponentModel;
+using CommunityToolkit.Mvvm.DependencyInjection;
 using Skua.Core.Interfaces;
 using Skua.Core.Models.Skills;
 using Skua.Core.Utils;
+using System.Security.Cryptography;
 
 namespace Skua.Core.Skills;
 
@@ -21,8 +23,7 @@ public class AdvancedSkillContainer : ObservableRecipient, IAdvancedSkillContain
     {
         _defaultSkillsSetsPath = Path.Combine(AppContext.BaseDirectory, "AdvancedSkills.txt");
         _userSkillsSetsPath = Path.Combine(AppContext.BaseDirectory, "UserAdvancedSkills.txt");
-        _CopyDefaultSkills();
-        LoadSkills();
+        SyncSkills();
     }
 
     public void Add(AdvancedSkill skill)
@@ -51,13 +52,23 @@ public class AdvancedSkillContainer : ObservableRecipient, IAdvancedSkillContain
 
     private void _CopyDefaultSkills()
     {
+        var getScripts = Ioc.Default.GetRequiredService<IGetScriptsService>();
         if (!File.Exists(_defaultSkillsSetsPath))
-            throw new FileNotFoundException("Default skills file not found.");
+            getScripts.DownloadSkillSetsFile().GetAwaiter().GetResult();
 
         if (File.Exists(_userSkillsSetsPath))
             File.Delete(_userSkillsSetsPath);
 
         File.Copy(_defaultSkillsSetsPath, _userSkillsSetsPath);
+    }
+
+    public async void SyncSkills()
+    {
+        await Task.Factory.StartNew(() =>
+        {
+            _CopyDefaultSkills();
+            LoadSkills();
+        });
     }
 
     public void LoadSkills()
@@ -84,16 +95,15 @@ public class AdvancedSkillContainer : ObservableRecipient, IAdvancedSkillContain
     
     public void ResetSkillsSets()
     {
-        Task.Factory.StartNew(() =>
-        {
-            _CopyDefaultSkills();
-            LoadSkills();
-        });
+        SyncSkills();
     }
 
     public void Save()
     {
-        File.WriteAllLines(_userSkillsSetsPath, _loadedSkills.OrderBy(s => s.ClassName).Select(s => s.SaveString));
-        LoadSkills();
+        Task.Factory.StartNew(() =>
+        {
+            File.WriteAllLines(_userSkillsSetsPath, _loadedSkills.OrderBy(s => s.ClassName).Select(s => s.SaveString));
+            LoadSkills();
+        });
     }
 }

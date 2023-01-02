@@ -5,6 +5,7 @@ using CommunityToolkit.Mvvm.Messaging.Messages;
 using Skua.Core.Interfaces;
 using Skua.Core.Messaging;
 using Skua.Core.Models.Skills;
+using System.Collections.ObjectModel;
 
 namespace Skua.Core.ViewModels;
 public partial class SavedAdvancedSkillsViewModel : ObservableRecipient
@@ -26,7 +27,19 @@ public partial class SavedAdvancedSkillsViewModel : ObservableRecipient
     [ObservableProperty]
     private AdvancedSkill? _selectedSkill;
 
-    public List<AdvancedSkill> LoadedSkills => _advancedSkillContainer.LoadedSkills;
+    private ObservableCollection<AdvancedSkill> _loadedSkills = new();
+    public ObservableCollection<AdvancedSkill> LoadedSkills
+    {
+        get
+        {
+            return new ObservableCollection<AdvancedSkill>(_advancedSkillContainer.LoadedSkills);
+        }
+        set
+        {
+            _loadedSkills = value;
+            OnPropertyChanged(nameof(LoadedSkills));
+        }
+    }
 
     public IRelayCommand RefreshSkillsCommand { get; }
     public IRelayCommand ResetSkillsSetCommand { get; }
