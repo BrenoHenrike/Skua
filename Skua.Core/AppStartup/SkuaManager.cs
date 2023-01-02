@@ -4,6 +4,7 @@ using Microsoft.Extensions.DependencyInjection;
 using Skua.Core.Interfaces;
 using Skua.Core.ViewModels;
 using Skua.Core.ViewModels.Manager;
+using System.Diagnostics;
 
 namespace Skua.Core.AppStartup;
 internal class SkuaManager

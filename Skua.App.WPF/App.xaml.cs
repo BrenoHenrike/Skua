@@ -15,6 +15,8 @@ using Westwind.Scripting;
 using Skua.Core.AppStartup;
 using Skua.WPF;
 using Skua.Core.Skills;
+using Skua.Core.Messaging;
+using Skua.Core.ViewModels.Manager;
 
 namespace Skua.App.WPF;
 
@@ -77,7 +79,6 @@ public sealed partial class App : Application
         StrongReferenceMessenger.Default.Reset();
 
         RoslynLifetimeManager.ShutdownRoslyn();
-
         Application.Current.Exit -= App_Exit;
     }
 
@@ -100,19 +101,11 @@ public sealed partial class App : Application
 
         main.Show();
 
+        var getScripts = Ioc.Default.GetRequiredService<IGetScriptsService>();
         if (Settings.Default.CheckScriptUpdates)
         {
-            Task.Run(async () =>
+            Task.Factory.StartNew(async () =>
             {
-                var getScripts = Ioc.Default.GetRequiredService<IGetScriptsService>();
-                var advanceSkillSets = new AdvancedSkillContainer();
-                var skillsFileSize = getScripts.GetSkillsSetsTextFileSize();
-                if(skillsFileSize < await getScripts.DownloadSkillSetsFile())
-                {
-                    Ioc.Default.GetRequiredService<IDialogService>().ShowMessageBox($"Skill Sets has been updated", "Addvance Skill Sets");
-                    advanceSkillSets.ResetSkillsSets();
-                }
-                
                 await getScripts.GetScriptsAsync(null, default);
                 if ((getScripts.Missing > 0 || getScripts.Outdated > 0) 
                     && (Settings.Default.AutoUpdateScripts || Ioc.Default.GetRequiredService<IDialogService>().ShowMessageBox("Would you like to update your scripts?", "Script Update", true) == true))
@@ -122,7 +115,18 @@ public sealed partial class App : Application
                 }
             });
         }
-
+        
+        var skillsFileSize = getScripts.GetSkillsSetsTextFileSize();
+        var advanceSkillSets = Ioc.Default.GetRequiredService<IAdvancedSkillContainer>();
+        Task.Factory.StartNew(async () =>
+        {
+            if (skillsFileSize < await getScripts.DownloadSkillSetsFile())
+            {
+                Ioc.Default.GetRequiredService<IDialogService>().ShowMessageBox($"Skill Sets has been updated", "Advance Skill Sets");
+                advanceSkillSets.SyncSkills();
+            }
+        });
+       
         Services.GetRequiredService<IPluginManager>().Initialize();
     }
 

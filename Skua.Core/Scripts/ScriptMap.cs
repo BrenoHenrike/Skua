@@ -288,7 +288,14 @@ public partial class ScriptMap : IScriptMap
                     RedirectStandardError = true,
                     FileName = "powershell.exe",
                     WorkingDirectory = Path.Combine(AppContext.BaseDirectory, "FFDec"),
-                    Arguments = $"/c ./ffdec.bat -export script \"{_cachePath}\\tmp\" \"{_cachePath}\\{fileName}\""
+                    ArgumentList = {
+                        "/c",
+                        "./ffdec.bat",
+                        "-export",
+                        "script",
+                        @$"""""""{_cachePath}\tmp""""""",
+                        @$"""""""{_cachePath}\{fileName}"""""""
+                    }
                 }
             };
             decompile.Start();
