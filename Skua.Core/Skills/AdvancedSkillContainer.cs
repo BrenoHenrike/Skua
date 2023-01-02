@@ -3,7 +3,6 @@ using CommunityToolkit.Mvvm.DependencyInjection;
 using Skua.Core.Interfaces;
 using Skua.Core.Models.Skills;
 using Skua.Core.Utils;
-using System.Security.Cryptography;
 
 namespace Skua.Core.Skills;
 
