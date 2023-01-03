@@ -45,7 +45,7 @@ package skua
 		private var urlLoader:URLLoader;
 		private var loader:Loader;
 		private var vars:Object;
-		private var sTitle:String = "<font color=\"#FDAF2D\">Birb</font>";
+		private var sTitle:String = "<font color=\"#FDAF2D\">Better Performance</font>";
 		
 		private var stg:Stage;
 		private var gameDomain:ApplicationDomain;
@@ -338,6 +338,79 @@ package skua
 			return false.toString();
 		}
 		
+		public static function getAuraByName(target:String, auraName:String) : String
+		{
+			var aura:Object = null;
+			var auras:Object = target == "Self" ? instance.game.world.myAvatar.dataLeaf.auras : instance.game.world.myAvatar.target.dataLeaf.auras;
+			var index:int = 0;
+			for each(aura in auras)
+			{
+				if(aura.nam.toLowerCase() == auraName.toLowerCase())
+				{
+					return JSON.stringify({
+						"Index":index,
+						"Name":aura.nam,
+						"Value":aura.val,
+						"Icon":aura.icon,
+						"Passive":aura.passive,
+						"TimeStamp":aura.ts,
+						"Duration":aura.dur,
+						"PotionType":aura.potionType,
+						"cat":aura.cat,
+						"t":aura.t,
+						"s":aura.s,
+						"fx":aura.fx,
+						"animOn":aura.animOn,
+						"animOff":aura.animOff,
+						"msgOn":aura.msgOn,
+						"isNew":aura.isNew
+					});
+				}
+				index++;
+			 }
+			 return undefined;
+		}
+		
+		public static function getAuraByIndex(target:String, index:int) : String
+		{
+			var aura:Object = null;
+			var auras:Object = target == "Self" ? instance.game.world.myAvatar.dataLeaf.auras : instance.game.world.myAvatar.target.dataLeaf.auras;
+			var _index:int = 0;
+			for each(aura in auras)
+			{
+				if(_index == index)
+				{
+					return JSON.stringify({
+						"index":index,
+						"nam":aura.nam,
+						"val":aura.val,
+						"icon":aura.icon,
+						"passive":aura.passive,
+						"ts":aura.ts,
+						"dur":aura.dur,
+						"potionType":aura.potionType,
+						"cat":aura.cat,
+						"t":aura.t,
+						"s":aura.s,
+						"fx":aura.fx,
+						"animOn":aura.animOn,
+						"animOff":aura.animOff,
+						"msgOn":aura.msgOn,
+						"isNew":aura.isNew
+					});
+				}
+				
+				_index++;
+			}
+			
+			return undefined;
+		}
+		
+		public static function getAvatar(id:int) : String
+		{
+			return JSON.stringify(instance.game.world.avatars[id].objData);
+		}	
+			
 		public static function clickServer(serverName:String):String
 		{
 			var source:* = instance.game.mcLogin.sl.iList;
