@@ -342,18 +342,18 @@ package skua
 		{
 			var aura:Object = null;
 			var auras:Object = instance.game.world.myAvatar.dataLeaf.auras;
-			var result:String = "";
-			var aura_2:Object = null;
+			var _index:int = 0;
+			var result:String = "[";
 			for each(aura in auras)
 			{
 				result += JSON.stringify({
-						"Name":aura.nam,
-						"Value":aura.val,
-						"Icon":aura.icon,
-						"Passive":aura.passive,
-						"TimeStamp":aura.ts,
-						"Duration":aura.dur,
-						"PotionType":aura.potionType,
+						"index": _index,
+						"name":aura.nam,
+						"value":aura.val == undefined ? "undefined" : aura.val,
+						"passive":aura.passive,
+						"timeStamp":aura.ts,
+						"duration":parseInt(aura.dur),
+						"potionType":aura.potionType,
 						"cat":aura.cat,
 						"t":aura.t,
 						"s":aura.s,
@@ -363,26 +363,30 @@ package skua
 						"msgOn":aura.msgOn,
 						"isNew":aura.isNew
 					});
+				if (aura != auras[auras.length - 1])
+					result += ",";
+				
+				_index++;
 			}
-			return result;
+			return result + "]";
 		}
 
 		public static function getTargetAuras(): String 
 		{
 			var aura:Object = null;
 			var auras:Object = instance.game.world.myAvatar.target.dataLeaf.auras;
-			var result:String = "";
-			var aura_2:Object = null;
+			var _index:int = 0;
+			var result:String = "[";
 			for each(aura in auras)
 			{
 				result += JSON.stringify({
-						"Name":aura.nam,
-						"Value":aura.val,
-						"Icon":aura.icon,
-						"Passive":aura.passive,
-						"TimeStamp":aura.ts,
-						"Duration":aura.dur,
-						"PotionType":aura.potionType,
+						"index": _index,
+						"name":aura.nam,
+						"value":aura.val == undefined ? "undefined" : aura.val,
+						"passive":aura.passive,
+						"timeStamp":aura.ts,
+						"duration":parseInt(aura.dur),
+						"potionType":aura.potionType,
 						"cat":aura.cat,
 						"t":aura.t,
 						"s":aura.s,
@@ -392,8 +396,12 @@ package skua
 						"msgOn":aura.msgOn,
 						"isNew":aura.isNew
 					});
+				if (aura != auras[auras.length - 1])
+					result += ",";
+					
+				_index++;
 			}
-			return result;
+			return result + "]";
 		}
 
 		public static function getProperties(obj:*):String  {
@@ -421,14 +429,13 @@ package skua
 				if(aura.nam.toLowerCase() == auraName.toLowerCase())
 				{
 					return JSON.stringify({
-						"Index":index,
-						"Name":aura.nam,
-						"Value":aura.val,
-						"Icon":aura.icon,
-						"Passive":aura.passive,
-						"TimeStamp":aura.ts,
-						"Duration":aura.dur,
-						"PotionType":aura.potionType,
+						"index":index,
+						"name":aura.nam,
+						"value":aura.val == undefined ? "undefined" : aura.val,
+						"passive":aura.passive,
+						"timeStamp":aura.ts,
+						"duration":parseInt(aura.dur),
+						"potionType":aura.potionType,
 						"cat":aura.cat,
 						"t":aura.t,
 						"s":aura.s,
@@ -455,12 +462,11 @@ package skua
 				{
 					return JSON.stringify({
 						"index":index,
-						"nam":aura.nam,
-						"val":aura.val,
-						"icon":aura.icon,
+						"name":aura.nam,
+						"value":aura.val == undefined ? "undefined" : aura.val,
 						"passive":aura.passive,
-						"ts":aura.ts,
-						"dur":aura.dur,
+						"timeStamp":aura.ts,
+						"duration": parseInt(aura.dur),
 						"potionType":aura.potionType,
 						"cat":aura.cat,
 						"t":aura.t,
