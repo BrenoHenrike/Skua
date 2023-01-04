@@ -338,6 +338,79 @@ package skua
 			return false.toString();
 		}
 		
+		public static function getSelfAuras(): String 
+		{
+			var aura:Object = null;
+			var auras:Object = instance.game.world.myAvatar.dataLeaf.auras;
+			var result:String = "";
+			var aura_2:Object = null;
+			for each(aura in auras)
+			{
+				result += JSON.stringify({
+						"Name":aura.nam,
+						"Value":aura.val,
+						"Icon":aura.icon,
+						"Passive":aura.passive,
+						"TimeStamp":aura.ts,
+						"Duration":aura.dur,
+						"PotionType":aura.potionType,
+						"cat":aura.cat,
+						"t":aura.t,
+						"s":aura.s,
+						"fx":aura.fx,
+						"animOn":aura.animOn,
+						"animOff":aura.animOff,
+						"msgOn":aura.msgOn,
+						"isNew":aura.isNew
+					});
+			}
+			return result;
+		}
+
+		public static function getTargetAuras(): String 
+		{
+			var aura:Object = null;
+			var auras:Object = instance.game.world.myAvatar.target.dataLeaf.auras;
+			var result:String = "";
+			var aura_2:Object = null;
+			for each(aura in auras)
+			{
+				result += JSON.stringify({
+						"Name":aura.nam,
+						"Value":aura.val,
+						"Icon":aura.icon,
+						"Passive":aura.passive,
+						"TimeStamp":aura.ts,
+						"Duration":aura.dur,
+						"PotionType":aura.potionType,
+						"cat":aura.cat,
+						"t":aura.t,
+						"s":aura.s,
+						"fx":aura.fx,
+						"animOn":aura.animOn,
+						"animOff":aura.animOff,
+						"msgOn":aura.msgOn,
+						"isNew":aura.isNew
+					});
+			}
+			return result;
+		}
+
+		public static function getProperties(obj:*):String  {
+            var p:*;
+            var res:String = '';
+            var val:String;
+            var prop:String;
+            for (p in obj) {
+                prop = String(p);
+                if (prop && prop!=='' && prop!==' ') {
+                    val = String(obj[p]);
+                    res += prop+': '+val+', ';
+                }
+            }
+            return res;
+        }
+		
 		public static function getAuraByName(target:String, auraName:String) : String
 		{
 			var aura:Object = null;
