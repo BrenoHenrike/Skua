@@ -12,6 +12,8 @@ using Microsoft.CodeAnalysis;
 using System.Reflection;
 using CommunityToolkit.Mvvm.Messaging;
 using Skua.Core.ViewModels.Manager;
+using Skua.Core.Scripts.Auras;
+using Skua.Core.Interfaces.Auras;
 
 namespace Skua.Core.AppStartup;
 public static class Services
@@ -54,6 +56,8 @@ public static class Services
         services.AddSingleton<IScriptHunt, ScriptHunt>();
         services.AddSingleton<IScriptSkill, ScriptSkill>();
         services.AddSingleton<IScriptAuto, ScriptAuto>();
+        services.AddSingleton<IScriptSelfAuras, ScriptSelfAuras>();
+        services.AddSingleton<IScriptTargetAuras, ScriptTargetAuras>();
 
         services.AddSingleton<IScriptFaction, ScriptFaction>();
         services.AddSingleton<IScriptMonster, ScriptMonster>();

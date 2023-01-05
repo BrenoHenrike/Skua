@@ -1,4 +1,5 @@
-﻿using Skua.Core.Models;
+﻿using Skua.Core.Interfaces.Auras;
+using Skua.Core.Models;
 
 namespace Skua.Core.Interfaces;
 
@@ -33,6 +34,10 @@ public interface IScriptInterface
     /// Stats of the current application runtime.
     /// </summary>
     IScriptBotStats Stats { get; }
+    
+    IScriptSelfAuras SelfAuras { get; }
+    IScriptTargetAuras TargetAuras { get; }
+
     /// <summary>
     /// Class to control combat mechanics.
     /// </summary>
