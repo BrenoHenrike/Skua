@@ -63,7 +63,6 @@ package skua
 			this.addCallback("auraComparison", Main.auraComparison);
 			this.addCallback("isTrue", Main.isTrue);
 			this.addCallback("getSubjectAuras", Main.getSubjectAuras);
-			this.addCallback("getSubjectAuraByName", Main.getSubjectAuraByName);
 			this.addCallback("getAvatar",Main.getAvatar);
 			
 			this.addCallback("injectScript", Main.injectScript);

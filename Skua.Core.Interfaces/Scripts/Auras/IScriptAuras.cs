@@ -4,12 +4,9 @@ namespace Skua.Core.Interfaces;
 public interface IScriptAuras
 {
     /// <summary>
-    /// Gets the auras of the specified subject type.
+    /// The list of auras.
     /// </summary>
-    /// <returns>
-    /// <see cref="IEnumerable{T}"/> of <see cref="Aura"/>s.
-    /// </returns>
-    IEnumerable<Aura>? GetAuras();
+    List<Aura> Auras { get; }
 
     /// <summary>
     /// Checks if the subtype has active <paramref name="auraName"/>.

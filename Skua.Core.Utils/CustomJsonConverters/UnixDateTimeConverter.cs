@@ -11,13 +11,18 @@ public class UnixDateTimeConverter : JsonConverter
 
     public override object ReadJson(JsonReader reader, Type objectType, object existingValue, JsonSerializer serializer)
     {
-        var t = long.Parse((string)reader.Value);
+        long t;
+        if(reader.Value!.GetType() != typeof(long))
+            t = long.Parse((string)reader.Value);
+        else
+            t = (long)reader.Value;
+        
         return _epoch.AddMilliseconds(t);
     }
 
     public override void WriteJson(JsonWriter writer, object value, JsonSerializer serializer)
     {
-        writer.WriteRawValue(((DateTime)value - _epoch).TotalMilliseconds + "000");
+        writer.WriteRawValue(((DateTime)value - _epoch).ToString());
     }
 }
 

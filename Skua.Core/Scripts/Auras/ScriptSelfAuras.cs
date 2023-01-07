@@ -15,14 +15,17 @@ public partial class ScriptSelfAuras : IScriptSelfAuras
         _lazyFlash = lazyFlash;
     }
 
-    public Aura? GetAura(string auraName)
+    public List<Aura>? Auras
     {
-        return JsonConvert.DeserializeObject<Aura>(Flash.Call("getSubjectAuraByName", SubjectType.Self.ToString(), auraName)!);
+        get
+        {
+            return JsonConvert.DeserializeObject<List<Aura>>(Flash.Call("getSubjectAuras", SubjectType.Self.ToString())) ?? new();
+        }
     }
 
-    public IEnumerable<Aura>? GetAuras()
+    public Aura? GetAura(string auraName)
     {
-        return JsonConvert.DeserializeObject<List<Aura>>(Flash.Call("getSubjectAuras", SubjectType.Self.ToString())!);
+        return Auras.FirstOrDefault(a => a.Name.Equals(auraName, StringComparison.OrdinalIgnoreCase));
     }
 
     public bool HasActiveAura(string auraName)

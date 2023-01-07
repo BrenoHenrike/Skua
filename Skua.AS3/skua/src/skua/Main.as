@@ -310,7 +310,6 @@ package skua
 		{			
 			var aura:Object = null;
 			var auras:Object = null;
-			
 			try 
 			{
 				auras = subject == "Self" ? instance.game.world.myAvatar.dataLeaf.auras : instance.game.world.myAvatar.target.dataLeaf.auras;
@@ -320,14 +319,15 @@ package skua
 				return "[]";
 			}
 
-			var result:String = "[";
-			for each(aura in auras)
+			var auraArray:Array = new Array();
+			for(var i:int = 0; i < auras.length; i++)
 			{
-				result += JSON.stringify({
+				aura = auras[i];
+				auraArray.push({
 						"name":aura.nam,
-						"value":aura.val == undefined ? "undefined" : aura.val,
+						"value":aura.val == undefined ? 0 : aura.val,
 						"passive":aura.passive,
-						"timeStamp":aura.ts.toString(),
+						"timeStamp":aura.ts,
 						"duration":parseInt(aura.dur),
 						"potionType":aura.potionType,
 						"cat":aura.cat,
@@ -339,39 +339,8 @@ package skua
 						"msgOn":aura.msgOn,
 						"isNew":aura.isNew
 					});
-				if (aura != auras[auras.length - 1])
-					result += ",";
 			}
-			return result + "]";
-		}
-
-		public static function getSubjectAuraByName(target:String, auraName:String) : String
-		{
-			var aura:Object = null;
-			var auras:Object = target == "Self" ? instance.game.world.myAvatar.dataLeaf.auras : instance.game.world.myAvatar.target.dataLeaf.auras;
-			for each(aura in auras)
-			{
-				if(aura.nam.toLowerCase() == auraName.toLowerCase())
-				{
-					return JSON.stringify({
-						"name":aura.nam,
-						"value":aura.val == undefined ? "undefined" : aura.val,
-						"passive":aura.passive,
-						"timeStamp":aura.ts.toString(),
-						"duration":parseInt(aura.dur),
-						"potionType":aura.potionType,
-						"cat":aura.cat,
-						"t":aura.t,
-						"s":aura.s,
-						"fx":aura.fx,
-						"animOn":aura.animOn,
-						"animOff":aura.animOff,
-						"msgOn":aura.msgOn,
-						"isNew":aura.isNew
-					});
-				}
-			 }
-			 return null;
+			return JSON.stringify(auraArray);
 		}
 		
 		public static function getAvatar(id:int) : String

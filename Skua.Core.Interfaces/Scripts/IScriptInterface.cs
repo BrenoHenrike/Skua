@@ -35,8 +35,8 @@ public interface IScriptInterface
     /// </summary>
     IScriptBotStats Stats { get; }
     
-    IScriptSelfAuras SelfAuras { get; }
-    IScriptTargetAuras TargetAuras { get; }
+    IScriptSelfAuras Self { get; }
+    IScriptTargetAuras Target { get; }
 
     /// <summary>
     /// Class to control combat mechanics.

@@ -28,10 +28,8 @@ public class ScriptInterface : IScriptInterface, IScriptInterfaceManager
     public IMessenger Messenger { get; }
     public IScriptBoost Boosts { get; }
     public IScriptBotStats Stats { get; }
-
-    public IScriptSelfAuras SelfAuras { get; }
-    public IScriptTargetAuras TargetAuras { get; }
-
+    public IScriptSelfAuras Self { get; }
+    public IScriptTargetAuras Target { get; }
     public IScriptCombat Combat { get; }
     public IScriptKill Kill { get; }
     public IScriptHunt Hunt { get; }
@@ -99,8 +97,8 @@ public class ScriptInterface : IScriptInterface, IScriptInterfaceManager
         Manager = manager;
         Boosts = boosts;
         Stats = stats;
-        SelfAuras = scriptSelfAuras;
-        TargetAuras = scriptTargetAuras;
+        Self = scriptSelfAuras;
+        Target = scriptTargetAuras;
         Combat = combat;
         Kill = kill;
         Hunt = hunt;
