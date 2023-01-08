@@ -62,7 +62,10 @@ public partial class CBOClassSelectViewModel : ObservableObject, IManageCBOption
     [RelayCommand]
     private void ReloadClasses()
     {
-        PlayerClasses = _inventory.Items?.Where(i => i.Category == ItemCategory.Class).Select(i => i.Name).ToList() ?? new();
+        PlayerClasses = _inventory.Items?.Where(i => 
+            (i.Category == ItemCategory.Class) && (i.EnhancementLevel > 0)
+        ).Select(i => i.Name).ToList() ?? new();
+        
         OnPropertyChanged(nameof(PlayerClasses));
 
         SoloUseModes = new();
