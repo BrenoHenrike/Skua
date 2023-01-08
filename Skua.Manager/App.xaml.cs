@@ -49,17 +49,11 @@ public partial class App : Application
                 case "--download-path":
                     settings.Set("ClientDownloadPath", args[++i]);
                     break;
-                case "--auto-scripts":
-                    settings.Set("AutoUpdateScripts", Convert.ToBoolean(args[++i]));
-                    break;
                 case "--client-releases":
                     settings.Set("CheckClientUpdates", Convert.ToBoolean(args[++i]));
                     break;
                 case "--client-pre-releases":
                     settings.Set("CheckClientPrereleases", Convert.ToBoolean(args[++i]));
-                    break;
-                case "--script-updates":
-                    settings.Set("CheckScriptUpdates", Convert.ToBoolean(args[++i]));
                     break;
                 case "--delete-zip":
                     settings.Set("DeleteZipFileAfter", Convert.ToBoolean(args[++i]));

@@ -46,7 +46,17 @@ public partial class GetScriptsService : ObservableObject, IGetScriptsService
         await GetScripts(progress, true, token);
     }
 
-    public async Task<long> DownloadSkillSetsFile()
+    public async Task<long> CheckAdvanceSkillSetsUpdates()
+    {
+        using (var client = new HttpClient())
+        {
+            var response = await client.GetAsync(_skillsSetsRawUrl);
+            var content = await response.Content.ReadAsStringAsync();
+            return content.Length;
+        }
+    }
+
+    public async Task<bool> UpdateSkillSetsFile()
     {
         using (var client = new HttpClient())
         {
@@ -54,10 +64,15 @@ public partial class GetScriptsService : ObservableObject, IGetScriptsService
             var content = await response.Content.ReadAsStringAsync();
             var skillsSetsFile = Path.Combine(AppContext.BaseDirectory, "AdvancedSkills.txt");
 
-            await File.WriteAllTextAsync(skillsSetsFile, content);
-
-            var file = new FileInfo(skillsSetsFile);
-            return file.Length;
+            try
+            {
+                await File.WriteAllTextAsync(skillsSetsFile, content);
+                return true;
+            }
+            catch
+            {
+                return false;
+            }
         }
     }
 

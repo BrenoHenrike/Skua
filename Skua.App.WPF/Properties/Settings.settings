@@ -53,12 +53,12 @@
       <Value Profile="(Default)" />
     </Setting>
     <Setting Name="AnimationFrameRate" Type="System.Int32" Scope="User">
-      <Value Profile="(Default)">60</Value>
+      <Value Profile="(Default)">30</Value>
     </Setting>
-    <Setting Name="AutoUpdateScripts" Type="System.Boolean" Scope="User">
+    <Setting Name="AutoUpdateBotScripts" Type="System.Boolean" Scope="User">
       <Value Profile="(Default)">True</Value>
     </Setting>
-    <Setting Name="CheckScriptUpdates" Type="System.Boolean" Scope="User">
+    <Setting Name="CheckBotScriptsUpdates" Type="System.Boolean" Scope="User">
       <Value Profile="(Default)">True</Value>
     </Setting>
     <Setting Name="IgnoreGHAuth" Type="System.Boolean" Scope="User">
@@ -80,6 +80,12 @@
   &lt;string&gt;ToggleAutoAttack|F4&lt;/string&gt;
   &lt;string&gt;ToggleAutoHunt|F5&lt;/string&gt;
 &lt;/ArrayOfString&gt;</Value>
+    </Setting>
+    <Setting Name="CheckAdvanceSkillSetsUpdates" Type="System.Boolean" Scope="User">
+      <Value Profile="(Default)">True</Value>
+    </Setting>
+    <Setting Name="AutoUpdateAdvanceSkillSetsUpdates" Type="System.Boolean" Scope="User">
+      <Value Profile="(Default)">True</Value>
     </Setting>
   </Settings>
 </SettingsFile>

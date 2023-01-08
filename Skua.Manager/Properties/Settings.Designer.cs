@@ -87,18 +87,6 @@ namespace Skua.Manager.Properties {
         [global::System.Configuration.UserScopedSettingAttribute()]
         [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
         [global::System.Configuration.DefaultSettingValueAttribute("True")]
-        public bool AutoUpdateScripts {
-            get {
-                return ((bool)(this["AutoUpdateScripts"]));
-            }
-            set {
-                this["AutoUpdateScripts"] = value;
-            }
-        }
-        
-        [global::System.Configuration.UserScopedSettingAttribute()]
-        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
-        [global::System.Configuration.DefaultSettingValueAttribute("True")]
         public bool CheckClientUpdates {
             get {
                 return ((bool)(this["CheckClientUpdates"]));
@@ -117,18 +105,6 @@ namespace Skua.Manager.Properties {
             }
             set {
                 this["CheckClientPrereleases"] = value;
-            }
-        }
-        
-        [global::System.Configuration.UserScopedSettingAttribute()]
-        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
-        [global::System.Configuration.DefaultSettingValueAttribute("True")]
-        public bool CheckScriptUpdates {
-            get {
-                return ((bool)(this["CheckScriptUpdates"]));
-            }
-            set {
-                this["CheckScriptUpdates"] = value;
             }
         }
         

@@ -130,7 +130,7 @@ namespace Skua.App.WPF.Properties {
         
         [global::System.Configuration.UserScopedSettingAttribute()]
         [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
-        [global::System.Configuration.DefaultSettingValueAttribute("60")]
+        [global::System.Configuration.DefaultSettingValueAttribute("30")]
         public int AnimationFrameRate {
             get {
                 return ((int)(this["AnimationFrameRate"]));
@@ -143,24 +143,24 @@ namespace Skua.App.WPF.Properties {
         [global::System.Configuration.UserScopedSettingAttribute()]
         [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
         [global::System.Configuration.DefaultSettingValueAttribute("True")]
-        public bool AutoUpdateScripts {
+        public bool AutoUpdateBotScripts {
             get {
-                return ((bool)(this["AutoUpdateScripts"]));
+                return ((bool)(this["AutoUpdateBotScripts"]));
             }
             set {
-                this["AutoUpdateScripts"] = value;
+                this["AutoUpdateBotScripts"] = value;
             }
         }
         
         [global::System.Configuration.UserScopedSettingAttribute()]
         [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
         [global::System.Configuration.DefaultSettingValueAttribute("True")]
-        public bool CheckScriptUpdates {
+        public bool CheckBotScriptsUpdates {
             get {
-                return ((bool)(this["CheckScriptUpdates"]));
+                return ((bool)(this["CheckBotScriptsUpdates"]));
             }
             set {
-                this["CheckScriptUpdates"] = value;
+                this["CheckBotScriptsUpdates"] = value;
             }
         }
         
@@ -214,6 +214,30 @@ namespace Skua.App.WPF.Properties {
             }
             set {
                 this["HotKeys"] = value;
+            }
+        }
+        
+        [global::System.Configuration.UserScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("True")]
+        public bool CheckAdvanceSkillSetsUpdates {
+            get {
+                return ((bool)(this["CheckAdvanceSkillSetsUpdates"]));
+            }
+            set {
+                this["CheckAdvanceSkillSetsUpdates"] = value;
+            }
+        }
+        
+        [global::System.Configuration.UserScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("True")]
+        public bool AutoUpdateAdvanceSkillSetsUpdates {
+            get {
+                return ((bool)(this["AutoUpdateAdvanceSkillSetsUpdates"]));
+            }
+            set {
+                this["AutoUpdateAdvanceSkillSetsUpdates"] = value;
             }
         }
     }
