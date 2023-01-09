@@ -7,6 +7,7 @@ using CommunityToolkit.Mvvm.Messaging;
 using Skua.Core.Messaging;
 using CommunityToolkit.Mvvm.DependencyInjection;
 using Skua.Core.Models;
+using Skua.Core.Interfaces.Auras;
 
 namespace Skua.Core.Scripts;
 public class ScriptInterface : IScriptInterface, IScriptInterfaceManager
@@ -27,6 +28,8 @@ public class ScriptInterface : IScriptInterface, IScriptInterfaceManager
     public IMessenger Messenger { get; }
     public IScriptBoost Boosts { get; }
     public IScriptBotStats Stats { get; }
+    public IScriptSelfAuras Self { get; }
+    public IScriptTargetAuras Target { get; }
     public IScriptCombat Combat { get; }
     public IScriptKill Kill { get; }
     public IScriptHunt Hunt { get; }
@@ -62,6 +65,8 @@ public class ScriptInterface : IScriptInterface, IScriptInterfaceManager
         IScriptServers server,
         IScriptBoost boosts,
         IScriptBotStats stats,
+        IScriptSelfAuras scriptSelfAuras,
+        IScriptTargetAuras scriptTargetAuras,
         IScriptCombat combat,
         IScriptDrop drops,
         IScriptEvent events,
@@ -92,6 +97,8 @@ public class ScriptInterface : IScriptInterface, IScriptInterfaceManager
         Manager = manager;
         Boosts = boosts;
         Stats = stats;
+        Self = scriptSelfAuras;
+        Target = scriptTargetAuras;
         Combat = combat;
         Kill = kill;
         Hunt = hunt;

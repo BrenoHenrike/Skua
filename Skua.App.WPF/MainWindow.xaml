@@ -31,7 +31,7 @@
             Visibility="Visible">
             <tb:TaskbarIcon.ContextMenu>
                 <ContextMenu>
-                    <MenuItem Click="MenuItem_Click" Header="Toggle Main Window" />
+                    <MenuItem Click="MenuItem_Click" Header="Toggle Bot" />
                 </ContextMenu>
             </tb:TaskbarIcon.ContextMenu>
         </tb:TaskbarIcon>

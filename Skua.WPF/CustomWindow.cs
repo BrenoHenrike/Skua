@@ -40,6 +40,14 @@ public partial class CustomWindow : Window
         DependencyProperty.Register("HideWindow", typeof(bool), typeof(CustomWindow), new PropertyMetadata(false));
 
 
+    public string TitleText
+    {
+        get { return (string)GetValue(TitleTextProperty); }
+        set { SetValue(TitleTextProperty, value); }
+    }
+
+    public static readonly DependencyProperty TitleTextProperty =
+        DependencyProperty.Register("TitleText", typeof(string), typeof(CustomWindow), new PropertyMetadata("Skua"));
 
     public CustomWindow() : base()
     {
@@ -64,7 +72,7 @@ public partial class CustomWindow : Window
             btnMaximize = (Button)Template.FindName("btnMaximize", this);
             btnMinimize = (Button)Template.FindName("btnMinimize", this);
 
-            if (!HideWindow)
+            if (!HideWindow && !TitleText.Contains("Skua Manager"))
             {
                 btnClose.Click += (s, e) =>
                 {
@@ -88,6 +96,7 @@ public partial class CustomWindow : Window
                         recipient.IsActive = false;
                 };
             }
+
             btnMinimize.Click += BtnMinimize_Click;
             if(!FixedSize)
             {

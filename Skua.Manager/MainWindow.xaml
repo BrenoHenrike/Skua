@@ -64,13 +64,19 @@
         <tb:TaskbarIcon
             DoubleClickCommand="{Binding ShowManagerCommand}"
             IconSource="SkuaIcon.ico"
-            MenuActivation="RightClick"
+            MenuActivation="LeftOrRightClick"
             PopupActivation="DoubleClick"
             ToolTipText="Skua Manager"
             Visibility="Visible">
             <tb:TaskbarIcon.ContextMenu>
                 <ContextMenu>
-                    <MenuItem Click="MenuItem_Click" Header="Toggle Main Window (Manager)" />
+                    <MenuItem 
+                        Click="MenuItem_Click"
+                        Header="Show Manager" />
+                    <MenuItem
+                        Click="LaunchNewSkuaBotClient_Click"
+                        Header="Skua Bot AQW"
+                        ToolTip="Launch new Skua Bot Client." />
                     <MenuItem
                         Command="{Binding Path=Parent.Parent.DataContext.UpdateScriptsCommand, RelativeSource={RelativeSource Self}}"
                         Header="Update Scripts"
@@ -83,6 +89,10 @@
                         Command="{Binding Path=Parent.Parent.DataContext.CheckUpdateCommand, RelativeSource={RelativeSource Self}}"
                         Header="Check Client Update"
                         ToolTip="Checks if there is any updates for the client." />
+                    <MenuItem
+                        Click="ExitWindow_Click"
+                        Header="Exit"
+                        ToolTip="Terminate Manager." />
                 </ContextMenu>
             </tb:TaskbarIcon.ContextMenu>
         </tb:TaskbarIcon>

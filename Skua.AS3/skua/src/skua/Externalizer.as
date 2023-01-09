@@ -60,14 +60,9 @@ package skua
 			this.addCallback("killLag", Main.killLag);
 			
 			// aura reading
-			this.addCallback("isAuraActive", Main.isAuraActive);
 			this.addCallback("auraComparison", Main.auraComparison);
-			this.addCallback("isAuraWithStrValActive", Main.isAuraWithStrValActive);
 			this.addCallback("isTrue", Main.isTrue);
-			this.addCallback("getAuraByName",Main.getAuraByName);
-			this.addCallback("getAuraByIndex",Main.getAuraByIndex);
-			this.addCallback("getSelfAuras", Main.getSelfAuras);
-			this.addCallback("getTargetAuras", Main.getTargetAuras);
+			this.addCallback("getSubjectAuras", Main.getSubjectAuras);
 			this.addCallback("getAvatar",Main.getAvatar);
 			
 			this.addCallback("injectScript", Main.injectScript);

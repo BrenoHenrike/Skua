@@ -3,9 +3,9 @@ using CommunityToolkit.Mvvm.Messaging;
 using Skua.Core.Interfaces;
 using Skua.Core.Messaging;
 using Skua.Core.ViewModels;
-using Skua.Core.ViewModels.Manager;
 using Skua.WPF;
 using Skua.WPF.UserControls;
+using System.ComponentModel;
 using System.Windows;
 
 namespace Skua.App.WPF;
