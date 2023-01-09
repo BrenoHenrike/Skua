@@ -8,8 +8,8 @@
     xmlns:usercontrols="clr-namespace:Skua.WPF.UserControls;assembly=Skua.WPF"
     xmlns:vms="clr-namespace:Skua.Core.ViewModels;assembly=Skua.Core"
     xmlns:wpf="clr-namespace:Skua.WPF;assembly=Skua.WPF"
-    ShutdownMode="OnMainWindowClose"
-    StartupUri="MainWindow.xaml">
+    StartupUri="MainWindow.xaml"
+    ShutdownMode="OnMainWindowClose">
     <Application.Resources>
         <ResourceDictionary>
             <ResourceDictionary.MergedDictionaries>
