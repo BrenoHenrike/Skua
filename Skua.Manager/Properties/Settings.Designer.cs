@@ -110,7 +110,7 @@ namespace Skua.Manager.Properties {
         
         [global::System.Configuration.UserScopedSettingAttribute()]
         [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
-        [global::System.Configuration.DefaultSettingValueAttribute("1.1.4")]
+        [global::System.Configuration.DefaultSettingValueAttribute("1.1.4.0")]
         public string ApplicationVersion {
             get {
                 return ((string)(this["ApplicationVersion"]));
@@ -153,6 +153,18 @@ namespace Skua.Manager.Properties {
             }
             set {
                 this["SyncThemes"] = value;
+            }
+        }
+        
+        [global::System.Configuration.UserScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("True")]
+        public bool AutoUpdateBotScripts {
+            get {
+                return ((bool)(this["AutoUpdateBotScripts"]));
+            }
+            set {
+                this["AutoUpdateBotScripts"] = value;
             }
         }
     }
