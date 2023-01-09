@@ -53,7 +53,7 @@ public class AdvancedSkillContainer : ObservableRecipient, IAdvancedSkillContain
     {
         var getScripts = Ioc.Default.GetRequiredService<IGetScriptsService>();
         if (!File.Exists(_defaultSkillsSetsPath))
-            getScripts.DownloadSkillSetsFile().GetAwaiter().GetResult();
+            getScripts.UpdateSkillSetsFile().GetAwaiter().GetResult();
 
         if (File.Exists(_userSkillsSetsPath))
             File.Delete(_userSkillsSetsPath);

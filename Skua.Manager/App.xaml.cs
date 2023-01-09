@@ -11,7 +11,7 @@ using Skua.Core.Messaging;
 using Skua.Manager.Properties;
 using System.Threading.Tasks;
 using Skua.Core.ViewModels.Manager;
-using System.Diagnostics;
+using System.Threading;
 
 namespace Skua.Manager;
 
@@ -20,9 +20,13 @@ namespace Skua.Manager;
 /// </summary>
 public partial class App : Application
 {
+    private const string _uniqueEventName = "Skua.Manager";
+    private EventWaitHandle? _eventWaitHandle = null;
+    
     public App()
     {
         InitializeComponent();
+        SingleInstanceWatcher();
 
         var args = Environment.GetCommandLineArgs();
         Services = ConfigureServices();
@@ -49,28 +53,22 @@ public partial class App : Application
                 case "--download-path":
                     settings.Set("ClientDownloadPath", args[++i]);
                     break;
-                case "--auto-scripts":
-                    settings.Set("AutoUpdateScripts", Convert.ToBoolean(args[++i]));
-                    break;
                 case "--client-releases":
                     settings.Set("CheckClientUpdates", Convert.ToBoolean(args[++i]));
                     break;
                 case "--client-pre-releases":
                     settings.Set("CheckClientPrereleases", Convert.ToBoolean(args[++i]));
                     break;
-                case "--script-updates":
-                    settings.Set("CheckScriptUpdates", Convert.ToBoolean(args[++i]));
-                    break;
                 case "--delete-zip":
                     settings.Set("DeleteZipFileAfter", Convert.ToBoolean(args[++i]));
                     break;
             }
         }
-
+        
         Dispatcher.ShutdownStarted += Dispatcher_ShutdownStarted;
         StrongReferenceMessenger.Default.Register<App, UpdateFinishedMessage>(this, CloseManager);
-
-        if(Settings.Default.CheckClientUpdates)
+        
+        if (Settings.Default.CheckClientUpdates)
         {
             Task.Run(async () =>
             {
@@ -82,6 +80,45 @@ public partial class App : Application
             });
         }
     }
+    
+    private void SingleInstanceWatcher()
+    {
+        try
+        {
+            _eventWaitHandle = EventWaitHandle.OpenExisting(_uniqueEventName);
+            _eventWaitHandle.Set();
+            Shutdown();
+        }
+        catch (WaitHandleCannotBeOpenedException)
+        {
+            _eventWaitHandle = new EventWaitHandle(false, EventResetMode.AutoReset, _uniqueEventName);
+        }
+
+        new Task(() =>
+        {
+            while (_eventWaitHandle.WaitOne())
+            {
+                Current.Dispatcher.BeginInvoke((Action)(() =>
+                {
+                    if (!Current.MainWindow.Equals(null))
+                    {
+                        var mainWindow = Current.MainWindow;
+                        if (mainWindow.WindowState == WindowState.Minimized || mainWindow.Visibility != Visibility.Visible)
+                        {
+                            mainWindow.Show();
+                            mainWindow.WindowState = WindowState.Normal;
+                        }
+
+                        mainWindow.Activate();
+                        mainWindow.Topmost = true;
+                        mainWindow.Topmost = false;
+                        mainWindow.Focus();
+                    }
+                }));
+            }
+        })
+        .Start();
+    }
 
     private void Dispatcher_ShutdownStarted(object? sender, EventArgs e)
     {
@@ -91,14 +128,6 @@ public partial class App : Application
     private void CloseManager(App recipient, UpdateFinishedMessage message)
     {
         Application.Current.Shutdown();
-    }
-
-    // app on exit event
-    protected override void OnExit(ExitEventArgs e)
-    {
-        base.OnExit(e);
-        var launcher = Ioc.Default.GetRequiredService<LauncherViewModel>();
-        launcher.KillAllSkuaProcesses();
     }
 
     public new static App Current => (App)Application.Current;

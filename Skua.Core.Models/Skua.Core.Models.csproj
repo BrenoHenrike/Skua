@@ -10,7 +10,11 @@
 
   <ItemGroup>
     <PackageReference Include="Caseless.Fody" Version="1.9.1" />
-    <PackageReference Include="Newtonsoft.Json" Version="13.0.1" />
+    <PackageReference Include="Newtonsoft.Json" Version="13.0.2" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\Skua.Core.Utils\Skua.Core.Utils.csproj" />
   </ItemGroup>
 
 </Project>

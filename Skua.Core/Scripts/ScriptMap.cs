@@ -187,15 +187,28 @@ public partial class ScriptMap : IScriptMap
                 var mapItemLines = MainTimelineText.Select((l, i) => new Tuple<string, int>(l, i)).Where(l => l.Item1.Contains("mapitem", StringComparison.OrdinalIgnoreCase) || l.Item1.Contains("itemdrop", StringComparison.OrdinalIgnoreCase));
                 foreach ((string mapItemLine, int index) in mapItemLines)
                 {
-                    string questID, mapItem;
+                    var questID = string.Empty;
+                    var mapItem = string.Empty;
                     switch (mapItemLine.Contains("getmapitem"))
                     {
                         case true:
-                            questID = MainTimelineText.Skip(index - 5 < 0 ? 0 : index - 5).Take(10).Where(l => l.Contains("isquestinprogress")).First().ToLower().Split("isquestinprogress")[1].Split(')')[0].RemoveLetters() ?? "";
+                            questID = MainTimelineText.Skip(index - 5 < 0 ? 0 : index - 5).Take(10).Where(l => l.Contains("isquestinprogress")).FirstOrDefault()!;
+
+                            if(questID == null)
+                                questID = string.Empty;
+                            else
+                                questID = questID.ToLower().Split("isquestinprogress")[1].Split(')')[0].RemoveLetters() ?? "";
+                            
                             mapItem = mapItemLine.RemoveLetters();
                             break;
                         case false:
-                            questID = MainTimelineText.Skip(index - 5 < 0 ? 0 : index - 5).Take(10).Where(l => l.Contains("questnum") || (l.Contains("intquest") && !l.Contains("intquestval"))).First().Split('=')[1].RemoveLetters() ?? "";
+                            questID = MainTimelineText.Skip(index - 5 < 0 ? 0 : index - 5).Take(10).Where(l => l.Contains("questnum") || (l.Contains("intquest") && !l.Contains("intquestval"))).FirstOrDefault()!;
+
+                            if (questID == null)
+                                questID = string.Empty;
+                            else
+                                questID = questID.Split('=')[1].RemoveLetters() ?? "";
+                            
                             mapItem = mapItemLine.Split('=')[1].RemoveLetters();
                             break;
                     }

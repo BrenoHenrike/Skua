@@ -105,18 +105,23 @@ public class ClientUpdateService : IClientUpdateService
                     args.Add(downloadPath);
                 }
 
-                args.Add("--auto-scripts");
-                args.Add(_settingsService.Get<bool>("AutoUpdateScripts").ToString());
-
                 args.Add("--client-releases");
                 args.Add(_settingsService.Get<bool>("CheckClientUpdates").ToString());
 
                 args.Add("--client-pre-releases");
                 args.Add(_settingsService.Get<bool>("CheckClientPrereleases").ToString());
 
-                args.Add("--script-updates");
-                args.Add(_settingsService.Get<bool>("CheckScriptUpdates").ToString());
+                args.Add("--auto-update-bot-scripts");
+                args.Add(_settingsService.Get<bool>("AutoUpdateBotScripts").ToString());
 
+                args.Add("--bot-script-updates");
+                args.Add(_settingsService.Get<bool>("CheckBotScriptsUpdates").ToString());
+
+                args.Add("--auto-update-advanceskill-sets");
+                args.Add(_settingsService.Get<bool>("AutoUpdateAdvanceSkillSetsUpdates").ToString());
+
+                args.Add("--advanceskill-sets-updates");
+                args.Add(_settingsService.Get<bool>("CheckAdvanceSkillSetsUpdates").ToString());
 
                 args.Add("--delete-zip");
                 args.Add(_settingsService.Get<bool>("DeleteZipFileAfter").ToString());
