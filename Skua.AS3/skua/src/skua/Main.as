@@ -449,13 +449,16 @@ package skua
 			}
 		}
 		
-		public static function useSkill(index:int):void
+		public static function useSkill(index:int):String
 		{
 			var skill:* = instance.game.world.actions.active[index];
 			if (skua.ExtractedFuncs.actionTimeCheck(skill) && instance.game.world.myAvatar.target.dataLeaf.intHP > 0)
 			{
 				instance.game.world.testAction(skill);
+				return true.toString();
 			}
+			
+			return false.toString();
 		}
 		
 		public static function magnetize():void

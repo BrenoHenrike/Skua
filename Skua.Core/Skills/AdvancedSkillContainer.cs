@@ -22,7 +22,7 @@ public class AdvancedSkillContainer : ObservableRecipient, IAdvancedSkillContain
     {
         _defaultSkillsSetsPath = Path.Combine(AppContext.BaseDirectory, "AdvancedSkills.txt");
         _userSkillsSetsPath = Path.Combine(AppContext.BaseDirectory, "UserAdvancedSkills.txt");
-        SyncSkills();
+        LoadSkills();
     }
 
     public void Add(AdvancedSkill skill)
@@ -73,7 +73,7 @@ public class AdvancedSkillContainer : ObservableRecipient, IAdvancedSkillContain
     public void LoadSkills()
     {
         if (!File.Exists(_userSkillsSetsPath))
-            return;
+            _CopyDefaultSkills();
 
         LoadedSkills.Clear();
         foreach (string line in File.ReadAllLines(_userSkillsSetsPath))

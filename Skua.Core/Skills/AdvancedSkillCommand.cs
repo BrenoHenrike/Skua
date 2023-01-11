@@ -1,47 +1,53 @@
 ﻿using Skua.Core.Interfaces;
+using System.Diagnostics;
 
 namespace Skua.Core.Skills;
 public class AdvancedSkillCommand
 {
-    public List<int> Skills { get; set; } = new List<int>();
-    public List<UseRule[]> UseRules { get; set; } = new();
-    private int _Index = 0;
+    private int _index = 0;
+    public Dictionary<int, UseRule[]> SkillSet { get; set; } = new();
 
     public int GetNextSkill()
     {
-        int skill = Skills[_Index];
-        _Index++;
-        if (_Index >= Skills.Count)
-            _Index = 0;
-
+        int skill = SkillSet.Keys.ElementAt(_index);
+        _index++;
+        if (_index >= SkillSet.Count)
+            _index = 0;
+        Trace.WriteLine($"Skill index: {skill}");
         return skill;
     }
 
-    public bool? ShouldUse(IScriptPlayer player)
+    
+    public bool? ShouldUse(IScriptPlayer player, int skill, bool canUse)
     {
-        if (UseRules.Count == 0 || UseRules[_Index].First().None)
-            return true;
+        UseRule[] rules = SkillSet[skill];        
+        if (SkillSet.Count == 0 || rules.First().Rule == SkillRule.None)
+            return true; 
+        
         bool shouldUse = true;
-        foreach (UseRule useRule in UseRules[_Index])
+        foreach (UseRule useRule in rules)
         {
             if (!player.Alive)
                 return false;
 
             switch (useRule.Rule)
             {
-                case true:
+                case SkillRule.Health:
                     shouldUse = HealthUseRule(player, useRule.Greater, useRule.Value);
                     break;
-                case false:
+                case SkillRule.Mana:
                     shouldUse = ManaUseRule(player, useRule.Greater, useRule.Value);
                     break;
-                case null:
-                    Thread.Sleep(useRule.Value);
+                case SkillRule.Wait:
+                    if (useRule.ShouldSkip && !canUse)
+                        return null; 
+                    Task.Delay(useRule.Value).Wait();
                     break;
             }
 
             if (useRule.ShouldSkip && !shouldUse)
                 return null;
+
             if (!shouldUse)
                 break;
         }
@@ -63,24 +69,33 @@ public class AdvancedSkillCommand
 
     public void Reset()
     {
-        _Index = 0;
+        _index = 0;
     }
+}
+
+public enum SkillRule
+{
+    None,
+    Health,
+    Mana,
+    Wait
 }
 
 public struct UseRule
 {
-    public UseRule(bool none)
+    public UseRule(SkillRule rule)
     {
-        None = none;
+        Rule = rule;
     }
-    public UseRule(bool? rule, bool greater, int value, bool shouldSkip)
+    
+    public UseRule(SkillRule rule, bool greater, int value, bool shouldSkip)
     {
         Rule = rule;
         Greater = greater;
         Value = value;
         ShouldSkip = shouldSkip;
     }
-    public readonly bool None = false;
+    
     /// <summary>
     /// <list type="bullet">
     /// <item><see langword="null"/> = Wait</item>
@@ -88,7 +103,8 @@ public struct UseRule
     /// <item><see langword="false"/> = Mana</item>
     /// </list>
     /// </summary>
-    public readonly bool? Rule = null;
+    public readonly SkillRule Rule = SkillRule.None;
+    
     /// <summary>
     /// <list type="bullet">
     /// <item><see langword="true"/> = Great than</item>
