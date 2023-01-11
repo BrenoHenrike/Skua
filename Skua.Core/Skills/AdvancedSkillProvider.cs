@@ -1,5 +1,6 @@
 ﻿using Skua.Core.Interfaces;
 using Skua.Core.Utils;
+using System.Diagnostics;
 
 namespace Skua.Core.Skills;
 
@@ -19,18 +20,21 @@ public class AdvancedSkillProvider : ISkillProvider
 
     public bool ResetOnTarget { get; set; } = false;
 
-    public int GetNextSkill()
+    public (int, int) GetNextSkill()
     {
         return Root.GetNextSkill();
     }
 
     public void Load(string skills)
     {
+        int index = 0;
         foreach (string command in skills.ToLower().Split('|').Select(s => s.Trim()).ToList())
         {
             if(int.TryParse(command.AsSpan(0, 1), out int skill))
             {
-                Root.SkillSet.Add(skill, command.Length <= 1 ? _none : ParseUseRule(command[1..]));
+                Root.Skills.Add(index, skill);
+                Root.UseRules.Add(command.Length <= 1 ? _none : ParseUseRule(command[1..]));
+                ++index;
             }
         }
     }
@@ -74,9 +78,9 @@ public class AdvancedSkillProvider : ISkillProvider
         if (ResetOnTarget && !_player.HasTarget)
             Root.Reset();
     }
-    public bool? ShouldUseSkill(int skill, bool canUse)
+    public bool? ShouldUseSkill(int skillIndex, bool canUse)
     {
-        return Root.ShouldUse(_player, skill, canUse);
+        return Root.ShouldUse(_player, skillIndex, canUse);
     }
 
     public void Stop()

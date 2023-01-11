@@ -4,28 +4,29 @@ using System.Diagnostics;
 namespace Skua.Core.Skills;
 public class AdvancedSkillCommand
 {
-    private int _index = 0;
-    public Dictionary<int, UseRule[]> SkillSet { get; set; } = new();
+    public Dictionary<int, int> Skills { get; set; } = new();
+    public List<UseRule[]> UseRules { get; set; } = new();
+    private int _Index = 0;
 
-    public int GetNextSkill()
+    public (int, int) GetNextSkill()
     {
-        int skill = SkillSet.Keys.ElementAt(_index);
-        _index++;
-        if (_index >= SkillSet.Count)
-            _index = 0;
+        int skill = Skills[_Index];
+        int index = _Index;
+        ++_Index;
+        if (_Index >= Skills.Count)
+            _Index = 0;
         Trace.WriteLine($"Skill index: {skill}");
-        return skill;
+        return (index, skill);
     }
 
     
-    public bool? ShouldUse(IScriptPlayer player, int skill, bool canUse)
+    public bool? ShouldUse(IScriptPlayer player, int skillIndex, bool canUse)
     {
-        UseRule[] rules = SkillSet[skill];        
-        if (SkillSet.Count == 0 || rules.First().Rule == SkillRule.None)
+        if (UseRules.Count == 0 || UseRules[skillIndex].First().Rule == SkillRule.None)
             return true; 
         
         bool shouldUse = true;
-        foreach (UseRule useRule in rules)
+        foreach (UseRule useRule in UseRules[skillIndex])
         {
             if (!player.Alive)
                 return false;
@@ -69,7 +70,7 @@ public class AdvancedSkillCommand
 
     public void Reset()
     {
-        _index = 0;
+        _Index = 0;
     }
 }
 

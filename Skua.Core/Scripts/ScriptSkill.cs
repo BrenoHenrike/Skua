@@ -211,9 +211,10 @@ public partial class ScriptSkill : IScriptSkill
         _lastRank = Player.CurrentClassRank;
         if (token.IsCancellationRequested)
             return;
+        
+        var (index, skillS) = _provider!.GetNextSkill();
 
-        int skillS = _provider!.GetNextSkill();
-        switch (_provider?.ShouldUseSkill(skillS, CanUseSkill(skillS)))
+        switch (_provider?.ShouldUseSkill(index, CanUseSkill(skillS)))
         {
             case true:
                 if (skillS != -1 && !_playerSkills![skillS].IsOk)
@@ -221,7 +222,7 @@ public partial class ScriptSkill : IScriptSkill
                 UseSkill(skillS);
                 break;
             case null:
-                int skill = _provider!.GetNextSkill();
+                var (indexS, skill) = _provider!.GetNextSkill();
                 if (skill != -1 && !_playerSkills![skill].IsOk)
                     break;
                 UseSkill(skill);
