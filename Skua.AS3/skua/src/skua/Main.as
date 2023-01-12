@@ -163,8 +163,60 @@ package skua
 		public static function getGameObject(path:String):String
 		{
 			var obj:* = _getObjectS(instance.game, path);
+			//instance.external.debug(JSON.stringify(instance.game.world.areaUsers));
+			//var users:* =  instance.game.world.areaUsers;
+			//var userData:* = null;
+			//var userObj:Object = {};
+			//for (var i:int = 0; i < users.length; i++){
+				//userData = instance.game.world.uoTreeLeaf(users[i]);
+				//userObj = {
+					//"Cell": userData.strFrame,
+					//"Pad": userData.strPad,
+					//"Auras": userData.auras
+				//};
+				//instance.external.debug(JSON.stringify(userObj));
+			//}
+			
 			return JSON.stringify(obj);
 		}
+		
+		public static function jumpCorrectRoom(cell:String, pad:String, autoCorrect:Boolean = false, clientOnly:Boolean = false):void
+		{
+			var users:* = instance.game.world.areaUsers;
+			var userData:* = null;
+			
+			if (!autoCorrect)
+			{
+				instance.game.world.moveToCell(cell, pad, clientOnly);
+				return;
+			}
+			else 
+			{
+				if (users.length <= 1)
+				{
+					instance.game.world.moveToCell(cell, pad, clientOnly);
+					return;
+				}
+				else	
+				{
+					for (var i:int = 0; i < users.length; i++)
+					{
+						userData = instance.game.world.uoTreeLeaf(users[i]);
+						if (cell == userData.strFrame && pad != userData.strPad)
+						{
+							instance.game.world.moveToCell(cell, userData.strPad, clientOnly);
+							break;
+						}
+						else 
+						{
+							instance.game.world.moveToCell(cell, pad, clientOnly);
+							break;
+						}
+					}
+				}		
+			}
+		}
+		
 		
 		public static function getGameObjectS(path:String):String
 		{
@@ -175,6 +227,7 @@ package skua
 			var obj:* = _getObjectS(_gameClass, path);
 			return JSON.stringify(obj);
 		}
+		
 		
 		public static function getGameObjectKey(path:String, key:String):String
 		{
@@ -438,6 +491,11 @@ package skua
 				}
 			}
 			return JSON.stringify(retMonsters);
+		}
+		
+		public function requestDoomArenaPVPQueue() : void
+		{
+			instance.game.world.rootClass.sfc.sendXtMessage("zm","PVPQr",["doomarena",0],"str",instance.game.world.rootClass.world.curRoom);
 		}
 		
 		private static function attackTarget(target:*):void

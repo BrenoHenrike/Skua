@@ -76,6 +76,13 @@ public partial class ScriptMap : IScriptMap
             Wait.ForCellChange(cell);
     }
 
+    [MethodCallBinding("jumpCorrectRoom", RunMethodPost = true)]
+    private void _jumpCorrect(string cell, string pad, bool autoCorrect = true, bool clientOnly = false)
+    {
+        if (Options.SafeTimings)
+            Wait.ForCellChange(cell);
+    }
+
     public void Join(string map, string cell = "Enter", string pad = "Spawn", bool ignoreCheck = false)
     {
         _Join(map, cell, pad, ignoreCheck);
