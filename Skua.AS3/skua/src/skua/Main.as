@@ -163,20 +163,6 @@ package skua
 		public static function getGameObject(path:String):String
 		{
 			var obj:* = _getObjectS(instance.game, path);
-			//instance.external.debug(JSON.stringify(instance.game.world.areaUsers));
-			//var users:* =  instance.game.world.areaUsers;
-			//var userData:* = null;
-			//var userObj:Object = {};
-			//for (var i:int = 0; i < users.length; i++){
-				//userData = instance.game.world.uoTreeLeaf(users[i]);
-				//userObj = {
-					//"Cell": userData.strFrame,
-					//"Pad": userData.strPad,
-					//"Auras": userData.auras
-				//};
-				//instance.external.debug(JSON.stringify(userObj));
-			//}
-			
 			return JSON.stringify(obj);
 		}
 		
