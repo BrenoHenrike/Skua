@@ -69,15 +69,8 @@ public partial class ScriptMap : IScriptMap
     [ObjectBinding("world.map.currentScene.labels", Select = "name", Default = "new()")]
     private List<string> _cells;
 
-    [MethodCallBinding("world.moveToCell", RunMethodPost = true, GameFunction = true)]
-    private void _jump(string cell, string pad, bool clientOnly = false)
-    {
-        if (Options.SafeTimings)
-            Wait.ForCellChange(cell);
-    }
-
     [MethodCallBinding("jumpCorrectRoom", RunMethodPost = true)]
-    private void _jumpCorrect(string cell, string pad, bool autoCorrect = true, bool clientOnly = false)
+    private void _jump(string cell, string pad, bool autoCorrect = true, bool clientOnly = false)
     {
         if (Options.SafeTimings)
             Wait.ForCellChange(cell);
