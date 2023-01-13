@@ -15,7 +15,6 @@ public class AdvancedSkillCommand
         ++_Index;
         if (_Index >= Skills.Count)
             _Index = 0;
-        Trace.WriteLine($"Skill index: {skill}");
         return (index, skill);
     }
 
