@@ -20,6 +20,7 @@ package skua
 	import flash.system.LoaderContext;
 	import flash.system.Security;
 	import flash.utils.getQualifiedClassName;
+	import flash.utils.setTimeout;
 	import skua.util.SFSEvent;
 	import skua.module.Modules;
 	
@@ -166,11 +167,9 @@ package skua
 			return JSON.stringify(obj);
 		}
 		
-		public static function jumpCorrectRoom(cell:String, pad:String, autoCorrect:Boolean = false, clientOnly:Boolean = false):void
+		public static function jumpCorrectRoom(cell:String, pad:String, autoCorrect:Boolean = true, clientOnly:Boolean = false):void
 		{
-			var users:* = instance.game.world.areaUsers;
-			var userData:* = null;
-			
+			var prevCell:String = instance.game.world.strFrame;
 			if (!autoCorrect)
 			{
 				instance.game.world.moveToCell(cell, pad, clientOnly);
@@ -178,30 +177,66 @@ package skua
 			}
 			else 
 			{
+				var users:* = instance.game.world.areaUsers;
 				if (users.length <= 1)
 				{
 					instance.game.world.moveToCell(cell, pad, clientOnly);
-					return;
 				}
-				else	
+				else 
 				{
+					var userCell:String = instance.game.world.strFrame;
+					var userPad:String = "Left";
+					users.splice(users.indexOf(instance.game.sfc.myUserName), 1);
 					for (var i:int = 0; i < users.length; i++)
 					{
-						userData = instance.game.world.uoTreeLeaf(users[i]);
-						if (cell == userData.strFrame && pad != userData.strPad)
-						{
-							instance.game.world.moveToCell(cell, userData.strPad, clientOnly);
+						userCell = instance.game.world.uoTree[users[i]].strFrame;
+						userPad = instance.game.world.uoTree[users[i]].strPad;
+						if (cell == userCell && pad != userPad)
 							break;
-						}
-						else 
-						{
-							instance.game.world.moveToCell(cell, pad, clientOnly);
-							break;
-						}
 					}
-				}		
+					instance.game.world.moveToCell(cell, userPad, clientOnly);
+				}
+				setTimeout(jumpCorrectPad, 100, cell, clientOnly);
+			}
+		}	
+		
+		public static function jumpCorrectPad(cell:String, clientOnly:Boolean = false):void
+		{
+			var cellPad:String = "Left";
+			var padArr:Array = getPads(false);
+			if (padArr.indexOf("Left") >= 0)
+			{
+				if (instance.game.world.strPad == cellPad)
+					return;
+				instance.game.world.moveToCell(cell, cellPad, clientOnly);
+			}
+			else 
+			{
+				cellPad = padArr[0];
+				if (instance.game.world.strPad == cellPad)
+					return;
+				instance.game.world.moveToCell(cell, cellPad, clientOnly);
 			}
 		}
+		
+		public static function getPads(param1:Boolean = true) : *
+		{
+			var _loc2_:Array = [];
+			var _loc3_:int = 0;
+			while(_loc3_ < instance.game.world.map.numChildren)
+			{
+				if(instance.game.world.map.getChildAt(_loc3_).toString().split(" ")[1].toLowerCase().indexOf("pad") > -1)
+				{
+					_loc2_.push(instance.game.world.map.getChildAt(_loc3_).name);
+				}
+				_loc3_++;
+			}
+			if(!param1)
+			{
+				return _loc2_;
+			}
+			return JSON.stringify(_loc2_);
+		}	
 		
 		
 		public static function getGameObjectS(path:String):String
