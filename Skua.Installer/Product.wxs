@@ -1,0 +1,75 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<Wix xmlns="http://schemas.microsoft.com/wix/2006/wi">
+
+    <!-- Give product a unique ID per platform -->
+    <?if $(var.Platform)=x64 ?>
+    <?define ProductCode = "{3AFE165B-ED77-4FD7-9F12-4742A7778A6E}" ?>
+    <?else?>
+    <?define ProductCode = "{9DD51CDC-E346-41AE-9744-92DC3405195A}" ?>
+    <?endif?>
+
+    <!-- Fixed upgrade Id -->
+    <?define UpgradeCode = "{8C197FE6-57DF-41FD-A0CD-84B5D3B97BDC}" ?>
+
+    <!-- Define main product -->
+    <Product Id="$(var.ProductCode)"
+           Name="!(loc.ProductName_$(var.Platform))"
+           Language="!(loc.Language)"
+           Version="$(var.BuildVersion)"
+           Manufacturer="!(loc.Company)"
+           UpgradeCode="$(var.UpgradeCode)">
+
+        <!-- Provide package details -->
+        <Package InstallerVersion="200"
+             Compressed="yes"
+             InstallScope="perMachine"
+             Platform="$(var.Platform)"
+             Manufacturer="!(loc.Company)"
+             Description="!(loc.Description)"
+             Keywords="!(loc.Keywords)"
+             Comments="!(loc.Comments)"
+             Languages="!(loc.Language)"
+             />
+
+        <!-- Downgrade error message -->
+        <MajorUpgrade DowngradeErrorMessage="!(loc.DowngradeErrorMessage)" />
+
+        <!-- Include .cab file into .msi file -->
+        <MediaTemplate
+      EmbedCab="yes"
+      />
+
+        <Property Id="WIXUI_INSTALLDIR" Value="TARGETDIR" />    
+        <UIRef Id="WixUI_Skua" />
+        <UIRef Id="WixUI_ErrorProgressText" />
+
+
+        <!-- Define main app icon -->
+        <Icon Id="icon.ico" SourceFile="$(var.ProjectDir)SkuaIcon.ico" />
+
+        <!-- Use the icon.ico icon for this installer (shows up in Add/Remove programs) -->
+        <Property Id="ARPPRODUCTICON">icon.ico</Property>
+        <!-- Help/Support website (shows in the Add/Remove programs) -->
+        <Property Id="ARPURLINFOABOUT">https://github.com/BrenoHenrike/Skua</Property>
+
+        <!-- Create a basic UI for the installer -->
+        <!--<UIRef Id="WixUI_Minimal" />-->
+
+        <!-- Change the installer UI background images -->
+        <!--<WixVariable Id="WixUILicenseRtf" Value="$(var.ProjectDir)\Assets\License.rtf" />
+        <WixVariable Id="WixUIDialogBmp" Value="$(var.ProjectDir)\Assets\Background.bmp" />
+        <WixVariable Id="WixUIBannerBmp" Value="$(var.ProjectDir)\Assets\Banner.bmp" />-->
+
+        <!-- Define components, shortcuts, files etc... for installer -->
+        <Feature Id="ProductFeature" Title="Skua" Description="The main application." Level="1">
+            <ComponentGroupRef Id="PublishedComponents" />
+        </Feature>
+        <Feature Id="VSCodeFolder" Title="Local Visual Studio Code" Level="1" Description="Whether to install Skua alongside with a portable version of VSCode (doesn't affect installed VSCode instance)."  >
+            <ComponentGroupRef Id="VSCodeComponents" />
+        </Feature>
+        <Feature Id="FFDec" Title="FFDec (Flash Decompiler)" Level="1" Description="Whether to install FFDec, a tool used by the Grabber to search for Map Item IDs in the game SWFs. (Needs Java 8)">
+            <ComponentGroupRef Id="FFDecComponents" />
+        </Feature>
+
+    </Product>
+</Wix>

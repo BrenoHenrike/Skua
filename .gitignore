@@ -363,8 +363,6 @@ MigrationBackup/
 FodyWeavers.xsd
 
 /Installers
-/Skua.Installer
-/Skua.Installer.Dependencies
 /VSCode-x64/VSCode
 /VSCode-x86/VSCode
 
