@@ -14,9 +14,6 @@ using Skua.Core.Utils;
 using Westwind.Scripting;
 using Skua.Core.AppStartup;
 using Skua.WPF;
-using Skua.Core.Skills;
-using Skua.Core.Messaging;
-using Skua.Core.ViewModels.Manager;
 
 namespace Skua.App.WPF;
 
@@ -35,11 +32,10 @@ public sealed partial class App : Application
         _bot.Flash.FlashCall += Flash_FlashCall;
 
         _ = Services.GetRequiredService<ILogService>();
+        
         var themes = Services.GetRequiredService<IThemeService>();
         var settings = Services.GetRequiredService<ISettingsService>();
-
         var args = Environment.GetCommandLineArgs();
-
         for(int i = 0; i < args.Length; i++)
         {
             switch(args[i])
@@ -70,9 +66,9 @@ public sealed partial class App : Application
         }
 
         RoslynLifetimeManager.WarmupRoslyn();
-
-        Application.Current.Exit += App_Exit;
         Timeline.DesiredFrameRateProperty.OverrideMetadata(typeof(Timeline), new FrameworkPropertyMetadata { DefaultValue = Services.GetRequiredService<ISettingsService>().Get<int>("AnimationFrameRate") });
+        
+        Application.Current.Exit += App_Exit;
     }
 
     private async void App_Exit(object? sender, EventArgs e)
@@ -103,15 +99,6 @@ public sealed partial class App : Application
         if (!Directory.Exists(Path.Combine(AppContext.BaseDirectory, "VSCode")))
             Settings.Default.UseLocalVSC = false;
 
-        if (!Directory.Exists(Path.Combine(AppContext.BaseDirectory, "Scripts")))
-            Directory.CreateDirectory(Path.Combine(AppContext.BaseDirectory, "Scripts"));
-
-        if (!Directory.Exists(Path.Combine(AppContext.BaseDirectory, "options")))
-            Directory.CreateDirectory(Path.Combine(AppContext.BaseDirectory, "options"));
-
-        if (!Directory.Exists(Path.Combine(AppContext.BaseDirectory, "plugins")))
-            Directory.CreateDirectory(Path.Combine(AppContext.BaseDirectory, "plugins"));
-
         MainWindow main = new();
         main.WindowStartupLocation = WindowStartupLocation.CenterScreen;
         Application.Current.MainWindow = main;
@@ -122,13 +109,9 @@ public sealed partial class App : Application
             HttpClients.UserGitHubClient = new(token);
 
         main.Show();
-        _StartDailyUpdates();
         
-        Services.GetRequiredService<IPluginManager>().Initialize();
-    }
+        RequiredFileGenerate();
 
-    private void _StartDailyUpdates()
-    {
         var getScripts = Ioc.Default.GetRequiredService<IGetScriptsService>();
         if (Settings.Default.CheckBotScriptsUpdates)
         {
@@ -169,6 +152,20 @@ public sealed partial class App : Application
                 }
             });
         }
+
+        Services.GetRequiredService<IPluginManager>().Initialize();
+    }
+    
+    private void RequiredFileGenerate()
+    {
+        if (!Directory.Exists(Path.Combine(AppContext.BaseDirectory, "Scripts")))
+            Directory.CreateDirectory(Path.Combine(AppContext.BaseDirectory, "Scripts"));
+
+        if (!Directory.Exists(Path.Combine(AppContext.BaseDirectory, "options")))
+            Directory.CreateDirectory(Path.Combine(AppContext.BaseDirectory, "options"));
+
+        if (!Directory.Exists(Path.Combine(AppContext.BaseDirectory, "plugins")))
+            Directory.CreateDirectory(Path.Combine(AppContext.BaseDirectory, "plugins"));
     }
 
     /// <summary>

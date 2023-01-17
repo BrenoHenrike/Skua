@@ -17,7 +17,7 @@ public class AdvancedSkillContainer : ObservableRecipient, IAdvancedSkillContain
         get { return _loadedSkills; }
         set { SetProperty(ref _loadedSkills, value, true); }
     }
-
+    
     public AdvancedSkillContainer()
     {
         _defaultSkillsSetsPath = Path.Combine(AppContext.BaseDirectory, "AdvancedSkills.txt");
