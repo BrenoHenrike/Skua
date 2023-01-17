@@ -38,6 +38,8 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Skua.App.WPF.Sync", "Skua.A
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Skua.SyncConsole", "Skua.SyncConsole\Skua.SyncConsole.csproj", "{81D3A71C-CB3C-4B12-9C49-D7A3BB06A899}"
 EndProject
+Project("{54435603-DBB4-11D2-8724-00A0C9A8B90C}") = "Skua.Setup", "Skua.Setup\Skua.Setup.vdproj", "{BC40A550-C4A9-418C-A745-B9E7684E03A0}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -207,6 +209,12 @@ Global
 		{81D3A71C-CB3C-4B12-9C49-D7A3BB06A899}.Release|Any CPU.Build.0 = Release|Any CPU
 		{81D3A71C-CB3C-4B12-9C49-D7A3BB06A899}.Release|x64.ActiveCfg = Release|Any CPU
 		{81D3A71C-CB3C-4B12-9C49-D7A3BB06A899}.Release|x86.ActiveCfg = Release|Any CPU
+		{BC40A550-C4A9-418C-A745-B9E7684E03A0}.Debug|Any CPU.ActiveCfg = Debug
+		{BC40A550-C4A9-418C-A745-B9E7684E03A0}.Debug|x64.ActiveCfg = Debug
+		{BC40A550-C4A9-418C-A745-B9E7684E03A0}.Debug|x86.ActiveCfg = Debug
+		{BC40A550-C4A9-418C-A745-B9E7684E03A0}.Release|Any CPU.ActiveCfg = Release
+		{BC40A550-C4A9-418C-A745-B9E7684E03A0}.Release|x64.ActiveCfg = Release
+		{BC40A550-C4A9-418C-A745-B9E7684E03A0}.Release|x86.ActiveCfg = Release
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

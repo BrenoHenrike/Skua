@@ -134,11 +134,11 @@ public partial class ClientUpdatesViewModel : BotControlViewModelBase
     public async Task ResetScripts(CancellationToken token)
     {
         IsBusy = true;
-        if (Directory.Exists("./Skua_Modules/Scripts"))
-            Directory.Delete("./Skua_Modules/Scripts", true);
+        if (Directory.Exists("./Scripts"))
+            Directory.Delete("./Scripts", true);
 
-        if (!Directory.Exists("./Skua_Modules/Scripts"))
-            Directory.CreateDirectory("./Skua_Modules/Scripts");
+        if (!Directory.Exists("./Scripts"))
+            Directory.CreateDirectory("./Scripts");
 
         await UpdateScripts(token);
     }

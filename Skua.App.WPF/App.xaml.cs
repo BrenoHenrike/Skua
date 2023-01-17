@@ -100,12 +100,21 @@ public sealed partial class App : Application
     {
         Task.Run(async () => await Ioc.Default.GetRequiredService<IScriptServers>().GetServers());
 
+        if (!Directory.Exists(Path.Combine(AppContext.BaseDirectory, "VSCode")))
+            Settings.Default.UseLocalVSC = false;
+
+        if (!Directory.Exists(Path.Combine(AppContext.BaseDirectory, "Scripts")))
+            Directory.CreateDirectory(Path.Combine(AppContext.BaseDirectory, "Scripts"));
+
+        if (!Directory.Exists(Path.Combine(AppContext.BaseDirectory, "options")))
+            Directory.CreateDirectory(Path.Combine(AppContext.BaseDirectory, "options"));
+
+        if (!Directory.Exists(Path.Combine(AppContext.BaseDirectory, "plugins")))
+            Directory.CreateDirectory(Path.Combine(AppContext.BaseDirectory, "plugins"));
+
         MainWindow main = new();
         main.WindowStartupLocation = WindowStartupLocation.CenterScreen;
         Application.Current.MainWindow = main;
-
-        if (!Directory.Exists(Path.Combine(AppContext.BaseDirectory, "VSCode")))
-            Settings.Default.UseLocalVSC = false;
 
         IDialogService dialogService = Services.GetRequiredService<IDialogService>();
         string? token = Settings.Default.UserGitHubToken;
@@ -113,14 +122,20 @@ public sealed partial class App : Application
             HttpClients.UserGitHubClient = new(token);
 
         main.Show();
+        _StartDailyUpdates();
+        
+        Services.GetRequiredService<IPluginManager>().Initialize();
+    }
 
+    private void _StartDailyUpdates()
+    {
         var getScripts = Ioc.Default.GetRequiredService<IGetScriptsService>();
         if (Settings.Default.CheckBotScriptsUpdates)
         {
             Task.Factory.StartNew(async () =>
             {
                 await getScripts.GetScriptsAsync(null, default);
-                if ((getScripts.Missing > 0 || getScripts.Outdated > 0) 
+                if ((getScripts.Missing > 0 || getScripts.Outdated > 0)
                     && (Settings.Default.AutoUpdateBotScripts || Ioc.Default.GetRequiredService<IDialogService>().ShowMessageBox("Would you like to update your scripts?", "Script Update", true) == true))
                 {
                     int count = await getScripts.DownloadAllWhereAsync(s => !s.Downloaded || s.Outdated);
@@ -128,7 +143,7 @@ public sealed partial class App : Application
                 }
             });
         }
-        
+
         if (Settings.Default.CheckAdvanceSkillSetsUpdates)
         {
             var skillsFileSize = getScripts.GetSkillsSetsTextFileSize();
@@ -138,13 +153,13 @@ public sealed partial class App : Application
                 if ((skillsFileSize < await getScripts.CheckAdvanceSkillSetsUpdates())
                     && (Settings.Default.AutoUpdateAdvanceSkillSetsUpdates || Ioc.Default.GetRequiredService<IDialogService>().ShowMessageBox("Would you like to update your AdvanceSkill Sets?", "AdvanceSkill Sets Update", true) == true))
                 {
-                    if(await getScripts.UpdateSkillSetsFile())
+                    if (await getScripts.UpdateSkillSetsFile())
                     {
                         if (Settings.Default.AutoUpdateAdvanceSkillSetsUpdates)
                             Ioc.Default.GetRequiredService<IDialogService>().ShowMessageBox($"AdvanceSkill Sets has been updated.\r\nYou can disable auto AdvanceSkill Sets updates in Options > Application.", "AdvanceSkill Sets Update");
                         else
                             Ioc.Default.GetRequiredService<IDialogService>().ShowMessageBox($"AdvanceSkill Sets has been updated.\r\nYou can enable auto AdvanceSkill Sets updates in Options > Application.", "AdvanceSkill Sets Update");
-                        
+
                         advanceSkillSets.SyncSkills();
                     }
                     else
@@ -154,9 +169,6 @@ public sealed partial class App : Application
                 }
             });
         }
-        
-       
-        Services.GetRequiredService<IPluginManager>().Initialize();
     }
 
     /// <summary>

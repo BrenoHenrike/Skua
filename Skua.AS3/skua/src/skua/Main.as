@@ -22,6 +22,9 @@ package skua
 	import flash.system.Security;
 	import flash.utils.getQualifiedClassName;
 	import flash.utils.setTimeout;
+	import flash.utils.clearTimeout;
+	import flash.utils.Timer;
+	import flash.events.TimerEvent;
 	import skua.util.SFSEvent;
 	import flash.utils.getQualifiedClassName;
 	import skua.module.Modules;
@@ -188,7 +191,6 @@ package skua
 				}
 				else 
 				{
-					//var usersPad:String = searchUserPadByCell(cell, users);
 					var usersCell:String = instance.game.world.strFrame;
 					var usersPad:String = "Left";
 					for (var i:int = 0; i < users.length; i++)
@@ -200,27 +202,15 @@ package skua
 					}
 					instance.game.world.moveToCell(cell, usersPad, clientOnly);
 				}
-				setTimeout(jumpCorrectPad, 50, cell, clientOnly);
+				
+				instance.external.debug(getQualifiedClassName(instance.game.world.map));
+				
+				var jumpTimer:Timer = new Timer(50, 1);
+				jumpTimer.addEventListener(TimerEvent.TIMER, function(e:TimerEvent):void{
+					jumpCorrectPad(cell, clientOnly);
+				});
+				jumpTimer.start();
 			}
-		}	
-
-		private static function searchUserPadByCell(cell:String, users:Array):String
-		{
-			var start:int = 0;
-			var end:int = users.length - 1;
-
-			while (start <= end)
-			{
-				var mid:* = Math.floor((start + end) / 2);
-				var userCell:String = instance.game.world.uoTree[users[mid]].strFrame;
-				if (cell === userCell)
-					return instance.game.world.uoTree[users[mid]].strPad;
-				else if (cell < userCell)
-					start = mid + 1;		
-				else
-					end = mid - 1;
-			}
-			return 'Left';
 		}
 		
 		public static function jumpCorrectPad(cell:String, clientOnly:Boolean = false):void
