@@ -1,0 +1,57 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<Wix xmlns="http://schemas.microsoft.com/wix/2006/wi">
+    <Fragment>
+        <!-- Define source dir -->
+        <Directory Id="TARGETDIR" Name="SourceDir">
+            <!-- Start Menu Folder-->
+            <Directory Id="ProgramMenuFolder">
+                <Directory Id="InstallProgramMenuFolder" Name="!(loc.ProductNameFolder)"/>
+            </Directory>
+
+            <Directory Id="DesktopFolder" Name="!(loc.ProductNameFolder)">
+                <Component Id="SkuaManagerDesktopShortcut" Guid="BE4D437D-911C-467F-8C59-799FD7178044">
+                    <Shortcut Id="SkuaManagerDesktopShortcut" 
+                        Name="!(loc.SkuaManagerShortcut)" 
+                        Description="!(loc.SkuaManagerShortcutDescription)" 
+                        Target="[INSTALLFOLDER]Skua.Manager.exe" 
+                        WorkingDirectory="INSTALLFOLDER" />
+                    <RemoveFolder Id="CleanUpSkuaManagerDesktopShortCut" Directory="DesktopFolder" On="uninstall"/>
+                    <RegistryValue Root="HKCU" Key="Software\HarborPearl\Skua\DesktopShortcuts" Name="Desktop" Type="string" Value="[DesktopFolder]" KeyPath="yes" />
+                </Component>
+                <Component Id="SkuaDesktopShortcut" Guid="CB7A85B4-EA80-4CFE-8D31-9972FDEDCED7">
+                    <Shortcut Id="SkuaDesktopShortcut" 
+                        Name="!(loc.SkuaShortcut)" 
+                        Description="!(loc.SkuaShortcutDescription)" 
+                        Target="[INSTALLFOLDER]Skua.exe" 
+                        WorkingDirectory="INSTALLFOLDER" />
+                    <RemoveFolder Id="CleanUpSkuaDesktopShortCut" Directory="DesktopFolder" On="uninstall"/>
+                    <RegistryValue Root="HKCU" Key="Software\HarborPearl\Skua\DesktopShortcuts" Name="Desktop" Type="string" Value="[DesktopFolder]" KeyPath="yes" />
+                </Component>
+            </Directory>
+
+
+            <!-- <Directory Id="INSTALLFOLDER" Name="!(loc.ProductNameFolder)" /> -->
+
+            <?if $(var.Platform)=x64 ?>
+                <!-- Program Files (64bit) folder -->
+                <Directory Id="ProgramFiles64Folder">
+                    <Directory Id="INSTALLFOLDER" Name="!(loc.ProductNameFolder)" />
+                </Directory>
+            <?else?>
+                <!-- Program Files (32bit) folder -->
+                <Directory Id="ProgramFilesFolder">
+                    <Directory Id="INSTALLFOLDER" Name="!(loc.ProductNameFolder)" />
+                </Directory>
+            <?endif?>
+        </Directory>
+
+        <?if $(var.Platform)=x86?>
+            <?define ProgramFilesFolder="ProgramFilesFolder" ?>
+        <?else?>
+            <?define ProgramFilesFolder="ProgramFiles64Folder" ?>
+        <?endif?>
+        <SetDirectory Id="TARGETDIR" Value="[$(var.ProgramFilesFolder)][ProductName]\"/>
+
+    </Fragment>
+
+</Wix>

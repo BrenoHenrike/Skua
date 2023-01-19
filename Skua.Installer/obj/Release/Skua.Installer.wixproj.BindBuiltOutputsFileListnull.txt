@@ -1,0 +1,2 @@
+C:\Users\g3nius\Documents\Projects\breno-skua\Skua\Skua.Installer\bin\Release\Skua-Release-x64.msi
+C:\Users\g3nius\Documents\Projects\breno-skua\Skua\Skua.Installer\bin\Release\Skua-Release-x64.wixpdb
