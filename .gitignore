@@ -368,9 +368,10 @@ FodyWeavers.xsd
 /VSCode-x64/VSCode
 /VSCode-x86/VSCode
 
-# ignore installers obj and bin
+# ignore installers bin, obj, and installs folders
 /Skua.Installer/obj
 /Skua.Installer/bin
+/Skua.Installer/Installs
 
 /Skua.App.WPF/App.config
 /Skua.App.WPF.Follower
