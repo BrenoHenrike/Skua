@@ -362,11 +362,15 @@ MigrationBackup/
 # Fody - auto-generated XML schema
 FodyWeavers.xsd
 
-/Installers
-/Skua.Installer
-/Skua.Installer.Dependencies
+# Installers
+# /Skua.Installer
+# /Skua.Installer.Dependencies
 /VSCode-x64/VSCode
 /VSCode-x86/VSCode
+
+# ignore installers obj and bin
+/Skua.Installer/obj
+/Skua.Installer/bin
 
 /Skua.App.WPF/App.config
 /Skua.App.WPF.Follower
