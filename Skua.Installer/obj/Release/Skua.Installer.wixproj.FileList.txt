@@ -1,9 +1,0 @@
-obj\Release\ComponentsGenerated.wixobj
-obj\Release\Directories.wixobj
-obj\Release\Product.wixobj
-obj\Release\UI.wixobj
-C:\Users\g3nius\Documents\Projects\breno-skua\Skua\Skua.Installer\bin\Release\Skua-Release-x64.msi
-C:\Users\g3nius\Documents\Projects\breno-skua\Skua\Skua.Installer\bin\Release\Skua-Release-x64.wixpdb
-obj\Release\Skua.Installer.wixproj.BindContentsFileListnull.txt
-obj\Release\Skua.Installer.wixproj.BindOutputsFileListnull.txt
-obj\Release\Skua.Installer.wixproj.BindBuiltOutputsFileListnull.txt

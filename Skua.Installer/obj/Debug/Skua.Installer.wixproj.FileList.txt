@@ -1,5 +1,0 @@
-obj\Debug\ComponentsGenerated.wixobj
-obj\Debug\Directories.wixobj
-obj\Debug\FFDecComponentsGenerated.wixobj
-obj\Debug\Product.wixobj
-obj\Debug\UI.wixobj

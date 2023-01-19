@@ -1,2 +1,0 @@
-C:\Users\g3nius\Documents\Projects\breno-skua\Skua\Skua.Installer\bin\Debug\Skua-Debug-x64.msi
-C:\Users\g3nius\Documents\Projects\breno-skua\Skua\Skua.Installer\bin\Debug\Skua-Debug-x64.wixpdb
