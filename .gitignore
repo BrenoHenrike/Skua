@@ -372,6 +372,8 @@ FodyWeavers.xsd
 /Skua.Installer/obj
 /Skua.Installer/bin
 /Skua.Installer/Installs
+/Skua.Installer/ComponentsGenerated.wxs
+/Skua.Installer/FFDecComponentsGenerated.wxs
 
 /Skua.App.WPF/App.config
 /Skua.App.WPF.Follower
