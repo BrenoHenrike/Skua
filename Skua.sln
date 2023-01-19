@@ -38,7 +38,7 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Skua.App.WPF.Sync", "Skua.A
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Skua.SyncConsole", "Skua.SyncConsole\Skua.SyncConsole.csproj", "{81D3A71C-CB3C-4B12-9C49-D7A3BB06A899}"
 EndProject
-Project("{930C7802-8A8C-48F9-8165-68863BCCD9DD}") = "Skua.Installer", "Skua.Installer\Skua.Installer.wixproj", "{8F0050E7-0118-4C3B-AAD7-3B11B842EEA8}"
+Project("{930C7802-8A8C-48F9-8165-68863BCCD9DD}") = "Skua.Installer", "Skua.Installer\Skua.Installer.wixproj", "{83AB2857-FE3F-477D-A0F7-F0F4BDBB30CA}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -209,18 +209,17 @@ Global
 		{81D3A71C-CB3C-4B12-9C49-D7A3BB06A899}.Release|Any CPU.Build.0 = Release|Any CPU
 		{81D3A71C-CB3C-4B12-9C49-D7A3BB06A899}.Release|x64.ActiveCfg = Release|Any CPU
 		{81D3A71C-CB3C-4B12-9C49-D7A3BB06A899}.Release|x86.ActiveCfg = Release|Any CPU
-		{8F0050E7-0118-4C3B-AAD7-3B11B842EEA8}.Debug|Any CPU.ActiveCfg = Debug|x86
-		{8F0050E7-0118-4C3B-AAD7-3B11B842EEA8}.Debug|Any CPU.Build.0 = Debug|x86
-		{8F0050E7-0118-4C3B-AAD7-3B11B842EEA8}.Debug|x64.ActiveCfg = Debug|x86
-		{8F0050E7-0118-4C3B-AAD7-3B11B842EEA8}.Debug|x64.Build.0 = Debug|x86
-		{8F0050E7-0118-4C3B-AAD7-3B11B842EEA8}.Debug|x86.ActiveCfg = Debug|x86
-		{8F0050E7-0118-4C3B-AAD7-3B11B842EEA8}.Debug|x86.Build.0 = Debug|x86
-		{8F0050E7-0118-4C3B-AAD7-3B11B842EEA8}.Release|Any CPU.ActiveCfg = Release|x86
-		{8F0050E7-0118-4C3B-AAD7-3B11B842EEA8}.Release|Any CPU.Build.0 = Release|x86
-		{8F0050E7-0118-4C3B-AAD7-3B11B842EEA8}.Release|x64.ActiveCfg = Release|x86
-		{8F0050E7-0118-4C3B-AAD7-3B11B842EEA8}.Release|x64.Build.0 = Release|x86
-		{8F0050E7-0118-4C3B-AAD7-3B11B842EEA8}.Release|x86.ActiveCfg = Release|x86
-		{8F0050E7-0118-4C3B-AAD7-3B11B842EEA8}.Release|x86.Build.0 = Release|x86
+		{83AB2857-FE3F-477D-A0F7-F0F4BDBB30CA}.Debug|Any CPU.ActiveCfg = Debug|x64
+		{83AB2857-FE3F-477D-A0F7-F0F4BDBB30CA}.Debug|Any CPU.Build.0 = Debug|x64
+		{83AB2857-FE3F-477D-A0F7-F0F4BDBB30CA}.Debug|x64.ActiveCfg = Debug|x64
+		{83AB2857-FE3F-477D-A0F7-F0F4BDBB30CA}.Debug|x64.Build.0 = Debug|x64
+		{83AB2857-FE3F-477D-A0F7-F0F4BDBB30CA}.Debug|x86.ActiveCfg = Debug|x86
+		{83AB2857-FE3F-477D-A0F7-F0F4BDBB30CA}.Debug|x86.Build.0 = Debug|x86
+		{83AB2857-FE3F-477D-A0F7-F0F4BDBB30CA}.Release|Any CPU.ActiveCfg = Release|x64
+		{83AB2857-FE3F-477D-A0F7-F0F4BDBB30CA}.Release|Any CPU.Build.0 = Release|x64
+		{83AB2857-FE3F-477D-A0F7-F0F4BDBB30CA}.Release|x64.ActiveCfg = Release|x64
+		{83AB2857-FE3F-477D-A0F7-F0F4BDBB30CA}.Release|x86.ActiveCfg = Release|x86
+		{83AB2857-FE3F-477D-A0F7-F0F4BDBB30CA}.Release|x86.Build.0 = Release|x86
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

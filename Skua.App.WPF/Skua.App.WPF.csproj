@@ -104,11 +104,11 @@
   </ItemGroup>
 
 	<Target Name="PreBuild" BeforeTargets="PreBuildEvent">
-		<Exec Command="if $(ConfigurationName) == Release rd /s /q &quot;$(TargetDir)&quot;&#xD;&#xA;if $(ConfigurationName) == Release xcopy &quot;$(SolutionDir)\FFDec\*.*&quot; &quot;$(TargetDir)\FFDec&quot; /Y /I /E" />
+		<Exec Command="if $(ConfigurationName) == Release rd /s /q &quot;$(TargetDir)&quot;&#xD;&#xA;if $(ConfigurationName) == Release xcopy &quot;..\FFDec\*.*&quot; &quot;$(TargetDir)FFDec&quot; /Y /I /E" />
 	</Target>
 
 	<Target Name="PostBuild" AfterTargets="PostBuildEvent">
-		<Exec Command="if not exist &quot;$(TargetDir)\plugins&quot; mkdir &quot;$(TargetDir)\plugins\options&quot;      &#xD;&#xA;if not exist &quot;$(TargetDir)\options&quot; mkdir &quot;$(TargetDir)\options&quot;&#xD;&#xA;if not exist &quot;$(TargetDir)\Scripts&quot; mkdir &quot;$(TargetDir)\Scripts&quot;&#xD;&#xA;&#xD;&#xA;if $(ConfigurationName) == Release rename &quot;$(TargetDir)Skua.App.WPF.exe&quot; &quot;Skua.exe&quot;&#xD;&#xA;;; Move all assemblies and related files to Assemblies folder&#xD;&#xA;ROBOCOPY &quot;$(TargetDir) &quot; &quot;$(TargetDir)\Assemblies\ &quot; /XF Skua.App.WPF.dll *.zip *.swf *.cfg *.pspdb *.pssym *.json *.txt *.exe *.config *.manifest /XD assemblies options tmp tools plugins Scripts FFDec /E /IS /MOVE&#xD;&#xA;if $(ConfigurationName) == Release ROBOCOPY &quot;$(TargetDir) &quot; &quot;$(SolutionDir)Build\$(PlatformName)\ &quot; /E&#xD;&#xA;if %25errorlevel%25 leq 4 exit 0 else exit %25errorlevel%25" />
+		<Exec Command="if not exist &quot;$(TargetDir)\plugins&quot; mkdir &quot;$(TargetDir)\plugins\options&quot;      &#xD;&#xA;if not exist &quot;$(TargetDir)\options&quot; mkdir &quot;$(TargetDir)\options&quot;&#xD;&#xA;if not exist &quot;$(TargetDir)\Scripts&quot; mkdir &quot;$(TargetDir)\Scripts&quot;&#xD;&#xA;&#xD;&#xA;del *.pdb&#xD;&#xA;del *.config&#xD;&#xA;if $(ConfigurationName) == Release rename &quot;$(TargetDir)Skua.App.WPF.exe&quot; &quot;Skua.exe&quot;&#xD;&#xA;;; Move all assemblies and related files to Assemblies folder&#xD;&#xA;ROBOCOPY &quot;$(TargetDir) &quot; &quot;$(TargetDir)\Assemblies\ &quot; /XF Skua.App.WPF.dll *.zip *.swf *.cfg *.pspdb *.pssym *.json *.txt *.exe *.config *.manifest /XD assemblies options tmp tools plugins Scripts FFDec /E /IS /MOVE&#xD;&#xA;if $(ConfigurationName) == Release ROBOCOPY &quot;$(TargetDir) &quot; &quot;..\Build\$(PlatformName)\ &quot; /E&#xD;&#xA;if %25errorlevel%25 leq 4 exit 0 else exit %25errorlevel%25" />
 	</Target>
 
 </Project>
