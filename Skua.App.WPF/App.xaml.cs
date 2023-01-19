@@ -14,7 +14,6 @@ using Skua.Core.Utils;
 using Westwind.Scripting;
 using Skua.Core.AppStartup;
 using Skua.WPF;
-using System.Diagnostics;
 
 namespace Skua.App.WPF;
 
@@ -28,10 +27,10 @@ public sealed partial class App : Application
         InitializeComponent();
 
         Services = ConfigureServices();
+        Services.GetRequiredService<IClientDirectoriesService>().CreateDirectories();
 
         _bot = Services.GetRequiredService<IScriptInterface>();
         _bot.Flash.FlashCall += Flash_FlashCall;
-
         _ = Services.GetRequiredService<ILogService>();
         
         var themes = Services.GetRequiredService<IThemeService>();
@@ -110,8 +109,6 @@ public sealed partial class App : Application
             HttpClients.UserGitHubClient = new(token);
 
         main.Show();
-        
-        RequiredFileGenerate();
 
         var getScripts = Ioc.Default.GetRequiredService<IGetScriptsService>();
         if (Settings.Default.CheckBotScriptsUpdates)
@@ -155,11 +152,6 @@ public sealed partial class App : Application
         }
 
         Services.GetRequiredService<IPluginManager>().Initialize();
-    }
-    
-    private void RequiredFileGenerate()
-    {
-        Ioc.Default.GetRequiredService<IClientDirectoriesService>().CreateDirectories();
     }
 
     /// <summary>
