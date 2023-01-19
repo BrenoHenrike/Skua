@@ -35,9 +35,7 @@
         <MajorUpgrade DowngradeErrorMessage="!(loc.DowngradeErrorMessage)" />
 
         <!-- Include .cab file into .msi file -->
-        <MediaTemplate
-      EmbedCab="yes"
-      />
+        <MediaTemplate EmbedCab="yes" />
 
         <Property Id="WIXUI_INSTALLDIR" Value="TARGETDIR" />
         <UIRef Id="WixUI_Skua" />
