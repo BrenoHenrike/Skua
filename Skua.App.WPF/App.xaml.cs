@@ -14,6 +14,7 @@ using Skua.Core.Utils;
 using Westwind.Scripting;
 using Skua.Core.AppStartup;
 using Skua.WPF;
+using System.Diagnostics;
 
 namespace Skua.App.WPF;
 
@@ -135,7 +136,7 @@ public sealed partial class App : Application
             {
                 if ((skillsFileSize < await getScripts.CheckAdvanceSkillSetsUpdates())
                     && (Settings.Default.AutoUpdateAdvanceSkillSetsUpdates || Ioc.Default.GetRequiredService<IDialogService>().ShowMessageBox("Would you like to update your AdvanceSkill Sets?", "AdvanceSkill Sets Update", true) == true))
-                {
+                {                
                     if (await getScripts.UpdateSkillSetsFile())
                     {
                         if (Settings.Default.AutoUpdateAdvanceSkillSetsUpdates)
@@ -158,14 +159,7 @@ public sealed partial class App : Application
     
     private void RequiredFileGenerate()
     {
-        if (!Directory.Exists(Path.Combine(AppContext.BaseDirectory, "Scripts")))
-            Directory.CreateDirectory(Path.Combine(AppContext.BaseDirectory, "Scripts"));
-
-        if (!Directory.Exists(Path.Combine(AppContext.BaseDirectory, "options")))
-            Directory.CreateDirectory(Path.Combine(AppContext.BaseDirectory, "options"));
-
-        if (!Directory.Exists(Path.Combine(AppContext.BaseDirectory, "plugins")))
-            Directory.CreateDirectory(Path.Combine(AppContext.BaseDirectory, "plugins"));
+        Ioc.Default.GetRequiredService<IClientDirectoriesService>().CreateDirectories();
     }
 
     /// <summary>

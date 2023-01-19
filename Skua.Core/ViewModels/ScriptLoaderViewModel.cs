@@ -25,7 +25,7 @@ public partial class ScriptLoaderViewModel : BotControlViewModelBase
         StrongReferenceMessenger.Default.Register<ScriptLoaderViewModel, ScriptStoppedMessage, int>(this, (int)MessageChannels.ScriptStatus, ScriptStopped);
         StrongReferenceMessenger.Default.Register<ScriptLoaderViewModel, ScriptStoppingMessage, int>(this, (int)MessageChannels.ScriptStatus, ScriptStopping);
 
-        _scriptPath = Path.Combine(AppContext.BaseDirectory, "Scripts");
+        _scriptPath = Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.MyDocuments), "Skua", "Scripts");
         ScriptLogs = logs.ToArray()[1];
         ScriptManager = scriptManager;
         _windowService = windowService;

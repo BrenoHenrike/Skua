@@ -137,8 +137,8 @@ public partial class ScriptMap : IScriptMap
         return _savedMapItems = JsonConvert.DeserializeObject<Dictionary<string, List<MapItem>>>(File.ReadAllText(_savedCacheFilePath))!;
     }
 
-    private readonly string _cachePath = Path.Combine(AppContext.BaseDirectory, "cache");
-    private readonly string _savedCacheFilePath = Path.Combine(AppContext.BaseDirectory, "cache", "0SavedMaps.json");
+    private readonly string _cachePath = Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.MyDocuments), "Skua", "cache");
+    private readonly string _savedCacheFilePath = Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.MyDocuments), "Skua", "cache", "0SavedMaps.json");
 
     public List<MapItem>? FindMapItems()
     {
