@@ -203,8 +203,6 @@ package skua
 					instance.game.world.moveToCell(cell, usersPad, clientOnly);
 				}
 				
-				instance.external.debug(getQualifiedClassName(instance.game.world.map));
-				
 				var jumpTimer:Timer = new Timer(50, 1);
 				jumpTimer.addEventListener(TimerEvent.TIMER, function(e:TimerEvent):void{
 					jumpCorrectPad(cell, clientOnly);
