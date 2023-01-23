@@ -206,6 +206,7 @@ package skua
 				var jumpTimer:Timer = new Timer(50, 1);
 				jumpTimer.addEventListener(TimerEvent.TIMER, function(e:TimerEvent):void{
 					jumpCorrectPad(cell, clientOnly);
+					jumpTimer.removeEventListener();
 				});
 				jumpTimer.start();
 			}
