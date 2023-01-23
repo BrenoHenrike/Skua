@@ -85,6 +85,7 @@ public static class Services
 
         services.AddSingleton<IPluginManager, PluginManager>();
         services.AddTransient<IPluginContainer, PluginContainer>();
+        services.AddSingleton<IPluginHelper, PluginHelper>();
 
         services.AddSingleton<IMapService, MapService>();
         services.AddSingleton<ILogService, LogService>();
