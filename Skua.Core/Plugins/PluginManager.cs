@@ -17,8 +17,8 @@ public class PluginManager : IPluginManager
 
     public void Initialize()
     {
-        Directory.CreateDirectory(Path.Combine(AppContext.BaseDirectory, "plugins", "options"));
-        Directory.GetFiles(Path.Combine(AppContext.BaseDirectory, "plugins"))
+        Directory.CreateDirectory(Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.MyDocuments), "Skua", "plugins", "options"));
+        Directory.GetFiles(Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.MyDocuments), "Skua", "plugins"))
             .Where(f => f.EndsWith(".dll"))
             .ForEach(f =>
             {

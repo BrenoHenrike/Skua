@@ -3,6 +3,7 @@ using Newtonsoft.Json;
 using Skua.Core.Interfaces;
 using Skua.Core.Models.GitHub;
 using Skua.Core.Utils;
+using System.Diagnostics;
 
 namespace Skua.Core.Services;
 public partial class GetScriptsService : ObservableObject, IGetScriptsService
@@ -32,9 +33,17 @@ public partial class GetScriptsService : ObservableObject, IGetScriptsService
 
     public long GetSkillsSetsTextFileSize()
     {
-        var skillsSetsFile = Path.Combine(AppContext.BaseDirectory, "AdvancedSkills.txt");
-        var file = new FileInfo(skillsSetsFile);
+        var skillsSetsFile = Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.MyDocuments), "Skua", "AdvancedSkills.txt");
+        var rootSkillsSetsFile = Path.Combine(AppContext.BaseDirectory, "AdvancedSkills.txt");
+        if (!File.Exists(skillsSetsFile))
+        {
+            if (File.Exists(rootSkillsSetsFile))
+                File.Copy(rootSkillsSetsFile, skillsSetsFile, true);
+            else
+                return 0;
+        }
 
+        var file = new FileInfo(skillsSetsFile);
         if (file.Exists)
             return file.Length;
            
@@ -62,8 +71,7 @@ public partial class GetScriptsService : ObservableObject, IGetScriptsService
         {
             var response = await client.GetAsync(_skillsSetsRawUrl);
             var content = await response.Content.ReadAsStringAsync();
-            var skillsSetsFile = Path.Combine(AppContext.BaseDirectory, "AdvancedSkills.txt");
-
+            var skillsSetsFile = Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.MyDocuments), "Skua", "AdvancedSkills.txt");
             try
             {
                 await File.WriteAllTextAsync(skillsSetsFile, content);

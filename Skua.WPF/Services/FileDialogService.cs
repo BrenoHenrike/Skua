@@ -12,7 +12,7 @@ public class FileDialogService : IFileDialogService
     public string? OpenFile()
     {
         OpenFileDialog opf = new();
-        opf.InitialDirectory = AppContext.BaseDirectory;
+        opf.InitialDirectory = Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.MyDocuments), "Skua");
         return opf.ShowDialog() == true ? opf.FileName : null;
     }
 
@@ -20,7 +20,7 @@ public class FileDialogService : IFileDialogService
     {
         OpenFileDialog opf = new()
         {
-            InitialDirectory = AppContext.BaseDirectory,
+            InitialDirectory = Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.MyDocuments), "Skua"),
             Filter = filter
         };
         return opf.ShowDialog() == true ? opf.FileName : null;
@@ -60,7 +60,7 @@ public class FileDialogService : IFileDialogService
     {
         OpenFileDialog opf = new()
         {
-            InitialDirectory = AppContext.BaseDirectory,
+            InitialDirectory = Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.MyDocuments), "Skua"),
             Filter = defaultFilter
         };
         return opf.ShowDialog() == true ? File.ReadAllLines(opf.FileName) : null;
@@ -70,7 +70,7 @@ public class FileDialogService : IFileDialogService
     {
         SaveFileDialog sfd = new()
         {
-            InitialDirectory = AppContext.BaseDirectory,
+            InitialDirectory = Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.MyDocuments), "Skua"),
             Filter = defaultFilter
         };
         return sfd.ShowDialog() == true ? sfd.FileName : null;
@@ -80,7 +80,7 @@ public class FileDialogService : IFileDialogService
     {
         SaveFileDialog sfd = new()
         {
-            InitialDirectory = AppContext.BaseDirectory,
+            InitialDirectory = Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.MyDocuments), "Skua"),
             Filter = filter
         };
         return sfd.ShowDialog() == true ? sfd.FileName : null;
@@ -100,7 +100,7 @@ public class FileDialogService : IFileDialogService
     {
         SaveFileDialog sfd = new()
         {
-            InitialDirectory = AppContext.BaseDirectory,
+            InitialDirectory = Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.MyDocuments), "Skua"),
             Filter = defaultFilter
         };
         string? file = sfd.ShowDialog() == true ? sfd.FileName : null;
@@ -114,7 +114,7 @@ public class FileDialogService : IFileDialogService
     {
         SaveFileDialog sfd = new()
         {
-            InitialDirectory = AppContext.BaseDirectory,
+            InitialDirectory = Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.MyDocuments), "Skua"),
             Filter = defaultFilter
         };
         string? file = sfd.ShowDialog() == true ? sfd.FileName : null;

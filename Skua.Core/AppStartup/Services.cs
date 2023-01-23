@@ -85,11 +85,13 @@ public static class Services
 
         services.AddSingleton<IPluginManager, PluginManager>();
         services.AddTransient<IPluginContainer, PluginContainer>();
+        services.AddSingleton<IPluginHelper, PluginHelper>();
 
         services.AddSingleton<IMapService, MapService>();
         services.AddSingleton<ILogService, LogService>();
         services.AddSingleton<IQuestDataLoaderService, QuestDataLoaderService>();
         services.AddSingleton<IGrabberService, GrabberService>();
+        services.AddSingleton<IClientDirectoriesService, ClientDirectoriesService>();
 
         return services;
     }
@@ -197,6 +199,7 @@ public static class Services
         //services.AddSingleton<AccountManagerViewModel>();
         services.AddSingleton<LauncherViewModel>();
         services.AddSingleton<IClientUpdateService, ClientUpdateService>();
+        services.AddSingleton<IClientDirectoriesService, ClientDirectoriesService>();
         services.AddSingleton<ClientUpdatesViewModel>();
         services.AddSingleton<GitHubAuthViewModel>();
         services.AddSingleton<ScriptRepoViewModel>();

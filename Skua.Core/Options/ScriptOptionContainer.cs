@@ -8,5 +8,5 @@ public class ScriptOptionContainer : OptionContainer, IScriptOptionContainer
 
     public string Storage { get; set; } = "default";
 
-    public override string OptionsFile => Path.Combine(AppContext.BaseDirectory, "options", $"{Storage}.cfg");
+    public override string OptionsFile => Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.MyDocuments), "Skua", "options", $"{Storage}.cfg");
 }

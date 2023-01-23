@@ -64,7 +64,7 @@ public class SkillItemViewModel : ObservableObject
                 manaVal = int.Parse(skillRules[i].RemoveLetters());
             }
 
-            if (skillRules[i].Contains('s'))
+            if (skillRules[i].Contains('S'))
                 useRule = skip = true;
         }
         _useRules = new SkillRulesViewModel()
@@ -103,24 +103,32 @@ public class SkillItemViewModel : ObservableObject
     {
         StringBuilder bob = new();
         bob.Append(Skill);
+
         if(!UseRules.UseRuleBool)
             return bob.ToString();
+        
         if(UseRules.WaitUseValue != 0)
-            bob.Append($" - Wait for {UseRules.WaitUseValue}");
+            bob.Append($" - [Wait for {UseRules.WaitUseValue}]");
+        
         if(UseRules.HealthUseValue != 0)
         {
-            bob.Append(" - Health");
-            _ = UseRules.HealthGreaterThanBool ? bob.Append(" greater than ") : bob.Append(" less than ");
+            bob.Append(" - [Health");
+            _ = UseRules.HealthGreaterThanBool ? bob.Append(" > ") : bob.Append(" < ");
             bob.Append(UseRules.HealthUseValue);
+            bob.Append("%]");
         }
+        
         if (UseRules.ManaUseValue != 0)
         {
-            bob.Append(" - Mana");
-            _ = UseRules.ManaGreaterThanBool ? bob.Append(" greater than ") : bob.Append(" less than ");
+            bob.Append(" - [Mana");
+            _ = UseRules.ManaGreaterThanBool ? bob.Append(" > ") : bob.Append(" < ");
             bob.Append(UseRules.ManaUseValue);
+            bob.Append("%]");
         }
+        
         if(UseRules.SkipUseBool)
-            bob.Append(" [Skip if not available]");
+            bob.Append(" - [Skip if not available]");
+        
         return bob.ToString();
     }
 

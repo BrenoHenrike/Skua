@@ -12,5 +12,5 @@ public interface IPluginContainer
     /// <summary>
     /// The file at which the plugin's options are saved.
     /// </summary>
-    string OptionsFile => Path.Combine("plugins", "options", $"{Plugin.OptionsStorage}.cfg");
+    string OptionsFile => Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.MyDocuments), "Skua", "plugins", "options", $"{Plugin.OptionsStorage}.cfg");
 }

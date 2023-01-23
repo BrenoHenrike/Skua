@@ -17,12 +17,18 @@ public class AdvancedSkillContainer : ObservableRecipient, IAdvancedSkillContain
         get { return _loadedSkills; }
         set { SetProperty(ref _loadedSkills, value, true); }
     }
-
+    
     public AdvancedSkillContainer()
     {
-        _defaultSkillsSetsPath = Path.Combine(AppContext.BaseDirectory, "AdvancedSkills.txt");
-        _userSkillsSetsPath = Path.Combine(AppContext.BaseDirectory, "UserAdvancedSkills.txt");
-        SyncSkills();
+        _defaultSkillsSetsPath = Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.MyDocuments), "Skua", "AdvancedSkills.txt");
+        _userSkillsSetsPath = Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.MyDocuments), "Skua", "UserAdvancedSkills.txt");
+
+        var rootDefaultSkills = Path.Combine(AppContext.BaseDirectory, "AdvancedSkills.txt");
+        if (File.Exists(rootDefaultSkills) && !File.Exists(_defaultSkillsSetsPath))
+        {
+            File.Copy(rootDefaultSkills, _defaultSkillsSetsPath, true);
+        }
+        LoadSkills();
     }
 
     public void Add(AdvancedSkill skill)
@@ -73,7 +79,7 @@ public class AdvancedSkillContainer : ObservableRecipient, IAdvancedSkillContain
     public void LoadSkills()
     {
         if (!File.Exists(_userSkillsSetsPath))
-            return;
+            _CopyDefaultSkills();
 
         LoadedSkills.Clear();
         foreach (string line in File.ReadAllLines(_userSkillsSetsPath))

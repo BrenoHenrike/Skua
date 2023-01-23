@@ -46,10 +46,10 @@ public partial class CoreBotsViewModel : BotControlViewModelBase
             if (tab.Content is IManageCBOptions cbo)
                 cbo.Save(bob);
         }
-        Directory.CreateDirectory(AppContext.BaseDirectory + @"\options\");
-        File.WriteAllText(AppContext.BaseDirectory + $@"\options\CBO_Storage({_player.Username}).txt", bob.ToString());
+        Directory.CreateDirectory(Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.MyDocuments), "Skua") + @"\options\");
+        File.WriteAllText(Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.MyDocuments), "Skua") + $@"\options\CBO_Storage({_player.Username}).txt", bob.ToString());
         _dialogService.ShowMessageBox($@"Saved to \options\CBO_Storage({_player.Username}).txt", "Save Successful!");
-        _readValues[_player.Username] = ReadValues(File.ReadAllLines(AppContext.BaseDirectory + $@"\options\CBO_Storage({_player.Username}).txt"));
+        _readValues[_player.Username] = ReadValues(File.ReadAllLines(Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.MyDocuments), "Skua") + $@"\options\CBO_Storage({_player.Username}).txt"));
     }
 
     [RelayCommand]
@@ -69,10 +69,10 @@ public partial class CoreBotsViewModel : BotControlViewModelBase
             return;
         }
 
-        if (!File.Exists(AppContext.BaseDirectory + $@"\options\CBO_Storage({_player.Username}).txt"))
+        if (!File.Exists(Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.MyDocuments), "Skua") + $@"\options\CBO_Storage({_player.Username}).txt"))
             return;
 
-        Dictionary<string, string> optionsDict = ReadValues(File.ReadAllLines(AppContext.BaseDirectory + $@"\options\CBO_Storage({_player.Username}).txt"));
+        Dictionary<string, string> optionsDict = ReadValues(File.ReadAllLines(Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.MyDocuments), "Skua") + $@"\options\CBO_Storage({_player.Username}).txt"));
 
         SetValues(optionsDict);
 

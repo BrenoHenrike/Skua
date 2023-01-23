@@ -128,6 +128,6 @@ public class OptionContainer : ObservableObject, IOptionContainer
         linesToSave.AddRange(Options.Where(o => !o.Transient).Select(o => $"Options:{o.Name}={OptionValues[o]}"));
         foreach (KeyValuePair<string, List<IOption>> item in MultipleOptions)
             linesToSave.AddRange(item.Value.Where(o => !o.Transient).Select(o => $"{item.Key}:{o.Name}={OptionValues[o]}"));
-        File.WriteAllLines(Path.Combine(AppContext.BaseDirectory, OptionsFile), linesToSave);
+        File.WriteAllLines(OptionsFile, linesToSave);
     }
 }

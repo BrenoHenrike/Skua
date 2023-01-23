@@ -7,7 +7,7 @@ public class PluginContainer : IPluginContainer
 {
     public IOptionContainer OptionContainer { get; }
     public ISkuaPlugin Plugin { get; private set; }
-    public string OptionsFile => Path.Combine("plugins", "options", $"{Plugin.OptionsStorage}.cfg");
+    public string OptionsFile => Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.MyDocuments), "Skua", "plugins", "options", $"{Plugin.OptionsStorage}.cfg");
 
     public PluginContainer(ISkuaPlugin plugin)
     {

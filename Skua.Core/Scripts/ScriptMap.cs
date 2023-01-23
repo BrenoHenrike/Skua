@@ -69,8 +69,8 @@ public partial class ScriptMap : IScriptMap
     [ObjectBinding("world.map.currentScene.labels", Select = "name", Default = "new()")]
     private List<string> _cells;
 
-    [MethodCallBinding("world.moveToCell", RunMethodPost = true, GameFunction = true)]
-    private void _jump(string cell, string pad, bool clientOnly = false)
+    [MethodCallBinding("jumpCorrectRoom", RunMethodPost = true)]
+    private void _jump(string cell, string pad, bool autoCorrect = true, bool clientOnly = false)
     {
         if (Options.SafeTimings)
             Wait.ForCellChange(cell);
@@ -137,8 +137,8 @@ public partial class ScriptMap : IScriptMap
         return _savedMapItems = JsonConvert.DeserializeObject<Dictionary<string, List<MapItem>>>(File.ReadAllText(_savedCacheFilePath))!;
     }
 
-    private readonly string _cachePath = Path.Combine(AppContext.BaseDirectory, "cache");
-    private readonly string _savedCacheFilePath = Path.Combine(AppContext.BaseDirectory, "cache", "0SavedMaps.json");
+    private readonly string _cachePath = Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.MyDocuments), "Skua", "cache");
+    private readonly string _savedCacheFilePath = Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.MyDocuments), "Skua", "cache", "0SavedMaps.json");
 
     public List<MapItem>? FindMapItems()
     {

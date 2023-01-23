@@ -47,7 +47,7 @@
             VirtualizingPanel.VirtualizationMode="Recycling">   
             <ListBox.ContextMenu>
                 <ContextMenu>
-                    <MenuItem Command="{Binding SkillsSetsViewModel.RemoveSelectedCommand}" Header="Remove Selected" />
+                    <MenuItem Command="{Binding RemoveSelectedCommand}" Header="Remove Selected" />
                 </ContextMenu>
             </ListBox.ContextMenu>
             <ListBox.ItemsPanel>

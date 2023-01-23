@@ -12,6 +12,7 @@ using Skua.Manager.Properties;
 using System.Threading.Tasks;
 using Skua.Core.ViewModels.Manager;
 using System.Threading;
+using System.IO;
 
 namespace Skua.Manager;
 
@@ -67,7 +68,8 @@ public partial class App : Application
         
         Dispatcher.ShutdownStarted += Dispatcher_ShutdownStarted;
         StrongReferenceMessenger.Default.Register<App, UpdateFinishedMessage>(this, CloseManager);
-        
+
+        Ioc.Default.GetRequiredService<IClientDirectoriesService>().CreateDirectories();
         if (Settings.Default.CheckClientUpdates)
         {
             Task.Run(async () =>

@@ -15,11 +15,11 @@ public class ScriptInfo
     [JsonProperty("path")]
     public string FilePath { get; set; }
     public string RelativePath => FilePath == FileName ? "Scripts/" : $"Scripts/{FilePath.Replace(FileName, "")}";
-    public string LocalFile => Path.Combine(AppContext.BaseDirectory, "Scripts", FilePath);
-    public string LocalShaFile => Path.Combine(AppContext.BaseDirectory, "Scripts", ".shacache", $"{FilePath}.sha");
+    public string LocalFile => Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.MyDocuments), "Skua", "Scripts", FilePath);
+    public string LocalShaFile => Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.MyDocuments), "Skua", "Scripts", ".shacache", $"{FilePath}.sha");
 
-    public string ManagerLocalFile => Path.Combine(AppContext.BaseDirectory, "Skua_Modules/Scripts", FilePath);
-    public string ManagerLocalShaFile => Path.Combine(AppContext.BaseDirectory, "Skua_Modules/Scripts", ".shacache", $"{FilePath}.sha");
+    public string ManagerLocalFile => Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.MyDocuments), "Skua", "Scripts", FilePath);
+    public string ManagerLocalShaFile => Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.MyDocuments), "Skua", "Scripts", ".shacache", $"{FilePath}.sha");
     
     public string? LocalSha => File.Exists(LocalShaFile) ? File.ReadAllText(LocalShaFile) : null;
     public bool Downloaded => File.Exists(LocalFile);
