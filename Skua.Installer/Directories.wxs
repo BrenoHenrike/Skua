@@ -30,19 +30,19 @@
             </Directory>
 
 
-            <!-- <Directory Id="INSTALLFOLDER" Name="!(loc.ProductNameFolder)" /> -->
+            <Directory Id="INSTALLFOLDER" Name="!(loc.ProductNameFolder)" />
 
-            <?if $(var.Platform)=x64 ?>
+            <!-- <?if $(var.Platform)=x64 ?> -->
                 <!-- Program Files (64bit) folder -->
-                <Directory Id="ProgramFiles64Folder">
+                <!-- <Directory Id="ProgramFiles64Folder">
                     <Directory Id="INSTALLFOLDER" Name="!(loc.ProductNameFolder)" />
-                </Directory>
-            <?else?>
+                </Directory> -->
+            <!-- <?else?> -->
                 <!-- Program Files (32bit) folder -->
-                <Directory Id="ProgramFilesFolder">
+                <!-- <Directory Id="ProgramFilesFolder">
                     <Directory Id="INSTALLFOLDER" Name="!(loc.ProductNameFolder)" />
                 </Directory>
-            <?endif?>
+            <?endif?> -->
         </Directory>
 
         <?if $(var.Platform)=x86?>
@@ -50,7 +50,7 @@
         <?else?>
             <?define ProgramFilesFolder="ProgramFiles64Folder" ?>
         <?endif?>
-        <SetDirectory Id="TARGETDIR" Value="[$(var.ProgramFilesFolder)][ProductName]\"/>
+        <SetDirectory Id="TARGETDIR" Value="[$(var.ProgramFilesFolder)][ProductName]"/>
 
     </Fragment>
 
