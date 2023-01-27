@@ -61,9 +61,20 @@
                         Grid.Column="0"
                         Margin="6,4,2,4"
                         VerticalAlignment="Center"
-                        Text="Downloaded:" />
+                        Text="Bot Scripts: " />
                     <TextBlock
                         Grid.Column="1"
+                        Margin="2"
+                        VerticalAlignment="Center">
+                        <Run Text="{Binding BotScriptQuantity, Mode=OneWay, UpdateSourceTrigger=PropertyChanged, FallbackValue=000}" />
+                    </TextBlock>
+                    <TextBlock
+                        Grid.Column="2"
+                        Margin="6,4,2,4"
+                        VerticalAlignment="Center"
+                        Text="Downloaded Script Files:" />
+                    <TextBlock
+                        Grid.Column="3"
                         Margin="2"
                         VerticalAlignment="Center">
                         <Run Text="{Binding DownloadedQuantity, Mode=OneWay, UpdateSourceTrigger=PropertyChanged, FallbackValue=000}" />
@@ -71,17 +82,18 @@
                         <Run Text="{Binding ScriptQuantity, Mode=OneWay, UpdateSourceTrigger=PropertyChanged, FallbackValue=000}" />
                     </TextBlock>
                     <TextBlock
-                        Grid.Column="2"
+                        Grid.Column="4"
                         Margin="6,4,2,4"
                         VerticalAlignment="Center"
                         Text="Outdated:" />
                     <TextBlock
-                        Grid.Column="3"
+                        Grid.Column="5"
                         Margin="2"
                         VerticalAlignment="Center"
                         Text="{Binding OutdatedQuantity, UpdateSourceTrigger=PropertyChanged, Mode=OneWay, FallbackValue=0}" />
                 </Grid>
             </Border>
+
             <DataGrid
                 x:Name="ScriptsDataGrid"
                 AutoGenerateColumns="False"
@@ -104,14 +116,6 @@
                             Header="Delete"
                             IsEnabled="{Binding SelectedItem.Downloaded, FallbackValue=False}" />
                         <MenuItem
-                            Command="{Binding LoadScriptCommand}"
-                            Header="Load"
-                            IsEnabled="{Binding SelectedItem.Downloaded, FallbackValue=False}" />
-                        <MenuItem
-                            Command="{Binding StartScriptCommand}"
-                            Header="Start"
-                            IsEnabled="{Binding SelectedItem.Downloaded, FallbackValue=False}" />
-                        <MenuItem
                             Command="{Binding OpenScriptCommand}"
                             Header="Open"
                             IsEnabled="{Binding SelectedItem.Downloaded, FallbackValue=False}" />
@@ -126,19 +130,57 @@
                         <b:InvokeCommandAction Command="{Binding LoadScriptCommand}" />
                     </b:EventTrigger>
                 </b:Interaction.Triggers>
+                <DataGrid.Resources>
+                    <DataTemplate x:Key="ScriptFileInfoTemplate">
+                        <StackPanel Orientation="Vertical">
+                            <DockPanel>
+                                <TextBlock Text="Name:" 
+                                    Margin="30,0,5,0" />
+                                <TextBlock Text="{Binding Info.Name}" 
+                                    FontWeight="Bold"/>
+                            </DockPanel>
+                            <DockPanel>
+                                <TextBlock Text="Description:"
+                                     Margin="0,0,5,0" />
+                                <TextBlock
+                                    TextWrapping="Wrap" 
+                                    Text="{Binding Info.Description}" />
+                            </DockPanel>
+                            <DockPanel>
+                                <TextBlock Text="Tags:"
+                                    Margin="40,0,5,0" />
+                                <TextBlock Width="Auto"
+                                        TextWrapping="Wrap" 
+                                        Text="{Binding Tags, Mode=OneWay}" />
+                            </DockPanel>
+                        </StackPanel>
+                    </DataTemplate>
+                    <DataTemplate x:Key="ScriptFileActionTemplate">
+                        <DockPanel>
+                            <Button Content="Start"
+                                Width="70"
+                                Command="{Binding StartScriptCommand}"
+                                CommandParameter="{Binding}"
+                                IsEnabled="{Binding Downloaded, FallbackValue=False}" />
+                            <Button Content="Load"
+                                Width="70"
+                                Command="{Binding LoadScriptCommand}" 
+                                CommandParameter="{Binding}"
+                                IsEnabled="{Binding Downloaded, FallbackValue=False}" />
+                        </DockPanel>
+                    </DataTemplate>
+                </DataGrid.Resources>
                 <DataGrid.Columns>
-                    <DataGridTextColumn
-                        Width="2*"
-                        Binding="{Binding FileName}"
-                        Header="Name" />
-                    <DataGridTextColumn
-                        Width="3*"
-                        Binding="{Binding FilePath, Mode=OneTime}"
-                        Header="Folder Path" />
-                    <DataGridTextColumn
-                        Width="70"
+                    <DataGridTemplateColumn CellTemplate="{StaticResource ScriptFileInfoTemplate}" 
+                         Header="Script" 
+                         Width="600*"/>
+                    <DataGridTemplateColumn CellTemplate="{StaticResource ScriptFileActionTemplate}" 
+                         Header="Action" 
+                         Width="180"/>
+                    <!--<DataGridTextColumn
+                        Width="170"
                         Binding="{Binding Size}"
-                        Header="Size" />
+                        Header="Action" />-->
                 </DataGrid.Columns>
                 <DataGrid.RowStyle>
                     <Style BasedOn="{StaticResource MaterialDesignDataGridRow}" TargetType="DataGridRow">

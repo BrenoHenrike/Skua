@@ -24,47 +24,34 @@ public partial class ScriptRepoViewModel : BotControlViewModelBase
 
     private readonly IGetScriptsService _getScriptsService;
     private readonly IProcessService _processService;
+
     [ObservableProperty]
-    [NotifyPropertyChangedFor(nameof(DownloadedQuantity), nameof(OutdatedQuantity), nameof(ScriptQuantity))]
+    [NotifyPropertyChangedFor(nameof(DownloadedQuantity), nameof(OutdatedQuantity), nameof(ScriptQuantity), nameof(BotScriptQuantity))]
     private RangedObservableCollection<ScriptInfoViewModel> _scripts = new();
+
     [ObservableProperty]
-    [NotifyPropertyChangedFor(nameof(DownloadedQuantity), nameof(OutdatedQuantity), nameof(ScriptQuantity))]
+    [NotifyPropertyChangedFor(nameof(DownloadedQuantity), nameof(OutdatedQuantity), nameof(ScriptQuantity), nameof(BotScriptQuantity))]
     private ScriptInfoViewModel? _selectedItem;
+
     [ObservableProperty]
     private bool _isBusy;
+
     [ObservableProperty]
     private string _progressReportMessage = string.Empty;
 
     public int DownloadedQuantity => _getScriptsService.Downloaded;
     public int OutdatedQuantity => _getScriptsService.Outdated;
-    public int ScriptQuantity => _scripts.Count;
+    public int ScriptQuantity => _getScriptsService.Total;
+    public int BotScriptQuantity => _scripts.Count;
     public IRelayCommand OpenScriptFolderCommand { get; }
-
-    [RelayCommand]
-    private void StartScript()
-    {
-        if (SelectedItem is null || !SelectedItem.Downloaded)
-            return;
-
-        StrongReferenceMessenger.Default.Send<StartScriptMessage, int>(new(SelectedItem.LocalFile), (int)MessageChannels.ScriptStatus);
-    }
-
+    
     [RelayCommand]
     private void OpenScript()
     {
         if (SelectedItem is null || !SelectedItem.Downloaded)
             return;
-
+        
         StrongReferenceMessenger.Default.Send<EditScriptMessage, int>(new(SelectedItem.LocalFile), (int)MessageChannels.ScriptStatus);
-    }
-
-    [RelayCommand]
-    private void LoadScript()
-    {
-        if (SelectedItem is null || !SelectedItem.Downloaded)
-            return;
-
-        StrongReferenceMessenger.Default.Send<LoadScriptMessage, int>(new(SelectedItem.LocalFile), (int)MessageChannels.ScriptStatus);
     }
 
     [RelayCommand]
@@ -82,15 +69,21 @@ public partial class ScriptRepoViewModel : BotControlViewModelBase
         catch { }
         RefreshScriptsList();
     }
+    
     private void RefreshScriptsList()
     {
         _scripts.Clear();
         foreach (ScriptInfo script in _getScriptsService.Scripts)
-            _scripts.Add(new(script));
+        {
+            if (!script.Name.Equals("null"))
+                _scripts.Add(new(script));
+        }
+            
         OnPropertyChanged(nameof(Scripts));
         OnPropertyChanged(nameof(DownloadedQuantity));
         OnPropertyChanged(nameof(OutdatedQuantity));
         OnPropertyChanged(nameof(ScriptQuantity));
+        OnPropertyChanged(nameof(BotScriptQuantity));
         IsBusy = false;
     }
     public void ProgressHandler(string message)
@@ -111,6 +104,7 @@ public partial class ScriptRepoViewModel : BotControlViewModelBase
         OnPropertyChanged(nameof(DownloadedQuantity));
         OnPropertyChanged(nameof(OutdatedQuantity));
         OnPropertyChanged(nameof(ScriptQuantity));
+        OnPropertyChanged(nameof(BotScriptQuantity));
         IsBusy = false;
     }
 
@@ -127,6 +121,7 @@ public partial class ScriptRepoViewModel : BotControlViewModelBase
         OnPropertyChanged(nameof(DownloadedQuantity));
         OnPropertyChanged(nameof(OutdatedQuantity));
         OnPropertyChanged(nameof(ScriptQuantity));
+        OnPropertyChanged(nameof(BotScriptQuantity));
         IsBusy = false;
     }
 

@@ -24,7 +24,7 @@ public partial class ScriptRepoView : UserControl
         if(string.IsNullOrWhiteSpace(SearchBox.Text))
             return true;
 
-        return obj is ScriptInfoViewModel script && script.FileName.Contains(SearchBox.Text);
+        return obj is ScriptInfoViewModel script && (script.FileName.Contains(SearchBox.Text) || script.Tags.Contains(SearchBox.Text));
     }
 
     private void TextBox_TextChanged(object sender, TextChangedEventArgs e)
