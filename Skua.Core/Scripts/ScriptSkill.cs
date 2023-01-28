@@ -167,7 +167,7 @@ public partial class ScriptSkill : IScriptSkill
         {
             if (Combat.StopAttacking)
             {
-                _counterAttack.WaitOne(1000);
+                _counterAttack.WaitOne(10000);
                 Combat.StopAttacking = false;
             }
            
