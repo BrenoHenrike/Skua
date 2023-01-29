@@ -45,8 +45,10 @@ public partial class ScriptServers : ObservableRecipient, IScriptServers
 
     public string LastIP { get; set; } = string.Empty;
     public string LastName { get; set; } = string.Empty;
+    
     [ObjectBinding("serialCmd.servers")]
     private List<Server> _serverList = new();
+    
     [ObservableProperty]
     [NotifyPropertyChangedRecipients]
     private List<Server> _cachedServers = new();
@@ -63,8 +65,16 @@ public partial class ScriptServers : ObservableRecipient, IScriptServers
         if (CachedServers.Count > 0 && !forceUpdate)
             return CachedServers;
 
-        string? response = await HttpClients.GetGHClient().GetStringAsync($"http://content.aq.com/game/api/data/servers").ConfigureAwait(false);
-        return response is null ? new() : CachedServers = JsonConvert.DeserializeObject<List<Server>>(response)!;
+        string? response = await HttpClients.GetGHClient()
+            .GetStringAsync($"http://content.aq.com/game/api/data/servers")
+            .ConfigureAwait(false);
+
+        if (response is null)
+            return new();
+
+        CachedServers = JsonConvert.DeserializeObject<List<Server>>(response)!;
+        
+        return CachedServers;
     }
 
     [MethodCallBinding("login", GameFunction = true)]
@@ -109,7 +119,13 @@ public partial class ScriptServers : ObservableRecipient, IScriptServers
     public bool Relogin(Server? server = null)
     {
         if (server is null)
-            server = Options.AutoReloginAny ? ServerList.Find(x => x.IP != LastIP)! : CachedServers.First(s => s.Name == Options.ReloginServer) ?? ServerList[0];
+        {
+            if (Options.AutoReloginAny)
+                server = ServerList.Find(x => x.IP != LastIP)!;
+            else
+                server = CachedServers.First(s => s.Name == Options.ReloginServer) ?? ServerList[0];
+        }
+        
         return ReloginIP(server.IP);
     }
 
@@ -117,17 +133,22 @@ public partial class ScriptServers : ObservableRecipient, IScriptServers
     {
         bool autoRelogSwitch = Options.AutoRelogin;
         Options.AutoRelogin = false;
+        
         Thread.Sleep(2000);
         Logout();
+        
         Stats.Relogins++;
         if(_loginInfoSetted)
             Login(_username, _password);
         else
             Login(Player.Username, Player.Password);
+        
         Thread.Sleep(2000);
         ConnectIP(ip);
+        
         Wait.ForTrue(() => Player.Playing && Flash.IsWorldLoaded, 30);
         Options.AutoRelogin = autoRelogSwitch;
+        
         return Player.Playing;
     }
 
@@ -135,19 +156,24 @@ public partial class ScriptServers : ObservableRecipient, IScriptServers
     {
         bool autoRelogSwitch = Options.AutoRelogin;
         Options.AutoRelogin = false;
+        
         Thread.Sleep(2000);
         Logout();
+        
         Stats.Relogins++;
         if (_loginInfoSetted)
             Login(_username, _password);
         else
             Login(Player.Username, Player.Password);
+        
         Thread.Sleep(2000);
         if (Flash.Call<bool>("clickServer", serverName))
             Wait.ForTrue(() => Player.Playing && Flash.IsWorldLoaded, 30);
         else
             Trace.WriteLine($"Server with name \"{serverName}\" was not found.");
+        
         Options.AutoRelogin = autoRelogSwitch;
+        
         return Player.Playing;
     }
 
@@ -168,12 +194,14 @@ public partial class ScriptServers : ObservableRecipient, IScriptServers
 
         int tries = 0;
         while (!Relogin(serverName) && !Manager.ShouldExit && !Player.Playing && ++tries < Options.ReloginTries)
-            Thread.Sleep(Options.ReloginTryDelay);
+            Task.Delay(Options.ReloginTryDelay).Wait();
+        
         return Player.Playing;
     }
 
     public async Task<bool> EnsureRelogin(CancellationToken token)
     {
+        Server server;
         int tries = 0;
         await GetServers(true);
         try
@@ -181,10 +209,16 @@ public partial class ScriptServers : ObservableRecipient, IScriptServers
             while (!token.IsCancellationRequested && !Manager.ShouldExit && !Player.Playing && ++tries < Options.ReloginTries)
             {
                 Login();
+                
                 await Task.Delay(3000, token);
-                Server server = Options.AutoReloginAny ? ServerList.Find(x => x.IP != LastIP)! : CachedServers.FirstOrDefault(s => s.Name == Options.ReloginServer) ?? ServerList[0];
+                if (Options.AutoReloginAny)
+                    server = ServerList.Find(x => x.IP != LastIP)!;
+                else
+                    server = CachedServers.FirstOrDefault(s => s.Name == Options.ReloginServer) ?? ServerList[0];
+                
                 if(!Flash.Call<bool>("clickServer", server.Name))
                     ConnectIP(server.IP, server.Port);
+                
                 using CancellationTokenSource waitLogin = new(Options.LoginTimeout);
                 try
                 {
