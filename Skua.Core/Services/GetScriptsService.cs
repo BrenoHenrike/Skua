@@ -160,10 +160,9 @@ public partial class GetScriptsService : ObservableObject, IGetScriptsService
         {
             var response = await client.GetAsync(_skillsSetsRawUrl);
             var content = await response.Content.ReadAsStringAsync();
-            var skillsSetsFile = ClientFileSources.SkuaAdvancedSkillsFile;
             try
             {
-                await File.WriteAllTextAsync(skillsSetsFile, content);
+                await File.WriteAllTextAsync(ClientFileSources.SkuaAdvancedSkillsFile, content);
                 return true;
             }
             catch
