@@ -24,6 +24,7 @@ public class QuestDataLoaderService : IQuestDataLoaderService
 
     public async Task<List<QuestData>> GetFromFileAsync(string fileName)
     {
+        fileName = Path.Combine(ClientFileSources.SkuaDIR, fileName);
         if (!File.Exists(fileName))
             return new();
         
@@ -38,8 +39,6 @@ public class QuestDataLoaderService : IQuestDataLoaderService
 
     public async Task<List<QuestData>> UpdateAsync(string fileName, bool all, IProgress<string>? progress, CancellationToken token)
     {
-        fileName = Path.Combine(ClientFileSources.SkuaDIR, fileName);
-        
         return await Task.Run(async () =>
         {
             if (!_player.LoggedIn)
