@@ -28,9 +28,9 @@ public class ScriptInfo
     
     public string RelativePath => FilePath == FileName ? "Scripts/" : $"Scripts/{FilePath.Replace(FileName, "")}";
     
-    public string LocalFile => Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.MyDocuments), "Skua", "Scripts", FilePath);
+    public string LocalFile => Path.Combine(ClientFileSources.SkuaScriptsDIR, FilePath);
 
-    public string ManagerLocalFile => Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.MyDocuments), "Skua", "Scripts", FilePath);
+    public string ManagerLocalFile => Path.Combine(ClientFileSources.SkuaScriptsDIR, FilePath);
 
     public bool Downloaded => File.Exists(LocalFile);
     

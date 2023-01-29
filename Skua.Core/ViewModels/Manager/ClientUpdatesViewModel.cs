@@ -5,6 +5,7 @@ using Skua.Core.Models.GitHub;
 using Skua.Core.Interfaces;
 using Skua.Core.Messaging;
 using Skua.Core.Utils;
+using Skua.Core.Models;
 
 namespace Skua.Core.ViewModels.Manager;
 public partial class ClientUpdatesViewModel : BotControlViewModelBase
@@ -134,7 +135,7 @@ public partial class ClientUpdatesViewModel : BotControlViewModelBase
     public async Task ResetScripts(CancellationToken token)
     {
         IsBusy = true;
-        var skuaPath = Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.MyDocuments), "Skua");
+        var skuaPath = ClientFileSources.SkuaScriptsDIR;
         if (Directory.Exists(skuaPath))
             Directory.Delete(skuaPath, true);
 
