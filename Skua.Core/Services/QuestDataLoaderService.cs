@@ -3,6 +3,7 @@ using CommunityToolkit.Mvvm.Messaging;
 using Newtonsoft.Json;
 using Skua.Core.Interfaces;
 using Skua.Core.Messaging;
+using Skua.Core.Models;
 using Skua.Core.Models.Quests;
 using static System.Collections.Generic.Dictionary<int, Skua.Core.Models.Quests.Quest>;
 
@@ -23,7 +24,6 @@ public class QuestDataLoaderService : IQuestDataLoaderService
 
     public async Task<List<QuestData>> GetFromFileAsync(string fileName)
     {
-        fileName = Path.Combine(Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.MyDocuments), fileName));
         if (!File.Exists(fileName))
             return new();
         
@@ -38,6 +38,8 @@ public class QuestDataLoaderService : IQuestDataLoaderService
 
     public async Task<List<QuestData>> UpdateAsync(string fileName, bool all, IProgress<string>? progress, CancellationToken token)
     {
+        fileName = Path.Combine(ClientFileSources.SkuaDIR, fileName);
+        
         return await Task.Run(async () =>
         {
             if (!_player.LoggedIn)
