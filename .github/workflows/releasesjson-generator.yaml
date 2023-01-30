@@ -21,7 +21,7 @@ jobs:
     - name: Get Releases
       id: get_releases
       run: |
-        curl -H "Authorization: token ${{ secrets.GITHUB_TOKEN }}" https://api.github.com/repos/brenohenrike/${{ github.repository }}/releases > releases.json
+        curl -H "Authorization: token ${{ secrets.GITHUB_TOKEN }}" https://api.github.com/repos/brenohenrike/skua/releases > releases.json
 
     - name: Upload Artifact
       uses: actions/upload-artifact@v2
