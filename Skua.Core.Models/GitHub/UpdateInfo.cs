@@ -16,6 +16,9 @@ public class UpdateInfo
     [JsonProperty("created_at")]
     public DateTime Time { get; set; }
 
+    [JsonProperty("assets")]
+    public List<Asset> Assets { get; set; } = new List<Asset>();
+
     public override string ToString()
     {
         return $"{Name} [{Version}]";
