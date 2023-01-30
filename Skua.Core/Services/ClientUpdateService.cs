@@ -24,7 +24,7 @@ public class ClientUpdateService : IClientUpdateService
 
     public async Task GetReleasesAsync()
     {
-        var releaseSearch = await HttpClients.GetGHClient().GetAsync("https://api.github.com/repos/brenohenrike/skua/releases");
+        var releaseSearch = await HttpClients.GetGHClient().GetAsync("https://raw.githubusercontent.com/BrenoHenrike/Skua/op-version/releases.json");
         if (!releaseSearch.IsSuccessStatusCode) 
             return;
 
