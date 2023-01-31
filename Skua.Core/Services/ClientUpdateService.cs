@@ -78,8 +78,8 @@ public class ClientUpdateService : IClientUpdateService
 
                 if (proc.ExitCode == 0)
                 {
-                    string startMenuPath = Environment.GetFolderPath(Environment.SpecialFolder.StartMenu);
-                    string appPath = Path.Combine(startMenuPath, "Skua AQW Bot", "Skua.Manager.exe");
+                    string startMenuPath = AppContext.BaseDirectory;
+                    string appPath = Path.Combine(startMenuPath, "Skua.Manager.exe");
                     Process.Start(appPath);
                     Environment.Exit(0);
                 }
