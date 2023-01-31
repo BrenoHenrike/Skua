@@ -12,6 +12,17 @@ public class ManagerOptionsViewModel : ObservableObject
         ManagerOptions = options;
         _settingsService = settingsService;
         _fileService = fileService;
+        
+        string initialDirectory = _settingsService.Get("ClientDownloadPath", string.Empty);
+        if (string.IsNullOrEmpty(initialDirectory))
+        {
+            initialDirectory = Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.UserProfile), "Downloads");
+            if (Directory.Exists(initialDirectory))
+                _settingsService.Set("ClientDownloadPath", initialDirectory);
+            else
+                _settingsService.Set("ClientDownloadPath", Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.MyDocuments)));
+        }
+        
         _downloadPath = _settingsService.Get("ClientDownloadPath", string.Empty);
         ChangeDownloadPathCommand = new RelayCommand(ChangeDownloadPath);
         OpenGHAuthCommand = new RelayCommand(OpenGHAuthDialog);
@@ -38,8 +49,16 @@ public class ManagerOptionsViewModel : ObservableObject
 
     private void ChangeDownloadPath()
     {
-        string initialDirectory = _settingsService.Get<string>("ClientDownloadPath", string.Empty);
-        initialDirectory = string.IsNullOrWhiteSpace(initialDirectory) ? AppContext.BaseDirectory : initialDirectory;
+        string initialDirectory = _settingsService.Get("ClientDownloadPath", string.Empty);
+        if (string.IsNullOrEmpty(initialDirectory))
+        {
+            initialDirectory = Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.UserProfile), "Downloads");
+            if (Directory.Exists(initialDirectory))
+                _settingsService.Set("ClientDownloadPath", initialDirectory);
+            else
+                _settingsService.Set("ClientDownloadPath", Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.MyDocuments)));
+        }
+ 
         string? folderPath = _fileService.OpenFolder(initialDirectory);
         if (!string.IsNullOrEmpty(folderPath))
         {
