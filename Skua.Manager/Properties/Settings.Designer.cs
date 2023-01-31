@@ -167,5 +167,41 @@ namespace Skua.Manager.Properties {
                 this["AutoUpdateBotScripts"] = value;
             }
         }
+        
+        [global::System.Configuration.UserScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("True")]
+        public bool CheckBotScriptsUpdates {
+            get {
+                return ((bool)(this["CheckBotScriptsUpdates"]));
+            }
+            set {
+                this["CheckBotScriptsUpdates"] = value;
+            }
+        }
+        
+        [global::System.Configuration.UserScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("True")]
+        public bool CheckAdvanceSkillSetsUpdates {
+            get {
+                return ((bool)(this["CheckAdvanceSkillSetsUpdates"]));
+            }
+            set {
+                this["CheckAdvanceSkillSetsUpdates"] = value;
+            }
+        }
+        
+        [global::System.Configuration.UserScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("True")]
+        public bool AutoUpdateAdvanceSkillSetsUpdates {
+            get {
+                return ((bool)(this["AutoUpdateAdvanceSkillSetsUpdates"]));
+            }
+            set {
+                this["AutoUpdateAdvanceSkillSetsUpdates"] = value;
+            }
+        }
     }
 }

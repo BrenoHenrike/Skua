@@ -25,16 +25,27 @@
              />
 		
 		<Upgrade Id="$(var.UpgradeCode)">
-          <UpgradeVersion OnlyDetect="yes" Minimum="$(var.BuildVersion)" Property="NEWERVERSIONDETECTED" IncludeMinimum="no"/>
-          <UpgradeVersion OnlyDetect="no" Maximum="$(var.BuildVersion)" Property="OLDERVERSIONBEINGUPGRADED" IncludeMaximum="no" />
+			<!-- Downgrade Protection -->
+			<UpgradeVersion Minimum="$(var.BuildVersion)" 
+				OnlyDetect="yes" 
+				IncludeMinimum="yes" 
+				Property="DOWNGRADE_DETECTED"  />
+			<!-- Major Upgrade Configuration -->
+			<UpgradeVersion 
+				IncludeMinimum="no" 
+				Maximum="$(var.BuildVersion)" 
+				IncludeMaximum="no" 
+				MigrateFeatures="yes" 
+				Property="UPGRADE_DETECTED"   />
         </Upgrade>
 
         <InstallExecuteSequence>
-          <RemoveExistingProducts Before="InstallInitialize" />
+          <RemoveExistingProducts After="InstallInitialize" />
         </InstallExecuteSequence>
 
-        <!-- Downgrade error message -->
-        <!--<MajorUpgrade DowngradeErrorMessage="!(loc.DowngradeErrorMessage)"/>-->
+		<Condition Message="!(loc.DowngradeErrorMessage)">
+			NOT DOWNGRADE_DETECTED
+		</Condition>
 		
         <!-- Include .cab file into .msi file -->
         <MediaTemplate EmbedCab="yes" />
