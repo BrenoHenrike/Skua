@@ -7,6 +7,7 @@ using Skua.Core.Utils;
 using System.Collections.Specialized;
 using System.Diagnostics;
 using System.IO.Compression;
+using System.Text.RegularExpressions;
 
 namespace Skua.Core.Services;
 public class ClientUpdateService : IClientUpdateService
@@ -59,23 +60,23 @@ public class ClientUpdateService : IClientUpdateService
 
             progress?.Report("Writing to folder...");
             string path = _settingsService.Get("ClientDownloadPath", string.Empty);
-
             if (string.IsNullOrEmpty(path) && !AppDomain.CurrentDomain.BaseDirectory.Contains("Program Files"))
                 path = Directory.GetParent(AppContext.BaseDirectory.TrimEnd(Path.DirectorySeparatorChar))?.FullName ?? AppContext.BaseDirectory;
-            
+
             string filePath = Path.Combine(path, fileName);
             await File.WriteAllBytesAsync(filePath, file);
-
             string extension = Path.GetExtension(filePath);
             if (extension == ".msi" || extension == ".exe")
             {
                 string winDir = Environment.GetFolderPath(Environment.SpecialFolder.Windows);
-                ProcessStartInfo startInfo = new ProcessStartInfo(Path.Combine(winDir, @"System32\msiexec.exe"), $"/i {filePath} /quiet /passive /qn+ /norestart ALLUSERS=1");
-                startInfo.Verb = "runas";
-                startInfo.UseShellExecute = true;
+                ProcessStartInfo startInfo = new(Path.Combine(winDir, @"System32\msiexec.exe"),
+                    $"/i {filePath} /quiet /passive /qn+ /norestart ALLUSERS=1")
+                {
+                    Verb = "runas",
+                    UseShellExecute = true
+                };
                 Process? proc = Process.Start(startInfo);
                 proc!.WaitForExit();
-
                 if (proc.ExitCode == 0)
                 {
                     string startMenuPath = AppContext.BaseDirectory;
