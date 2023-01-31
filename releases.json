@@ -171,7 +171,7 @@
         "content_type": "application/x-zip-compressed",
         "state": "uploaded",
         "size": 20124500,
-        "download_count": 4546,
+        "download_count": 4547,
         "created_at": "2023-01-09T10:50:07Z",
         "updated_at": "2023-01-09T10:50:14Z",
         "browser_download_url": "https://github.com/BrenoHenrike/Skua/releases/download/1.1.4.0/Skua-1.1.4.0-Release-x64.zip"
