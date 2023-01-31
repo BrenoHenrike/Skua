@@ -60,17 +60,29 @@ public class ClientUpdateService : IClientUpdateService
             progress?.Report("Writing to folder...");
             string path = _settingsService.Get("ClientDownloadPath", string.Empty);
 
-            if (string.IsNullOrEmpty(path) && AppDomain.CurrentDomain.BaseDirectory.Contains("Program Files"))
+            if (string.IsNullOrEmpty(path) && !AppDomain.CurrentDomain.BaseDirectory.Contains("Program Files"))
                 path = Directory.GetParent(AppContext.BaseDirectory.TrimEnd(Path.DirectorySeparatorChar))?.FullName ?? AppContext.BaseDirectory;
             
             string filePath = Path.Combine(path, fileName);
             await File.WriteAllBytesAsync(filePath, file);
 
             string extension = Path.GetExtension(filePath);
-            if(extension == ".msi" || extension == ".exe")
+            if (extension == ".msi" || extension == ".exe")
             {
-                Process.Start(filePath);
-                Environment.Exit(0);
+                string winDir = Environment.GetFolderPath(Environment.SpecialFolder.Windows);
+                ProcessStartInfo startInfo = new ProcessStartInfo(Path.Combine(winDir, @"System32\msiexec.exe"), $"/i {filePath} /quiet /passive /qn+ /norestart ALLUSERS=1");
+                startInfo.Verb = "runas";
+                startInfo.UseShellExecute = true;
+                Process? proc = Process.Start(startInfo);
+                proc!.WaitForExit();
+
+                if (proc.ExitCode == 0)
+                {
+                    string startMenuPath = Environment.GetFolderPath(Environment.SpecialFolder.StartMenu);
+                    string appPath = Path.Combine(startMenuPath, "Skua AQW Bot", "Skua.Manager.exe");
+                    Process.Start(appPath);
+                    Environment.Exit(0);
+                }
             }
             else
             {
