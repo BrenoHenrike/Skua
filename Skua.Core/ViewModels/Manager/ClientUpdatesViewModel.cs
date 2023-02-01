@@ -87,14 +87,21 @@ public partial class ClientUpdatesViewModel : BotControlViewModelBase
         try
         {
             await _updateService.GetReleasesAsync();
+            
             bool checkPrereleases = _settingsService.Get("CheckClientPrereleases", false);
             UpdateInfo? latest = _updateService.Releases.FirstOrDefault(r => checkPrereleases || !r.Prerelease);
             UpdateVisible = latest?.ParsedVersion.CompareTo(_appVersion) > 0;
+            
             if (UpdateVisible)
                 Latest = latest;
+
             Releases.Clear();
             foreach(var release in _updateService.Releases)
-                Releases.Add(new(release));
+            {
+                if (checkPrereleases || !release.Prerelease)
+                    Releases.Add(new(release));
+            }
+                
             Status = UpdateVisible ? "Update available" : "You have the latest version";
         }
         catch

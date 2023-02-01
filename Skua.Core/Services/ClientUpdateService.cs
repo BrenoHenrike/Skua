@@ -7,7 +7,6 @@ using Skua.Core.Utils;
 using System.Collections.Specialized;
 using System.Diagnostics;
 using System.IO.Compression;
-using System.Text.RegularExpressions;
 
 namespace Skua.Core.Services;
 public class ClientUpdateService : IClientUpdateService
@@ -33,7 +32,7 @@ public class ClientUpdateService : IClientUpdateService
         var releaseList = JsonConvert.DeserializeObject<List<UpdateInfo>>(releases) ?? null;
         if (releaseList is null)
             return;
-        
+
         Releases.Clear();
         Releases = releaseList.OrderByDescending(r => r.ParsedVersion).ToList();
     }
