@@ -7,14 +7,7 @@ on:
         - dev
         - 'op-version'
   release:
-      types:
-        - created
-        - edited
-        - published
-        - released
-        - deleted
-        - prereleased
-        - unpublished
+      types: [published]
 
 jobs:
   build:
