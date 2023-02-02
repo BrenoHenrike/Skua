@@ -10,8 +10,8 @@
     xmlns:vms="clr-namespace:Skua.Core.ViewModels;assembly=Skua.Core"
     xmlns:wpf="clr-namespace:Skua.WPF"
     d:DataContext="{d:DesignInstance vms:ScriptRepoViewModel}"
-    d:DesignHeight="450"
-    d:DesignWidth="800"
+    d:DesignHeight="600"
+    d:DesignWidth="850"
     mc:Ignorable="d">
     <Grid Margin="6">
         <DockPanel>
@@ -37,7 +37,7 @@
                 <TextBox
                     x:Name="SearchBox"
                     Margin="3,0"
-                    materialDesign:HintAssist.Hint="Search"
+                    materialDesign:HintAssist.Hint="Search:"
                     MaxLines="1"
                     TextChanged="TextBox_TextChanged" />
             </DockPanel>
@@ -93,7 +93,6 @@
                         Text="{Binding OutdatedQuantity, UpdateSourceTrigger=PropertyChanged, Mode=OneWay, FallbackValue=0}" />
                 </Grid>
             </Border>
-
             <DataGrid
                 x:Name="ScriptsDataGrid"
                 AutoGenerateColumns="False"
@@ -121,39 +120,59 @@
                             IsEnabled="{Binding SelectedItem.Downloaded, FallbackValue=False}" />
                     </ContextMenu>
                 </DataGrid.ContextMenu>
-                <b:Interaction.Triggers>
-                    <b:EventTrigger EventName="MouseDoubleClick">
-                        <b:InvokeCommandAction Command="{Binding LoadScriptCommand}" />
-                    </b:EventTrigger>
-                </b:Interaction.Triggers>
                 <DataGrid.Resources>
                     <DataTemplate x:Key="ScriptFileInfoTemplate">
                         <StackPanel Orientation="Vertical">
                             <DockPanel>
                                 <TextBlock Text="Name:" 
+                                    Foreground="#919191"
                                     Margin="30,0,5,0" />
                                 <TextBlock Text="{Binding Info.Name}" 
-                                    FontWeight="Bold"/>
+                                    Foreground="#97d2de"
+                                    FontWeight="DemiBold"/>
                             </DockPanel>
                             <DockPanel>
                                 <TextBlock Text="Description:"
+                                     Foreground="#919191"
                                      Margin="0,0,5,0" />
                                 <TextBlock
                                     TextWrapping="Wrap" 
-                                    Text="{Binding Info.Description}" />
+                                    Text="{Binding Info.Description}" 
+                                     Margin="0,0,0,5"/>
                             </DockPanel>
                             <DockPanel>
                                 <TextBlock Text="Tags:"
+                                    Foreground="#919191"
                                     Margin="40,0,5,0" />
-                                <TextBlock Width="Auto"
-                                        TextWrapping="Wrap" 
-                                        Text="{Binding Tags, Mode=OneWay}" />
+                                <ItemsControl ItemsSource="{Binding InfoTags}">
+                                    <ItemsControl.ItemsPanel>
+                                        <ItemsPanelTemplate>
+                                            <WrapPanel />
+                                        </ItemsPanelTemplate>
+                                    </ItemsControl.ItemsPanel>
+                                    <ItemsControl.ItemTemplate>
+                                        <DataTemplate>
+                                            <Border
+                                                BorderBrush="#97d2de"
+                                                BorderThickness="1"
+                                                CornerRadius="5" 
+                                                Padding="5,0,5,2"
+                                                Margin="0,1,5,5">
+                                                <TextBlock
+                                                    Foreground="#97d2de"
+                                                    Text="{Binding}" />
+                                            </Border>
+                                        </DataTemplate>
+                                    </ItemsControl.ItemTemplate>
+                                </ItemsControl>
                             </DockPanel>
                             <DockPanel>
                                 <TextBlock Text="ScriptPath:"
-                                     Margin="9,0,5,0" />
+                                     Foreground="#919191"
+                                     Margin="9,0,5,5" />
                                 <TextBlock
                                     TextWrapping="Wrap" 
+                                    Foreground="#a8a8a8"
                                     Text="{Binding ScriptPath}" />
                             </DockPanel>
                         </StackPanel>
@@ -172,18 +191,19 @@
                                 IsEnabled="{Binding Downloaded, FallbackValue=False}" />
                         </DockPanel>
                     </DataTemplate>
+                    <Style x:Key="CenterGridHeaderStyle" TargetType="DataGridColumnHeader">
+                        <Setter Property="HorizontalContentAlignment" Value="Center"/>
+                        <Setter Property="Background" Value="Transparent"/>
+                    </Style>
                 </DataGrid.Resources>
                 <DataGrid.Columns>
                     <DataGridTemplateColumn CellTemplate="{StaticResource ScriptFileInfoTemplate}" 
-                         Header="Script" 
+                         Header="Script"
                          Width="600*"/>
                     <DataGridTemplateColumn CellTemplate="{StaticResource ScriptFileActionTemplate}" 
-                         Header="Action" 
+                         Header="Action"
+                         HeaderStyle="{StaticResource CenterGridHeaderStyle}"
                          Width="180"/>
-                    <!--<DataGridTextColumn
-                        Width="170"
-                        Binding="{Binding Size}"
-                        Header="Action" />-->
                 </DataGrid.Columns>
                 <DataGrid.RowStyle>
                     <Style BasedOn="{StaticResource MaterialDesignDataGridRow}" TargetType="DataGridRow">
@@ -191,7 +211,7 @@
                             <DataTrigger Binding="{Binding Downloaded, UpdateSourceTrigger=PropertyChanged}" Value="True">
                                 <Setter Property="Background">
                                     <Setter.Value>
-                                        <SolidColorBrush Opacity="0.2" Color="Green" />
+                                        <SolidColorBrush Opacity="0.2" Color="#456796" />
                                     </Setter.Value>
                                 </Setter>
                             </DataTrigger>
