@@ -22,7 +22,7 @@ public partial class ScriptRepoView : UserControl
 
     private bool Search(object obj)
     {
-        var searchScript = SearchBox.Text;
+        var searchScript = SearchBox.Text.ToLower();
         if(string.IsNullOrWhiteSpace(searchScript))
             return true;
 
