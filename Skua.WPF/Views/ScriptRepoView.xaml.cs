@@ -1,6 +1,5 @@
 ﻿using System;
 using System.ComponentModel;
-using System.Linq;
 using System.Threading.Tasks;
 using System.Windows.Controls;
 using System.Windows.Data;
@@ -19,7 +18,6 @@ public partial class ScriptRepoView : UserControl
         InitializeComponent();
         DataContext = Ioc.Default.GetRequiredService<ScriptRepoViewModel>();
         _collectionView = CollectionViewSource.GetDefaultView(((ScriptRepoViewModel)DataContext).Scripts);
-        //_collectionView.Filter = Search;
     }
 
     private bool Search(object obj)
@@ -32,7 +30,7 @@ public partial class ScriptRepoView : UserControl
         if (script is null)
             return false;
 
-        var scriptName = script.Info.Name;
+        var scriptName = script.Info.Name.ToLower();
         if (KMPSearch(scriptName, searchScript))
             return true;
 
@@ -47,7 +45,6 @@ public partial class ScriptRepoView : UserControl
 
     private async void TextBox_TextChanged(object sender, TextChangedEventArgs e)
     {
-        //_collectionView.Refresh();
         await Task.Run(async () =>
         {
             await Dispatcher.BeginInvoke(new Action(() =>
