@@ -117,11 +117,7 @@
                             IsEnabled="{Binding SelectedItem.Downloaded, FallbackValue=False}" />
                         <MenuItem
                             Command="{Binding OpenScriptCommand}"
-                            Header="Open"
-                            IsEnabled="{Binding SelectedItem.Downloaded, FallbackValue=False}" />
-                        <MenuItem
-                            Command="{Binding OpenScriptFolderCommand}"
-                            Header="Open VSCode"
+                            Header="Open in VSCode"
                             IsEnabled="{Binding SelectedItem.Downloaded, FallbackValue=False}" />
                     </ContextMenu>
                 </DataGrid.ContextMenu>
@@ -152,6 +148,13 @@
                                 <TextBlock Width="Auto"
                                         TextWrapping="Wrap" 
                                         Text="{Binding Tags, Mode=OneWay}" />
+                            </DockPanel>
+                            <DockPanel>
+                                <TextBlock Text="ScriptPath:"
+                                     Margin="9,0,5,0" />
+                                <TextBlock
+                                    TextWrapping="Wrap" 
+                                    Text="{Binding ScriptPath}" />
                             </DockPanel>
                         </StackPanel>
                     </DataTemplate>

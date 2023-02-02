@@ -2,6 +2,7 @@
 using CommunityToolkit.Mvvm.Input;
 using CommunityToolkit.Mvvm.Messaging;
 using Skua.Core.Messaging;
+using Skua.Core.Models;
 using Skua.Core.Models.GitHub;
 
 namespace Skua.Core.ViewModels;
@@ -19,6 +20,7 @@ public partial class ScriptInfoViewModel : ObservableObject
     public int Size => Info.Size;
     public string LocalFile => Info.LocalFile;
     public string FilePath => Info.FilePath;
+    public string ScriptPath => Path.Combine(ClientFileSources.SkuaScriptsDIR, FilePath.Replace("/", "\\"));
     public string Tags => string.Join(", ", Info.Tags);
 
     [ObservableProperty]
