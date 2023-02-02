@@ -22,15 +22,10 @@ public partial class ScriptInfoViewModel : ObservableObject
     public string LocalFile => Info.LocalFile;
     public string FilePath => Info.FilePath;
     public string ScriptPath => Path.Combine(ClientFileSources.SkuaScriptsDIR, FilePath.Replace("/", "\\"));
-    //public string Tags => string.Join("   ", Info.Tags);
     public ObservableCollection<string> InfoTags
     {
-        get
-        {
-            return new ObservableCollection<string>(Info.Tags);
-        }
+        get => new ObservableCollection<string>(Info.Tags);
     }
-
 
     [ObservableProperty]
     [NotifyPropertyChangedFor(nameof(Outdated))]

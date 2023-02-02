@@ -39,6 +39,7 @@
                     Margin="3,0"
                     materialDesign:HintAssist.Hint="Search:"
                     MaxLines="1"
+                    UseLayoutRounding="True"
                     TextChanged="TextBox_TextChanged" />
             </DockPanel>
             <Border
