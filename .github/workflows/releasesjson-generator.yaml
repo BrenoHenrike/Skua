@@ -1,11 +1,6 @@
 name: Get Releases
 
 on:
-  push:
-      branches:
-        - master
-        - dev
-        - 'op-version'
   release:
       types: [published]
 
