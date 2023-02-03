@@ -17,11 +17,6 @@ public class InventoryItem : ItemBase
     [JsonConverter(typeof(StringBoolConverter))]
     public bool Equipped { get; set; }
     /// <summary>
-    /// The meta value of the item. This is used to link buffs (xp boosts etc).
-    /// </summary>
-    [JsonProperty("sMeta")]
-    public string Meta { get; set; }
-    /// <summary>
     /// The level of the item.
     /// </summary>
     [JsonProperty("iLvl")]
