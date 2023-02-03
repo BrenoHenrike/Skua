@@ -27,7 +27,8 @@ public sealed partial class App : Application
         InitializeComponent();
 
         Services = ConfigureServices();
-        Services.GetRequiredService<IClientDirectoriesService>().CreateDirectories();
+        Services.GetRequiredService<IClientFilesService>().CreateDirectories();
+        Services.GetRequiredService<IClientFilesService>().CreateFiles();
 
         _bot = Services.GetRequiredService<IScriptInterface>();
         _bot.Flash.FlashCall += Flash_FlashCall;

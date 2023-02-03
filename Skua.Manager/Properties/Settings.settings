@@ -29,7 +29,7 @@
       <Value Profile="(Default)">False</Value>
     </Setting>
     <Setting Name="ApplicationVersion" Type="System.String" Scope="User">
-      <Value Profile="(Default)">1.1.4.1</Value>
+      <Value Profile="(Default)">1.1.5.0</Value>
     </Setting>
     <Setting Name="ClientDownloadPath" Type="System.String" Scope="User">
       <Value Profile="(Default)" />
@@ -41,6 +41,15 @@
       <Value Profile="(Default)">False</Value>
     </Setting>
     <Setting Name="AutoUpdateBotScripts" Type="System.Boolean" Scope="User">
+      <Value Profile="(Default)">True</Value>
+    </Setting>
+    <Setting Name="CheckBotScriptsUpdates" Type="System.Boolean" Scope="User">
+      <Value Profile="(Default)">True</Value>
+    </Setting>
+    <Setting Name="CheckAdvanceSkillSetsUpdates" Type="System.Boolean" Scope="User">
+      <Value Profile="(Default)">True</Value>
+    </Setting>
+    <Setting Name="AutoUpdateAdvanceSkillSetsUpdates" Type="System.Boolean" Scope="User">
       <Value Profile="(Default)">True</Value>
     </Setting>
   </Settings>

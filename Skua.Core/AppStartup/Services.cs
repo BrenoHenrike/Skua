@@ -91,7 +91,7 @@ public static class Services
         services.AddSingleton<ILogService, LogService>();
         services.AddSingleton<IQuestDataLoaderService, QuestDataLoaderService>();
         services.AddSingleton<IGrabberService, GrabberService>();
-        services.AddSingleton<IClientDirectoriesService, ClientDirectoriesService>();
+        services.AddSingleton<IClientFilesService, ClientFilesService>();
 
         return services;
     }
@@ -199,7 +199,7 @@ public static class Services
         //services.AddSingleton<AccountManagerViewModel>();
         services.AddSingleton<LauncherViewModel>();
         services.AddSingleton<IClientUpdateService, ClientUpdateService>();
-        services.AddSingleton<IClientDirectoriesService, ClientDirectoriesService>();
+        services.AddSingleton<IClientFilesService, ClientFilesService>();
         services.AddSingleton<ClientUpdatesViewModel>();
         services.AddSingleton<GitHubAuthViewModel>();
         services.AddSingleton<ScriptRepoViewModel>();

@@ -1,5 +1,7 @@
 ﻿using System.Diagnostics;
 using Skua.Core.Interfaces;
+using Skua.Core.Models;
+
 namespace Skua.Core.Services;
 public class ProcessStartService : IProcessService
 {
@@ -10,7 +12,7 @@ public class ProcessStartService : IProcessService
     }
 
     private readonly string _vscPath = Path.Combine(AppContext.BaseDirectory, "VSCode", "code");
-    private readonly string _scriptsPath = Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.MyDocuments), "Skua", "Scripts");
+    private readonly string _scriptsPath = ClientFileSources.SkuaScriptsDIR;
     private readonly ISettingsService _settingsService;
     private readonly IDialogService _dialogService;
 

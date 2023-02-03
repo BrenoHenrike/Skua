@@ -110,7 +110,7 @@ namespace Skua.Manager.Properties {
         
         [global::System.Configuration.UserScopedSettingAttribute()]
         [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
-        [global::System.Configuration.DefaultSettingValueAttribute("1.1.4.1")]
+        [global::System.Configuration.DefaultSettingValueAttribute("1.1.5.0")]
         public string ApplicationVersion {
             get {
                 return ((string)(this["ApplicationVersion"]));
@@ -165,6 +165,42 @@ namespace Skua.Manager.Properties {
             }
             set {
                 this["AutoUpdateBotScripts"] = value;
+            }
+        }
+        
+        [global::System.Configuration.UserScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("True")]
+        public bool CheckBotScriptsUpdates {
+            get {
+                return ((bool)(this["CheckBotScriptsUpdates"]));
+            }
+            set {
+                this["CheckBotScriptsUpdates"] = value;
+            }
+        }
+        
+        [global::System.Configuration.UserScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("True")]
+        public bool CheckAdvanceSkillSetsUpdates {
+            get {
+                return ((bool)(this["CheckAdvanceSkillSetsUpdates"]));
+            }
+            set {
+                this["CheckAdvanceSkillSetsUpdates"] = value;
+            }
+        }
+        
+        [global::System.Configuration.UserScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("True")]
+        public bool AutoUpdateAdvanceSkillSetsUpdates {
+            get {
+                return ((bool)(this["AutoUpdateAdvanceSkillSetsUpdates"]));
+            }
+            set {
+                this["AutoUpdateAdvanceSkillSetsUpdates"] = value;
             }
         }
     }

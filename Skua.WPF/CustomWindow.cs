@@ -78,6 +78,10 @@ public partial class CustomWindow : Window
                 {
                     Close();
                     WindowChrome.SetWindowChrome(this, null);
+
+                    GC.Collect();
+                    GC.WaitForPendingFinalizers();
+                    GC.Collect();
                 };
             }
             else

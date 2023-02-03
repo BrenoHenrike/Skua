@@ -3,6 +3,7 @@ using CommunityToolkit.Mvvm.Messaging;
 using CommunityToolkit.Mvvm.Input;
 using Skua.Core.Interfaces;
 using Skua.Core.Messaging;
+using Skua.Core.Models;
 
 namespace Skua.Core.ViewModels;
 public partial class ScriptLoaderViewModel : BotControlViewModelBase
@@ -25,7 +26,7 @@ public partial class ScriptLoaderViewModel : BotControlViewModelBase
         StrongReferenceMessenger.Default.Register<ScriptLoaderViewModel, ScriptStoppedMessage, int>(this, (int)MessageChannels.ScriptStatus, ScriptStopped);
         StrongReferenceMessenger.Default.Register<ScriptLoaderViewModel, ScriptStoppingMessage, int>(this, (int)MessageChannels.ScriptStatus, ScriptStopping);
 
-        _scriptPath = Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.MyDocuments), "Skua", "Scripts");
+        _scriptPath = ClientFileSources.SkuaScriptsDIR;
         ScriptLogs = logs.ToArray()[1];
         ScriptManager = scriptManager;
         _windowService = windowService;

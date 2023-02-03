@@ -1,6 +1,7 @@
 ﻿using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.DependencyInjection;
 using Skua.Core.Interfaces;
+using Skua.Core.Models;
 using Skua.Core.Models.Skills;
 using Skua.Core.Utils;
 
@@ -20,8 +21,8 @@ public class AdvancedSkillContainer : ObservableRecipient, IAdvancedSkillContain
     
     public AdvancedSkillContainer()
     {
-        _defaultSkillsSetsPath = Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.MyDocuments), "Skua", "AdvancedSkills.txt");
-        _userSkillsSetsPath = Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.MyDocuments), "Skua", "UserAdvancedSkills.txt");
+        _defaultSkillsSetsPath = ClientFileSources.SkuaAdvancedSkillsFile;
+        _userSkillsSetsPath = Path.Combine(ClientFileSources.SkuaDIR, "UserAdvancedSkills.txt");
 
         var rootDefaultSkills = Path.Combine(AppContext.BaseDirectory, "AdvancedSkills.txt");
         if (File.Exists(rootDefaultSkills) && !File.Exists(_defaultSkillsSetsPath))

@@ -5,6 +5,7 @@ using Skua.Core.Models.GitHub;
 using Skua.Core.Interfaces;
 using Skua.Core.Messaging;
 using Skua.Core.Utils;
+using Skua.Core.Models;
 
 namespace Skua.Core.ViewModels.Manager;
 public partial class ClientUpdatesViewModel : BotControlViewModelBase
@@ -86,14 +87,21 @@ public partial class ClientUpdatesViewModel : BotControlViewModelBase
         try
         {
             await _updateService.GetReleasesAsync();
+            
             bool checkPrereleases = _settingsService.Get("CheckClientPrereleases", false);
             UpdateInfo? latest = _updateService.Releases.FirstOrDefault(r => checkPrereleases || !r.Prerelease);
             UpdateVisible = latest?.ParsedVersion.CompareTo(_appVersion) > 0;
+            
             if (UpdateVisible)
                 Latest = latest;
+
             Releases.Clear();
             foreach(var release in _updateService.Releases)
-                Releases.Add(new(release));
+            {
+                if (checkPrereleases || !release.Prerelease)
+                    Releases.Add(new(release));
+            }
+                
             Status = UpdateVisible ? "Update available" : "You have the latest version";
         }
         catch
@@ -134,7 +142,7 @@ public partial class ClientUpdatesViewModel : BotControlViewModelBase
     public async Task ResetScripts(CancellationToken token)
     {
         IsBusy = true;
-        var skuaPath = Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.MyDocuments), "Skua");
+        var skuaPath = ClientFileSources.SkuaScriptsDIR;
         if (Directory.Exists(skuaPath))
             Directory.Delete(skuaPath, true);
 

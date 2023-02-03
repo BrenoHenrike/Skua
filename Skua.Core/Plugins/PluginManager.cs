@@ -2,6 +2,7 @@
 using CommunityToolkit.Mvvm.Messaging;
 using Skua.Core.Interfaces;
 using Skua.Core.Messaging;
+using Skua.Core.Models;
 using Skua.Core.Utils;
 using System.Diagnostics;
 using System.Reflection;
@@ -17,8 +18,8 @@ public class PluginManager : IPluginManager
 
     public void Initialize()
     {
-        Directory.CreateDirectory(Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.MyDocuments), "Skua", "plugins", "options"));
-        Directory.GetFiles(Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.MyDocuments), "Skua", "plugins"))
+        Directory.CreateDirectory(Path.Combine(ClientFileSources.SkuaPluginsDIR, "options"));
+        Directory.GetFiles(ClientFileSources.SkuaPluginsDIR)
             .Where(f => f.EndsWith(".dll"))
             .ForEach(f =>
             {

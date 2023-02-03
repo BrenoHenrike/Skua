@@ -189,8 +189,8 @@ public partial class ScriptManager : ObservableObject, IScriptManager
         sw.Start();
 
         List<string> references = new();
-        if (_refCache.Count == 0 && Directory.Exists(Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.MyDocuments), "Skua", "plugins")))
-            _refCache.AddRange(Directory.GetFiles(Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.MyDocuments), "Skua", "plugins"), "*.dll").Select(x => Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.MyDocuments), "Skua", x)).Where(CanLoadAssembly));
+        if (_refCache.Count == 0 && Directory.Exists(ClientFileSources.SkuaPluginsDIR))
+            _refCache.AddRange(Directory.GetFiles(ClientFileSources.SkuaPluginsDIR, "*.dll").Select(x => Path.Combine(ClientFileSources.SkuaDIR, x)).Where(CanLoadAssembly));
         _refCache.ForEach(x => references.Add(x));
         string toRemove = "";
         List<string> sources = new() { source };
@@ -205,14 +205,14 @@ public partial class ScriptManager : ObservableObject, IScriptManager
                 switch (cmd)
                 {
                     case "ref":
-                        string local = Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.MyDocuments), "Skua", parts[1]);
+                        string local = Path.Combine(ClientFileSources.SkuaDIR, parts[1]);
                         if (File.Exists(local))
                             references.Add(local);
                         else if (File.Exists(parts[1]))
                             references.Add(parts[1]);
                         break;
                     case "include":
-                        string localSource = Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.MyDocuments), "Skua", parts[1]);
+                        string localSource = Path.Combine(ClientFileSources.SkuaDIR, parts[1]);
                         if (File.Exists(localSource))
                             sources.Add($"// Added from {localSource}\n{File.ReadAllText(localSource)}");
                         else if (File.Exists(parts[1]))
@@ -251,7 +251,7 @@ public partial class ScriptManager : ObservableObject, IScriptManager
         dynamic? assembly = compiler.CompileClass(final);
         sw.Stop();
         Trace.WriteLine($"Script compilation took {sw.ElapsedMilliseconds}ms.");
-        File.WriteAllText(Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.MyDocuments), "Skua", "Scripts", "z_CompiledScript.cs"), final);
+        File.WriteAllText(Path.Combine(ClientFileSources.SkuaScriptsDIR, "z_CompiledScript.cs"), final);
         if (compiler.Error)
             throw new ScriptCompileException(compiler.ErrorMessage, compiler.GeneratedClassCodeWithLineNumbers);
 
