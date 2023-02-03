@@ -89,7 +89,7 @@ public class QuestDataLoaderService : IQuestDataLoaderService
             }
             
             quests.AddRange(_quests.Cached);
-            await File.WriteAllTextAsync(fileName, JsonConvert.SerializeObject(quests.Distinct().OrderBy(q => q.ID), Formatting.Indented));
+            await File.WriteAllTextAsync(Path.Combine(ClientFileSources.SkuaDIR, fileName), JsonConvert.SerializeObject(quests.Distinct().OrderBy(q => q.ID), Formatting.Indented));
             progress?.Report($"Getting quests from file {fileName}");
             
             return _quests.Cached = await GetFromFileAsync(fileName);
