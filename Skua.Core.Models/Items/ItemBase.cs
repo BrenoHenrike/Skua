@@ -73,12 +73,12 @@ public class ItemBase
     /// <summary>
     /// The name of the source file of the item.
     /// </summary>
-    [JsonProperty("sFile")]
+    [JsonProperty("sLink")]
     public virtual string FileName { get; set; }
     /// <summary>
     /// The link to the source file of the item.
     /// </summary>
-    [JsonProperty("sLink")]
+    [JsonProperty("sFile")]
     public virtual string FileLink { get; set; }
     /// <summary>
     /// The meta value of the item. This is used to link buffs (xp boosts etc).
