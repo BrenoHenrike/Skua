@@ -74,32 +74,19 @@ public class ItemBase
     public override string ToString()
     {
         var tag = string.Empty;
-        var itemGroup = string.Empty;
 
         tag += Coins ? "AC " : string.Empty;
         tag += Upgrade ? "Member" : string.Empty;
 
-        switch (ItemGroup)
+        string itemGroup = (ItemGroup) switch
         {
-            case "co":
-                itemGroup = "(Armor)";
-                break;
-            case "ba":
-                itemGroup = "(Cape)";
-                break;
-            case "he":
-                itemGroup = "(Helm)";
-                break;
-            case "pe":
-                itemGroup = "(Pet)";
-                break;
-            case "Weapon":
-                itemGroup = "(Weapon)";
-                break;
-            default:
-                itemGroup = "(Item)";
-                break;
-        }
+            "co" => "(Armor)",
+            "ba" => "(Cape)",
+            "he" => "(Helm)",
+            "pe" => "(Pet)",
+            "Weapon" => "(Weapon)",
+            _ => "(Item)"
+        };
 
         return $"[{ID}]\t{itemGroup} {Name} x{Quantity} {tag}";
     }
