@@ -14,6 +14,7 @@ using Skua.Core.Utils;
 using Westwind.Scripting;
 using Skua.Core.AppStartup;
 using Skua.WPF;
+using System.Threading;
 
 namespace Skua.App.WPF;
 
@@ -41,13 +42,21 @@ public sealed partial class App : Application
         {
             switch(args[i])
             {
+                case "--usr":
+                    if (args[i + 2] != "--psw")
+                        break;
+                    if (args[i + 4] == "--sv")
+                        _server = args[i + 5];
+                    _bot.Servers.SetLoginInfo(args[++i], args[++i + 1]);
+                    _login = true;
+                    break;
                 case "--use-theme":
                     string theme = args[++i];
-                    if(!string.IsNullOrWhiteSpace(theme) && theme != "no-theme")
+                    if (!string.IsNullOrWhiteSpace(theme) && theme != "no-theme")
                         themes.SetCurrentTheme(ThemeItem.FromString(theme));
                     break;
                 case "--gh-token":
-                    if(string.IsNullOrEmpty(Settings.Default.UserGitHubToken))
+                    if (string.IsNullOrEmpty(Settings.Default.UserGitHubToken))
                         Settings.Default.UserGitHubToken = args[++i];
                     Settings.Default.Save();
                     break;
@@ -93,6 +102,8 @@ public sealed partial class App : Application
     }
 
     private readonly IScriptInterface _bot;
+    private bool _login = false;
+    private string _server = string.Empty;
     private void Application_Startup(object sender, StartupEventArgs e)
     {
         Task.Run(async () => await Ioc.Default.GetRequiredService<IScriptServers>().GetServers());
@@ -196,6 +207,22 @@ public sealed partial class App : Application
                 break;
             case "loaded":
                 _bot.Flash.FlashCall -= Flash_FlashCall;
+                
+                if (!_login)
+                    break;
+
+                Task.Factory.StartNew(async () =>
+                {
+                    await Task.Delay(2000);
+
+                    if (string.IsNullOrEmpty(_server))
+                    {
+                        _bot.Servers.Relogin("Twilly");
+                        return;
+                    }
+
+                    _bot.Servers.Relogin(_server);
+                });
                 break;
         }
     }

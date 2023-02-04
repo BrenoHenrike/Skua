@@ -203,5 +203,16 @@ namespace Skua.Manager.Properties {
                 this["AutoUpdateAdvanceSkillSetsUpdates"] = value;
             }
         }
+        
+        [global::System.Configuration.UserScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        public global::System.Collections.Specialized.StringCollection ManagedAccounts {
+            get {
+                return ((global::System.Collections.Specialized.StringCollection)(this["ManagedAccounts"]));
+            }
+            set {
+                this["ManagedAccounts"] = value;
+            }
+        }
     }
 }

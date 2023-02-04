@@ -13,7 +13,7 @@ internal class SkuaManager
     {
         List<TabItemViewModel> tabs = new()
         {
-            //new("Accounts", s.GetRequiredService<AccountManagerViewModel>()),
+            new("Accounts", s.GetRequiredService<AccountManagerViewModel>()),
             new("Launcher", s.GetRequiredService<LauncherViewModel>()),
             new("Updates", s.GetRequiredService<ClientUpdatesViewModel>()),
             new("Options", s.GetRequiredService<ManagerOptionsViewModel>()),
