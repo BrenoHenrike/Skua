@@ -1,4 +1,6 @@
-﻿using System.Windows.Controls;
+﻿using CommunityToolkit.Mvvm.DependencyInjection;
+using Skua.Core.ViewModels;
+using System.Windows.Controls;
 
 namespace Skua.WPF.Views;
 /// <summary>
@@ -9,5 +11,6 @@ public partial class AboutView : UserControl
     public AboutView()
     {
         InitializeComponent();
+        DataContext = Ioc.Default.GetRequiredService<AboutViewModel>();
     }
 }

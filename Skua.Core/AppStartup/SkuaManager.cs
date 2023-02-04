@@ -19,6 +19,7 @@ internal class SkuaManager
             new("Options", s.GetRequiredService<ManagerOptionsViewModel>()),
             new("Themes", s.GetRequiredService<ApplicationThemesViewModel>()),
             new("Goals", s.GetRequiredService<GoalsViewModel>()),
+            new("About", s.GetRequiredService<AboutViewModel>()),
         };
         return new(tabs, s.GetRequiredService<IDialogService>(), s.GetRequiredService<ISettingsService>());
     }
