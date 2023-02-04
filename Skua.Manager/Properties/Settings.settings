@@ -29,7 +29,7 @@
       <Value Profile="(Default)">False</Value>
     </Setting>
     <Setting Name="ApplicationVersion" Type="System.String" Scope="User">
-      <Value Profile="(Default)">1.1.5.0</Value>
+      <Value Profile="(Default)">1.2.0.0</Value>
     </Setting>
     <Setting Name="ClientDownloadPath" Type="System.String" Scope="User">
       <Value Profile="(Default)" />
@@ -51,6 +51,9 @@
     </Setting>
     <Setting Name="AutoUpdateAdvanceSkillSetsUpdates" Type="System.Boolean" Scope="User">
       <Value Profile="(Default)">True</Value>
+    </Setting>
+    <Setting Name="ManagedAccounts" Type="System.Collections.Specialized.StringCollection" Scope="User">
+      <Value Profile="(Default)" />
     </Setting>
   </Settings>
 </SettingsFile>

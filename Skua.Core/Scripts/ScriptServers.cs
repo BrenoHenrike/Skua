@@ -202,23 +202,37 @@ public partial class ScriptServers : ObservableRecipient, IScriptServers
     public async Task<bool> EnsureRelogin(CancellationToken token)
     {
         Server server;
-        int tries = 0;
         await GetServers(true);
+        if (Options.AutoReloginAny)
+            server = ServerList.Find(x => x.IP != LastIP)!;
+        else
+            server = CachedServers.FirstOrDefault(s => s.Name == Options.ReloginServer) ?? ServerList[0];
+        
+        return await EnsureLogin(server, token);
+    }
+
+    public async Task<bool> EnsureRelogin(string serverName, CancellationToken token)
+    {
+        Server? server = ServerList.Find(x => x.Name == serverName);
+        server ??= ServerList[0];
+
+        return await EnsureLogin(server, token);
+    }
+
+    private async Task<bool> EnsureLogin(Server server, CancellationToken token)
+    {
+        int tries = 0;
         try
         {
             while (!token.IsCancellationRequested && !Manager.ShouldExit && !Player.Playing && ++tries < Options.ReloginTries)
             {
                 Login();
-                
+
                 await Task.Delay(3000, token);
-                if (Options.AutoReloginAny)
-                    server = ServerList.Find(x => x.IP != LastIP)!;
-                else
-                    server = CachedServers.FirstOrDefault(s => s.Name == Options.ReloginServer) ?? ServerList[0];
-                
-                if(!Flash.Call<bool>("clickServer", server.Name))
+
+                if (!Flash.Call<bool>("clickServer", server.Name))
                     ConnectIP(server.IP, server.Port);
-                
+
                 using CancellationTokenSource waitLogin = new(Options.LoginTimeout);
                 try
                 {

@@ -3,8 +3,12 @@ using CommunityToolkit.Mvvm.Messaging;
 using CommunityToolkit.Mvvm.Input;
 using Skua.Core.Interfaces;
 using Skua.Core.Messaging;
+using Skua.Core.Models;
 using Skua.Core.Utils;
 using System.Diagnostics;
+using System.Collections.Specialized;
+using Newtonsoft.Json;
+using Skua.Core.Models.Servers;
 
 namespace Skua.Core.ViewModels.Manager;
 public sealed partial class AccountManagerViewModel : BotControlViewModelBase
@@ -12,26 +16,36 @@ public sealed partial class AccountManagerViewModel : BotControlViewModelBase
     public AccountManagerViewModel(ISettingsService settingsService, IDialogService dialogService)
         : base("Accounts")
     {
+        Messenger.Register<AccountManagerViewModel, RemoveAccountMessage>(this, (r, m) => r._RemoveAccount(m.Account));
         _settingsService = settingsService;
         _dialogService = dialogService;
+        Task.Run(() => _GetServers());
         Accounts = new();
-        // TODO client path
-        Clients = new();
-        Clients.Add(new ClientItemViewModel() { Name = "Follower", Path = "C:\\Repo\\Skua\\Skua.App.WPF.Follower\\bin\\Debug\\net6.0-windows\\Skua.App.WPF.Follower.exe" });
-        Clients.Add(new ClientItemViewModel() { Name = "Sync", Path = "C:\\Repo\\Skua\\Skua.App.WPF.Sync\\bin\\Debug\\net6.0-windows\\Skua.App.WPF.Sync.exe" });
+        _GetSavedAccounts();
+
+        // TODO different clients path
     }
+
+    private const string _separator = "{=}";
+    private readonly string[] _arrSeparator = { _separator };
 
     private readonly ISettingsService _settingsService;
     private readonly IDialogService _dialogService;
 
     public RangedObservableCollection<AccountItemViewModel> Accounts { get; }
-    public List<ClientItemViewModel> Clients { get; }
 
     [ObservableProperty]
     private string _usernameInput;
     [ObservableProperty]
     private string _displayNameInput;
+    [ObservableProperty]
+    private string _selectedServer;
+    [ObservableProperty]
+    private bool _useNameAsDisplay;
 
+    public List<string> ServersList => _cachedServers.Select(s => s.Name).ToList();
+
+    private List<Server> _cachedServers = new();
     public string PasswordInput { private get; set; }
 
     [RelayCommand]
@@ -47,31 +61,100 @@ public sealed partial class AccountManagerViewModel : BotControlViewModelBase
         {
             Username = UsernameInput,
             Password = PasswordInput,
-            DisplayName = string.IsNullOrEmpty(DisplayNameInput) ? $"{Accounts.Count + 1}" : DisplayNameInput
+            DisplayName = string.IsNullOrEmpty(DisplayNameInput) && !UseNameAsDisplay
+                ? $"{Accounts.Count + 1}"
+                : UseNameAsDisplay ? UsernameInput : DisplayNameInput
         });
 
         Messenger.Send<ClearPasswordBoxMessage>();
         UsernameInput = string.Empty;
         DisplayNameInput = string.Empty;
 
-        // TODO save accounts
+        _SaveAccounts();
     }
 
     [RelayCommand]
     public async Task StartAccounts()
     {
         // TODO show dialog to choose between clients
-        //_dialogService
-        // TODO manage ids
+        // TODO manage ids for sync in the future
+
+        foreach (var acc in Accounts.Where(a => a.UseCheck))
+            _LaunchAcc(acc.Username, acc.Password);
+    }
+
+    [RelayCommand]
+    public async Task StartAllAccounts()
+    {
+        foreach (var acc in Accounts)
+            _LaunchAcc(acc.Username, acc.Password);
+    }
+
+    [RelayCommand]
+    public async Task RemoveAccounts()
+    {
         foreach (var acc in Accounts.Where(a => a.UseCheck).ToList())
+            _RemoveAccount(acc);
+
+        _SaveAccounts();
+    }
+
+    private void _RemoveAccount(AccountItemViewModel account)
+    {
+        Accounts.Remove(account);
+
+        _SaveAccounts();
+    }
+
+    private void _SaveAccounts()
+    {
+        StringCollection accs = new();
+        foreach (var account in Accounts)
+            accs.Add($"{account.DisplayName}{_separator}{account.Username}{_separator}{account.Password}");
+
+        _settingsService.Set("ManagedAccounts", accs);
+    }
+
+    private void _LaunchAcc(string username, string password)
+    {
+        ProcessStartInfo psi = new(Path.Combine(AppContext.BaseDirectory, "Skua.exe"))
         {
-            ProcessStartInfo psi = new(Clients.Last().Path)
+            Arguments = $"--usr \"{username}\" --psw \"{password}\" --sv \"{_selectedServer}\"",
+            WorkingDirectory = AppContext.BaseDirectory
+        };
+        Process.Start(psi);
+    }
+
+    private void _GetSavedAccounts()
+    {
+        Accounts.Clear();
+        var accs = _settingsService.Get<StringCollection>("ManagedAccounts");
+        if (accs is null)
+            return;
+
+        foreach (var acc in accs)
+        {
+            if (acc is null)
+                continue;
+            string[] info = acc.Split(_arrSeparator, StringSplitOptions.None);
+            Accounts.Add(new AccountItemViewModel()
             {
-                Arguments = $"--usr \"{acc.Username}\" --psw \"{acc.Password}\" --id \"{acc.DisplayName}\"",
-                WorkingDirectory = Path.GetDirectoryName(Clients.Last().Path)
-            };
-            Process.Start(psi);
-            await Task.Delay(1000);
+                DisplayName = info[0],
+                Username = info[1],
+                Password = info[2]
+            });
         }
+    }
+
+    private async void _GetServers()
+    {
+        string? response = await HttpClients.GetGHClient()
+            .GetStringAsync($"http://content.aq.com/game/api/data/servers")
+            .ConfigureAwait(false);
+
+        if (response is null)
+            return;
+
+        _cachedServers = JsonConvert.DeserializeObject<List<Server>>(response)!;
     }
 }
