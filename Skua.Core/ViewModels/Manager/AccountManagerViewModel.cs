@@ -9,9 +9,10 @@ using System.Collections.Specialized;
 using Newtonsoft.Json;
 using Skua.Core.Models.Servers;
 using System.Collections.ObjectModel;
+using System.ComponentModel;
 
 namespace Skua.Core.ViewModels.Manager;
-public sealed partial class AccountManagerViewModel : BotControlViewModelBase
+public sealed partial class AccountManagerViewModel : BotControlViewModelBase, INotifyPropertyChanged
 {
     public AccountManagerViewModel(ISettingsService settingsService, IDialogService dialogService)
         : base("Accounts")
@@ -43,9 +44,6 @@ public sealed partial class AccountManagerViewModel : BotControlViewModelBase
     [ObservableProperty]
     private bool _useNameAsDisplay;
 
-    public ObservableCollection<string> ServersList => new(_cachedServers.Select(s => s.Name).ToList());
-
-    private List<Server> _cachedServers = new();
     public string PasswordInput { private get; set; }
 
     [RelayCommand]
@@ -146,6 +144,21 @@ public sealed partial class AccountManagerViewModel : BotControlViewModelBase
         }
     }
 
+    private List<Server> _cachedServers = new();
+    private ObservableCollection<string> _serverList;
+    public ObservableCollection<string> ServersList
+    {
+        get
+        {
+            return _serverList;
+        }
+        set
+        {
+            _serverList = value;
+            NotifyPropertyChanged("ServersList");
+        }
+    }
+
     private async Task _GetServers()
     {
         string? response = await HttpClients.GetGHClient()
@@ -155,5 +168,15 @@ public sealed partial class AccountManagerViewModel : BotControlViewModelBase
             return;
 
         _cachedServers = JsonConvert.DeserializeObject<List<Server>>(response)!;
+        _serverList = new ObservableCollection<string>(_cachedServers.Select(s => s.Name).ToList());
+    }
+
+    public event PropertyChangedEventHandler PropertyChanged;
+    public void NotifyPropertyChanged(string name)
+    {
+        if (PropertyChanged != null)
+        {
+            PropertyChanged(this, new PropertyChangedEventArgs(name));
+        }
     }
 }
