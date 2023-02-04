@@ -12,7 +12,7 @@ using System.Collections.ObjectModel;
 using System.ComponentModel;
 
 namespace Skua.Core.ViewModels.Manager;
-public sealed partial class AccountManagerViewModel : BotControlViewModelBase, INotifyPropertyChanged
+public sealed partial class AccountManagerViewModel : BotControlViewModelBase
 {
     public AccountManagerViewModel(ISettingsService settingsService, IDialogService dialogService)
         : base("Accounts")
@@ -20,6 +20,7 @@ public sealed partial class AccountManagerViewModel : BotControlViewModelBase, I
         Messenger.Register<AccountManagerViewModel, RemoveAccountMessage>(this, (r, m) => r._RemoveAccount(m.Account));
         _settingsService = settingsService;
         _dialogService = dialogService;
+        ServerList = new();
         Task.Run(async () => await _GetServers());
         Accounts = new();
         _GetSavedAccounts();
@@ -43,6 +44,10 @@ public sealed partial class AccountManagerViewModel : BotControlViewModelBase, I
     private string _selectedServer;
     [ObservableProperty]
     private bool _useNameAsDisplay;
+    private List<Server> _cachedServers = new();
+    [ObservableProperty]
+    private RangedObservableCollection<string> _serverList;
+
 
     public string PasswordInput { private get; set; }
 
@@ -64,9 +69,9 @@ public sealed partial class AccountManagerViewModel : BotControlViewModelBase, I
                 : UseNameAsDisplay ? UsernameInput : DisplayNameInput
         });
 
-        Messenger.Send<ClearPasswordBoxMessage>();
         UsernameInput = string.Empty;
         DisplayNameInput = string.Empty;
+        Messenger.Send<ClearPasswordBoxMessage>();
 
         _SaveAccounts();
     }
@@ -144,21 +149,6 @@ public sealed partial class AccountManagerViewModel : BotControlViewModelBase, I
         }
     }
 
-    private List<Server> _cachedServers = new();
-    private ObservableCollection<string> _serverList;
-    public ObservableCollection<string> ServersList
-    {
-        get
-        {
-            return _serverList;
-        }
-        set
-        {
-            _serverList = value;
-            NotifyPropertyChanged("ServersList");
-        }
-    }
-
     private async Task _GetServers()
     {
         string? response = await HttpClients.GetGHClient()
@@ -168,15 +158,6 @@ public sealed partial class AccountManagerViewModel : BotControlViewModelBase, I
             return;
 
         _cachedServers = JsonConvert.DeserializeObject<List<Server>>(response)!;
-        _serverList = new ObservableCollection<string>(_cachedServers.Select(s => s.Name).ToList());
-    }
-
-    public event PropertyChangedEventHandler PropertyChanged;
-    public void NotifyPropertyChanged(string name)
-    {
-        if (PropertyChanged != null)
-        {
-            PropertyChanged(this, new PropertyChangedEventArgs(name));
-        }
+        ServerList.AddRange(_cachedServers.Select(s => s.Name));
     }
 }

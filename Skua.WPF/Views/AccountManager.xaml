@@ -39,12 +39,12 @@
                         <TextBox
                             Margin="6"
                             materialDesign:HintAssist.Hint="Display Name"
-                            Text="{Binding DisplayNameInput}" />
+                            Text="{Binding DisplayNameInput, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" />
                     </DockPanel>
                     <TextBox
                         Margin="6,0"
                         materialDesign:HintAssist.Hint="Username"
-                        Text="{Binding UsernameInput}" />
+                        Text="{Binding UsernameInput, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" />
                     <PasswordBox
                         x:Name="PswBox"
                         Margin="6"
@@ -84,7 +84,7 @@
                     Grid.Column="0"
                     Margin="0,0,5,0"
                     materialDesign:HintAssist.Hint="Login Server"
-                    ItemsSource="{Binding ServersList, UpdateSourceTrigger=PropertyChanged}"
+                    ItemsSource="{Binding ServerList, UpdateSourceTrigger=PropertyChanged}"
                     SelectedItem="{Binding SelectedServer}"
                     Style="{StaticResource MaterialDesignFloatingHintComboBox}"
                     ToolTip="Which server to login when launching accounts" />
