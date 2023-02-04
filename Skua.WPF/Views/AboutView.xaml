@@ -20,8 +20,10 @@
             <RowDefinition Height="auto" />
         </Grid.RowDefinitions>
         <mdxam:MarkdownScrollViewer
+            x:Name="Markdownview"
             Foreground="White"
-            Margin="10,5"
+            Margin="20,20"
+            DataContextChanged="Markdownview_DataContextChanged"
             Markdown="{Binding MarkdownDoc, UpdateSourceTrigger=PropertyChanged}"/>
     </Grid>
 </UserControl>
