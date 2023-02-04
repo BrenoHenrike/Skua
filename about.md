@@ -1,7 +1,7 @@
-### About Skua
+## About Skua
 Skua is the successor to Rbot (originally made by "rodit"), now maintained and renamed by Breno_Henrike, with help from Delfina & Lord Exelot, and a handful of scripters. It is a Third Party Client Made by the people above. It also has many "features", and quirks, and overall will just make this Glorified flash game on steroids a piece of cake.
 
-### Do we store information?
+## Do we store information?
 The *only* things that get recorded are; auto-generated number(Not your actual UserID) to identify you, the amount of scripts ran(stopped & started), which script was run, and for how long. This can be completely opted out of when first running a script, or you can edit the text file ***“DataCollectionSettings”*** in your `SkuaFolder > Skua_Modules > DataCollectionSettings.txt`, Make it look below. This will send absolutely nothing 👍
 ```
 UserID: null
@@ -10,10 +10,10 @@ scriptNameConsent: false
 stopTimeConsent: false
 ```
 
-### What do we use this data for?
+## What do we use this data for?
 To keep track of what bots are run, how often, how long, and really just how popular some bots are.
 
-### Types of Scripts Skua has:
+## Types of Scripts Skua has:
 - **Story scripts** found in the `Story Folder`.
 - **Merge scripts** found in the `Other > MergeShops Folder`.
 - **Farming scripts** found in the `Farm Folder`. such as gold, exp, etc.
@@ -22,10 +22,10 @@ To keep track of what bots are run, how often, how long, and really just how pop
 - **Core & 0Files** aren't meant to be run, and 0files are basically "Do everything required for this script.."
 -  if you wanted to have a new farming script that they don't exist though please request them [here](https://forms.gle/casF8pCNsP2qMGZS6)
 
-### How to use:
+## How to use:
 To run *correctly*, you will need to download and install [Skua Dependencies](https://github.com/BrenoHenrike/Skua/releases/download/1.0.0.0/Skua.Dependencies.exe) (fetch the correct zip for your PC, most will want the x64 version.) install the Dependencies and open Skua. Manager. once it's opened, click the "GitHub AUthentication" button in the top right and go through the steps on the window that pops up. once that's finished, press the "launch Skua" button. once Skua is open, you will get the "skills loaded" popup (close that).
 
-### Skua Features:
+## Skua Features:
 - Automatically **Download & Update** scripts for you; no more hassle of finding them on the site as grim does.
 - Notify you if Updates are available and even pre-releases.
 - Have Scripts for 99% of the farms ingame; the only thing excluded atm is ultras; in the works but still very, very, early alpha.
@@ -61,6 +61,6 @@ To run *correctly*, you will need to download and install [Skua Dependencies](ht
     - ***How to use:***
         - Click mob to select what to attack/hunt or just start to kill everything available in that cell. On death, the respawn point is set to that cell and pad. Press the refresh icon to reload the list of your class and skill mode to select. Then click "use select", and then hit either button to start.
 
-#### For Questions & help join the discord & go to the [#skua-questions-help](https://discord.com/channels/1008293278162092073/1008293280087289983) channel.
+## For Questions & help join the discord & go to the [#skua-questions-help](https://discord.com/channels/1008293278162092073/1008293280087289983) channel.
 
-# [Skua Discord](https://discord.gg/pearlharbor) join the community and get help with Skua.
+## [Skua Discord](https://discord.gg/pearlharbor) join the community and get help with Skua.
