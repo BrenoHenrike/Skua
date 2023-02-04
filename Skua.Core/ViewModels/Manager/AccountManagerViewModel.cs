@@ -117,10 +117,10 @@ public sealed partial class AccountManagerViewModel : BotControlViewModelBase
 
     private void _LaunchAcc(string username, string password)
     {
-        ProcessStartInfo psi = new(Path.Combine(ClientFileSources.SkuaDIR, "Skua.exe"))
+        ProcessStartInfo psi = new(Path.Combine(AppContext.BaseDirectory, "Skua.exe"))
         {
             Arguments = $"--usr \"{username}\" --psw \"{password}\" --sv \"{_selectedServer}\"",
-            WorkingDirectory = ClientFileSources.SkuaDIR
+            WorkingDirectory = AppContext.BaseDirectory
         };
         Process.Start(psi);
     }
