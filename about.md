@@ -1,0 +1,2 @@
+### About Skua
+Skua is the successor to Rbot (originally made by "rodit"), now maintained and renamed by Breno_Henrike, with help from Delfina & Lord Exelot, and a handful of scripters. It is a Third Party Client Made by the people above. It also has many "features", and quirks, and overall will just make this Glorified flash game on steroids a piece of cake.
