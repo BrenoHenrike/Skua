@@ -1,6 +1,7 @@
 ﻿using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
 using CommunityToolkit.Mvvm.Messaging;
+using Skua.Core.Messaging;
 
 namespace Skua.Core.ViewModels;
 public partial class AccountItemViewModel : ObservableObject
@@ -17,6 +18,6 @@ public partial class AccountItemViewModel : ObservableObject
     [RelayCommand]
     private void Remove()
     {
-        // TODO remove account
+        WeakReferenceMessenger.Default.Send<RemoveAccountMessage>(new(this));
     }
 }
