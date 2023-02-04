@@ -22,25 +22,29 @@ public partial class ScriptRepoView : UserControl
 
     private bool Search(object obj)
     {
-        var searchScript = SearchBox.Text.ToLower();
-        if(string.IsNullOrWhiteSpace(searchScript))
+        var flag = false;
+        var searchScript = SearchBox.Text;
+        if (string.IsNullOrWhiteSpace(searchScript))
             return true;
 
         var script = (ScriptInfoViewModel)obj;
         if (script is null)
             return false;
 
-        var scriptName = script.Info.Name.ToLower();
+        var scriptName = script.Info.Name;
         if (KMPSearch(scriptName, searchScript))
-            return true;
+            flag = true;
 
         foreach (var tag in script.InfoTags)
         {
             if (KMPSearch(tag, searchScript))
-                return true;
+            {
+                flag = true;
+                break;
+            }
         }
 
-        return false;
+        return flag;
     }
 
     private async void TextBox_TextChanged(object sender, TextChangedEventArgs e)
