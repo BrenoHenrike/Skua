@@ -69,7 +69,7 @@ public class ClientUpdateService : IClientUpdateService
             {
                 string winDir = Environment.GetFolderPath(Environment.SpecialFolder.Windows);
                 ProcessStartInfo startInfo = new(Path.Combine(winDir, @"System32\msiexec.exe"),
-                    $"/i {filePath} /quiet /passive /qb+ /norestart ALLUSERS=1")
+                    $"/i {filePath} /quiet /passive /qb!- /norestart ALLUSERS=1")
                 {
                     Verb = "runas",
                     UseShellExecute = true
