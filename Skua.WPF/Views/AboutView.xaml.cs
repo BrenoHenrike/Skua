@@ -9,6 +9,7 @@ using System.Threading.Tasks;
 using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Documents;
+using System.Windows.Threading;
 
 namespace Skua.WPF.Views;
 /// <summary>
@@ -23,19 +24,14 @@ public partial class AboutView : UserControl
         Markdownview.MarkdownStyle = MarkdownStyle.SasabuneStandard;
     }
 
-    private async void Markdownview_DataContextChanged(object sender, DependencyPropertyChangedEventArgs e)
+    private async void Markdownview_LayoutUpdated(object sender, EventArgs e)
     {
         await Task.Run(async () =>
         {
             await Dispatcher.BeginInvoke(new Action(() =>
             {
-                while (!((AboutViewModel)DataContext).MarkdownDoc.Contains("About"))
-                {
-                    Trace.WriteLine("Null");
-                    Task.Delay(1500).Wait();
-                }
                 SubscribeToAllHyperlinks(Markdownview.Document);
-            }));
+            }), DispatcherPriority.Loaded);
         });
     }
 
