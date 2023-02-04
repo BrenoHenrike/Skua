@@ -51,22 +51,11 @@
                         materialDesign:HintAssist.Hint="Password"
                         PasswordChanged="PasswordBox_PasswordChanged"
                         Style="{StaticResource MaterialDesignFloatingHintPasswordBox}" />
-                    <Grid>
-                        <Grid.ColumnDefinitions>
-                            <ColumnDefinition />
-                            <ColumnDefinition />
-                        </Grid.ColumnDefinitions>
-                        <Button
-                            Grid.Column="0"
-                            Margin="6,0,6,6"
-                            Command="{Binding AddAccountCommand}"
-                            Content="Add" />
-                        <Button
-                            Grid.Column="1"
-                            Margin="0,0,6,6"
-                            Command="{Binding CancelAccountCommand}"
-                            Content="Cancel" />
-                    </Grid>
+                    <Button
+                        Grid.Column="0"
+                        Margin="6,0,6,6"
+                        Command="{Binding AddAccountCommand}"
+                        Content="Add" />
                 </StackPanel>
             </Expander>
 
