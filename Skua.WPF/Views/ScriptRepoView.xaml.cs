@@ -23,7 +23,7 @@ public partial class ScriptRepoView : UserControl
     private bool Search(object obj)
     {
         var flag = false;
-        var searchScript = SearchBox.Text;
+        var searchScript = SearchBox.Text.ToLower();
         if (string.IsNullOrWhiteSpace(searchScript))
             return true;
 
@@ -31,7 +31,7 @@ public partial class ScriptRepoView : UserControl
         if (script is null)
             return false;
 
-        var scriptName = script.Info.Name;
+        var scriptName = script.Info.Name.ToLower();
         if (KMPSearch(scriptName, searchScript))
             flag = true;
 
