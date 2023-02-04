@@ -22,6 +22,6 @@
         <mdxam:MarkdownScrollViewer
             Foreground="White"
             Margin="10,5"
-            Markdown="{Binding MarkdownDoc}"/>
+            Markdown="{Binding MarkdownDoc, UpdateSourceTrigger=PropertyChanged}"/>
     </Grid>
 </UserControl>

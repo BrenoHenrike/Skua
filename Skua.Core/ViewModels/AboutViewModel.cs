@@ -3,7 +3,7 @@
 namespace Skua.Core.ViewModels;
 public class AboutViewModel : BotControlViewModelBase
 {
-    private string _markDownContent;
+    private string _markDownContent = "Loading content...";
     
     public AboutViewModel() : base("About")
     {
@@ -19,18 +19,14 @@ public class AboutViewModel : BotControlViewModelBase
     {
         var response = await HttpClients.Default.GetAsync("https://raw.githubusercontent.com/BrenoHenrike/Skua/op-version/about.md");
         if (!response.IsSuccessStatusCode)
-            _markDownContent = "### No content found. Please check your internet connection.";
-        
-        _markDownContent = await response.Content.ReadAsStringAsync();
+            MarkdownDoc = "### No content found. Please check your internet connection.";
+
+        MarkdownDoc = await response.Content.ReadAsStringAsync();
     }
     
     public string MarkdownDoc
     {
-        get => _markDownContent;
-        set
-        {
-            _markDownContent = value;
-            OnPropertyChanged(nameof(MarkdownDoc));
-        }
+        get { return _markDownContent; }
+        set { SetProperty(ref _markDownContent, value); }
     }
 }
