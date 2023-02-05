@@ -70,36 +70,38 @@ public class ItemBase
     /// </summary>
     [JsonProperty("sES")]
     public virtual string ItemGroup { get; set; }
+    /// <summary>
+    /// The name of the source file of the item.
+    /// </summary>
+    [JsonProperty("sLink")]
+    public virtual string FileName { get; set; }
+    /// <summary>
+    /// The link to the source file of the item.
+    /// </summary>
+    [JsonProperty("sFile")]
+    public virtual string FileLink { get; set; }
+    /// <summary>
+    /// The meta value of the item. This is used to link buffs (xp boosts etc).
+    /// </summary>
+    [JsonProperty("sMeta")]
+    public virtual string Meta { get; set; }
 
     public override string ToString()
     {
         var tag = string.Empty;
-        var itemGroup = string.Empty;
 
         tag += Coins ? "AC " : string.Empty;
         tag += Upgrade ? "Member" : string.Empty;
 
-        switch (ItemGroup)
+        string itemGroup = (ItemGroup) switch
         {
-            case "co":
-                itemGroup = "(Armor)";
-                break;
-            case "ba":
-                itemGroup = "(Cape)";
-                break;
-            case "he":
-                itemGroup = "(Helm)";
-                break;
-            case "pe":
-                itemGroup = "(Pet)";
-                break;
-            case "Weapon":
-                itemGroup = "(Weapon)";
-                break;
-            default:
-                itemGroup = "(Item)";
-                break;
-        }
+            "co" => "(Armor)",
+            "ba" => "(Cape)",
+            "he" => "(Helm)",
+            "pe" => "(Pet)",
+            "Weapon" => "(Weapon)",
+            _ => "(Item)"
+        };
 
         return $"[{ID}]\t{itemGroup} {Name} x{Quantity} {tag}";
     }

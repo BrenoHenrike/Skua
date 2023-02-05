@@ -78,6 +78,31 @@
         <?endif?>
         <SetDirectory Id="TARGETDIR" Value="[$(var.ProgramFilesFolder)][ProductName]"/>
 
+    <Fragment>
+
+        <Directory Id="TARGETDIR" Name="SourceDir">
+            <!-- Start Menu -->
+            <!--<Directory Id="ProgramMenuFolder">
+                <Directory Id="InstallProgramMenuFolder" Name="!(loc.ProductNameFolder)" />
+            </Directory>-->
+
+            <Directory Id="INSTALLFOLDER" Name="!(loc.ProductNameFolder)" />
+
+            <!--<?if $(var.Platform)=x64 ?>
+            --><!-- Program Files (64bit) folder --><!--
+            <Directory Id="ProgramFiles64Folder">
+                <Directory Id="INSTALLFOLDER" Name="!(loc.ProductNameFolder)" />
+            </Directory>
+            <?else?>
+            --><!-- Program Files (32bit) folder --><!--
+            <Directory Id="ProgramFilesFolder">
+                <Directory Id="INSTALLFOLDER" Name="!(loc.ProductNameFolder)" />
+            </Directory>
+            <?endif?>-->
+
+        </Directory>
+        <SetDirectory Id="TARGETDIR" Value="[WindowsVolume][ProductName]\"/>
+
     </Fragment>
 
 </Wix>

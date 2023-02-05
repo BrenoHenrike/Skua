@@ -1,0 +1,74 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<Wix xmlns="http://schemas.microsoft.com/wix/2006/wi">
+    <Bundle
+        Name="Skua Dependencies"
+        Compressed="yes"
+        AboutUrl="https://www.github.com/BrenoHenrike/Skua"
+        HelpUrl="https://discord.io/AQWBots" Version="1.0.0.0"
+        Manufacturer="Skua"
+        UpgradeCode="6fa1b3f3-d317-458f-b1d1-32eef8ccf074">
+        <BootstrapperApplicationRef Id="WixStandardBootstrapperApplication.HyperlinkLicense">
+            <bal:WixStandardBootstrapperApplication
+              LicenseUrl=""
+              xmlns:bal="http://schemas.microsoft.com/wix/BalExtension" />
+        </BootstrapperApplicationRef>
+
+        <Chain>
+            <ExePackage
+                SourceFile="..\Installers\windowsdesktop-runtime-6.0.8-win-x64.exe"
+                DetectCondition="ExeDetectedVariable"
+                DownloadUrl="https://dotnet.microsoft.com/en-us/download/dotnet/thank-you/runtime-desktop-6.0.8-windows-x64-installer"
+                InstallCommand="/q /ACTION=Install"
+                RepairCommand="/q ACTION=Repair /hideconsole"
+                UninstallCommand="/q ACTION=Uninstall /hideconsole"
+                InstallCondition="VersionNT64 AND VersionNT >= v6.1" />
+            <ExePackage
+                SourceFile="..\Installers\aspnetcore-runtime-6.0.8-win-x64.exe"
+                DetectCondition="ExeDetectedVariable"
+                DownloadUrl="https://dotnet.microsoft.com/en-us/download/dotnet/thank-you/runtime-aspnetcore-6.0.8-windows-x64-installer"
+                InstallCommand="/q /ACTION=Install"
+                RepairCommand="/q ACTION=Repair /hideconsole"
+                UninstallCommand="/q ACTION=Uninstall /hideconsole"
+                InstallCondition="VersionNT64 AND VersionNT >= v6.1" />
+            <ExePackage
+                SourceFile="..\Installers\windowsdesktop-runtime-6.0.8-win-x86.exe"
+                DetectCondition="ExeDetectedVariable"
+                DownloadUrl="https://dotnet.microsoft.com/en-us/download/dotnet/thank-you/runtime-desktop-6.0.8-windows-x86-installer"
+                InstallCommand="/q /ACTION=Install"
+                RepairCommand="/q ACTION=Repair /hideconsole"
+                UninstallCommand="/q ACTION=Uninstall /hideconsole"
+                InstallCondition="NOT VersionNT64 AND VersionNT >= v6.1" />
+            <ExePackage
+                SourceFile="..\Installers\aspnetcore-runtime-6.0.8-win-x86.exe"
+                DetectCondition="ExeDetectedVariable"
+                DownloadUrl="https://dotnet.microsoft.com/en-us/download/dotnet/thank-you/runtime-aspnetcore-6.0.8-windows-x86-installer"
+                InstallCommand="/q /ACTION=Install"
+                RepairCommand="/q ACTION=Repair /hideconsole"
+                UninstallCommand="/q ACTION=Uninstall /hideconsole"
+                InstallCondition="NOT VersionNT64 AND VersionNT >= v6.1" />
+            <ExePackage
+                SourceFile="..\Installers\cleanflash3400267installer1.exe"
+                DetectCondition="ExeDetectedVariable"
+                DownloadUrl="https://bluepload.unstable.life/cleanflash3400267installer1.exe"
+                InstallCommand="/q /ACTION=Install"
+                RepairCommand="/q ACTION=Repair /hideconsole"
+                UninstallCommand="/q ACTION=Uninstall /hideconsole" />
+            <ExePackage
+                Vital="no"
+                SourceFile="..\Installers\jre-8u341-windows-x64.exe"
+                DetectCondition="ExeDetectedVariable" 
+                DownloadUrl="https://javadl.oracle.com/webapps/download/AutoDL?BundleId=246806_424b9da4b48848379167015dcc250d8d"
+                InstallCommand="/s"
+                UninstallCommand="/s /uninstall"
+                InstallCondition="VersionNT64 AND VersionNT >= v6.1" />
+            <ExePackage
+                Vital="no"
+                SourceFile="..\Installers\jre-8u341-windows-x86.exe"
+                DetectCondition="ExeDetectedVariable"
+                DownloadUrl="https://javadl.oracle.com/webapps/download/AutoDL?BundleId=246808_424b9da4b48848379167015dcc250d8d"
+                InstallCommand="/s"
+                UninstallCommand="/s /uninstall"
+                InstallCondition="NOT VersionNT64 AND VersionNT >= v6.1" />
+        </Chain>
+    </Bundle>
+</Wix>
