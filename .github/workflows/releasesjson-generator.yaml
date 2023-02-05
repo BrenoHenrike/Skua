@@ -5,6 +5,7 @@ on:
     branches:
       - master
       - dev
+      - 'op-version'
   pull_request:
       types: [closed]
   release:
