@@ -70,13 +70,11 @@ To run *correctly*, you will need to download and install [Skua Dependencies](ht
 #### [Skua Discord](https://discord.gg/pearlharbor) join the community and get help with Skua.
 
 ## Sponsorship & Donation ❤️
-For us to make the Skua better, skua developers need your support. You can support us by donating or sponsoring us and by clicking the buttons below.
+For us to make the Skua better, skua developers need your support. You can support us by donating or sponsoring us and by clicking the PayPal link below.
 
-**Breno Henrike**
-[![Donate](https://img.shields.io/badge/Donate-PayPal-green.svg)](https://www.paypal.com/donate?hosted_button_id=QVQ4Q7XSH9VBY).
-
-**Yor Delfina**
-[![Donate](https://img.shields.io/badge/Donate-PayPal-green.svg)](https://www.paypal.com/donate/?hosted_button_id=DMZFDRYJ5BT96)
+**Skua Developers**
+- [Breno Henrike PayPal](https://www.paypal.com/donate?hosted_button_id=QVQ4Q7XSH9VBY).
+- [Yor Delfina PayPal](https://www.paypal.com/donate/?hosted_button_id=DMZFDRYJ5BT96)
 
 ## Casts:
 - **Breno Henrike** the artist of Skua.
