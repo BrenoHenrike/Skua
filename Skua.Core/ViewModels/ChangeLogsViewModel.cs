@@ -5,7 +5,7 @@ public class ChangeLogsViewModel : BotControlViewModelBase
 {
     private string _markDownContent = "Loading content...";
     
-    public ChangeLogsViewModel() : base("Change Logs")
+    public ChangeLogsViewModel() : base("Change Logs", 460, 500)
     {
         _markDownContent = string.Empty;
         Task.Run(async () => await GetChangeLogsContent());
