@@ -69,9 +69,9 @@ To run *correctly*, you will need to download and install [Skua Dependencies](ht
 
 ### [Skua Discord](https://discord.gg/pearlharbor) join the community and get help with Skua.
 
-## Sponsorship & Donation ❤️
+# Sponsorship & Donation ❤️
 For us to make the Skua better, skua developers need your support. You can support us by donating or sponsoring us and by clicking the PayPal link below. Thank you for your support.
-#### Skua Developers
+### Skua Developers
 - [Breno Henrike PayPal](https://www.paypal.com/donate?hosted_button_id=QVQ4Q7XSH9VBY).
 - [Yor Delfina PayPal](https://www.paypal.com/donate/?hosted_button_id=DMZFDRYJ5BT96)
 
