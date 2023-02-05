@@ -10,8 +10,8 @@
     xmlns:vms="clr-namespace:Skua.Core.ViewModels;assembly=Skua.Core"
     xmlns:wpf="clr-namespace:Skua.WPF"
     d:DataContext="{d:DesignInstance vms:ScriptRepoViewModel}"
-    d:DesignHeight="450"
-    d:DesignWidth="800"
+    d:DesignHeight="600"
+    d:DesignWidth="850"
     mc:Ignorable="d">
     <Grid Margin="6">
         <DockPanel>
@@ -37,8 +37,9 @@
                 <TextBox
                     x:Name="SearchBox"
                     Margin="3,0"
-                    materialDesign:HintAssist.Hint="Search"
+                    materialDesign:HintAssist.Hint="Search:"
                     MaxLines="1"
+                    UseLayoutRounding="True"
                     TextChanged="TextBox_TextChanged" />
             </DockPanel>
             <Border
@@ -61,9 +62,20 @@
                         Grid.Column="0"
                         Margin="6,4,2,4"
                         VerticalAlignment="Center"
-                        Text="Downloaded:" />
+                        Text="Bot Scripts: " />
                     <TextBlock
                         Grid.Column="1"
+                        Margin="2"
+                        VerticalAlignment="Center">
+                        <Run Text="{Binding BotScriptQuantity, Mode=OneWay, UpdateSourceTrigger=PropertyChanged, FallbackValue=000}" />
+                    </TextBlock>
+                    <TextBlock
+                        Grid.Column="2"
+                        Margin="6,4,2,4"
+                        VerticalAlignment="Center"
+                        Text="Downloaded Script Files:" />
+                    <TextBlock
+                        Grid.Column="3"
                         Margin="2"
                         VerticalAlignment="Center">
                         <Run Text="{Binding DownloadedQuantity, Mode=OneWay, UpdateSourceTrigger=PropertyChanged, FallbackValue=000}" />
@@ -71,12 +83,12 @@
                         <Run Text="{Binding ScriptQuantity, Mode=OneWay, UpdateSourceTrigger=PropertyChanged, FallbackValue=000}" />
                     </TextBlock>
                     <TextBlock
-                        Grid.Column="2"
+                        Grid.Column="4"
                         Margin="6,4,2,4"
                         VerticalAlignment="Center"
                         Text="Outdated:" />
                     <TextBlock
-                        Grid.Column="3"
+                        Grid.Column="5"
                         Margin="2"
                         VerticalAlignment="Center"
                         Text="{Binding OutdatedQuantity, UpdateSourceTrigger=PropertyChanged, Mode=OneWay, FallbackValue=0}" />
@@ -104,41 +116,95 @@
                             Header="Delete"
                             IsEnabled="{Binding SelectedItem.Downloaded, FallbackValue=False}" />
                         <MenuItem
-                            Command="{Binding LoadScriptCommand}"
-                            Header="Load"
-                            IsEnabled="{Binding SelectedItem.Downloaded, FallbackValue=False}" />
-                        <MenuItem
-                            Command="{Binding StartScriptCommand}"
-                            Header="Start"
-                            IsEnabled="{Binding SelectedItem.Downloaded, FallbackValue=False}" />
-                        <MenuItem
                             Command="{Binding OpenScriptCommand}"
-                            Header="Open"
-                            IsEnabled="{Binding SelectedItem.Downloaded, FallbackValue=False}" />
-                        <MenuItem
-                            Command="{Binding OpenScriptFolderCommand}"
-                            Header="Open VSCode"
+                            Header="Open in VSCode"
                             IsEnabled="{Binding SelectedItem.Downloaded, FallbackValue=False}" />
                     </ContextMenu>
                 </DataGrid.ContextMenu>
-                <b:Interaction.Triggers>
-                    <b:EventTrigger EventName="MouseDoubleClick">
-                        <b:InvokeCommandAction Command="{Binding LoadScriptCommand}" />
-                    </b:EventTrigger>
-                </b:Interaction.Triggers>
+                <DataGrid.Resources>
+                    <DataTemplate x:Key="ScriptFileInfoTemplate">
+                        <StackPanel Orientation="Vertical">
+                            <DockPanel>
+                                <TextBlock Text="Name:" 
+                                    Foreground="#919191"
+                                    Margin="30,0,5,0" />
+                                <TextBlock Text="{Binding Info.Name}" 
+                                    Foreground="#97d2de"
+                                    FontWeight="DemiBold"/>
+                            </DockPanel>
+                            <DockPanel>
+                                <TextBlock Text="Description:"
+                                     Foreground="#919191"
+                                     Margin="0,0,5,0" />
+                                <TextBlock
+                                    TextWrapping="Wrap" 
+                                    Text="{Binding Info.Description}" 
+                                     Margin="0,0,0,5"/>
+                            </DockPanel>
+                            <DockPanel>
+                                <TextBlock Text="Tags:"
+                                    Foreground="#919191"
+                                    Margin="40,0,5,0" />
+                                <ItemsControl ItemsSource="{Binding InfoTags}">
+                                    <ItemsControl.ItemsPanel>
+                                        <ItemsPanelTemplate>
+                                            <WrapPanel />
+                                        </ItemsPanelTemplate>
+                                    </ItemsControl.ItemsPanel>
+                                    <ItemsControl.ItemTemplate>
+                                        <DataTemplate>
+                                            <Border
+                                                BorderBrush="#97d2de"
+                                                BorderThickness="1"
+                                                CornerRadius="5" 
+                                                Padding="5,0,5,2"
+                                                Margin="0,1,5,5">
+                                                <TextBlock
+                                                    Foreground="#97d2de"
+                                                    Text="{Binding}" />
+                                            </Border>
+                                        </DataTemplate>
+                                    </ItemsControl.ItemTemplate>
+                                </ItemsControl>
+                            </DockPanel>
+                            <DockPanel>
+                                <TextBlock Text="ScriptPath:"
+                                     Foreground="#919191"
+                                     Margin="9,0,5,5" />
+                                <TextBlock
+                                    TextWrapping="Wrap" 
+                                    Foreground="#a8a8a8"
+                                    Text="{Binding ScriptPath}" />
+                            </DockPanel>
+                        </StackPanel>
+                    </DataTemplate>
+                    <DataTemplate x:Key="ScriptFileActionTemplate">
+                        <DockPanel>
+                            <Button Content="Start"
+                                Width="70"
+                                Command="{Binding StartScriptCommand}"
+                                CommandParameter="{Binding}"
+                                IsEnabled="{Binding Downloaded, FallbackValue=False}" />
+                            <Button Content="Load"
+                                Width="70"
+                                Command="{Binding LoadScriptCommand}" 
+                                CommandParameter="{Binding}"
+                                IsEnabled="{Binding Downloaded, FallbackValue=False}" />
+                        </DockPanel>
+                    </DataTemplate>
+                    <Style x:Key="CenterGridHeaderStyle" TargetType="DataGridColumnHeader">
+                        <Setter Property="HorizontalContentAlignment" Value="Center"/>
+                        <Setter Property="Background" Value="Transparent"/>
+                    </Style>
+                </DataGrid.Resources>
                 <DataGrid.Columns>
-                    <DataGridTextColumn
-                        Width="2*"
-                        Binding="{Binding FileName}"
-                        Header="Name" />
-                    <DataGridTextColumn
-                        Width="3*"
-                        Binding="{Binding FilePath, Mode=OneTime}"
-                        Header="Folder Path" />
-                    <DataGridTextColumn
-                        Width="70"
-                        Binding="{Binding Size}"
-                        Header="Size" />
+                    <DataGridTemplateColumn CellTemplate="{StaticResource ScriptFileInfoTemplate}" 
+                         Header="Script"
+                         Width="600*"/>
+                    <DataGridTemplateColumn CellTemplate="{StaticResource ScriptFileActionTemplate}" 
+                         Header="Action"
+                         HeaderStyle="{StaticResource CenterGridHeaderStyle}"
+                         Width="180"/>
                 </DataGrid.Columns>
                 <DataGrid.RowStyle>
                     <Style BasedOn="{StaticResource MaterialDesignDataGridRow}" TargetType="DataGridRow">
@@ -146,7 +212,7 @@
                             <DataTrigger Binding="{Binding Downloaded, UpdateSourceTrigger=PropertyChanged}" Value="True">
                                 <Setter Property="Background">
                                     <Setter.Value>
-                                        <SolidColorBrush Opacity="0.2" Color="Green" />
+                                        <SolidColorBrush Opacity="0.2" Color="#456796" />
                                     </Setter.Value>
                                 </Setter>
                             </DataTrigger>

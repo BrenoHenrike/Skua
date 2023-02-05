@@ -14,9 +14,7 @@ using Skua.Core.Utils;
 using Westwind.Scripting;
 using Skua.Core.AppStartup;
 using Skua.WPF;
-using Skua.Core.Skills;
-using Skua.Core.Messaging;
-using Skua.Core.ViewModels.Manager;
+using System.Threading;
 
 namespace Skua.App.WPF;
 
@@ -30,27 +28,35 @@ public sealed partial class App : Application
         InitializeComponent();
 
         Services = ConfigureServices();
+        Services.GetRequiredService<IClientFilesService>().CreateDirectories();
+        Services.GetRequiredService<IClientFilesService>().CreateFiles();
 
         _bot = Services.GetRequiredService<IScriptInterface>();
         _bot.Flash.FlashCall += Flash_FlashCall;
-
         _ = Services.GetRequiredService<ILogService>();
+        
         var themes = Services.GetRequiredService<IThemeService>();
         var settings = Services.GetRequiredService<ISettingsService>();
-
         var args = Environment.GetCommandLineArgs();
-
         for(int i = 0; i < args.Length; i++)
         {
             switch(args[i])
             {
+                case "--usr":
+                    if (args[i + 2] != "--psw")
+                        break;
+                    if (args[i + 4] == "--sv")
+                        _server = args[i + 5];
+                    _bot.Servers.SetLoginInfo(args[++i], args[++i + 1]);
+                    _login = true;
+                    break;
                 case "--use-theme":
                     string theme = args[++i];
-                    if(!string.IsNullOrWhiteSpace(theme) && theme != "no-theme")
+                    if (!string.IsNullOrWhiteSpace(theme) && theme != "no-theme")
                         themes.SetCurrentTheme(ThemeItem.FromString(theme));
                     break;
                 case "--gh-token":
-                    if(string.IsNullOrEmpty(Settings.Default.UserGitHubToken))
+                    if (string.IsNullOrEmpty(Settings.Default.UserGitHubToken))
                         Settings.Default.UserGitHubToken = args[++i];
                     Settings.Default.Save();
                     break;
@@ -70,9 +76,9 @@ public sealed partial class App : Application
         }
 
         RoslynLifetimeManager.WarmupRoslyn();
-
-        Application.Current.Exit += App_Exit;
         Timeline.DesiredFrameRateProperty.OverrideMetadata(typeof(Timeline), new FrameworkPropertyMetadata { DefaultValue = Services.GetRequiredService<ISettingsService>().Get<int>("AnimationFrameRate") });
+        
+        Application.Current.Exit += App_Exit;
     }
 
     private async void App_Exit(object? sender, EventArgs e)
@@ -96,16 +102,18 @@ public sealed partial class App : Application
     }
 
     private readonly IScriptInterface _bot;
+    private bool _login = false;
+    private string _server = string.Empty;
     private void Application_Startup(object sender, StartupEventArgs e)
     {
         Task.Run(async () => await Ioc.Default.GetRequiredService<IScriptServers>().GetServers());
 
+        if (!Directory.Exists(Path.Combine(AppContext.BaseDirectory, "VSCode")))
+            Settings.Default.UseLocalVSC = false;
+
         MainWindow main = new();
         main.WindowStartupLocation = WindowStartupLocation.CenterScreen;
         Application.Current.MainWindow = main;
-
-        if (!Directory.Exists(Path.Combine(AppContext.BaseDirectory, "VSCode")))
-            Settings.Default.UseLocalVSC = false;
 
         IDialogService dialogService = Services.GetRequiredService<IDialogService>();
         string? token = Settings.Default.UserGitHubToken;
@@ -120,7 +128,7 @@ public sealed partial class App : Application
             Task.Factory.StartNew(async () =>
             {
                 await getScripts.GetScriptsAsync(null, default);
-                if ((getScripts.Missing > 0 || getScripts.Outdated > 0) 
+                if ((getScripts.Missing > 0 || getScripts.Outdated > 0)
                     && (Settings.Default.AutoUpdateBotScripts || Ioc.Default.GetRequiredService<IDialogService>().ShowMessageBox("Would you like to update your scripts?", "Script Update", true) == true))
                 {
                     int count = await getScripts.DownloadAllWhereAsync(s => !s.Downloaded || s.Outdated);
@@ -128,7 +136,7 @@ public sealed partial class App : Application
                 }
             });
         }
-        
+
         if (Settings.Default.CheckAdvanceSkillSetsUpdates)
         {
             var skillsFileSize = getScripts.GetSkillsSetsTextFileSize();
@@ -137,14 +145,14 @@ public sealed partial class App : Application
             {
                 if ((skillsFileSize < await getScripts.CheckAdvanceSkillSetsUpdates())
                     && (Settings.Default.AutoUpdateAdvanceSkillSetsUpdates || Ioc.Default.GetRequiredService<IDialogService>().ShowMessageBox("Would you like to update your AdvanceSkill Sets?", "AdvanceSkill Sets Update", true) == true))
-                {
-                    if(await getScripts.UpdateSkillSetsFile())
+                {                
+                    if (await getScripts.UpdateSkillSetsFile())
                     {
                         if (Settings.Default.AutoUpdateAdvanceSkillSetsUpdates)
                             Ioc.Default.GetRequiredService<IDialogService>().ShowMessageBox($"AdvanceSkill Sets has been updated.\r\nYou can disable auto AdvanceSkill Sets updates in Options > Application.", "AdvanceSkill Sets Update");
                         else
                             Ioc.Default.GetRequiredService<IDialogService>().ShowMessageBox($"AdvanceSkill Sets has been updated.\r\nYou can enable auto AdvanceSkill Sets updates in Options > Application.", "AdvanceSkill Sets Update");
-                        
+
                         advanceSkillSets.SyncSkills();
                     }
                     else
@@ -154,8 +162,7 @@ public sealed partial class App : Application
                 }
             });
         }
-        
-       
+
         Services.GetRequiredService<IPluginManager>().Initialize();
     }
 
@@ -200,6 +207,22 @@ public sealed partial class App : Application
                 break;
             case "loaded":
                 _bot.Flash.FlashCall -= Flash_FlashCall;
+                
+                if (!_login)
+                    break;
+
+                Task.Factory.StartNew(async () =>
+                {
+                    await Task.Delay(2000);
+
+                    if (string.IsNullOrEmpty(_server))
+                    {
+                        _bot.Servers.Relogin("Twilly");
+                        return;
+                    }
+
+                    _bot.Servers.Relogin(_server);
+                });
                 break;
         }
     }

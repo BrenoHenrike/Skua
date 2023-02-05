@@ -29,41 +29,38 @@
                     <Style BasedOn="{StaticResource MaterialDesignFloatingHintTextBox}" TargetType="TextBox" />
                 </Expander.Resources>
                 <StackPanel>
-                    <TextBox
-                        Margin="6"
-                        materialDesign:HintAssist.Hint="Display Name"
-                        Text="{Binding DisplayNameInput}" />
+                    <DockPanel>
+                        <CheckBox
+                            Margin="6,0"
+                            materialDesign:CheckBoxAssist.CheckBoxSize="25"
+                            Content="Username as Display"
+                            DockPanel.Dock="Right"
+                            IsChecked="{Binding UseNameAsDisplay}" />
+                        <TextBox
+                            Margin="6"
+                            materialDesign:HintAssist.Hint="Display Name"
+                            Text="{Binding DisplayNameInput, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" />
+                    </DockPanel>
                     <TextBox
                         Margin="6,0"
                         materialDesign:HintAssist.Hint="Username"
-                        Text="{Binding UsernameInput}" />
+                        Text="{Binding UsernameInput, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" />
                     <PasswordBox
                         x:Name="PswBox"
                         Margin="6"
                         materialDesign:HintAssist.Hint="Password"
                         PasswordChanged="PasswordBox_PasswordChanged"
                         Style="{StaticResource MaterialDesignFloatingHintPasswordBox}" />
-                    <Grid>
-                        <Grid.ColumnDefinitions>
-                            <ColumnDefinition />
-                            <ColumnDefinition />
-                        </Grid.ColumnDefinitions>
-                        <Button
-                            Grid.Column="0"
-                            Margin="6,0,6,6"
-                            Command="{Binding AddAccountCommand}"
-                            Content="Add" />
-                        <Button
-                            Grid.Column="1"
-                            Margin="0,0,6,6"
-                            Command="{Binding CancelAccountCommand}"
-                            Content="Cancel" />
-                    </Grid>
+                    <Button
+                        Grid.Column="0"
+                        Margin="6,0,6,6"
+                        Command="{Binding AddAccountCommand}"
+                        Content="Add" />
                 </StackPanel>
             </Expander>
 
             <ScrollViewer
-                MaxHeight="500"
+                MaxHeight="220"
                 Margin="0,6"
                 materialDesign:ScrollViewerAssist.IsAutoHideEnabled="True">
                 <ItemsControl
@@ -81,36 +78,34 @@
                 <Grid.ColumnDefinitions>
                     <ColumnDefinition />
                     <ColumnDefinition />
+                    <ColumnDefinition />
                 </Grid.ColumnDefinitions>
-                <Button
+                <ComboBox
                     Grid.Column="0"
                     Margin="0,0,5,0"
-                    Command="{Binding StartAccountsCommand}"
-                    Content="Start" />
+                    materialDesign:HintAssist.Hint="Login Server"
+                    ItemsSource="{Binding ServerList, UpdateSourceTrigger=PropertyChanged}"
+                    SelectedItem="{Binding SelectedServer}"
+                    Style="{StaticResource MaterialDesignFloatingHintComboBox}"
+                    ToolTip="Which server to login when launching accounts" />
                 <Button
                     Grid.Column="1"
+                    Margin="5,0,5,0"
+                    Command="{Binding StartAccountsCommand}"
+                    Content="Start Selected"
+                    ToolTip="Launch and login all the accounts with the checkbox marked" />
+                <Button
+                    Grid.Column="2"
                     Margin="5,0,0,0"
                     Command="{Binding RemoveAccountsCommand}"
-                    Content="Remove" />
+                    Content="Remove Selected"
+                    ToolTip="Removes all accounts with the checkbox marked." />
             </Grid>
             <Button
                 Margin="0,5,0,0"
                 Command="{Binding StartAllAccountsCommand}"
-                Content="Start All" />
+                Content="Start All"
+                ToolTip="Launchs all saved accounts" />
         </StackPanel>
-        <Expander
-            Grid.Row="1"
-            Margin="6"
-            Header="Special">
-            <StackPanel Margin="6">
-                <TextBox materialDesign:HintAssist.Hint="Maximum Concurrent Clients" Text="{Binding MaximumClients}">
-                    <b:Interaction.Behaviors>
-                        <wpf:TextBoxOnlyNumbersBehavior />
-                    </b:Interaction.Behaviors>
-                </TextBox>
-                <Button Margin="0,6" Content="Dailies" />
-                <Button Content="Wheel of Doom" />
-            </StackPanel>
-        </Expander>
     </Grid>
 </UserControl>

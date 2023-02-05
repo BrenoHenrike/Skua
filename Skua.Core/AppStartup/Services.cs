@@ -91,6 +91,7 @@ public static class Services
         services.AddSingleton<ILogService, LogService>();
         services.AddSingleton<IQuestDataLoaderService, QuestDataLoaderService>();
         services.AddSingleton<IGrabberService, GrabberService>();
+        services.AddSingleton<IClientFilesService, ClientFilesService>();
 
         return services;
     }
@@ -195,13 +196,15 @@ public static class Services
     public static IServiceCollection AddSkuaManagerViewModels(this IServiceCollection services)
     {
         services.AddThemeViewModels();
-        //services.AddSingleton<AccountManagerViewModel>();
+        services.AddSingleton<AccountManagerViewModel>();
         services.AddSingleton<LauncherViewModel>();
         services.AddSingleton<IClientUpdateService, ClientUpdateService>();
+        services.AddSingleton<IClientFilesService, ClientFilesService>();
         services.AddSingleton<ClientUpdatesViewModel>();
         services.AddSingleton<GitHubAuthViewModel>();
         services.AddSingleton<ScriptRepoViewModel>();
         services.AddSingleton<GoalsViewModel>();
+        services.AddSingleton<AboutViewModel>();
         services.AddSingleton(SkuaManager.CreateViewModel);
         services.AddSingleton(SkuaManager.CreateOptionsViewModel);
 

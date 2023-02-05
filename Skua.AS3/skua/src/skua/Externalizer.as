@@ -39,6 +39,7 @@ package skua
 			this.addCallback("rejectExcept", Main.rejectExcept);
 			
 			this.addCallback("walkTo", Main.walkTo);
+			this.addCallback("jumpCorrectRoom", Main.jumpCorrectRoom);
 			
 			this.addCallback("availableMonsters", Main.availableMonstersInCell);
 			this.addCallback("attackMonsterName", Main.attackMonsterByName);

@@ -4,6 +4,8 @@ using Skua.Core.Interfaces;
 using Skua.Core.Messaging;
 using Skua.Core.Models.Skills;
 using Skua.Core.Skills;
+using System;
+using System.Diagnostics;
 
 namespace Skua.Core.Scripts;
 
@@ -52,7 +54,7 @@ public partial class ScriptSkill : IScriptSkill
     private bool _canUseSkill(int index) => false;
 
     [MethodCallBinding("useSkill")]
-    private void _useSkill(int index) { }
+    private bool _useSkill(int index) => false;
 
     public ISkillProvider? OverrideProvider { get; set; } = null;
     public ISkillProvider BaseProvider { get; private set; }
@@ -70,8 +72,10 @@ public partial class ScriptSkill : IScriptSkill
             _provider = BaseProvider;
         }
         _provider = OverrideProvider ?? BaseProvider;
+        
         if (TimerRunning)
             return;
+        
         _skillThread = new(async () =>
         {
             _skillsCTS = new();
@@ -87,6 +91,7 @@ public partial class ScriptSkill : IScriptSkill
                 TimerRunning = false;
             }
         });
+        
         _skillThread.Name = "Skill Timer";
         _skillThread.Start();
         TimerRunning = true;
@@ -147,11 +152,17 @@ public partial class ScriptSkill : IScriptSkill
         OverrideProvider.Load(skills);
     }
 
+    private int _lastRank = -1;
+    private SkillInfo[] _playerSkills = null!;
+
     private async Task _Timer(CancellationToken token)
     {
+        // get current player skills
         SkillInfo[]? playerSkills = Player.Skills;
+        // if the player has skills assign to _playerSkills to be used later
         if (playerSkills is not null && playerSkills.Length > 0)
-            _lastSkills = playerSkills;
+            _playerSkills = playerSkills;
+
         while (!token.IsCancellationRequested)
         {
             if (Combat.StopAttacking)
@@ -159,58 +170,79 @@ public partial class ScriptSkill : IScriptSkill
                 _counterAttack.WaitOne(10000);
                 Combat.StopAttacking = false;
             }
+           
+            // if the player has target or bot attack without target option is on
+            // then activate the skills
             if (Options.AttackWithoutTarget || Player.HasTarget)
-                _Poll(token);
+            {
+               _Poll(token);
+            }
+           
+            // target reset if player has no target
             _provider?.OnTargetReset();
+
+            // wait for skill interval
             if (!token.IsCancellationRequested)
                 await Task.Delay(SkillInterval, token);
         }
     }
-
-    private int _lastRank = -1;
-    private SkillInfo[] _lastSkills = null!;
+    
     private void _Poll(CancellationToken token)
     {
-        int rank = Player.CurrentClassRank;
-        if (_lastSkills is not null && rank > _lastRank)
+        // if the current player has skills and the current class rank is different from the last rank
+        // then update the skills since classes will enable a certain skill base on the rank
+        if (_playerSkills is not null && Player.CurrentClassRank > _lastRank)
         {
+            // Update the player skills skills
             SkillInfo[]? playerSkills = Player.Skills;
             if (playerSkills is not null && playerSkills.Length > 0)
-                _lastSkills = playerSkills;
-            using FlashArray<object> skills = (FlashArray<object>)Flash.CreateFlashObject<object>("world.actions.active").ToArray();
+                _playerSkills = playerSkills;
+
             int k = 0;
+            using FlashArray<object> skills = (FlashArray<object>)Flash.CreateFlashObject<object>("world.actions.active").ToArray();   
             foreach (FlashObject<object> skill in skills)
             {
                 using FlashObject<long> ts = (FlashObject<long>)skill.GetChild<long>("ts");
-                ts.Value = _lastSkills[k++]?.LastUse ?? 0;
+                ts.Value = _playerSkills[k++]?.LastUse ?? 0;
             }
         }
-        _lastRank = rank;
+        
+        // Store the last rank if the player is ranking up
+        _lastRank = Player.CurrentClassRank;
         if (token.IsCancellationRequested)
             return;
-        switch (_provider?.ShouldUseSkill())
+        
+        var (index, skillS) = _provider!.GetNextSkill();
+
+        switch (_provider?.ShouldUseSkill(index, CanUseSkill(skillS)))
         {
             case true:
-                int skill = _provider.GetNextSkill();
-                if (skill != -1 && !_lastSkills![skill].IsOk)
+                if (skillS != -1 && !_playerSkills![skillS].IsOk)
                     break;
-                UseSkill(skill);
+                UseSkill(skillS);
                 break;
             case null:
-                _provider?.GetNextSkill();
+                var (indexS, skill) = _provider!.GetNextSkill();
+                if (skill != -1 && !_playerSkills![skill].IsOk)
+                    break;
+                UseSkill(skill);
                 break;
             default:
                 break;
         }
 
+        // This method will activate a skill
         void UseSkill(int skill)
         {
             switch (SkillUseMode)
             {
+                // if SkillUseMode is UseIfAvailable then use skills without waiting for cooldown
                 case SkillUseMode.UseIfAvailable:
                     if ((Options.AttackWithoutTarget || CanUseSkill(skill)) && !Combat.StopAttacking)
                         this.UseSkill(skill);
                     break;
+
+                // if SkillUseMode is UseIfAvailable then use skills with waiting for cooldown
                 case SkillUseMode.WaitForCooldown:
                     if (Options.AttackWithoutTarget || (skill != -1 && Wait.ForTrue(() => CanUseSkill(skill), null, SkillTimeout, SkillInterval) && !Combat.StopAttacking))
                         this.UseSkill(skill);

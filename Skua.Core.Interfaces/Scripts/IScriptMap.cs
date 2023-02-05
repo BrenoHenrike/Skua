@@ -87,7 +87,7 @@ public interface IScriptMap
     /// <param name="cell">Cell to jump to.</param>
     /// <param name="pad">Pad to jump to.</param>
     /// <param name="clientOnly">If <see langword="true"/>, the client will not send a moveToCell packet to the server.</param>
-    void Jump(string cell, string pad, bool clientOnly = false);
+    void Jump(string cell, string pad, bool autoCorrect = true, bool clientOnly = false);
     /// <summary>
     /// Sends a getMapItem packet for the specified item <paramref name="id"/>.
     /// </summary>

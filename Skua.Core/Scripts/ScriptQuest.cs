@@ -358,8 +358,8 @@ public partial class ScriptQuest : ObservableRecipient, IScriptQuest
         if (Cached.Count > 0)
             return;
 
-        string text = File.ReadAllText(Path.Combine(AppContext.BaseDirectory, "Quests.txt"));
-        Cached = JsonConvert.DeserializeObject<List<QuestData>>(text) ?? new();
+        var skuaQuestFile = File.ReadAllText(ClientFileSources.SkuaQuestsFile);
+        Cached = JsonConvert.DeserializeObject<List<QuestData>>(skuaQuestFile) ?? new();
         CachedDictionary = Cached.ToDictionary(x => x.ID, x => x);
     }
 

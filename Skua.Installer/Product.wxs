@@ -7,11 +7,11 @@
     <?else?>
     <?define ProductCode = "{9DD51CDC-E346-41AE-9744-92DC3405195A}" ?>
     <?endif?>
-
     <!-- Fixed upgrade Id -->
     <?define UpgradeCode = "{8C197FE6-57DF-41FD-A0CD-84B5D3B97BDC}" ?>
 
     <!-- Define main product -->
+    <Product Id="*"
     <Product Id="$(var.ProductCode)"
            Name="!(loc.ProductName_$(var.Platform))"
            Language="!(loc.Language)"
@@ -30,6 +30,37 @@
              Comments="!(loc.Comments)"
              Languages="!(loc.Language)"
              />
+		
+		<Upgrade Id="$(var.UpgradeCode)">
+			<!-- Downgrade Protection -->
+			<UpgradeVersion Minimum="$(var.BuildVersion)" 
+				OnlyDetect="yes" 
+				IncludeMinimum="yes" 
+				Property="DOWNGRADE_DETECTED"  />
+			<!-- Major Upgrade Configuration -->
+			<UpgradeVersion 
+				IncludeMinimum="no" 
+				Maximum="$(var.BuildVersion)" 
+				IncludeMaximum="no" 
+				MigrateFeatures="yes" 
+				Property="UPGRADE_DETECTED"   />
+        </Upgrade>
+
+        <InstallExecuteSequence>
+          <RemoveExistingProducts After="InstallInitialize" />
+        </InstallExecuteSequence>
+
+		<Condition Message="!(loc.DowngradeErrorMessage)">
+			NOT DOWNGRADE_DETECTED
+		</Condition>
+		
+        <!-- Include .cab file into .msi file -->
+        <MediaTemplate EmbedCab="yes" />
+
+        <Property Id="WIXUI_INSTALLDIR" Value="TARGETDIR" />
+        <UIRef Id="WixUI_Skua" />
+        <UIRef Id="WixUI_ErrorProgressText" />
+
 
         <!-- Downgrade error message -->
         <MajorUpgrade DowngradeErrorMessage="!(loc.DowngradeErrorMessage)" />
@@ -58,6 +89,19 @@
         <!-- Change the installer UI background images -->
         <!--<WixVariable Id="WixUILicenseRtf" Value="$(var.ProjectDir)\Assets\License.rtf" />
         <WixVariable Id="WixUIDialogBmp" Value="$(var.ProjectDir)\Assets\Background.bmp" />
+        <WixVariable Id="WixUIBannerBmp" Value="$(var.ProjectDir)\Assets\Banner.bmp" />-->   
+
+        <!-- Define components, shortcuts, files etc... for installer -->
+        <Feature Id="SkuaProductFeature" Title="Skua" Description="The main application." Level="1">
+            <ComponentGroupRef Id="SkuaPublishedComponents" />
+        </Feature>
+        
+        <!-- include the feature for the shortcuts -->
+        <Feature Id="SkuaShortcuts" Title="Shortcuts" Description="Create shortcuts for Skua." Level="1">
+            <ComponentRef Id="SkuaManagerShortcut" />
+            <ComponentRef Id="SkuaShortcut" />
+            <ComponentRef Id="SkuaDesktopShortcut" />
+            <ComponentRef Id="SkuaManagerDesktopShortcut" />
         <WixVariable Id="WixUIBannerBmp" Value="$(var.ProjectDir)\Assets\Banner.bmp" />-->
 
         <!-- Define components, shortcuts, files etc... for installer -->

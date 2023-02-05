@@ -23,7 +23,7 @@
             <RowDefinition />
         </Grid.RowDefinitions>
         <DockPanel Grid.Row="0" Height="44">
-            <Button
+            <!--<Button
                 Margin="6"
                 Command="{Binding OpenGHAuthDialogCommand}"
                 DockPanel.Dock="Right"
@@ -38,7 +38,7 @@
                             Text="GitHub Authentication" />
                     </StackPanel>
                 </Button.Content>
-            </Button>
+            </Button>-->
             <ListBox
                 DockPanel.Dock="Top"
                 ItemsSource="{Binding Tabs}"

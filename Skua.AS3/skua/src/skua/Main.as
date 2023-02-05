@@ -11,6 +11,7 @@ package skua
 	import flash.display.Stage;
 	import flash.display.StageScaleMode;
 	import flash.display.StageAlign;
+	import flash.display.DisplayObject;
 	import flash.events.Event;
 	import flash.events.MouseEvent;
 	import flash.events.ProgressEvent;
@@ -20,7 +21,12 @@ package skua
 	import flash.system.LoaderContext;
 	import flash.system.Security;
 	import flash.utils.getQualifiedClassName;
+	import flash.utils.setTimeout;
+	import flash.utils.clearTimeout;
+	import flash.utils.Timer;
+	import flash.events.TimerEvent;
 	import skua.util.SFSEvent;
+	import flash.utils.getQualifiedClassName;
 	import skua.module.Modules;
 	
 	public class Main extends MovieClip
@@ -35,17 +41,17 @@ package skua
 		private var game:*;
 		private var external:skua.Externalizer;
 		
-		private var sURL:String = "https://game.aq.com/game/";
-		private var versionUrl:String = (sURL + "api/data/gameversion");
-		private var loginURL:String = (sURL + "api/login/now");
+		private var sURL:String = 'https://game.aq.com/game/';
+		private var versionUrl:String = (sURL + 'api/data/gameversion');
+		private var loginURL:String = (sURL + 'api/login/now');
 		
 		private var sFile:String;
-		private var sBG:String = "Generic2.swf";
+		private var sBG:String = 'Generic2.swf';
 		private var isEU:Boolean;
 		private var urlLoader:URLLoader;
 		private var loader:Loader;
 		private var vars:Object;
-		private var sTitle:String = "<font color=\"#FDAF2D\">Better Performance</font>";
+		private var sTitle:String = '<font color="#FDAF2D">Better Performance</font>';
 		
 		private var stg:Stage;
 		private var gameDomain:ApplicationDomain;
@@ -54,7 +60,7 @@ package skua
 		{
 			String.prototype.trim = function():String
 			{
-				return this.replace(/^\s+|\s+$/g, "");
+				return this.replace(/^\s+|\s+$/g, '');
 			};
 			
 			Main.instance = this;
@@ -77,7 +83,7 @@ package skua
 		
 		private function onAddedToStage():void
 		{
-			Security.allowDomain("*");
+			Security.allowDomain('*');
 			this.urlLoader = new URLLoader();
 			this.urlLoader.addEventListener(Event.COMPLETE, this.onDataComplete);
 			this.urlLoader.load(new URLRequest(this.versionUrl));
@@ -87,7 +93,7 @@ package skua
 		{
 			this.urlLoader.removeEventListener(Event.COMPLETE, this.onDataComplete);
 			this.vars = JSON.parse(event.target.data);
-			this.sFile = ((this.vars.sFile + "?ver=") + Math.random());
+			this.sFile = ((this.vars.sFile + '?ver=') + Math.random());
 			this.loadGame()
 		}
 		
@@ -95,7 +101,7 @@ package skua
 		{
 			this.loader = new Loader();
 			this.loader.contentLoaderInfo.addEventListener(Event.COMPLETE, this.onComplete);
-			this.loader.load(new URLRequest(this.sURL + "gamefiles/" + this.sFile));
+			this.loader.load(new URLRequest(this.sURL + 'gamefiles/' + this.sFile));
 		}
 		
 		private function onComplete(event:Event):void
@@ -128,21 +134,21 @@ package skua
 			
 			this.game.stage.addEventListener(KeyboardEvent.KEY_DOWN, this.key_StageGame);
 			
-			this.external.call("loaded");
+			this.external.call('loaded');
 		}
 		
 		public function onExtensionResponse(packet:*):void
 		{
-			this.external.call("pext", JSON.stringify(packet));
+			this.external.call('pext', JSON.stringify(packet));
 		}
 		
 		public function key_StageGame(kbArgs:KeyboardEvent):void
 		{
 			if (!(kbArgs.target is TextField || kbArgs.currentTarget is TextField))
 			{
-				if (kbArgs.keyCode == this.game.litePreference.data.keys["Bank"])
+				if (kbArgs.keyCode == this.game.litePreference.data.keys['Bank'])
 				{
-					if (this.game.stage.focus == null || (this.game.stage.focus != null && !("text" in this.game.stage.focus)))
+					if (this.game.stage.focus == null || (this.game.stage.focus != null && !('text' in this.game.stage.focus)))
 					{
 						this.game.world.toggleBank();
 					}
@@ -166,6 +172,98 @@ package skua
 			return JSON.stringify(obj);
 		}
 		
+		public static function jumpCorrectRoom(cell:String, pad:String, autoCorrect:Boolean = true, clientOnly:Boolean = false):void
+		{
+			var prevCell:String = instance.game.world.strFrame;
+			if (!autoCorrect)
+			{
+				instance.game.world.moveToCell(cell, pad, clientOnly);
+				return;
+			}
+			else 
+			{
+				var users:Array = instance.game.world.areaUsers;
+				users.splice(users.indexOf(instance.game.sfc.myUserName), 1);
+				users.sort();
+				if (users.length <= 1)
+				{
+					instance.game.world.moveToCell(cell, pad, clientOnly);
+				}
+				else 
+				{
+					var usersCell:String = instance.game.world.strFrame;
+					var usersPad:String = "Left";
+					for (var i:int = 0; i < users.length; i++)
+					{
+						usersCell = instance.game.world.uoTree[users[i]].strFrame;
+						usersPad = instance.game.world.uoTree[users[i]].strPad;
+						if (cell == usersCell && pad != usersPad)
+							break;
+					}
+					instance.game.world.moveToCell(cell, usersPad, clientOnly);
+				}
+				
+				var jumpTimer:Timer = new Timer(50, 1);
+				jumpTimer.addEventListener(TimerEvent.TIMER, function(e:TimerEvent):void{
+					jumpCorrectPad(cell, clientOnly);
+					jumpTimer.removeEventListener();
+				});
+				jumpTimer.start();
+			}
+		}
+		
+		public static function jumpCorrectPad(cell:String, clientOnly:Boolean = false):void
+		{
+			var cellPad:String = 'Left';
+			var padArr:Array = getCellPads();			
+			if (padArr.indexOf(cellPad) >= 0)
+			{
+				if (instance.game.world.strPad === cellPad)
+					return;
+				instance.game.world.moveToCell(cell, cellPad, clientOnly);
+			}
+			else 
+			{
+				cellPad = padArr[0];
+				if (instance.game.world.strPad === cellPad)
+					return;
+				instance.game.world.moveToCell(cell, cellPad, clientOnly);
+			}
+		}
+		
+		public static function getCellPads():Array
+		{
+			var cellPads:Array = new Array();
+			var padNames:RegExp = /(Spawn|Center|Left|Right|Up|Down|Top|Bottom)/;
+			var cellPadsCnt:int = instance.game.world.map.numChildren;
+			for (var i:int = 0; i < cellPadsCnt; ++i)
+			{
+				var child:DisplayObject = instance.game.world.map.getChildAt(i);
+				if(padNames.test(child.name))
+				{
+					cellPads.push(child.name);
+				}
+			}
+			return cellPads;
+		}	
+		
+		private static function getProperties(obj:*):String  {
+            var p:*;
+            var res:String = '';
+            var val:String;
+            var prop:String;
+            for (p in obj) {
+                prop = String(p);
+                if (prop && prop!=='' && prop!==' ') {
+                    val = String(obj[p]);
+                    res += prop+': '+val+', ';
+                }
+            }
+            res = res.substr(0, res.length-2);
+            return res;
+        }
+		
+		
 		public static function getGameObjectS(path:String):String
 		{
 			if (_gameClass == null)
@@ -176,6 +274,7 @@ package skua
 			return JSON.stringify(obj);
 		}
 		
+		
 		public static function getGameObjectKey(path:String, key:String):String
 		{
 			var obj:* = _getObjectS(instance.game, path);
@@ -185,7 +284,7 @@ package skua
 		
 		public static function setGameObject(path:String, value:*):void
 		{
-			var parts:Array = path.split(".");
+			var parts:Array = path.split('.');
 			var varName:String = parts.pop();
 			var obj:* = _getObjectA(instance.game, parts);
 			obj[varName] = value;
@@ -193,7 +292,7 @@ package skua
 		
 		public static function setGameObjectKey(path:String, key:String, value:*):void
 		{
-			var parts:Array = path.split(".");
+			var parts:Array = path.split('.');
 			var obj:* = _getObjectA(instance.game, parts);
 			obj[key] = value;
 		}
@@ -212,7 +311,7 @@ package skua
 		
 		public static function callGameFunction(path:String, ... args):String
 		{
-			var parts:Array = path.split(".");
+			var parts:Array = path.split('.');
 			var funcName:String = parts.pop();
 			var obj:* = _getObjectA(instance.game, parts);
 			var func:Function = obj[funcName] as Function;
@@ -221,7 +320,7 @@ package skua
 		
 		public static function callGameFunction0(path:String):String
 		{
-			var parts:Array = path.split(".");
+			var parts:Array = path.split('.');
 			var funcName:String = parts.pop();
 			var obj:* = _getObjectA(instance.game, parts);
 			var func:Function = obj[funcName] as Function;
@@ -233,8 +332,8 @@ package skua
 			var obj:* = _getObjectS(instance.game, path);
 			if (!(obj is Array))
 			{
-				instance.external.debug("selectArrayObjects target is not an array");
-				return "";
+				instance.external.debug('selectArrayObjects target is not an array');
+				return '';
 			}
 			var array:Array = obj as Array;
 			var narray:Array = new Array();
@@ -247,7 +346,7 @@ package skua
 		
 		public static function _getObjectS(root:*, path:String):*
 		{
-			return _getObjectA(root, path.split("."));
+			return _getObjectA(root, path.split('.'));
 		}
 		
 		public static function _getObjectA(root:*, parts:Array):*
@@ -269,7 +368,7 @@ package skua
 			catch (ex:Error)
 			{
 			}
-			return "true";
+			return 'true';
 		}
 		
 		public static function isTrue():String
@@ -280,24 +379,24 @@ package skua
 		public static function auraComparison(target:String, operator:String, auraName:String, auraValue:int):String
 		{
 			var aura:Object = null;
-			var auras:Object = target == "Self" ? instance.game.world.myAvatar.dataLeaf.auras : instance.game.world.myAvatar.target.dataLeaf.auras;
+			var auras:Object = target == 'Self' ? instance.game.world.myAvatar.dataLeaf.auras : instance.game.world.myAvatar.target.dataLeaf.auras;
 			for each (aura in auras)
 			{
 				if (aura.nam.toLowerCase() == auraName.toLowerCase())
 				{
-					if (aura.val == null || aura.val == "undefined" || aura.val == "")
+					if (aura.val == null || aura.val == 'undefined' || aura.val == '')
 					{
 						return false.toString();
 					}
-					if (operator == "Greater" && aura.val.toFixed(0) > auraValue.toFixed(0))
+					if (operator == 'Greater' && aura.val.toFixed(0) > auraValue.toFixed(0))
 					{
 						return true.toString();
 					}
-					if (operator == "Less" && aura.val.toFixed(0) < auraValue.toFixed(0))
+					if (operator == 'Less' && aura.val.toFixed(0) < auraValue.toFixed(0))
 					{
 						return true.toString();
 					}
-					if (operator == "Equal" && aura.val.toFixed(0) == auraValue.toFixed(0))
+					if (operator == 'Equal' && aura.val.toFixed(0) == auraValue.toFixed(0))
 					{
 						return true.toString();
 					}
@@ -312,11 +411,11 @@ package skua
 			var auras:Object = null;
 			try 
 			{
-				auras = subject == "Self" ? instance.game.world.myAvatar.dataLeaf.auras : instance.game.world.myAvatar.target.dataLeaf.auras;
+				auras = subject == 'Self' ? instance.game.world.myAvatar.dataLeaf.auras : instance.game.world.myAvatar.target.dataLeaf.auras;
 			} 
 			catch (e:Error) 
 			{
-				return "[]";
+				return '[]';
 			}
 
 			var auraArray:Array = new Array();
@@ -324,20 +423,20 @@ package skua
 			{
 				aura = auras[i];
 				auraArray.push({
-						"name":aura.nam,
-						"value":aura.val == undefined ? 0 : aura.val,
-						"passive":aura.passive,
-						"timeStamp":aura.ts,
-						"duration":parseInt(aura.dur),
-						"potionType":aura.potionType,
-						"cat":aura.cat,
-						"t":aura.t,
-						"s":aura.s,
-						"fx":aura.fx,
-						"animOn":aura.animOn,
-						"animOff":aura.animOff,
-						"msgOn":aura.msgOn,
-						"isNew":aura.isNew
+						'name':aura.nam,
+						'value':aura.val == undefined ? 0 : aura.val,
+						'passive':aura.passive,
+						'timeStamp':aura.ts,
+						'duration':parseInt(aura.dur),
+						'potionType':aura.potionType,
+						'cat':aura.cat,
+						't':aura.t,
+						's':aura.s,
+						'fx':aura.fx,
+						'animOn':aura.animOn,
+						'animOff':aura.animOff,
+						'msgOn':aura.msgOn,
+						'isNew':aura.isNew
 					});
 			}
 			return JSON.stringify(auraArray);
@@ -384,7 +483,7 @@ package skua
 		{
 			walkSpeed = (walkSpeed == 8 ? instance.game.world.WALKSPEED : walkSpeed);
 			instance.game.world.myAvatar.pMC.walkTo(xPos, yPos, walkSpeed);
-			instance.game.world.moveRequest({"mc": instance.game.world.myAvatar.pMC, "tx": xPos, "ty": yPos, "sp": walkSpeed});
+			instance.game.world.moveRequest({'mc': instance.game.world.myAvatar.pMC, 'tx': xPos, 'ty': yPos, 'sp': walkSpeed});
 		}
 		
 		public static function untargetSelf():void
@@ -419,7 +518,7 @@ package skua
 			for each (var monster:* in instance.game.world.getMonstersByCell(instance.game.world.strFrame))
 			{
 				var monName:String = monster.objData.strMonName.toLowerCase();
-				if ((monName.indexOf(name.toLowerCase()) > -1 || name == "*") && monster.pMC != null && monster.dataLeaf.intState > 0)
+				if ((monName.indexOf(name.toLowerCase()) > -1 || name == '*') && monster.pMC != null && monster.dataLeaf.intState > 0)
 				{
 					return monster;
 				}
@@ -440,6 +539,11 @@ package skua
 			return JSON.stringify(retMonsters);
 		}
 		
+		public function requestDoomArenaPVPQueue() : void
+		{
+			instance.game.world.rootClass.sfc.sendXtMessage("zm","PVPQr",["doomarena",0],"str",instance.game.world.rootClass.world.curRoom);
+		}
+		
 		private static function attackTarget(target:*):void
 		{
 			if (target != null && target.pMC != null)
@@ -449,13 +553,16 @@ package skua
 			}
 		}
 		
-		public static function useSkill(index:int):void
+		public static function useSkill(index:int):String
 		{
 			var skill:* = instance.game.world.actions.active[index];
 			if (skua.ExtractedFuncs.actionTimeCheck(skill) && instance.game.world.myAvatar.target.dataLeaf.intHP > 0)
 			{
 				instance.game.world.testAction(skill);
+				return true.toString();
 			}
+			
+			return false.toString();
 		}
 		
 		public static function magnetize():void
@@ -577,7 +684,7 @@ package skua
 		
 		public static function rejectExcept(whitelist:String):void
 		{
-			var pickup:Array = whitelist.split(",");
+			var pickup:Array = whitelist.split(',');
 			if (instance.game.litePreference.data.bCustomDrops)
 			{
 				var source:* = instance.game.cDropsUI.mcDraggable ? instance.game.cDropsUI.mcDraggable.menu : instance.game.cDropsUI;
@@ -601,7 +708,7 @@ package skua
 				{
 					child = instance.game.ui.dropStack.getChildAt(i);
 					var type:String = getQualifiedClassName(child);
-					if (type.indexOf("DFrame2MC") != -1)
+					if (type.indexOf('DFrame2MC') != -1)
 					{
 						var drop:* = parseDrop(child.cnt.strName.text);
 						var name:* = drop.name;
@@ -632,7 +739,7 @@ package skua
 			}
 			catch (ex:Error)
 			{
-				instance.external.debug("Error while running injection: " + ex);
+				instance.external.debug('Error while running injection: ' + ex);
 			}
 		}
 		
@@ -645,47 +752,47 @@ package skua
 		{
 			if (_handler == null)
 			{
-				var cls:Class = Class(instance.gameDomain.getDefinition("it.gotoandplay.smartfoxserver.handlers.ExtHandler"));
+				var cls:Class = Class(instance.gameDomain.getDefinition('it.gotoandplay.smartfoxserver.handlers.ExtHandler'));
 				_handler = new cls(instance.game.sfc);
 			}
 			switch (type)
 			{
-			case "xml": 
+			case 'xml': 
 				xmlReceived(packet);
 				break;
-			case "json": 
+			case 'json': 
 				jsonReceived(packet);
 				break;
-			case "str": 
+			case 'str': 
 				strReceived(packet);
 				break;
 			default: 
-				instance.external.debug("Invalid packet type.");
+				instance.external.debug('Invalid packet type.');
 			}
 			;
 		}
 		
 		public static function xmlReceived(packet:String):void
 		{
-			_handler.handleMessage(new XML(packet), "xml");
+			_handler.handleMessage(new XML(packet), 'xml');
 		}
 		
 		public static function jsonReceived(packet:String):void
 		{
-			_handler.handleMessage(JSON.parse(packet)["b"], "json");
+			_handler.handleMessage(JSON.parse(packet)['b'], 'json');
 		}
 		
 		public static function strReceived(packet:String):void
 		{
-			var array:Array = packet.substr(1, packet.length - 2).split("%");
-			_handler.handleMessage(array.splice(1, array.length - 1), "str");
+			var array:Array = packet.substr(1, packet.length - 2).split('%');
+			_handler.handleMessage(array.splice(1, array.length - 1), 'str');
 		}
 		
 		public static function packetReceived(packet:*):void
 		{
-			if (packet.params.message.indexOf("%xt%zm%") > -1)
+			if (packet.params.message.indexOf('%xt%zm%') > -1)
 			{
-				instance.external.call("packet", packet.params.message.split(":", 2)[1].trim());
+				instance.external.call('packet', packet.params.message.split(':', 2)[1].trim());
 			}
 		}
 		

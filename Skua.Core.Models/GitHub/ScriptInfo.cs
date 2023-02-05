@@ -3,27 +3,39 @@
 namespace Skua.Core.Models.GitHub;
 public class ScriptInfo
 {
-    public ScriptRepo Parent { get; set; }
+    
     [JsonProperty("name")]
-    public string FileName { get; set; }
-    [JsonProperty("sha")]
-    public string Hash { get; set; }
-    [JsonProperty("size")]
-    public int Size { get; set; }
-    [JsonProperty("download_url")]
-    public string DownloadUrl { get; set; }
+    public string Name { get; set; }
+
+    [JsonProperty("description")]
+    public string Description { get; set; }
+
+    [JsonProperty("tags")]
+    public string[] Tags { get; set; }
+
     [JsonProperty("path")]
     public string FilePath { get; set; }
-    public string RelativePath => FilePath == FileName ? "Scripts/" : $"Scripts/{FilePath.Replace(FileName, "")}";
-    public string LocalFile => Path.Combine(AppContext.BaseDirectory, "Scripts", FilePath);
-    public string LocalShaFile => Path.Combine(AppContext.BaseDirectory, "Scripts", ".shacache", $"{FilePath}.sha");
 
-    public string ManagerLocalFile => Path.Combine(AppContext.BaseDirectory, "Skua_Modules/Scripts", FilePath);
-    public string ManagerLocalShaFile => Path.Combine(AppContext.BaseDirectory, "Skua_Modules/Scripts", ".shacache", $"{FilePath}.sha");
+    [JsonProperty("size")]
+    public int Size { get; set; }
+
+    [JsonProperty("fileName")]
+    public string FileName { get; set; }
+
+    [JsonProperty("downloadUrl")]
+    public string DownloadUrl { get; set; }
     
-    public string? LocalSha => File.Exists(LocalShaFile) ? File.ReadAllText(LocalShaFile) : null;
+    
+    public string RelativePath => FilePath == FileName ? "Scripts/" : $"Scripts/{FilePath.Replace(FileName, "")}";
+    
+    public string LocalFile => Path.Combine(ClientFileSources.SkuaScriptsDIR, FilePath);
+
+    public string ManagerLocalFile => Path.Combine(ClientFileSources.SkuaScriptsDIR, FilePath);
+
     public bool Downloaded => File.Exists(LocalFile);
-    public bool Outdated => Downloaded && LocalSha != Hash;
+    
+    public int LocalSize => Downloaded ? (int)new FileInfo(LocalFile).Length : 0;
+    public bool Outdated => Downloaded && LocalSize != Size;
 
     public override string ToString()
     {

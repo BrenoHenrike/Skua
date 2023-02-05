@@ -108,4 +108,11 @@ public interface IScriptServers : INotifyPropertyChanged
     /// <returns><see langword="true"/> if the relogin was successful</returns>
     /// <remarks>This is mainly used for auto relogin. If you plan in using this, do a <see cref="Logout"/> first.</remarks>
     Task<bool> EnsureRelogin(CancellationToken token);
+    /// <summary>
+    /// Tries to relogin for the number of <see cref="IScriptOption.ReloginTries"/>.
+    /// </summary>
+    /// <param name="serverName">Name of the server to connect to.</param>
+    /// <returns><see langword="true"/> if the relogin was successful</returns>
+    /// <remarks>This is mainly used for auto relogin. If you plan in using this, do a <see cref="Logout"/> first.</remarks>
+    Task<bool> EnsureRelogin(string serverName, CancellationToken token);
 }

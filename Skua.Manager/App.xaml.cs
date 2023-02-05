@@ -12,6 +12,7 @@ using Skua.Manager.Properties;
 using System.Threading.Tasks;
 using Skua.Core.ViewModels.Manager;
 using System.Threading;
+using System.IO;
 
 namespace Skua.Manager;
 
@@ -30,6 +31,8 @@ public partial class App : Application
 
         var args = Environment.GetCommandLineArgs();
         Services = ConfigureServices();
+        Services.GetRequiredService<IClientFilesService>().CreateDirectories();
+        Services.GetRequiredService<IClientFilesService>().CreateFiles();
 
         _ = Services.GetRequiredService<IThemeService>();
         var settings = Services.GetRequiredService<ISettingsService>();
@@ -67,7 +70,6 @@ public partial class App : Application
         
         Dispatcher.ShutdownStarted += Dispatcher_ShutdownStarted;
         StrongReferenceMessenger.Default.Register<App, UpdateFinishedMessage>(this, CloseManager);
-        
         if (Settings.Default.CheckClientUpdates)
         {
             Task.Run(async () =>

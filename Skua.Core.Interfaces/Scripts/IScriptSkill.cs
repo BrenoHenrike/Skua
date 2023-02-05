@@ -47,7 +47,10 @@ public interface IScriptSkill
     /// Uses the skill with the specified <paramref name="index"/> (1-4).
     /// </summary>
     /// <param name="index">Index of the skill.</param>
-    void UseSkill(int index);
+    /// <returns>
+    /// <see langword="true"/> if the skill was used, <see langword="false"/> if the skill was not used.
+    /// </returns>
+    bool UseSkill(int index);
     /// <summary>
     /// Loads the skills from the specified <paramref name="skills"/> string.
     /// </summary>
