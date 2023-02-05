@@ -3,12 +3,13 @@ using CommunityToolkit.Mvvm.Messaging;
 using CommunityToolkit.Mvvm.Input;
 using Skua.Core.Interfaces;
 using Skua.Core.Messaging;
-using Skua.Core.Models;
 using Skua.Core.Utils;
 using System.Diagnostics;
 using System.Collections.Specialized;
 using Newtonsoft.Json;
 using Skua.Core.Models.Servers;
+using System.Collections.ObjectModel;
+using System.ComponentModel;
 
 namespace Skua.Core.ViewModels.Manager;
 public sealed partial class AccountManagerViewModel : BotControlViewModelBase
@@ -19,7 +20,8 @@ public sealed partial class AccountManagerViewModel : BotControlViewModelBase
         Messenger.Register<AccountManagerViewModel, RemoveAccountMessage>(this, (r, m) => r._RemoveAccount(m.Account));
         _settingsService = settingsService;
         _dialogService = dialogService;
-        Task.Run(() => _GetServers());
+        ServerList = new();
+        Task.Run(async () => await _GetServers());
         Accounts = new();
         _GetSavedAccounts();
 
@@ -42,10 +44,11 @@ public sealed partial class AccountManagerViewModel : BotControlViewModelBase
     private string _selectedServer;
     [ObservableProperty]
     private bool _useNameAsDisplay;
-
-    public List<string> ServersList => _cachedServers.Select(s => s.Name).ToList();
-
     private List<Server> _cachedServers = new();
+    [ObservableProperty]
+    private RangedObservableCollection<string> _serverList;
+
+
     public string PasswordInput { private get; set; }
 
     [RelayCommand]
@@ -66,9 +69,9 @@ public sealed partial class AccountManagerViewModel : BotControlViewModelBase
                 : UseNameAsDisplay ? UsernameInput : DisplayNameInput
         });
 
-        Messenger.Send<ClearPasswordBoxMessage>();
         UsernameInput = string.Empty;
         DisplayNameInput = string.Empty;
+        Messenger.Send<ClearPasswordBoxMessage>();
 
         _SaveAccounts();
     }
@@ -146,15 +149,15 @@ public sealed partial class AccountManagerViewModel : BotControlViewModelBase
         }
     }
 
-    private async void _GetServers()
+    private async Task _GetServers()
     {
         string? response = await HttpClients.GetGHClient()
-            .GetStringAsync($"http://content.aq.com/game/api/data/servers")
-            .ConfigureAwait(false);
+            .GetStringAsync($"http://content.aq.com/game/api/data/servers");
 
         if (response is null)
             return;
 
         _cachedServers = JsonConvert.DeserializeObject<List<Server>>(response)!;
+        ServerList.AddRange(_cachedServers.Select(s => s.Name));
     }
 }

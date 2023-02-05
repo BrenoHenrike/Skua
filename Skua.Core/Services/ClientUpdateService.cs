@@ -69,14 +69,14 @@ public class ClientUpdateService : IClientUpdateService
             {
                 string winDir = Environment.GetFolderPath(Environment.SpecialFolder.Windows);
                 ProcessStartInfo startInfo = new(Path.Combine(winDir, @"System32\msiexec.exe"),
-                    $"/i {filePath} /quiet /passive /qn+ /norestart ALLUSERS=1")
+                    $"/i {filePath} /quiet /passive /qb!- /norestart ALLUSERS=1")
                 {
                     Verb = "runas",
                     UseShellExecute = true
                 };
                 Process? proc = Process.Start(startInfo);
                 proc!.WaitForExit();
-                if (proc.ExitCode == 0)
+                if(proc.ExitCode == 0)
                 {
                     string startMenuPath = AppContext.BaseDirectory;
                     string appPath = Path.Combine(startMenuPath, "Skua.Manager.exe");

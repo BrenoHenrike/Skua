@@ -1,6 +1,10 @@
 name: Get Releases
 
 on:
+  push:
+    branches:
+      - master
+      - dev
   pull_request:
       types: [closed]
   release:

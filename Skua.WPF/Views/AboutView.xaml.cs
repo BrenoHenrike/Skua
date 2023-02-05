@@ -24,15 +24,12 @@ public partial class AboutView : UserControl
         Markdownview.MarkdownStyle = MarkdownStyle.SasabuneStandard;
     }
 
-    private async void Markdownview_LayoutUpdated(object sender, EventArgs e)
+    private void Markdownview_DataContextChanged(object sender, DependencyPropertyChangedEventArgs e)
     {
-        await Task.Run(async () =>
+        Dispatcher.BeginInvoke(new Action(() =>
         {
-            await Dispatcher.BeginInvoke(new Action(() =>
-            {
-                SubscribeToAllHyperlinks(Markdownview.Document);
-            }), DispatcherPriority.Loaded);
-        });
+            SubscribeToAllHyperlinks(Markdownview.Document);
+        }), DispatcherPriority.Loaded);
     }
 
     void SubscribeToAllHyperlinks(FlowDocument flowDocument)

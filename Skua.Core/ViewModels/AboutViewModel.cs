@@ -11,12 +11,8 @@ public class AboutViewModel : BotControlViewModelBase
     public AboutViewModel() : base("About")
     {
         _markDownContent = string.Empty;
+        Task.Run(async () => await GetAboutContent());
         NavigateCommand = new RelayCommand<string>(url => Process.Start(new ProcessStartInfo(url) { UseShellExecute = true }));
-    }
-
-    protected override void OnActivated()
-    {
-        GetAboutContent();
     }
 
     public string MarkdownDoc

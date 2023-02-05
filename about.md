@@ -1,8 +1,8 @@
 ## About Skua
 Skua is the successor to Rbot (originally made by "rodit"), now maintained and renamed by Breno_Henrike, with help from Delfina & Lord Exelot, and a handful of scripters. It is a Third Party Client Made by the people above. It also has many "features", and quirks, and overall will just make this Glorified flash game on steroids a piece of cake.
 
-## Do we store information?
-The *only* things that get recorded are; auto-generated number(Not your actual UserID) to identify you, the amount of scripts ran(stopped & started), which script was run, and for how long. This can be completely opted out of when first running a script, or you can edit the text file ***“DataCollectionSettings”*** in your `SkuaFolder > Skua_Modules > DataCollectionSettings.txt`, Make it look below. This will send absolutely nothing 👍
+## Do we store information online?
+The *only* things that get recorded are; auto-generated number **(not your actual game user ID)** to identify you, the amount of scripts ran(stopped & started), and for how long. This can be completely opted out of when first running a script, or you can edit the text file ***“DataCollectionSettings”*** in your `Documents\Skua > DataCollectionSettings.txt`, Make it look below. This will send absolutely nothing 👍
 ```
 UserID: null
 genericDataConsent: false
@@ -10,22 +10,26 @@ scriptNameConsent: false
 stopTimeConsent: false
 ```
 
+## For Account Manager
+Your **Account Info** will be stored only in your **local app** and never shown anywhere nor in a text file. We **DO NOT** store it online because we intended to make account manager with **no  database**.
+
 ## What do we use this data for?
 To keep track of what bots are run, how often, how long, and really just how popular some bots are.
 
 ## Types of Scripts Skua has:
-- **Story scripts** found in the `Story Folder`.
-- **Merge scripts** found in the `Other > MergeShops Folder`.
-- **Farming scripts** found in the `Farm Folder`. such as gold, exp, etc.
+- **Story scripts** found in the `Story` folder.
+- **Merge scripts** found in the `Other > MergeShops` folder.
+- **Farming scripts** found in the `Farm` folder. such as gold, exp, etc.
 - **Faction-specific** (nation/legion/etc) can be found in their folders.
 - Specific tools such as **Butler** (a follow and kill [doesnt support quests]), "ChooseBestGear" (a script that will look at your inv, and equip the appropriate setting for the race type you select.), Buyout ( will either buy **all/non-ac/ac** (will prompt due to acs) from a specified shop)
-- **Core & 0Files** aren't meant to be run, and 0files are basically "Do everything required for this script.."
--  if you wanted to have a new farming script that they don't exist though please request them [here](https://forms.gle/casF8pCNsP2qMGZS6)
+- **Core Script Files** are not meant to be run, and **0ScripName.cs** are basically "Do everything required for this script.."
+-  If you wanted to have a new farming script that they don't exist though please request them [here](https://forms.gle/casF8pCNsP2qMGZS6)
 
 ## How to use:
-To run *correctly*, you will need to download and install [Skua Dependencies](https://github.com/BrenoHenrike/Skua/releases/download/1.0.0.0/Skua.Dependencies.exe) (fetch the correct zip for your PC, most will want the x64 version.) install the Dependencies and open Skua. Manager. once it's opened, click the "GitHub AUthentication" button in the top right and go through the steps on the window that pops up. once that's finished, press the "launch Skua" button. once Skua is open, you will get the "skills loaded" popup (close that).
+To run *correctly*, you will need to download and install [Skua Dependencies](https://github.com/BrenoHenrike/Skua/releases/download/1.0.0.0/Skua.Dependencies.exe) (fetch the correct zip for your PC, most will want the x64 version.) install the Dependencies and open Skua. Manager. Once it's opened, you can manage your accounts in account manager and start the Skua client with `Start All` or `Start Selected` button. Once Skua is open, you will get the **Script Updates** popup then start sailing.
 
 ## Skua Features:
+- **Account Manager**; allows you to have multiple accounts, and switch between them, and even have multiple clients open at once.
 - Automatically **Download & Update** scripts for you; no more hassle of finding them on the site as grim does.
 - Notify you if Updates are available and even pre-releases.
 - Have Scripts for 99% of the farms ingame; the only thing excluded atm is ultras; in the works but still very, very, early alpha.
@@ -61,6 +65,23 @@ To run *correctly*, you will need to download and install [Skua Dependencies](ht
     - ***How to use:***
         - Click mob to select what to attack/hunt or just start to kill everything available in that cell. On death, the respawn point is set to that cell and pad. Press the refresh icon to reload the list of your class and skill mode to select. Then click "use select", and then hit either button to start.
 
-## For Questions & help join the discord & go to the [#skua-questions-help](https://discord.com/channels/1008293278162092073/1008293280087289983) channel.
+### For Questions & help join the discord & go to the [#skua-questions-help](https://discord.com/channels/1008293278162092073/1008293280087289983) channel.
 
-## [Skua Discord](https://discord.gg/pearlharbor) join the community and get help with Skua.
+### [Skua Discord](https://discord.gg/pearlharbor) join the community and get help with Skua.
+
+# Sponsorship & Donation ❤️
+For us to make the Skua better, skua developers need your support. You can support us by donating or sponsoring us and by clicking the PayPal link below. Thank you for your support.
+### Skua Developers
+- [Breno Henrike PayPal](https://www.paypal.com/donate?hosted_button_id=QVQ4Q7XSH9VBY).
+- [Yor Delfina PayPal](https://www.paypal.com/donate/?hosted_button_id=DMZFDRYJ5BT96)
+
+## Casts:
+- **Breno Henrike** the artist of Skua.
+- **Delfina** the developer of Skua.
+- **Lord Exelot** the bot scripts writer and Skua Discord owner.
+- **tato** the scripts writer, also the writer of this about content.
+- **Skua Heroes** the script makers and helpers.
+- **Boaters** the one who sail overnight using Skua and helped the Skua to improve by their feedbacks and suggestions **which is you**.
+
+
+
