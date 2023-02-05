@@ -1,5 +1,5 @@
 
-## Skua 1.2
+# Skua 1.2
 ### What's new?
 - **Skua Manager Account Manager**; successfully implemented by @BrenoHenrike
 - **About Skua** detailed content about skua and etc. 
