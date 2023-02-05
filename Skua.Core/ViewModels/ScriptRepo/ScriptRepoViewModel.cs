@@ -76,7 +76,15 @@ public partial class ScriptRepoViewModel : BotControlViewModelBase
         foreach (ScriptInfo script in _getScriptsService.Scripts)
         {
             if (!script.Name.Equals("null"))
+            {
+                if (script.Description.Equals("null"))
+                    script.Description = "No description provided.";
+
+                if (script.Tags.Contains("null") && (script.Tags.Length == 1))
+                    script.Tags = new[] { "no-tags" };
+                
                 _scripts.Add(new(script));
+            }
         }
             
         OnPropertyChanged(nameof(Scripts));
