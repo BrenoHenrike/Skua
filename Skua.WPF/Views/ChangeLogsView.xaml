@@ -20,11 +20,5 @@
             <RowDefinition Height="auto" />
         </Grid.RowDefinitions>
         <TextBlock Text="Skua" FontSize="20"/>
-        <!--<mdxam:MarkdownScrollViewer
-            x:Name="Markdownview"
-            Foreground="White"
-            Margin="20,10,0,20"
-            DataContextChanged="Markdownview_DataContextChanged"
-            Markdown="{Binding MarkdownDoc, UpdateSourceTrigger=PropertyChanged}"/>-->
     </Grid>
 </UserControl>

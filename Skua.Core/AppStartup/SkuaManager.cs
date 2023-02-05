@@ -4,8 +4,6 @@ using Microsoft.Extensions.DependencyInjection;
 using Skua.Core.Interfaces;
 using Skua.Core.ViewModels;
 using Skua.Core.ViewModels.Manager;
-using System.Diagnostics;
-
 namespace Skua.Core.AppStartup;
 internal class SkuaManager
 {
@@ -20,6 +18,7 @@ internal class SkuaManager
             new("Themes", s.GetRequiredService<ApplicationThemesViewModel>()),
             new("Goals", s.GetRequiredService<GoalsViewModel>()),
             new("About", s.GetRequiredService<AboutViewModel>()),
+            new("Change Logs", s.GetRequiredService<ChangeLogsViewModel>()),
         };
         return new(tabs, s.GetRequiredService<IDialogService>(), s.GetRequiredService<ISettingsService>());
     }
