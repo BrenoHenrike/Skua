@@ -10,7 +10,7 @@ scriptNameConsent: false
 stopTimeConsent: false
 ```
 
-**For Account Manager**
+## For Account Manager
 Your **Account Info** will be stored only in your **local app** and never shown anywhere nor in a text file. We **DO NOT** store it online because we intended to make account manager with **no  database**.
 
 ## What do we use this data for?
@@ -65,14 +65,13 @@ To run *correctly*, you will need to download and install [Skua Dependencies](ht
     - ***How to use:***
         - Click mob to select what to attack/hunt or just start to kill everything available in that cell. On death, the respawn point is set to that cell and pad. Press the refresh icon to reload the list of your class and skill mode to select. Then click "use select", and then hit either button to start.
 
-#### For Questions & help join the discord & go to the [#skua-questions-help](https://discord.com/channels/1008293278162092073/1008293280087289983) channel.
+### For Questions & help join the discord & go to the [#skua-questions-help](https://discord.com/channels/1008293278162092073/1008293280087289983) channel.
 
-#### [Skua Discord](https://discord.gg/pearlharbor) join the community and get help with Skua.
+### [Skua Discord](https://discord.gg/pearlharbor) join the community and get help with Skua.
 
 ## Sponsorship & Donation ❤️
-For us to make the Skua better, skua developers need your support. You can support us by donating or sponsoring us and by clicking the PayPal link below.
-
-**Skua Developers**
+For us to make the Skua better, skua developers need your support. You can support us by donating or sponsoring us and by clicking the PayPal link below. Thank you for your support.
+#### Skua Developers
 - [Breno Henrike PayPal](https://www.paypal.com/donate?hosted_button_id=QVQ4Q7XSH9VBY).
 - [Yor Delfina PayPal](https://www.paypal.com/donate/?hosted_button_id=DMZFDRYJ5BT96)
 
