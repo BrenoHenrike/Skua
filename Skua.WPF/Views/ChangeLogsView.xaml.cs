@@ -1,5 +1,6 @@
 ﻿using System.Windows.Controls;
 using CommunityToolkit.Mvvm.DependencyInjection;
+using MdXaml;
 using Skua.Core.ViewModels;
 
 namespace Skua.WPF.Views;
@@ -12,5 +13,6 @@ public partial class ChangeLogsView : UserControl
     {
         InitializeComponent();
         DataContext = Ioc.Default.GetRequiredService<ChangeLogsViewModel>();
+        Markdownview.MarkdownStyle = MarkdownStyle.SasabuneStandard;
     }
 }
