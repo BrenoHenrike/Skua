@@ -38,12 +38,12 @@ public partial class LoaderViewModel : BotControlViewModelBase, IManagedWindow
     {
         if (SelectedIndex == 0 && int.TryParse(InputIDs, out int id))
         {
-            _shops.Load(id);
+            Task.Factory.StartNew(() => _shops.Load(id));
             return;
         }
         if (SelectedIndex == 1)
         {
-            _quests.Load(InputIDs.Split(new char[] { ',', ' ' }, StringSplitOptions.RemoveEmptyEntries).Select(x => int.Parse(x)).ToArray());
+            Task.Factory.StartNew(() => _quests.Load(InputIDs.Split(new char[] { ',', ' ' }, StringSplitOptions.RemoveEmptyEntries).Select(x => int.Parse(x)).ToArray()));
         }
     }
     private bool AllDigits()
