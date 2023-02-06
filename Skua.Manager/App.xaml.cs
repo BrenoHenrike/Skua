@@ -88,11 +88,12 @@ public partial class App : Application
     protected override void OnStartup(StartupEventArgs e)
     {
         base.OnStartup(e);
-        IWindowService windowService = Services.GetRequiredService<IWindowService>();
-        windowService.RegisterManagedWindow("Change Logs", Services.GetRequiredService<ChangeLogsViewModel>());
-        windowService.ShowManagedWindow("Change Logs");
-
-        // TODO: start the change logs window during after installing/update app only 
+        bool isChangeLogActivated = Services.GetRequiredService<ISettingsService>().Get<bool>("ChangeLogActivated");
+        if (!isChangeLogActivated)
+        {
+            Ioc.Default.GetRequiredService<IWindowService>().ShowHostWindow<ChangeLogsViewModel>(600, 700);
+            Services.GetRequiredService<ISettingsService>().Set("ChangeLogActivated", true);
+        }
     }
 
     private void SingleInstanceWatcher()
