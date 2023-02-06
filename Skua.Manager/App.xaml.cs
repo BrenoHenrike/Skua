@@ -91,7 +91,7 @@ public partial class App : Application
         bool isChangeLogActivated = Services.GetRequiredService<ISettingsService>().Get<bool>("ChangeLogActivated");
         if (!isChangeLogActivated)
         {
-            Ioc.Default.GetRequiredService<IWindowService>().ShowHostWindow<ChangeLogsViewModel>(600, 700);
+            Ioc.Default.GetRequiredService<IWindowService>().ShowWindow<ChangeLogsViewModel>(600, 700);
             Services.GetRequiredService<ISettingsService>().Set("ChangeLogActivated", true);
         }
     }

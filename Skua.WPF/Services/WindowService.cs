@@ -33,7 +33,7 @@ public class WindowService : IWindowService
         hostWindow.Show();
     }
 
-    public void ShowHostWindow<TViewModel>(int width, int height)
+    public void ShowWindow<TViewModel>(int width, int height)
         where TViewModel : class
     {
         HostWindow window = new()
