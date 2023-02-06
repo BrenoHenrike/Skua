@@ -78,6 +78,7 @@ public class ClientUpdateService : IClientUpdateService
                 proc!.WaitForExit();
                 if(proc.ExitCode == 0)
                 {
+                    _settingsService.Set("ChangeLogActivated", false);
                     string startMenuPath = AppContext.BaseDirectory;
                     string appPath = Path.Combine(startMenuPath, "Skua.Manager.exe");
                     Process.Start(appPath);
