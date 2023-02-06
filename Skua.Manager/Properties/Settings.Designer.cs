@@ -214,5 +214,17 @@ namespace Skua.Manager.Properties {
                 this["ManagedAccounts"] = value;
             }
         }
+        
+        [global::System.Configuration.UserScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("False")]
+        public bool ChangeLogActivated {
+            get {
+                return ((bool)(this["ChangeLogActivated"]));
+            }
+            set {
+                this["ChangeLogActivated"] = value;
+            }
+        }
     }
 }
