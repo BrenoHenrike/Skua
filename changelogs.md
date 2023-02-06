@@ -7,6 +7,8 @@
 - **Get Scripts Data** null values was replaced to "No description provided." and "no-tags" for tags in the client side.
 - **Shop Loader in Loader tab**; now you can load shop from the loader tab without freezing your client.
 
+---
+
 ## Skua 1.2.0.0
 ### What's new?
 - **Skua Manager Account Manager**; successfully implemented by @BrenoHenrike
