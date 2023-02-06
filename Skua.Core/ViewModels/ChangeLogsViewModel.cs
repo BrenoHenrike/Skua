@@ -1,4 +1,7 @@
-﻿using Skua.Core.Utils;
+﻿using CommunityToolkit.Mvvm.DependencyInjection;
+using CommunityToolkit.Mvvm.Input;
+using Skua.Core.Interfaces;
+using Skua.Core.Utils;
 
 namespace Skua.Core.ViewModels;
 public class ChangeLogsViewModel : BotControlViewModelBase
@@ -9,7 +12,14 @@ public class ChangeLogsViewModel : BotControlViewModelBase
     {
         _markDownContent = string.Empty;
         Task.Run(async () => await GetChangeLogsContent());
+
+        OpenDelfinaDonationLink = new RelayCommand(() => Ioc.Default.GetRequiredService<IProcessService>().OpenLink("https://www.paypal.com/donate/?hosted_button_id=DMZFDRYJ5BT96"));
+        
+        OpenBrenoHenrikeDonationLink = new RelayCommand(() => Ioc.Default.GetRequiredService<IProcessService>().OpenLink("https://www.paypal.com/donate/?hosted_button_id=QVQ4Q7XSH9VBY"));
     }
+
+    public IRelayCommand OpenDelfinaDonationLink { get; }
+    public IRelayCommand OpenBrenoHenrikeDonationLink { get; }
 
     public string MarkdownDoc
     {

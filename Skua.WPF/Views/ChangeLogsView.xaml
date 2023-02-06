@@ -26,5 +26,34 @@
             FontFamily="Cambria"
             Margin="20,10,0,20"
             Markdown="{Binding MarkdownDoc, UpdateSourceTrigger=PropertyChanged}"/>
+        <Grid Grid.Row="1">
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition />
+                <ColumnDefinition />
+            </Grid.ColumnDefinitions>
+            <Grid.RowDefinitions>
+                <RowDefinition Height="auto" />
+                <RowDefinition Height="auto" />
+            </Grid.RowDefinitions>
+            <TextBlock
+                Grid.Column="0"
+                Grid.ColumnSpan="2"
+                Margin="6,0"
+                FontSize="16"
+                Text="Donations can be made via PayPal you can click the buttons below."
+                TextWrapping="Wrap" />
+            <Button
+                Grid.Row="1"
+                Grid.Column="0"
+                Margin="6"
+                Command="{Binding OpenDelfinaDonationLink}"
+                Content="Delfina PayPal" />
+            <Button
+                Grid.Row="1"
+                Grid.Column="1"
+                Margin="0,6,6,6"
+                Command="{Binding OpenBrenoHenrikeDonationLink}"
+                Content="BrenoHenrike PayPal" />
+        </Grid>
     </Grid>
 </UserControl>
