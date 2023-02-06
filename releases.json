@@ -63,7 +63,7 @@
         "content_type": "application/octet-stream",
         "state": "uploaded",
         "size": 20733768,
-        "download_count": 416,
+        "download_count": 476,
         "created_at": "2023-02-04T14:27:30Z",
         "updated_at": "2023-02-04T14:27:35Z",
         "browser_download_url": "https://github.com/BrenoHenrike/Skua/releases/download/1.2.0.0/Skua-1.2.0.0-Release-x64.msi"
@@ -97,7 +97,7 @@
         "content_type": "application/octet-stream",
         "state": "uploaded",
         "size": 20704958,
-        "download_count": 45,
+        "download_count": 53,
         "created_at": "2023-02-04T14:27:35Z",
         "updated_at": "2023-02-04T14:27:38Z",
         "browser_download_url": "https://github.com/BrenoHenrike/Skua/releases/download/1.2.0.0/Skua-1.2.0.0-Release-x86.msi"
@@ -280,7 +280,7 @@
         "content_type": "application/x-zip-compressed",
         "state": "uploaded",
         "size": 20124500,
-        "download_count": 4978,
+        "download_count": 4980,
         "created_at": "2023-01-09T10:50:07Z",
         "updated_at": "2023-01-09T10:50:14Z",
         "browser_download_url": "https://github.com/BrenoHenrike/Skua/releases/download/1.1.4.0/Skua-1.1.4.0-Release-x64.zip"
@@ -314,7 +314,7 @@
         "content_type": "application/x-zip-compressed",
         "state": "uploaded",
         "size": 20098321,
-        "download_count": 388,
+        "download_count": 389,
         "created_at": "2023-01-09T10:50:14Z",
         "updated_at": "2023-01-09T10:50:17Z",
         "browser_download_url": "https://github.com/BrenoHenrike/Skua/releases/download/1.1.4.0/Skua-1.1.4.0-Release-x86.zip"
@@ -325,13 +325,13 @@
     "body": "### What's new?\r\n- Aura reading to be used in bot scripts like (CoreArmy: to read player auras based on the skills or consumables)\r\n- Auto/Check update advance skill sets settings added in the `Options > Application`\r\n\r\n### Fixed tools\r\n- Grabber tool\r\n\r\n### Existing feature (if you never notice this feature)\r\n- You can toggle show/hide Skua Bot Client window in tray\r\n\r\n### Client Changes\r\n- Skua manager can be now closed (process will run in background)\r\n   - No more multiple skua manager window on startup skua.manager.exe\r\n   - Tray skua options:\r\n        - Show Skua manager (if closed)\r\n        - Skua Bot AQW (launch new skua bot client instance) \r\n        - Update Scripts\r\n        - Reset Scripts\r\n        - Check client options\r\n        - Exit  (All Skua windows manager, & bot clients will be terminated)\r\n        \r\nIf you want to help the developer to make skua better just click the buttons.\r\n[Artist of Skua] Breno Henrike\r\n[![Donate](https://img.shields.io/badge/Donate-PayPal-green.svg)](https://www.paypal.com/donate?hosted_button_id=QVQ4Q7XSH9VBY).\r\n\r\n[Developer] Yor Delfina\r\n[![Donate](https://img.shields.io/badge/Donate-PayPal-green.svg)](https://www.paypal.com/donate/?hosted_button_id=DMZFDRYJ5BT96)",
     "reactions": {
       "url": "https://api.github.com/repos/BrenoHenrike/Skua/releases/88208062/reactions",
-      "total_count": 2,
+      "total_count": 3,
       "+1": 0,
       "-1": 0,
       "laugh": 0,
       "hooray": 0,
       "confused": 0,
-      "heart": 2,
+      "heart": 3,
       "rocket": 0,
       "eyes": 0
     }
@@ -2189,7 +2189,7 @@
         "content_type": "application/x-msdownload",
         "state": "uploaded",
         "size": 315364257,
-        "download_count": 7646,
+        "download_count": 7651,
         "created_at": "2022-08-20T16:14:27Z",
         "updated_at": "2022-08-20T16:15:08Z",
         "browser_download_url": "https://github.com/BrenoHenrike/Skua/releases/download/1.0.0.0/Skua.Dependencies.exe"
