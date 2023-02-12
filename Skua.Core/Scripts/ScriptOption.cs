@@ -137,7 +137,7 @@ public partial class ScriptOption : ObservableRecipient, IScriptOption, IOptionD
     [ObservableProperty]
     private int _maximumTries = 10;
     [ObservableProperty]
-    private int _actionDelay = 700;
+    private int _actionDelay = 800;
     [ObservableProperty]
     private int _privateNumber = 0;
     [ObservableProperty]
@@ -145,11 +145,11 @@ public partial class ScriptOption : ObservableRecipient, IScriptOption, IOptionD
     [ObservableProperty]
     private int _questAcceptAndCompleteTries = 30;
     [ObservableProperty]
-    private int _reloginTries = 3;
+    private int _reloginTries = 5;
     [ObservableProperty]
-    private int _reloginTryDelay = 3000;
+    private int _reloginTryDelay = 800;
     [ObservableProperty]
-    private int _loginTimeout = 10_000;
+    private int _loginTimeout = 10000;
     [ObservableProperty]
     private HuntPriorities _HuntPriority = HuntPriorities.None;
 
