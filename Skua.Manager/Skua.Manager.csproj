@@ -18,11 +18,11 @@
   <ItemGroup>
     <Resource Include="SkuaIcon.ico" />
   </ItemGroup>
-	<!--<ItemGroup>
+	<ItemGroup>
 	    <None Include="..\Skua.AS3\skua\bin\skua.swf" Link="skua.swf">
 		    <CopyToOutputDirectory>Always</CopyToOutputDirectory>
 	    </None>
-    </ItemGroup> -->
+    </ItemGroup> 
 	
 
     <ItemGroup>
