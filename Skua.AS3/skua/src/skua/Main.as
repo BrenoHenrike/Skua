@@ -398,7 +398,7 @@ package skua
 			var serverData:Object = JSON.parse(server);
 			var objLogin:Object = null;
 			
-			var connectionServerTimer:Timer = new Timer(100, 50);
+			var connectionServerTimer:Timer = new Timer(500, 50);
 			connectionServerTimer.addEventListener(TimerEvent.TIMER, connectingServer);
 			connectionServerTimer.start();
 			
