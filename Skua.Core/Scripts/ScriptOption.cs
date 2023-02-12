@@ -112,12 +112,14 @@ public partial class ScriptOption : ObservableRecipient, IScriptOption, IOptionD
     private bool _disableDeathAds;
     [ModuleBinding("HidePlayers")]
     private bool _hidePlayers;
-    private string? _reloginServer = null;
+
+    private string? _reloginServer = "Twilly";
     public string? ReloginServer
     {
         get { return _reloginServer; }
         set { SetProperty(ref _reloginServer, value, true); }
     }
+    
     [ObjectBinding("world.myAvatar.objData.strUsername", "world.rootClass.ui.mcPortrait.strName.text", "world.myAvatar.pMC.pname.ti.text", Get = false, HasSetter = true, Default = "string.Empty")]
     private string _customName = string.Empty;
     [ObjectBinding("world.myAvatar.pMC.pname.ti.textColor", Get = false, HasSetter = true, Default = "0xFFFFFF")]
@@ -129,7 +131,7 @@ public partial class ScriptOption : ObservableRecipient, IScriptOption, IOptionD
     [ObjectBinding("world.WALKSPEED", Get = false, HasSetter = true, Default = "8")]
     private int _walkSpeed = 8;
     [ObservableProperty]
-    private int _loadTimeout = 16000;
+    private int _loadTimeout = 30000;
     [ObservableProperty]
     private int _huntDelay = 1000;
     [ObservableProperty]
@@ -149,7 +151,7 @@ public partial class ScriptOption : ObservableRecipient, IScriptOption, IOptionD
     [ObservableProperty]
     private int _reloginTryDelay = 800;
     [ObservableProperty]
-    private int _loginTimeout = 10000;
+    private int _loginTimeout = 30000;
     [ObservableProperty]
     private HuntPriorities _HuntPriority = HuntPriorities.None;
 
