@@ -34,6 +34,10 @@
     <!-- <Compile Include="FFDecComponentsGenerated.wxs" /> -->
     <Compile Include="Product.wxs" />
     <Compile Include="UI.wxs" />
+    <Compile Include="FFDecComponentsGenerated.wxs" />
+    <Compile Include="Product.wxs" />
+    <Compile Include="UI.wxs" />
+    <Compile Include="VSCodeComponentsGenerated.wxs" />
   </ItemGroup>
   <ItemGroup>
     <EmbeddedResource Include="Common.wxl" />
@@ -65,6 +69,11 @@
     <Exec Command="dotnet build ..\Skua.Manager\Skua.Manager.csproj -c $(Configuration) -a $(Platform) --no-self-contained" />
     <!-- Get assembly version -->
     <GetAssemblyIdentity AssemblyFiles="..\Build\$(Platform)\Skua.App.WPF.dll">
+    <Exec Command="rd /s /q ..\Skua.App.WPF\bin\$(Configuration)\net6.0-windows\win-$(Platform)" />
+    <!-- Publish dotnet core app -->
+    <Exec Command="dotnet build ..\Skua.App.WPF\Skua.App.WPF.csproj -c $(Configuration) -a $(Platform) --no-self-contained" />
+    <!-- Get assembly version -->
+    <GetAssemblyIdentity AssemblyFiles="..\Skua.App.WPF\bin\$(Configuration)\net6.0-windows\win-$(Platform)\Skua.App.WPF.dll">
       <Output TaskParameter="Assemblies" ItemName="AssemblyVersion" />
     </GetAssemblyIdentity>
     <!-- Define some variables we need -->
@@ -104,6 +113,16 @@
   <Target Name="AfterBuild">
     <!-- Get assembly version -->
     <GetAssemblyIdentity AssemblyFiles="..\Build\$(Platform)\Skua.App.WPF.dll">
+      <DefineConstants>BuildVersion=%(AssemblyVersion.Version);BasePath=..\Skua.App.WPF\bin\$(Configuration)\net6.0-windows\win-$(Platform)\;VSCodePath=..\VSCode-$(Platform)\;FFDecPath=..\FFDec\</DefineConstants>
+    </PropertyGroup>
+    <!-- Harvest file components from publish folder -->
+    <HeatDirectory RunAsSeparateProcess="true" OutputFile="ComponentsGenerated.wxs" DirectoryRefId="INSTALLFOLDER" ComponentGroupName="PublishedComponents" SuppressCom="true" Directory="..\Skua.App.WPF\bin\$(Configuration)\net6.0-windows\win-$(Platform)\" SuppressFragments="true" SuppressRegistry="true" SuppressRootDirectory="true" AutoGenerateGuids="false" GenerateGuidsNow="true" ToolPath="$(WixToolPath)" PreprocessorVariable="var.BasePath" />
+    <HeatDirectory RunAsSeparateProcess="true" OutputFile="VSCodeComponentsGenerated.wxs" DirectoryRefId="INSTALLFOLDER" ComponentGroupName="VSCodeComponents" SuppressCom="true" Directory="..\VSCode-$(Platform)\" SuppressFragments="true" SuppressRegistry="true" SuppressRootDirectory="true" AutoGenerateGuids="false" GenerateGuidsNow="true" ToolPath="$(WixToolPath)" PreprocessorVariable="var.VSCodePath" />
+    <HeatDirectory RunAsSeparateProcess="true" OutputFile="FFDecComponentsGenerated.wxs" DirectoryRefId="INSTALLFOLDER" ComponentGroupName="FFDecComponents" SuppressCom="true" Directory="..\FFDec\" SuppressFragments="true" SuppressRegistry="true" SuppressRootDirectory="false" AutoGenerateGuids="false" GenerateGuidsNow="true" ToolPath="$(WixToolPath)" PreprocessorVariable="var.FFDecPath" />
+  </Target>
+  <Target Name="AfterBuild">
+    <!-- Get assembly version -->
+    <GetAssemblyIdentity AssemblyFiles="..\Skua.App.WPF\bin\\$(Configuration)\net6.0-windows\win-$(Platform)\Skua.App.WPF.dll">
       <Output TaskParameter="Assemblies" ItemName="AssemblyVersion" />
     </GetAssemblyIdentity>
     <!-- Rename and move final MSI -->

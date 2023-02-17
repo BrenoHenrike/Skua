@@ -365,6 +365,7 @@ FodyWeavers.xsd
 # Installers
 # /Skua.Installer
 # /Skua.Installer.Dependencies
+/Installers
 /VSCode-x64/VSCode
 /VSCode-x86/VSCode
 
