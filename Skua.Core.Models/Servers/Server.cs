@@ -32,8 +32,7 @@ public class Server
     /// Indicates whether or not the server is online.
     /// </summary>
     [JsonProperty("bOnline")]
-    [JsonConverter(typeof(StringBoolConverter))]
-    public bool Online { get; set; }
+    public int Online { get; set; }
     /// <summary>
     /// The language of this server (en/pt).
     /// </summary>
@@ -48,8 +47,13 @@ public class Server
     /// Indicates whether this is an upgrade only server.
     /// </summary>
     [JsonProperty("bUpg")]
-    [JsonConverter(typeof(StringBoolConverter))]
-    public bool Upgrade { get; set; }
+    public int Upgrade { get; set; }
+
+    [JsonProperty("iMax")]
+    public int MaxPlayers { get; set; }
+
+    [JsonProperty("iLevel")]
+    public int Level { get; set; }
 
     public override string ToString()
     {

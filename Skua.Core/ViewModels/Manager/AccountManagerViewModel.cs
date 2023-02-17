@@ -41,12 +41,12 @@ public sealed partial class AccountManagerViewModel : BotControlViewModelBase
     [ObservableProperty]
     private string _displayNameInput;
     [ObservableProperty]
-    private string _selectedServer;
+    private Server _selectedServer;
     [ObservableProperty]
     private bool _useNameAsDisplay;
     private List<Server> _cachedServers = new();
     [ObservableProperty]
-    private RangedObservableCollection<string> _serverList;
+    private RangedObservableCollection<Server> _serverList;
 
 
     public string PasswordInput { private get; set; }
@@ -117,12 +117,12 @@ public sealed partial class AccountManagerViewModel : BotControlViewModelBase
 
         _settingsService.Set("ManagedAccounts", accs);
     }
-
+    
     private void _LaunchAcc(string username, string password)
     {
         ProcessStartInfo psi = new(Path.Combine(AppContext.BaseDirectory, "Skua.exe"))
         {
-            Arguments = $"--usr \"{username}\" --psw \"{password}\" --sv \"{_selectedServer}\"",
+            Arguments = $"--usr \"{username}\" --psw \"{password}\" --sv \"{_selectedServer.Name}\"",
             WorkingDirectory = AppContext.BaseDirectory
         };
         Process.Start(psi);
@@ -158,6 +158,6 @@ public sealed partial class AccountManagerViewModel : BotControlViewModelBase
             return;
 
         _cachedServers = JsonConvert.DeserializeObject<List<Server>>(response)!;
-        ServerList.AddRange(_cachedServers.Select(s => s.Name));
+        ServerList.AddRange(_cachedServers);
     }
 }

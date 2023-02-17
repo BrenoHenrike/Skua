@@ -30,8 +30,7 @@ public partial class ScriptAuto : ObservableObject, IScriptAuto
         _lazyHunt = hunt;
         _lazyWait = wait;
     }
-    private CancellationTokenSource? _ctsAuto;
-    private Thread? _autoThread;
+   
     private readonly ILogService _logger;
     private readonly Lazy<IScriptPlayer> _lazyPlayer;
     private readonly Lazy<IScriptDrop> _lazyDrops;
@@ -54,14 +53,19 @@ public partial class ScriptAuto : ObservableObject, IScriptAuto
 
     [ObservableProperty]
     private bool _isRunning;
-    
+
+    private Task? _autoTask;
+    private CancellationTokenSource? _ctsAuto;
+
     public void StartAutoAttack(string? className = null, ClassUseMode classUseMode = ClassUseMode.Base)
     {
+        _ctsAuto = new CancellationTokenSource();
         _DoActionAuto(hunt: false, className, classUseMode);
     }
     
     public void StartAutoHunt(string? className = null, ClassUseMode classUseMode = ClassUseMode.Base)
     {
+        _ctsAuto = new CancellationTokenSource();
         _DoActionAuto(hunt: true, className, classUseMode);
     }
 
@@ -75,6 +79,7 @@ public partial class ScriptAuto : ObservableObject, IScriptAuto
         
         _ctsAuto?.Cancel();
         _wait.ForTrue(() => _ctsAuto is null, 20);
+        _autoTask?.Dispose();
         IsRunning = false;
     }
 
@@ -88,12 +93,13 @@ public partial class ScriptAuto : ObservableObject, IScriptAuto
         
         _ctsAuto?.Cancel();
         await _wait.ForTrueAsync(() => _ctsAuto is null, 20);
+        _autoTask?.Dispose();
         IsRunning = false;
     }
 
     private void _DoActionAuto(bool hunt, string? className = null, ClassUseMode classUseMode = ClassUseMode.Base)
     {
-        if (_autoThread?.IsAlive ?? false)
+        if (_autoTask != null && !_autoTask.IsCompleted)
             return;
 
         if (!_player.LoggedIn)
@@ -105,28 +111,29 @@ public partial class ScriptAuto : ObservableObject, IScriptAuto
         else
             _skills.StartAdvanced(_player.CurrentClass?.Name ?? "Generic", true);
 
-        _autoThread = new(async () =>
+        _autoTask = Task.Run(async () =>
         {
-            _ctsAuto = new();
             try
             {
                 if (hunt)
-                    await _Hunt(_ctsAuto.Token);
+                    await _Hunt(_ctsAuto!.Token);
                 else
-                    await _Attack(_ctsAuto.Token);
+                    await _Attack(_ctsAuto!.Token);
             }
             catch { }
-            _drops.Stop();
-            _skills.Stop();
-            _boosts.Stop();
-            _ctsAuto?.Dispose();
-            _ctsAuto = null;
+            finally
+            {
+                _drops.Stop();
+                _skills.Stop();
+                _boosts.Stop();
+                _ctsAuto?.Dispose();
+                _ctsAuto = null;
+                IsRunning = false;
+            }
         });
-        _autoThread.Name = "Auto Thread";
-        _autoThread.Start();
         IsRunning = true;
     }
-    
+
     private string _target = "";
     private async Task _Attack(CancellationToken token)
     {
@@ -136,7 +143,14 @@ public partial class ScriptAuto : ObservableObject, IScriptAuto
         {
             if (!_options.AttackWithoutTarget)
                 _kill.Monster("*", token);
-            await Task.Delay(500, token);
+            try
+            {
+                await Task.Delay(500, token);
+            }
+            catch (TaskCanceledException)
+            {
+                break;
+            }
         }
         Trace.WriteLine("Auto attack stopped.");
     }
@@ -157,7 +171,14 @@ public partial class ScriptAuto : ObservableObject, IScriptAuto
         while (!token.IsCancellationRequested)
         {
             _hunt.Monster(_target, token);
-            await Task.Delay(500, token);
+            try
+            {
+                await Task.Delay(500, token);
+            }
+            catch (TaskCanceledException)
+            {
+                break;
+            }
         }
         Trace.WriteLine("Auto hunt stopped.");
     }

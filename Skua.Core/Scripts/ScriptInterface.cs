@@ -524,7 +524,7 @@ public class ScriptInterface : IScriptInterface, IScriptInterfaceManager
         _waitForLogin = true;
         Messenger.Send<ReloginTriggeredMessage, int>(new(kicked), (int)MessageChannels.GameEvents);
 
-        Relogin((!Options.SafeRelogin && !kicked) ? 5000 : 70000, wasRunning);
+        Relogin((!Options.SafeRelogin && !kicked) ? Options.ReloginTryDelay : 70000, wasRunning);
     }
     private void Relogin(int delay, bool startScript)
     {

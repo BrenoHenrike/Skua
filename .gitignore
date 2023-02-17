@@ -380,6 +380,5 @@ FodyWeavers.xsd
 /Skua.App.WPF.Follower
 /Skua.gRPC.Protos
 /Skua.gRPC.Server
-/Skua.AS3
 /Build
 /Assets

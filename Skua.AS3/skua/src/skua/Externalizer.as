@@ -25,6 +25,7 @@ package skua
 			this.addCallback("callGameFunction", Main.callGameFunction);
 			this.addCallback("callGameFunction0", Main.callGameFunction0);
 			this.addCallback("selectArrayObjects", Main.selectArrayObjects);
+			this.addCallback("connectToServer", Main.connectToServer);
 			this.addCallback("isNull", Main.isNull);
 			
 			this.addCallback("clickServer", Main.clickServer);
