@@ -13,6 +13,8 @@ using System.Threading.Tasks;
 using Skua.Core.ViewModels.Manager;
 using System.Threading;
 using System.IO;
+using Skua.Core.ViewModels;
+using System.Windows.Navigation;
 
 namespace Skua.Manager;
 
@@ -66,8 +68,8 @@ public partial class App : Application
                     settings.Set("DeleteZipFileAfter", Convert.ToBoolean(args[++i]));
                     break;
             }
-        }
-        
+        }   
+
         Dispatcher.ShutdownStarted += Dispatcher_ShutdownStarted;
         StrongReferenceMessenger.Default.Register<App, UpdateFinishedMessage>(this, CloseManager);
         if (Settings.Default.CheckClientUpdates)
@@ -82,7 +84,18 @@ public partial class App : Application
             });
         }
     }
-    
+
+    protected override void OnStartup(StartupEventArgs e)
+    {
+        base.OnStartup(e);
+        bool isChangeLogActivated = Services.GetRequiredService<ISettingsService>().Get<bool>("ChangeLogActivated");
+        if (!isChangeLogActivated)
+        {
+            Ioc.Default.GetRequiredService<IWindowService>().ShowWindow<ChangeLogsViewModel>(600, 700);
+            Services.GetRequiredService<ISettingsService>().Set("ChangeLogActivated", true);
+        }
+    }
+
     private void SingleInstanceWatcher()
     {
         try

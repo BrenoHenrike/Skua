@@ -110,7 +110,7 @@ namespace Skua.Manager.Properties {
         
         [global::System.Configuration.UserScopedSettingAttribute()]
         [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
-        [global::System.Configuration.DefaultSettingValueAttribute("1.2.0.0")]
+        [global::System.Configuration.DefaultSettingValueAttribute("1.2.1.0")]
         public string ApplicationVersion {
             get {
                 return ((string)(this["ApplicationVersion"]));
@@ -212,6 +212,18 @@ namespace Skua.Manager.Properties {
             }
             set {
                 this["ManagedAccounts"] = value;
+            }
+        }
+        
+        [global::System.Configuration.UserScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("False")]
+        public bool ChangeLogActivated {
+            get {
+                return ((bool)(this["ChangeLogActivated"]));
+            }
+            set {
+                this["ChangeLogActivated"] = value;
             }
         }
     }

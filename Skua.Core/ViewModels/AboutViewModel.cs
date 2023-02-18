@@ -11,7 +11,9 @@ public class AboutViewModel : BotControlViewModelBase
     public AboutViewModel() : base("About")
     {
         _markDownContent = string.Empty;
+        
         Task.Run(async () => await GetAboutContent());
+        
         NavigateCommand = new RelayCommand<string>(url => Process.Start(new ProcessStartInfo(url) { UseShellExecute = true }));
     }
 
@@ -25,10 +27,13 @@ public class AboutViewModel : BotControlViewModelBase
 
     private async Task GetAboutContent()
     {
-        var response = await HttpClients.Default.GetAsync("https://raw.githubusercontent.com/BrenoHenrike/Skua/op-version/about.md");
-        if (!response.IsSuccessStatusCode)
-            MarkdownDoc = "### No content found. Please check your internet connection.";
+        using(var client = new HttpClient())
+        {
+            var response = await client.GetAsync("https://raw.githubusercontent.com/BrenoHenrike/Skua/op-version/about.md");
+            if (!response.IsSuccessStatusCode)
+                MarkdownDoc = "### No content found. Please check your internet connection.";
 
-        MarkdownDoc = await response.Content.ReadAsStringAsync();
+            MarkdownDoc = await response.Content.ReadAsStringAsync().ConfigureAwait(false);
+        }
     }
 }

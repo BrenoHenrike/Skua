@@ -15,20 +15,4 @@
     <String Id="SkuaShortcut">Skua</String>
     <String Id="SkuaShortcutDescription">Skua Bot Client</String>
 
-
-    <String Id="Company">Skua</String>
-
-    <String Id="ProductNameFolder">Skua.App</String>
-
-    <String Id="ProductName_x86">Skua (32bit)</String>
-    <String Id="ProductName_x64">Skua (64bit)</String>
-
-    <String Id="Description">Scriptable C# bot for AdventureQuest Worlds</String>
-    <String Id="Comments">Birb</String>
-    <String Id="Keywords">dotnet,core,application,installer,wpf,aqw,adventurequest worlds,bot,C#</String>
-
-    <String Id="DowngradeErrorMessage">A newer version of Skua is already installed.</String>
-
-    <String Id="Language">1033</String>
-
 </WixLocalization>

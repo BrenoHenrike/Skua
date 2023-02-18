@@ -29,7 +29,7 @@
       <Value Profile="(Default)">False</Value>
     </Setting>
     <Setting Name="ApplicationVersion" Type="System.String" Scope="User">
-      <Value Profile="(Default)">1.2.0.0</Value>
+      <Value Profile="(Default)">1.2.1.0</Value>
     </Setting>
     <Setting Name="ClientDownloadPath" Type="System.String" Scope="User">
       <Value Profile="(Default)" />
@@ -54,6 +54,9 @@
     </Setting>
     <Setting Name="ManagedAccounts" Type="System.Collections.Specialized.StringCollection" Scope="User">
       <Value Profile="(Default)" />
+    </Setting>
+    <Setting Name="ChangeLogActivated" Type="System.Boolean" Scope="User">
+      <Value Profile="(Default)">False</Value>
     </Setting>
   </Settings>
 </SettingsFile>

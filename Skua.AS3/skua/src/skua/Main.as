@@ -28,6 +28,7 @@ package skua
 	import skua.util.SFSEvent;
 	import flash.utils.getQualifiedClassName;
 	import skua.module.Modules;
+	import skua.module.ModalMC;
 	
 	public class Main extends MovieClip
 	{
@@ -180,7 +181,7 @@ package skua
 				instance.game.world.moveToCell(cell, pad, clientOnly);
 				return;
 			}
-			else 
+			else
 			{
 				var users:Array = instance.game.world.areaUsers;
 				users.splice(users.indexOf(instance.game.sfc.myUserName), 1);
@@ -189,7 +190,7 @@ package skua
 				{
 					instance.game.world.moveToCell(cell, pad, clientOnly);
 				}
-				else 
+				else
 				{
 					var usersCell:String = instance.game.world.strFrame;
 					var usersPad:String = "Left";
@@ -204,25 +205,29 @@ package skua
 				}
 				
 				var jumpTimer:Timer = new Timer(50, 1);
-				jumpTimer.addEventListener(TimerEvent.TIMER, function(e:TimerEvent):void{
-					jumpCorrectPad(cell, clientOnly);
-					jumpTimer.removeEventListener();
-				});
+				jumpTimer.addEventListener(TimerEvent.TIMER, jumpTimerEvent);
 				jumpTimer.start();
+				
+				function jumpTimerEvent(e:TimerEvent):void
+				{
+					jumpCorrectPad(cell, clientOnly);
+					jumpTimer.stop();
+					jumpTimer.removeEventListener(TimerEvent.TIMER, jumpTimerEvent);
+				}
 			}
 		}
 		
 		public static function jumpCorrectPad(cell:String, clientOnly:Boolean = false):void
 		{
 			var cellPad:String = 'Left';
-			var padArr:Array = getCellPads();			
+			var padArr:Array = getCellPads();
 			if (padArr.indexOf(cellPad) >= 0)
 			{
 				if (instance.game.world.strPad === cellPad)
 					return;
 				instance.game.world.moveToCell(cell, cellPad, clientOnly);
 			}
-			else 
+			else
 			{
 				cellPad = padArr[0];
 				if (instance.game.world.strPad === cellPad)
@@ -239,30 +244,32 @@ package skua
 			for (var i:int = 0; i < cellPadsCnt; ++i)
 			{
 				var child:DisplayObject = instance.game.world.map.getChildAt(i);
-				if(padNames.test(child.name))
+				if (padNames.test(child.name))
 				{
 					cellPads.push(child.name);
 				}
 			}
 			return cellPads;
-		}	
+		}
 		
-		private static function getProperties(obj:*):String  {
-            var p:*;
-            var res:String = '';
-            var val:String;
-            var prop:String;
-            for (p in obj) {
-                prop = String(p);
-                if (prop && prop!=='' && prop!==' ') {
-                    val = String(obj[p]);
-                    res += prop+': '+val+', ';
-                }
-            }
-            res = res.substr(0, res.length-2);
-            return res;
-        }
-		
+		private static function getProperties(obj:*):String
+		{
+			var p:*;
+			var res:String = '';
+			var val:String;
+			var prop:String;
+			for (p in obj)
+			{
+				prop = String(p);
+				if (prop && prop !== '' && prop !== ' ')
+				{
+					val = String(obj[p]);
+					res += prop + ': ' + val + ', ';
+				}
+			}
+			res = res.substr(0, res.length - 2);
+			return res;
+		}
 		
 		public static function getGameObjectS(path:String):String
 		{
@@ -273,7 +280,6 @@ package skua
 			var obj:* = _getObjectS(_gameClass, path);
 			return JSON.stringify(obj);
 		}
-		
 		
 		public static function getGameObjectKey(path:String, key:String):String
 		{
@@ -371,6 +377,113 @@ package skua
 			return 'true';
 		}
 		
+		private static function killLoginModals():void
+		{
+			var loc2_:MovieClip = null;
+			var loc1_:MovieClip = instance.game.mcLogin.ModalStack;
+			var loc3_:int = 0;
+			while (loc3_ < loc1_.numChildren)
+			{
+				loc2_ = loc1_.getChildAt(loc3_) as MovieClip;
+				if ("fClose" in loc2_)
+				{
+					loc2_.fClose();
+				}
+				loc3_++;
+			}
+		}
+		
+		public static function connectToServer(server:String):String
+		{
+			var serverData:Object = JSON.parse(server);
+			var objLogin:Object = null;
+			
+			var connectionServerTimer:Timer = new Timer(500, 50);
+			connectionServerTimer.addEventListener(TimerEvent.TIMER, connectingServer);
+			connectionServerTimer.start();
+			
+			function connectingServer(e:Event):void
+			{
+				instance.external.debug(JSON.stringify(objLogin));
+				if (objLogin != null)
+				{
+					connectServer(serverData, objLogin);
+					connectionServerTimer.stop();
+					connectionServerTimer.removeEventListener(TimerEvent.TIMER, connectingServer);
+				}
+				objLogin = JSON.parse(getGameObjectS("objLogin"));
+			}
+			
+			return true.toString();
+		}
+		
+		private static function connectServer(server:Object, objLoginData:Object):*
+		{
+			var _loc2_:ModalMC = null;
+			var _loc3_:Object = null;
+			var _loc4_:* = undefined;
+			instance.game.showTracking("4");
+			if (!instance.game.serialCmdMode)
+			{
+				if ((_loc4_ = server).bOnline == 0)
+				{
+					instance.game.MsgBox.notify("Server currently offline!");
+				}
+				else if (_loc4_.iCount >= _loc4_.iMax)
+				{
+					instance.game.MsgBox.notify("Server is Full!");
+				}
+				else if (_loc4_.iChat > 0 && objLoginData.bCCOnly == 1)
+				{
+					instance.game.MsgBox.notify("Account Restricted to Moglin Sage Server Only.");
+				}
+				else if (_loc4_.iChat > 0 && objLoginData.iAge < 13 && objLoginData.iUpgDays < 0)
+				{
+					instance.game.MsgBox.notify("Ask your parent to upgrade your account in order to play on chat enabled servers.");
+				}
+				else if (_loc4_.bUpg == 1 && objLoginData.iUpgDays < 0)
+				{
+					_loc2_ = new ModalMC();
+					_loc3_ = {};
+					_loc3_.strBody = "Member Server! Do you want to upgrade your account to access this premium server now?";
+					_loc3_.params = {};
+					_loc3_.glow = "white,medium";
+					_loc3_.btns = "dual";
+					instance.game.mcLogin.ModalStack.addChild(_loc2_);
+					_loc2_.init(_loc3_);
+				}
+				else if (Number(_loc4_.iMax) % 2 > 0)
+				{
+					_loc2_ = new ModalMC();
+					_loc3_ = {};
+					_loc3_.strBody = "Testing Server! Do you want to switch to the testing game client?";
+					_loc3_.params = {};
+					_loc3_.glow = "white,medium";
+					_loc3_.btns = "dual";
+					instance.game.mcLogin.ModalStack.addChild(_loc2_);
+					_loc2_.init(_loc3_);
+				}
+				else if (_loc4_.iLevel > 0 && objLoginData.iEmailStatus <= 2)
+				{
+					_loc2_ = new ModalMC();
+					_loc3_ = {};
+					_loc3_.strBody = "This server requires a confirmed email address.";
+					_loc3_.params = {};
+					_loc3_.glow = "red,medium";
+					_loc3_.btns = "mono";
+					instance.game.mcLogin.ModalStack.addChild(_loc2_);
+					_loc2_.init(_loc3_);
+				}
+				else
+				{
+					instance.game.objServerInfo = _loc4_;
+					instance.game.chatF.iChat = _loc4_.iChat;
+					killLoginModals();
+					instance.game.connectTo(_loc4_.sIP, _loc4_.iPort);
+				}
+			}
+		}
+		
 		public static function isTrue():String
 		{
 			return true.toString();
@@ -405,48 +518,33 @@ package skua
 			return false.toString();
 		}
 		
-		public static function getSubjectAuras(subject:String): String 
-		{			
+		public static function getSubjectAuras(subject:String):String
+		{
 			var aura:Object = null;
 			var auras:Object = null;
-			try 
+			try
 			{
 				auras = subject == 'Self' ? instance.game.world.myAvatar.dataLeaf.auras : instance.game.world.myAvatar.target.dataLeaf.auras;
-			} 
-			catch (e:Error) 
+			}
+			catch (e:Error)
 			{
 				return '[]';
 			}
-
+			
 			var auraArray:Array = new Array();
-			for(var i:int = 0; i < auras.length; i++)
+			for (var i:int = 0; i < auras.length; i++)
 			{
 				aura = auras[i];
-				auraArray.push({
-						'name':aura.nam,
-						'value':aura.val == undefined ? 0 : aura.val,
-						'passive':aura.passive,
-						'timeStamp':aura.ts,
-						'duration':parseInt(aura.dur),
-						'potionType':aura.potionType,
-						'cat':aura.cat,
-						't':aura.t,
-						's':aura.s,
-						'fx':aura.fx,
-						'animOn':aura.animOn,
-						'animOff':aura.animOff,
-						'msgOn':aura.msgOn,
-						'isNew':aura.isNew
-					});
+				auraArray.push({'name': aura.nam, 'value': aura.val == undefined ? 0 : aura.val, 'passive': aura.passive, 'timeStamp': aura.ts, 'duration': parseInt(aura.dur), 'potionType': aura.potionType, 'cat': aura.cat, 't': aura.t, 's': aura.s, 'fx': aura.fx, 'animOn': aura.animOn, 'animOff': aura.animOff, 'msgOn': aura.msgOn, 'isNew': aura.isNew});
 			}
 			return JSON.stringify(auraArray);
 		}
 		
-		public static function getAvatar(id:int) : String
+		public static function getAvatar(id:int):String
 		{
 			return JSON.stringify(instance.game.world.avatars[id].objData);
-		}	
-			
+		}
+		
 		public static function clickServer(serverName:String):String
 		{
 			var source:* = instance.game.mcLogin.sl.iList;
@@ -539,9 +637,9 @@ package skua
 			return JSON.stringify(retMonsters);
 		}
 		
-		public function requestDoomArenaPVPQueue() : void
+		public function requestDoomArenaPVPQueue():void
 		{
-			instance.game.world.rootClass.sfc.sendXtMessage("zm","PVPQr",["doomarena",0],"str",instance.game.world.rootClass.world.curRoom);
+			instance.game.world.rootClass.sfc.sendXtMessage("zm", "PVPQr", ["doomarena", 0], "str", instance.game.world.rootClass.world.curRoom);
 		}
 		
 		private static function attackTarget(target:*):void

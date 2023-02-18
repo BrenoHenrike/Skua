@@ -1,5 +1,7 @@
 ﻿using System;
 using System.Windows;
+using CommunityToolkit.Mvvm.DependencyInjection;
+using Skua.Core.AppStartup;
 using Skua.Core.Interfaces;
 using Skua.Core.Models;
 using Skua.Core.ViewModels;

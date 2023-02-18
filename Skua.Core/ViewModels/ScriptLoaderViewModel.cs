@@ -4,6 +4,7 @@ using CommunityToolkit.Mvvm.Input;
 using Skua.Core.Interfaces;
 using Skua.Core.Messaging;
 using Skua.Core.Models;
+using System.Diagnostics;
 
 namespace Skua.Core.ViewModels;
 public partial class ScriptLoaderViewModel : BotControlViewModelBase
@@ -175,6 +176,43 @@ public partial class ScriptLoaderViewModel : BotControlViewModelBase
 
     private async void StartScript(ScriptLoaderViewModel recipient, StartScriptMessage message)
     {
+        var startNew = false;
+        var msgPathFileName = Path.GetFileName(message.Path) ?? string.Empty;
+        var runningScriptMessage = $"Script {LoadedScript} is already running. Do you want to stop it?";
+        
+        ToggleScriptEnabled = false;
+
+        if (ScriptManager.ScriptRunning)
+        {
+            if (Path.GetFileName(ScriptManager.LoadedScript) != msgPathFileName)
+            {
+                runningScriptMessage = $"{LoadedScript} is running. Do you want to stop it and start {msgPathFileName}?";
+                startNew = true;
+            }
+               
+            var dialogResult = _dialogService.ShowMessageBox(runningScriptMessage, "Script Error", "No", "Yes");
+
+            if (dialogResult.Text == "Yes")
+            {
+                ToggleScriptEnabled = false;
+                await ScriptManager.StopScriptAsync();
+                
+                if (startNew)
+                {
+                    LoadedScript = Path.GetFileName(message.Path) ?? string.Empty;
+                    await Task.Delay(5000);
+                    await recipient.StartScriptAsync(message.Path);
+                }
+            }
+
+            ToggleScriptEnabled = true;
+            return;
+        }
+        else
+        {
+            LoadedScript = Path.GetFileName(message.Path) ?? string.Empty;
+        }
+
         await recipient.StartScriptAsync(message.Path);
     }
 

@@ -33,6 +33,19 @@ public class WindowService : IWindowService
         hostWindow.Show();
     }
 
+    public void ShowWindow<TViewModel>(int width, int height)
+        where TViewModel : class
+    {
+        HostWindow window = new()
+        {
+            DataContext = _services.GetService<TViewModel>(),
+            Height = height,
+            Width = width,
+            WindowStartupLocation = System.Windows.WindowStartupLocation.CenterScreen
+        };
+        window.Show();
+    }
+
     public void ShowWindow<TViewModel>(TViewModel viewModel)
         where TViewModel : class
     {

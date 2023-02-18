@@ -205,6 +205,7 @@ public static class Services
         services.AddSingleton<ScriptRepoViewModel>();
         services.AddSingleton<GoalsViewModel>();
         services.AddSingleton<AboutViewModel>();
+        services.AddSingleton<ChangeLogsViewModel>();
         services.AddSingleton(SkuaManager.CreateViewModel);
         services.AddSingleton(SkuaManager.CreateOptionsViewModel);
 
