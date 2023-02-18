@@ -35,27 +35,31 @@ public partial class ScriptManager : ObservableObject, IScriptManager
     private readonly Lazy<IScriptDrop> _lazyDrops;
     private readonly Lazy<IScriptWait> _lazyWait;
     private readonly ILogService _logger;
-    private readonly Dictionary<string, bool> _configured = new();
+    
     private IScriptHandlers Handlers => _lazyHandlers.Value;
     private IScriptSkill Skills => _lazySkills.Value;
     private IScriptDrop Drops => _lazyDrops.Value;
     private IScriptWait Wait => _lazyWait.Value;
+
     private Thread? _currentScriptThread;
-    public CancellationTokenSource? ScriptCTS { get; private set; }
-    
+    private bool _stoppedByScript;
+    private bool _runScriptStoppingBool;
+    private readonly Dictionary<string, bool> _configured = new();
+    private readonly List<string> _refCache = new();
+
     [ObservableProperty]
     private bool _scriptRunning = false;
     [ObservableProperty]
     private string _loadedScript = string.Empty;
     [ObservableProperty]
     private string _compiledScript = string.Empty;
+    
     public IScriptOptionContainer? Config { get; set; }
+
+    public CancellationTokenSource? ScriptCTS { get; private set; }
 
     public bool ShouldExit => ScriptCTS?.IsCancellationRequested ?? false;
 
-    private bool _stoppedByScript;
-    private bool _runScriptStoppingBool;
-    private readonly List<string> _refCache = new();
     public async Task<Exception?> StartScriptAsync()
     {
         if (ScriptRunning)
@@ -69,9 +73,11 @@ public partial class ScriptManager : ObservableObject, IScriptManager
             await _lazyBot.Value.Auto.StopAsync();
 
             object? script = Compile(File.ReadAllText(LoadedScript));
+            
             LoadScriptConfig(script);
             if (_configured.TryGetValue(Config!.Storage, out bool b) && !b)
                 Config.Configure();
+            
             Handlers.Clear();
             _currentScriptThread = new(async () =>
             {
@@ -87,6 +93,7 @@ public partial class ScriptManager : ObservableObject, IScriptManager
                     {
                         exception = e;
                         Trace.WriteLine($"Error while running script:\r\nMessage: {(e.InnerException is not null ? e.InnerException.Message : e.Message)}\r\nStackTrace: {(e.InnerException is not null ? e.InnerException.StackTrace : e.StackTrace)}");
+                        
                         StrongReferenceMessenger.Default.Send<ScriptErrorMessage, int>(new(e), (int)MessageChannels.ScriptStatus);
                         _runScriptStoppingBool = true;
                     }
@@ -113,6 +120,8 @@ public partial class ScriptManager : ObservableObject, IScriptManager
                         }
                         catch { }
                     }
+
+                    script = null;
                     Skills.Stop();
                     Drops.Stop();
                     ScriptCTS.Dispose();
@@ -121,10 +130,13 @@ public partial class ScriptManager : ObservableObject, IScriptManager
                     ScriptRunning = false;
                 }
             });
+            
             _currentScriptThread.Name = "Script Thread";
             _currentScriptThread.Start();
             ScriptRunning = true;
+            
             StrongReferenceMessenger.Default.Send<ScriptStartedMessage, int>((int)MessageChannels.ScriptStatus);
+            
             return null;
         }
         catch (Exception e)
@@ -185,51 +197,96 @@ public partial class ScriptManager : ObservableObject, IScriptManager
 
     public object? Compile(string source)
     {
-        Stopwatch sw = new();
-        sw.Start();
+        var sw = Stopwatch.StartNew();
+        var references = GetReferences();
+        var final = ProcessSources(source, ref references);
+        var tree = CSharpSyntaxTree.ParseText(final, encoding: Encoding.UTF8);
+        
+        CompiledScript = final = tree.GetRoot().NormalizeWhitespace().ToFullString();
+        Compiler compiler = Ioc.Default.GetRequiredService<Compiler>();
+        
+        if (references.Count > 0)
+            compiler.AddAssemblies(references.ToArray());
 
-        List<string> references = new();
+        dynamic? assembly = compiler.CompileClass(final);
+
+        sw.Stop();
+        Trace.WriteLine($"Script compilation took {sw.ElapsedMilliseconds}ms.");
+
+        File.WriteAllText(Path.Combine(ClientFileSources.SkuaScriptsDIR, "z_CompiledScript.cs"), final);
+
+        if (compiler.Error)
+            throw new ScriptCompileException(compiler.ErrorMessage, compiler.GeneratedClassCodeWithLineNumbers);
+
+        return assembly;
+    }
+
+    private HashSet<string> GetReferences()
+    {
+        var references = new HashSet<string>();
         if (_refCache.Count == 0 && Directory.Exists(ClientFileSources.SkuaPluginsDIR))
-            _refCache.AddRange(Directory.GetFiles(ClientFileSources.SkuaPluginsDIR, "*.dll").Select(x => Path.Combine(ClientFileSources.SkuaDIR, x)).Where(CanLoadAssembly));
-        _refCache.ForEach(x => references.Add(x));
-        string toRemove = "";
-        List<string> sources = new() { source };
-        foreach (string line in source.Split('\n').Select(l => l.Trim()))
+        {
+            foreach (var file in Directory.EnumerateFiles(ClientFileSources.SkuaPluginsDIR, "*.dll"))
+            {
+                var path = Path.Combine(ClientFileSources.SkuaDIR, file);
+                if (CanLoadAssembly(path))
+                {
+                    _refCache.Add(path);
+                    references.Add(path);
+                }
+            }
+        }
+        else
+        {
+            references.UnionWith(_refCache);
+        }
+
+        return references;
+    }
+
+    private string ProcessSources(string source, ref HashSet<string> references)
+    {
+        var toRemove = new StringBuilder();
+        var sources = new List<string> { source };
+
+        foreach (var line in source.Split('\n').Select(l => l.Trim()))
         {
             if (line.StartsWith("using"))
                 break;
+
             if (line.StartsWith("//cs_"))
             {
-                string[] parts = line.Split((char[])null!, 2, StringSplitOptions.RemoveEmptyEntries);
-                string cmd = parts[0].Substring(5);
+                var parts = line.Split((char[])null!, 2, StringSplitOptions.RemoveEmptyEntries);
+                var cmd = parts[0].Substring(5);
                 switch (cmd)
                 {
                     case "ref":
-                        string local = Path.Combine(ClientFileSources.SkuaDIR, parts[1]);
+                        var local = Path.Combine(ClientFileSources.SkuaDIR, parts[1]);
                         if (File.Exists(local))
                             references.Add(local);
                         else if (File.Exists(parts[1]))
                             references.Add(parts[1]);
                         break;
                     case "include":
-                        string localSource = Path.Combine(ClientFileSources.SkuaDIR, parts[1]);
+                        var localSource = Path.Combine(ClientFileSources.SkuaDIR, parts[1]);
                         if (File.Exists(localSource))
                             sources.Add($"// Added from {localSource}\n{File.ReadAllText(localSource)}");
                         else if (File.Exists(parts[1]))
                             sources.Add($"// Added from {parts[1]}\n{File.ReadAllText(parts[1])}");
                         break;
                 }
-                toRemove = $"{toRemove}{line}{Environment.NewLine}";
+                toRemove.Append(line).AppendLine();
             }
         }
 
         if (sources.Count > 1)
         {
-            sources[0] = sources[0].Replace(toRemove, "");
-            string joinedSource = string.Join(Environment.NewLine, sources);
-            List<string> lines = joinedSource.Split('\n').Select(l => l.Trim()).ToList();
-            List<string> usings = new();
-            for (int i = lines.Count - 1; i >= 0; i--)
+            sources[0] = sources[0].Replace(toRemove.ToString(), "");
+
+            var usings = new List<string>();
+            var joinedSource = string.Join(Environment.NewLine, sources);
+            var lines = joinedSource.Split('\n').Select(l => l.Trim()).ToList();
+            for (var i = lines.Count - 1; i >= 0; i--)
             {
                 if (lines[i].StartsWith("using") && lines[i].Split(' ').Length == 2)
                 {
@@ -237,26 +294,14 @@ public partial class ScriptManager : ObservableObject, IScriptManager
                     lines.RemoveAt(i);
                 }
             }
+
             lines.Insert(0, $"{string.Join(Environment.NewLine, usings.Distinct())}{Environment.NewLine}#nullable enable{Environment.NewLine}");
             sources = lines;
         }
 
-        string final = string.Join('\n', sources);
-        SyntaxTree tree = CSharpSyntaxTree.ParseText(final, encoding: Encoding.UTF8);
-        CompiledScript = final = tree.GetRoot().NormalizeWhitespace().ToFullString();
-        Compiler compiler = Ioc.Default.GetRequiredService<Compiler>();
-        if (references.Count > 0)
-            compiler.AddAssemblies(references.ToArray());
-
-        dynamic? assembly = compiler.CompileClass(final);
-        sw.Stop();
-        Trace.WriteLine($"Script compilation took {sw.ElapsedMilliseconds}ms.");
-        File.WriteAllText(Path.Combine(ClientFileSources.SkuaScriptsDIR, "z_CompiledScript.cs"), final);
-        if (compiler.Error)
-            throw new ScriptCompileException(compiler.ErrorMessage, compiler.GeneratedClassCodeWithLineNumbers);
-
-        return assembly;
+        return string.Join(Environment.NewLine, sources);
     }
+    
     public void LoadScriptConfig(object? script)
     {
         if (script is null)
@@ -292,6 +337,7 @@ public partial class ScriptManager : ObservableObject, IScriptManager
             _configured[opts.Storage] = (bool)dontPreconfField.GetValue(script)!;
         else if (optsField is not null)
             _configured[opts.Storage] = false;
+        
         opts.SetDefaults();
         opts.Load();
     }
