@@ -1,18 +1,11 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <Wix xmlns="http://schemas.microsoft.com/wix/2006/wi">
 
-    <!-- Give product a unique ID per platform -->
-    <?if $(var.Platform)=x64 ?>
-    <?define ProductCode = "{3AFE165B-ED77-4FD7-9F12-4742A7778A6E}" ?>
-    <?else?>
-    <?define ProductCode = "{9DD51CDC-E346-41AE-9744-92DC3405195A}" ?>
-    <?endif?>
     <!-- Fixed upgrade Id -->
     <?define UpgradeCode = "{8C197FE6-57DF-41FD-A0CD-84B5D3B97BDC}" ?>
 
     <!-- Define main product -->
     <Product Id="*"
-    <Product Id="$(var.ProductCode)"
            Name="!(loc.ProductName_$(var.Platform))"
            Language="!(loc.Language)"
            Version="$(var.BuildVersion)"
@@ -44,31 +37,18 @@
 				IncludeMaximum="no" 
 				MigrateFeatures="yes" 
 				Property="UPGRADE_DETECTED"   />
-        </Upgrade>
+    </Upgrade>
 
         <InstallExecuteSequence>
           <RemoveExistingProducts After="InstallInitialize" />
         </InstallExecuteSequence>
 
-		<Condition Message="!(loc.DowngradeErrorMessage)">
-			NOT DOWNGRADE_DETECTED
-		</Condition>
+      <Condition Message="!(loc.DowngradeErrorMessage)">
+        NOT DOWNGRADE_DETECTED
+      </Condition>
 		
         <!-- Include .cab file into .msi file -->
         <MediaTemplate EmbedCab="yes" />
-
-        <Property Id="WIXUI_INSTALLDIR" Value="TARGETDIR" />
-        <UIRef Id="WixUI_Skua" />
-        <UIRef Id="WixUI_ErrorProgressText" />
-
-
-        <!-- Downgrade error message -->
-        <MajorUpgrade DowngradeErrorMessage="!(loc.DowngradeErrorMessage)" />
-
-        <!-- Include .cab file into .msi file -->
-        <MediaTemplate
-      EmbedCab="yes"
-      />
 
         <Property Id="WIXUI_INSTALLDIR" Value="TARGETDIR" />    
         <UIRef Id="WixUI_Skua" />
@@ -97,23 +77,11 @@
         </Feature>
         
         <!-- include the feature for the shortcuts -->
-        <Feature Id="SkuaShortcuts" Title="Shortcuts" Description="Create shortcuts for Skua." Level="1">
-            <ComponentRef Id="SkuaManagerShortcut" />
-            <ComponentRef Id="SkuaShortcut" />
-            <ComponentRef Id="SkuaDesktopShortcut" />
-            <ComponentRef Id="SkuaManagerDesktopShortcut" />
-        <WixVariable Id="WixUIBannerBmp" Value="$(var.ProjectDir)\Assets\Banner.bmp" />-->
-
-        <!-- Define components, shortcuts, files etc... for installer -->
-        <Feature Id="ProductFeature" Title="Skua" Description="The main application." Level="1">
-            <ComponentGroupRef Id="PublishedComponents" />
-        </Feature>
-        <Feature Id="VSCodeFolder" Title="Local Visual Studio Code" Level="1" Description="Whether to install Skua alongside with a portable version of VSCode (doesn't affect installed VSCode instance)."  >
-            <ComponentGroupRef Id="VSCodeComponents" />
-        </Feature>
-        <Feature Id="FFDec" Title="FFDec (Flash Decompiler)" Level="1" Description="Whether to install FFDec, a tool used by the Grabber to search for Map Item IDs in the game SWFs. (Needs Java 8)">
-            <ComponentGroupRef Id="FFDecComponents" />
-        </Feature>
-
+      <Feature Id="SkuaShortcuts" Title="Shortcuts" Description="Create shortcuts for Skua." Level="1">
+        <ComponentRef Id="SkuaManagerShortcut" />
+        <ComponentRef Id="SkuaShortcut" />
+        <ComponentRef Id="SkuaDesktopShortcut" />
+        <ComponentRef Id="SkuaManagerDesktopShortcut" />
+      </Feature>	
     </Product>
 </Wix>

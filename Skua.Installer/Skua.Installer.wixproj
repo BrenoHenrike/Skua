@@ -34,10 +34,6 @@
     <!-- <Compile Include="FFDecComponentsGenerated.wxs" /> -->
     <Compile Include="Product.wxs" />
     <Compile Include="UI.wxs" />
-    <Compile Include="FFDecComponentsGenerated.wxs" />
-    <Compile Include="Product.wxs" />
-    <Compile Include="UI.wxs" />
-    <Compile Include="VSCodeComponentsGenerated.wxs" />
   </ItemGroup>
   <ItemGroup>
     <EmbeddedResource Include="Common.wxl" />
