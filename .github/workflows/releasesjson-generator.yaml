@@ -6,6 +6,7 @@ on:
       - master
       - dev
       - 'op-version'
+      - 'feature/*'
   pull_request:
       types: [closed]
   release:
@@ -17,7 +18,7 @@ jobs:
 
     steps:
     - name: Checkout repository
-      uses: actions/checkout@v2
+      uses: actions/checkout@v3
       with:
         ref: ${{ github.head_ref }}
 
@@ -35,6 +36,7 @@ jobs:
     - name: Commit and push changes
       uses: stefanzweifel/git-auto-commit-action@v4
       with:
+        branch: ${{ github.head_ref }}
         commit_message: 'Automatic commit by GitHub Actions'
         files: 'releases.json'
         push: true
