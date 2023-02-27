@@ -32,4 +32,15 @@ public partial class ScriptSelfAuras : IScriptSelfAuras
     {
         return GetAura(auraName) != null;
     }
+
+    public bool TryGetAura(string auraName, out Aura? aura)
+    {
+        if (HasActiveAura(auraName))
+        {
+            aura = GetAura(auraName);
+            return true;
+        }
+        aura = null;
+        return false;
+    }
 }
