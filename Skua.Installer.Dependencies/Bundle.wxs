@@ -4,7 +4,7 @@
         Name="Skua Dependencies"
         Compressed="yes"
         AboutUrl="https://www.github.com/BrenoHenrike/Skua"
-        HelpUrl="https://discord.io/AQWBots" Version="1.0.0.0"
+        HelpUrl="https://discord.gg/hstRRK9G7w" Version="1.0.0.0"
         Manufacturer="Skua"
         UpgradeCode="6fa1b3f3-d317-458f-b1d1-32eef8ccf074">
         <BootstrapperApplicationRef Id="WixStandardBootstrapperApplication.HyperlinkLicense">
