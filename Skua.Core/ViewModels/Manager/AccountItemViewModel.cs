@@ -12,8 +12,17 @@ public partial class AccountItemViewModel : ObservableObject
     private string _username;
     [ObservableProperty]
     private string _password;
-    [ObservableProperty]
+
     private bool _useCheck;
+    public bool UseCheck
+    {
+        get => _useCheck;
+        set
+        {
+            if (SetProperty(ref _useCheck, value))
+                WeakReferenceMessenger.Default.Send<AccountSelectedMessage>(new(_useCheck));
+        }
+    }
 
     [RelayCommand]
     private void Remove()

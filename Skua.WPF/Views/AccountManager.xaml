@@ -14,98 +14,167 @@
     d:DesignHeight="450"
     d:DesignWidth="800"
     mc:Ignorable="d">
+
     <Grid Margin="6">
-        <Grid.ColumnDefinitions>
-            <ColumnDefinition />
-        </Grid.ColumnDefinitions>
         <Grid.RowDefinitions>
+            <RowDefinition Height="auto" />
+            <RowDefinition Height="auto" />
             <RowDefinition />
             <RowDefinition Height="auto" />
+            <RowDefinition Height="auto" />
+            <RowDefinition Height="auto" />
         </Grid.RowDefinitions>
-
-        <StackPanel Grid.Column="1" Margin="5">
-            <Expander Header="Add Account">
-                <Expander.Resources>
-                    <Style BasedOn="{StaticResource MaterialDesignFloatingHintTextBox}" TargetType="TextBox" />
-                </Expander.Resources>
-                <StackPanel>
-                    <DockPanel>
-                        <CheckBox
-                            Margin="6,0"
-                            materialDesign:CheckBoxAssist.CheckBoxSize="25"
-                            Content="Username as Display"
-                            DockPanel.Dock="Right"
-                            IsChecked="{Binding UseNameAsDisplay}" />
-                        <TextBox
-                            Margin="6"
-                            materialDesign:HintAssist.Hint="Display Name"
-                            Text="{Binding DisplayNameInput, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" />
-                    </DockPanel>
-                    <TextBox
+        <Expander Grid.Row="0" Header="Add Account">
+            <Expander.Resources>
+                <Style BasedOn="{StaticResource MaterialDesignFloatingHintTextBox}" TargetType="TextBox" />
+            </Expander.Resources>
+            <StackPanel>
+                <DockPanel>
+                    <CheckBox
                         Margin="6,0"
-                        materialDesign:HintAssist.Hint="Username"
-                        Text="{Binding UsernameInput, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" />
-                    <PasswordBox
-                        x:Name="PswBox"
+                        materialDesign:CheckBoxAssist.CheckBoxSize="25"
+                        Content="Username as Display"
+                        DockPanel.Dock="Right"
+                        IsChecked="{Binding UseNameAsDisplay}" />
+                    <TextBox
                         Margin="6"
-                        materialDesign:HintAssist.Hint="Password"
-                        PasswordChanged="PasswordBox_PasswordChanged"
-                        Style="{StaticResource MaterialDesignFloatingHintPasswordBox}" />
-                    <Button
-                        Grid.Column="0"
-                        Margin="6,0,6,6"
-                        Command="{Binding AddAccountCommand}"
-                        Content="Add" />
-                </StackPanel>
-            </Expander>
-
-            <ScrollViewer
-                MaxHeight="220"
-                Margin="0,6"
-                materialDesign:ScrollViewerAssist.IsAutoHideEnabled="True">
-                <ItemsControl
-                    Margin="6,0,0,0"
-                    d:ItemsSource="{d:SampleData ItemCount=5}"
-                    ItemsSource="{Binding Accounts}">
-                    <ItemsControl.ItemTemplate>
-                        <DataTemplate>
-                            <usercontrols:AccountItemUserControl DataContext="{Binding}" />
-                        </DataTemplate>
-                    </ItemsControl.ItemTemplate>
-                </ItemsControl>
-            </ScrollViewer>
-            <Grid>
-                <Grid.ColumnDefinitions>
-                    <ColumnDefinition />
-                    <ColumnDefinition />
-                    <ColumnDefinition />
-                </Grid.ColumnDefinitions>
-                <ComboBox
+                        materialDesign:HintAssist.Hint="Display Name"
+                        Text="{Binding DisplayNameInput, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" />
+                </DockPanel>
+                <TextBox
+                    Margin="6,0"
+                    materialDesign:HintAssist.Hint="Username"
+                    Text="{Binding UsernameInput, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" />
+                <PasswordBox
+                    x:Name="PswBox"
+                    Margin="6"
+                    materialDesign:HintAssist.Hint="Password"
+                    PasswordChanged="PasswordBox_PasswordChanged"
+                    Style="{StaticResource MaterialDesignFloatingHintPasswordBox}" />
+                <Button
                     Grid.Column="0"
-                    Margin="0,0,5,0"
-                    materialDesign:HintAssist.Hint="Login Server"
-                    ItemsSource="{Binding ServerList, UpdateSourceTrigger=PropertyChanged}"
-                    SelectedItem="{Binding SelectedServer}"
-                    Style="{StaticResource MaterialDesignFloatingHintComboBox}"
-                    ToolTip="Which server to login when launching accounts" />
+                    Margin="6,0,6,6"
+                    Command="{Binding AddAccountCommand}"
+                    Content="Add" />
+            </StackPanel>
+        </Expander>
+        <DockPanel
+            Grid.Row="1"
+            Margin="0,6"
+            LastChildFill="False">
+            <TextBox
+                Width="70"
+                Margin="3,6,6,6"
+                VerticalAlignment="Center"
+                materialDesign:HintAssist.Hint="Columns"
+                DockPanel.Dock="Right"
+                Text="{Binding Columns, UpdateSourceTrigger=PropertyChanged}">
+                <b:Interaction.Behaviors>
+                    <wpf:TextBoxOnlyNumbersBehavior />
+                </b:Interaction.Behaviors>
+            </TextBox>
+            <TextBlock
+                Margin="0,0,50,0"
+                VerticalAlignment="Center"
+                d:Text="000"
+                DockPanel.Dock="Right"
+                FontSize="18"
+                FontWeight="Bold"
+                Text="{Binding SelectedAccountQuant}" />
+            <TextBlock
+                Margin="0,0,10,0"
+                VerticalAlignment="Center"
+                DockPanel.Dock="Right"
+                FontSize="18"
+                Text="Selected:" />
+        </DockPanel>
+        <ScrollViewer
+            Grid.Row="2"
+            Margin="0,0,0,6"
+            materialDesign:ScrollViewerAssist.IsAutoHideEnabled="True">
+            <ItemsControl
+                Margin="6,0,0,0"
+                d:ItemsSource="{d:SampleData ItemCount=15}"
+                ItemsSource="{Binding Accounts}">
+                <ItemsControl.ItemTemplate>
+                    <DataTemplate>
+                        <usercontrols:AccountItemUserControl DataContext="{Binding}" />
+                    </DataTemplate>
+                </ItemsControl.ItemTemplate>
+                <ItemsControl.ItemsPanel>
+                    <ItemsPanelTemplate>
+                        <UniformGrid d:Columns="1" Columns="{Binding RelativeSource={RelativeSource AncestorType=UserControl}, Path=DataContext.Columns}" />
+                    </ItemsPanelTemplate>
+                </ItemsControl.ItemsPanel>
+            </ItemsControl>
+        </ScrollViewer>
+        <Grid Grid.Row="3">
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition />
+                <ColumnDefinition />
+                <ColumnDefinition />
+            </Grid.ColumnDefinitions>
+            <ComboBox
+                Grid.Column="0"
+                Margin="0,0,5,0"
+                materialDesign:HintAssist.Hint="Login Server"
+                ItemsSource="{Binding ServerList, UpdateSourceTrigger=PropertyChanged}"
+                SelectedItem="{Binding SelectedServer}"
+                Style="{StaticResource MaterialDesignFloatingHintComboBox}"
+                ToolTip="Which server to login when launching accounts" />
+            <Button
+                Grid.Column="1"
+                Margin="5,0,5,0"
+                Command="{Binding StartAccountsCommand}"
+                Content="Start Selected"
+                ToolTip="Launch and login all the accounts with the checkbox marked" />
+            <Button
+                Grid.Column="2"
+                Margin="5,0,0,0"
+                Command="{Binding RemoveAccountsCommand}"
+                Content="Remove Selected"
+                ToolTip="Removes all accounts with the checkbox marked." />
+        </Grid>
+        <Button
+            Grid.Row="4"
+            Margin="0,5,0,0"
+            Command="{Binding StartAllAccountsCommand}"
+            Content="Start All"
+            ToolTip="Launchs all saved accounts" />
+        <Grid Grid.Row="5" Margin="0,6,0,0">
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="2*" />
+                <ColumnDefinition />
+            </Grid.ColumnDefinitions>
+            <DockPanel>
                 <Button
                     Grid.Column="1"
-                    Margin="5,0,5,0"
-                    Command="{Binding StartAccountsCommand}"
-                    Content="Start Selected"
-                    ToolTip="Launch and login all the accounts with the checkbox marked" />
-                <Button
-                    Grid.Column="2"
-                    Margin="5,0,0,0"
-                    Command="{Binding RemoveAccountsCommand}"
-                    Content="Remove Selected"
-                    ToolTip="Removes all accounts with the checkbox marked." />
-            </Grid>
-            <Button
-                Margin="0,5,0,0"
-                Command="{Binding StartAllAccountsCommand}"
-                Content="Start All"
-                ToolTip="Launchs all saved accounts" />
-        </StackPanel>
+                    VerticalAlignment="Center"
+                    materialDesign:ButtonAssist.CornerRadius="0 2 2 0"
+                    Command="{Binding ChangeScriptPathCommand}"
+                    Content="{materialDesign:PackIcon Kind=Folder}"
+                    DockPanel.Dock="Right"
+                    ToolTip="Change the script path." />
+                <Border
+                    Grid.Column="0"
+                    Height="32"
+                    BorderBrush="{DynamicResource PrimaryHueMidBrush}"
+                    BorderThickness="1,1,0,1"
+                    CornerRadius="2 0 0 2"
+                    ToolTip="Paht to a script which will be loaded and started after launching an account.">
+                    <TextBlock
+                        Margin="16,0,0,0"
+                        VerticalAlignment="Center"
+                        Text="{Binding ScriptPath, FallbackValue='Script Path'}" />
+                </Border>
+            </DockPanel>
+            <CheckBox
+                Grid.Column="1"
+                Margin="6,0,0,0"
+                materialDesign:CheckBoxAssist.CheckBoxSize="24"
+                Content="Start with Script"
+                IsChecked="{Binding StartWithScript}"
+                ToolTip="After launching and loging in the accounts, starts the specified script." />
+        </Grid>
     </Grid>
 </UserControl>

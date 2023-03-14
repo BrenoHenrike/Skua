@@ -8,18 +8,19 @@ using System.Diagnostics;
 using System.Collections.Specialized;
 using Newtonsoft.Json;
 using Skua.Core.Models.Servers;
-using System.Collections.ObjectModel;
-using System.ComponentModel;
+using Skua.Core.Models;
 
 namespace Skua.Core.ViewModels.Manager;
 public sealed partial class AccountManagerViewModel : BotControlViewModelBase
 {
-    public AccountManagerViewModel(ISettingsService settingsService, IDialogService dialogService)
+    public AccountManagerViewModel(ISettingsService settingsService, IDialogService dialogService, IFileDialogService fileService)
         : base("Accounts")
     {
         Messenger.Register<AccountManagerViewModel, RemoveAccountMessage>(this, (r, m) => r._RemoveAccount(m.Account));
+        Messenger.Register<AccountManagerViewModel, AccountSelectedMessage>(this, AccountSelected);
         _settingsService = settingsService;
         _dialogService = dialogService;
+        _fileService = fileService;
         ServerList = new();
         Task.Run(async () => await _GetServers());
         Accounts = new();
@@ -33,9 +34,18 @@ public sealed partial class AccountManagerViewModel : BotControlViewModelBase
 
     private readonly ISettingsService _settingsService;
     private readonly IDialogService _dialogService;
+    private readonly IFileDialogService _fileService;
 
     public RangedObservableCollection<AccountItemViewModel> Accounts { get; }
 
+    [ObservableProperty]
+    private string _scriptPath = string.Empty;
+    [ObservableProperty]
+    private bool _startWithScript;
+    [ObservableProperty]
+    private int _columns = 1;
+    [ObservableProperty]
+    private int _selectedAccountQuant;
     [ObservableProperty]
     private string _usernameInput;
     [ObservableProperty]
@@ -48,8 +58,16 @@ public sealed partial class AccountManagerViewModel : BotControlViewModelBase
     [ObservableProperty]
     private RangedObservableCollection<Server> _serverList;
 
-
     public string PasswordInput { private get; set; }
+
+    [RelayCommand]
+    public void ChangeScriptPath()
+    {
+        string? folderPath = _fileService.OpenFile(ClientFileSources.SkuaScriptsDIR, "Skua Scripts (*.cs)|*.cs");
+
+        if (!string.IsNullOrEmpty(folderPath))
+            ScriptPath = folderPath;
+    }
 
     [RelayCommand]
     public void AddAccount()
@@ -122,7 +140,7 @@ public sealed partial class AccountManagerViewModel : BotControlViewModelBase
     {
         ProcessStartInfo psi = new(Path.Combine(AppContext.BaseDirectory, "Skua.exe"))
         {
-            Arguments = $"--usr \"{username}\" --psw \"{password}\" --sv \"{_selectedServer.Name}\"",
+            Arguments = $"--usr \"{username}\" --psw \"{password}\" --sv \"{_selectedServer.Name}\"{(_settingsService.Get("SyncThemes", false) ? $" --use-theme \"{_settingsService.Get("CurrentTheme", "no-theme")}\"" : string.Empty)}{(StartWithScript ? $" --run-script \"{ScriptPath ?? string.Empty}\"" : string.Empty)}",
             WorkingDirectory = AppContext.BaseDirectory
         };
         Process.Start(psi);
@@ -159,5 +177,13 @@ public sealed partial class AccountManagerViewModel : BotControlViewModelBase
 
         _cachedServers = JsonConvert.DeserializeObject<List<Server>>(response)!;
         ServerList.AddRange(_cachedServers);
+    }
+
+    private void AccountSelected(AccountManagerViewModel recipient, AccountSelectedMessage message)
+    {
+        if (message.Add)
+            recipient.SelectedAccountQuant++;
+        else
+            recipient.SelectedAccountQuant--;
     }
 }

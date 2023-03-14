@@ -10,3 +10,4 @@ public sealed class UpdateStartedMessage : AsyncRequestMessage<bool> { }
 public sealed record UpdateFinishedMessage();
 public sealed record ClearPasswordBoxMessage();
 public sealed record RemoveAccountMessage(AccountItemViewModel Account);
+public sealed record AccountSelectedMessage(bool Add);
