@@ -593,22 +593,22 @@ package skua
 			}
 		}
 		
-		public static function attackMonsterByID(id:int):void
+		public static function attackMonsterByID(id:int):String
 		{
 			var monster:* = instance.game.world.getMonster(id);
-			attackTarget(monster);
+			return attackTarget(monster);
 		}
 		
-		public static function attackMonsterByName(name:String):void
+		public static function attackMonsterByName(name:String):String
 		{
 			var monster:* = getMonster(name);
-			attackTarget(monster);
+			return attackTarget(monster);
 		}
 		
-		public static function attackPlayer(name:String):void
+		public static function attackPlayer(name:String):String
 		{
 			var player:* = instance.game.world.getAvatarByUserName(name.toLowerCase());
-			attackTarget(player);
+			return attackTarget(player);
 		}
 		
 		public static function getMonster(name:String):*
@@ -642,13 +642,15 @@ package skua
 			instance.game.world.rootClass.sfc.sendXtMessage("zm", "PVPQr", ["doomarena", 0], "str", instance.game.world.rootClass.world.curRoom);
 		}
 		
-		private static function attackTarget(target:*):void
+		private static function attackTarget(target:*):String
 		{
 			if (target != null && target.pMC != null)
 			{
 				instance.game.world.setTarget(target);
 				instance.game.world.approachTarget();
+				return true.toString();
 			}
+			return false.toString();
 		}
 		
 		public static function useSkill(index:int):String
