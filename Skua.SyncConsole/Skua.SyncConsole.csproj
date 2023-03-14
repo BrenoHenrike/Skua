@@ -12,7 +12,6 @@
     <ProjectReference Include="..\Skua.Core.Models\Skua.Core.Models.csproj" />
     <ProjectReference Include="..\Skua.Core.Utils\Skua.Core.Utils.csproj" />
     <ProjectReference Include="..\Skua.Core\Skua.Core.csproj" />
-    <ProjectReference Include="..\Skua.gRPC.Protos\Skua.gRPC.Protos.csproj" />
   </ItemGroup>
 
 </Project>
