@@ -49,8 +49,15 @@ public partial class CustomWindow : Window
     public static readonly DependencyProperty TitleTextProperty =
         DependencyProperty.Register("TitleText", typeof(string), typeof(CustomWindow), new PropertyMetadata("Skua"));
 
+    static CustomWindow()
+    {
+        DefaultStyleKeyProperty.OverrideMetadata(typeof(CustomWindow), new FrameworkPropertyMetadata(typeof(CustomWindow)));
+    }
+
     public CustomWindow() : base()
     {
+        ApplyTemplate();
+
         SourceInitialized += (s, e) =>
         {
             IntPtr handle = new WindowInteropHelper(this).Handle;

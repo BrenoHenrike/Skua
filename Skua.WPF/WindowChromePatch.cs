@@ -12,7 +12,7 @@ public static class WindowChromePatch
         {
             case 0x0024:
                 WmGetMinMaxInfo(hwnd, lParam);
-                handled = true;
+                handled = false;
                 break;
         }
         return (IntPtr)0;
