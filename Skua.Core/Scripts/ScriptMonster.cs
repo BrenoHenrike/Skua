@@ -27,6 +27,9 @@ public partial class ScriptMonster : IScriptMonster
 
     [ObjectBinding("world.monsters", Select = "objData", Default = "new()")]
     private List<Monster> _mapMonsters = new();
+
+    [ObjectBinding("world.monsters", Select = "dataLeaf", Default = "new()")]
+    private List<MonsterDataLeaf> _mapMonstersDataLeaf = new();
     public List<Monster> CurrentAvailableMonsters
     {
         get

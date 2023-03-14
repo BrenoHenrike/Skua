@@ -18,28 +18,28 @@ public interface IScriptCombat
     /// </summary>
     /// <param name="mapId">The id of the monster to attack.</param>
     /// <remarks>This will not wait until the monster is killed, but simply select it and start attacking it.</remarks>
-    void Attack(int id);
+    bool Attack(int id);
     /// <summary>
     /// Attacks the specified instance of a <paramref name="monster"/>.
     /// </summary>
     /// <param name="monster">Monster to attack.</param>
     /// <remarks>This will not wait until the monster is killed, but simply select it and start attacking it.</remarks>
-    void Attack(Monster monster)
+    bool Attack(Monster monster)
     {
-        Attack(monster.MapID);
+        return Attack(monster.MapID);
     }
     /// <summary>
     /// Attacks the monster with specified <paramref name="name"/>.
     /// </summary>
     /// <param name="name">Name of the monster to attack.</param>
     /// <remarks>This will not wait until the monster is killed, but simply select it and start attacking it.</remarks>
-    void Attack(string name);
+    bool Attack(string name);
     /// <summary>
     /// Attacks the player with specified <paramref name="name"/>. If not in PVP mode, this will only target the player, and not attack them.
     /// </summary>
     /// <param name="name">Name of the player to attack.</param>
     /// <remarks>This will not wait until the player is killed, but simply select it.</remarks>
-    void AttackPlayer(string name);
+    bool AttackPlayer(string name);
     /// <summary>
     /// Cancel the player's auto attack.
     /// </summary>

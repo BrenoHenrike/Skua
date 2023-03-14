@@ -69,28 +69,32 @@ public partial class ScriptCombat : IScriptCombat
         Wait.ForCombatExit();
     }
 
-    [MethodCallBinding("attackMonsterName", RunMethodPre = true)]
-    private void _attack(string name)
+    public bool Attack(string name)
     {
         if (StopAttacking)
         {
             CancelTarget();
-            return;
+            return false;
         }
+
+        return Flash.Call<bool>("attackMonsterName", name);
     }
 
-    [MethodCallBinding("attackMonsterID", RunMethodPre = true)]
-    private void _attack(int id)
+    public bool Attack(int id)
     {
         if (StopAttacking)
         {
             CancelTarget();
-            return;
+            return false;
         }
+
+        return Flash.Call<bool>("attackMonsterID", id);
     }
 
-    [MethodCallBinding("attackPlayer")]
-    private void _attackPlayer(string name) { }
+    public bool AttackPlayer(string name)
+    {
+        return Flash.Call<bool>("attackPlayer", name);
+    }
 
     private void PlayerDead(ScriptCombat recipient, PlayerDeathMessage message)
     {

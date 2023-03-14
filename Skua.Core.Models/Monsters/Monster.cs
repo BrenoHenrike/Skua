@@ -2,6 +2,9 @@
 
 namespace Skua.Core.Models.Monsters;
 
+/// <summary>
+/// Class that represents the object data of a Monster
+/// </summary>
 public class Monster
 {
     /// <summary>

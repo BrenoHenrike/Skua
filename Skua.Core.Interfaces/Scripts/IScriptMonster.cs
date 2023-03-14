@@ -13,6 +13,10 @@ public interface IScriptMonster
     /// </summary>
     List<Monster> MapMonsters { get; }
     /// <summary>
+    /// A list of all monsters dataLeaf object in the current map.
+    /// </summary>
+    List<MonsterDataLeaf> MapMonstersDataLeaf { get; }
+    /// <summary>
     /// A list of all monsters that the player can attack in the current cell.
     /// </summary>
     List<Monster> CurrentAvailableMonsters { get; }
@@ -23,7 +27,10 @@ public interface IScriptMonster
     /// <returns><see langword="true"/> if the specified monster exists and is alive in the current cell.</returns>
     bool Exists(string name)
     {
-        return MapMonsters.Any(m => name == "*" || (m.Name.Trim() == name.Trim() && m.Alive));
+        if (TryGetMonster(name, out Monster? monster) && monster != null)
+            return MapMonstersDataLeaf.Any(m => name == "*" || (monster.Name.Trim() == name.Trim() && m.Alive));
+
+        return false;
     }
     /// <summary>
     /// Checks whether the specified <paramref name="id"/> exists in the current cell.
@@ -32,7 +39,7 @@ public interface IScriptMonster
     /// <returns><see langword="true"/> if the specified monster exists and is alive in the current cell.</returns>
     bool Exists(int id)
     {
-        return MapMonsters.Any(m => m.ID == id && m.Alive);
+        return MapMonstersDataLeaf.Any(m => m.ID == id && m.Alive);
     }
     /// <summary>
     /// Gets a dictionary which maps cell names of the current map to all monsters in that cell.
@@ -50,7 +57,29 @@ public interface IScriptMonster
     /// </summary>
     List<string> GetLivingMonsterCells(int id)
     {
-        return MapMonsters.Where(m => m.Alive && m.ID == id).Select(m => m.Cell).Distinct().ToList();
+        return MapMonstersDataLeaf.Where(m => m.Alive && m.ID == id).Select(m => m.Cell).Distinct().ToList();
+    }
+    /// <summary>
+    /// Gets all of the cells with a living monster of the spacified <paramref name="name"/>
+    /// This uses the dataLeaf of the monster to prevent outdated data.
+    /// </summary>
+    List<string> GetLivingMonsterDataLeafCells(string name)
+    {
+        if (name == "*")
+            return MapMonstersDataLeaf.Where(m => m.Alive).Select(m => m.Cell).Distinct().ToList();
+
+        if (TryGetMonster(name, out Monster? monster) && monster != null)
+            return MapMonstersDataLeaf.Where(m => m.Alive && m.ID == monster.ID).Select(m => m.Cell).Distinct().ToList();
+
+        return new();
+    }
+    /// <summary>
+    /// Gets all of the cells with a living monster of the spacified <paramref name="id"/>
+    /// This uses the dataLeaf of the monster to prevent outdated data.
+    /// </summary>
+    List<string> GetLivingMonsterDataLeafCells(int id)
+    {
+        return MapMonstersDataLeaf.Where(m => m.Alive && m.ID == id).Select(m => m.Cell).Distinct().ToList();
     }
     /// <summary>
     /// Gets all of the cells with the desired monster in.
