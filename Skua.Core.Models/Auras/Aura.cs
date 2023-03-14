@@ -9,7 +9,7 @@ public class Aura
     /// </summary>
     [JsonProperty("name")]
     public string? Name { get; set; }
-    
+
     /// <summary>
     /// The aura's stack value.
     /// </summary>
@@ -80,4 +80,8 @@ public class Aura
     {
         return JsonConvert.SerializeObject(this, Formatting.Indented);
     }
+
+    public int SecondsRemaining()
+        => (this == null || ExpiresAt == null) ? 0 : (int)(((DateTime)ExpiresAt) - DateTime.Now).TotalSeconds;
+
 }

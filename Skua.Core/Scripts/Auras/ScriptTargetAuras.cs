@@ -22,7 +22,7 @@ public partial class ScriptTargetAuras : IScriptTargetAuras
             return JsonConvert.DeserializeObject<List<Aura>>(Flash.Call("getSubjectAuras", SubjectType.Target.ToString())) ?? new();
         }
     }
-    
+
     public Aura? GetAura(string auraName)
     {
         return Auras.FirstOrDefault(a => a.Name.Equals(auraName, StringComparison.OrdinalIgnoreCase));
@@ -31,5 +31,16 @@ public partial class ScriptTargetAuras : IScriptTargetAuras
     public bool HasActiveAura(string auraName)
     {
         return GetAura(auraName) != null;
+    }
+
+    public bool TryGetAura(string auraName, out Aura? aura)
+    {
+        if (HasActiveAura(auraName))
+        {
+            aura = GetAura(auraName);
+            return true;
+        }
+        aura = null;
+        return false;
     }
 }
