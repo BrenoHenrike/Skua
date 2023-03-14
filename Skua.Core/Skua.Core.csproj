@@ -33,7 +33,6 @@
 
     <ItemGroup>
         <ProjectReference Include="..\Skua.Core.Generators\Skua.Core.Generators.csproj" OutputItemType="Analyzer" ReferenceOutputAssembly="false" />
-        <ProjectReference Include="..\Skua.gRPC.Protos\Skua.gRPC.Protos.csproj" />
     </ItemGroup>
 
 </Project>

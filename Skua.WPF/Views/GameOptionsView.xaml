@@ -5,7 +5,7 @@
     xmlns:b="http://schemas.microsoft.com/xaml/behaviors"
     xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
     xmlns:local="clr-namespace:Skua.WPF.Views"
-    xmlns:materiaDesign="http://materialdesigninxaml.net/winfx/xaml/themes"
+    xmlns:materialDesign="http://materialdesigninxaml.net/winfx/xaml/themes"
     xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
     xmlns:usercontrols="clr-namespace:Skua.WPF.UserControls"
     xmlns:vms="clr-namespace:Skua.Core.ViewModels;assembly=Skua.Core"
@@ -29,7 +29,7 @@
             <TextBox
                 Width="70"
                 Margin="3,6,6,6"
-                materiaDesign:HintAssist.Hint="Columns"
+                materialDesign:HintAssist.Hint="Columns"
                 DockPanel.Dock="Right"
                 Text="{Binding Columns, UpdateSourceTrigger=PropertyChanged}">
                 <b:Interaction.Behaviors>
@@ -39,7 +39,7 @@
             <TextBox
                 x:Name="SearchBox"
                 Margin="6,6,3,6"
-                materiaDesign:HintAssist.Hint="Search"
+                materialDesign:HintAssist.Hint="Search"
                 TextChanged="TextBox_TextChanged" />
         </DockPanel>
         <ScrollViewer
@@ -67,20 +67,20 @@
             Grid.Row="2"
             Grid.ColumnSpan="2"
             Margin="6,3,3,3"
-            materiaDesign:HintAssist.Hint="Relogin Server"
+            materialDesign:HintAssist.Hint="Relogin Server"
             ItemsSource="{Binding ServersList}"
             SelectedItem="{Binding SelectedServer}"
             Style="{StaticResource MaterialDesignFloatingHintComboBox}" />
         <DockPanel Grid.Row="3" Margin="6,3,3,6">
             <Button
-                materiaDesign:ButtonAssist.CornerRadius="0 2 2 0"
+                materialDesign:ButtonAssist.CornerRadius="0 2 2 0"
                 Command="{Binding ResetDefaultOptionsCommand}"
                 Content="Default"
                 DockPanel.Dock="Right"
                 ToolTip="Reset to the application default values." />
             <Button
                 Margin="0,0,1,0"
-                materiaDesign:ButtonAssist.CornerRadius="2 0 0 2"
+                materialDesign:ButtonAssist.CornerRadius="2 0 0 2"
                 Command="{Binding ResetOptionsCommand}"
                 Content="Reset"
                 ToolTip="Resets to the user saved default values. If no user defaults are found, resets to the application default." />

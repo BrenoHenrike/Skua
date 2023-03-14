@@ -110,7 +110,7 @@ namespace Skua.Manager.Properties {
         
         [global::System.Configuration.UserScopedSettingAttribute()]
         [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
-        [global::System.Configuration.DefaultSettingValueAttribute("1.2.1.0")]
+        [global::System.Configuration.DefaultSettingValueAttribute("1.2.2.0")]
         public string ApplicationVersion {
             get {
                 return ((string)(this["ApplicationVersion"]));
@@ -224,6 +224,18 @@ namespace Skua.Manager.Properties {
             }
             set {
                 this["ChangeLogActivated"] = value;
+            }
+        }
+        
+        [global::System.Configuration.UserScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("True")]
+        public bool UpgradeRequired {
+            get {
+                return ((bool)(this["UpgradeRequired"]));
+            }
+            set {
+                this["UpgradeRequired"] = value;
             }
         }
     }

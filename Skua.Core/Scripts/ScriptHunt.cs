@@ -84,11 +84,15 @@ public class ScriptHunt : IScriptHunt
         while ((!token?.IsCancellationRequested ?? true) && !Manager.ShouldExit)
         {
             List<string> cells = names.SelectMany(n => Monsters.GetLivingMonsterCells(n)).Distinct().ToList();
+
+            if (cells.Count == 0)
+                cells = names.SelectMany(n => Monsters.GetLivingMonsterDataLeafCells(n)).Distinct().ToList();
+
             foreach (string cell in cells)
             {
                 if (token?.IsCancellationRequested ?? false)
                     break;
-                if (!cells.Contains(Player.Cell) && (!token?.IsCancellationRequested ?? true))
+                if ((!cells.Contains(Player.Cell) || cell != Player.Cell) && (!token?.IsCancellationRequested ?? true))
                 {
                     if (Environment.TickCount - _lastHuntTick < Options.HuntDelay)
                         Thread.Sleep(Options.HuntDelay - Environment.TickCount + _lastHuntTick);
@@ -101,6 +105,8 @@ public class ScriptHunt : IScriptHunt
                         break;
                     if (Monsters.Exists(mon) && (!token?.IsCancellationRequested ?? true))
                     {
+                        if (!Combat.Attack(mon))
+                            continue;
                         Kill.Monster(mon, token);
                         return;
                     }
@@ -114,6 +120,10 @@ public class ScriptHunt : IScriptHunt
         while ((!token?.IsCancellationRequested ?? true) && !Manager.ShouldExit)
         {
             List<string> cells = Monsters.GetLivingMonsterCells(id);
+
+            if (cells.Count == 0)
+                cells = Monsters.GetLivingMonsterDataLeafCells(id);
+
             foreach (string cell in cells)
             {
                 if (token?.IsCancellationRequested ?? false)
@@ -129,6 +139,8 @@ public class ScriptHunt : IScriptHunt
                     break;
                 if (Monsters.Exists(id) && (!token?.IsCancellationRequested ?? true))
                 {
+                    if (!Combat.Attack(id))
+                        continue;
                     Kill.Monster(id, token);
                     return;
                 }

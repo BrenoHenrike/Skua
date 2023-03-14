@@ -7,7 +7,7 @@
     <UseWPF>true</UseWPF>
     <Platforms>AnyCPU;x64;x86</Platforms>
     <StartupObject>Skua.Manager.Program</StartupObject>
-    <AssemblyVersion>1.2.1.0</AssemblyVersion>
+    <AssemblyVersion>1.2.2.0</AssemblyVersion>
     <SatelliteResourceLanguages>en</SatelliteResourceLanguages>
     <WithCulture>false</WithCulture>
     <NeutralLanguage>en</NeutralLanguage>
@@ -39,7 +39,6 @@
 
   <ItemGroup>
     <ProjectReference Include="..\Skua.Core\Skua.Core.csproj" />
-    <ProjectReference Include="..\Skua.gRPC.Protos\Skua.gRPC.Protos.csproj" />
     <ProjectReference Include="..\Skua.WPF\Skua.WPF.csproj" />
   </ItemGroup>
 

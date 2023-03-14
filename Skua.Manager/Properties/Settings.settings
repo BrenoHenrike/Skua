@@ -29,7 +29,7 @@
       <Value Profile="(Default)">False</Value>
     </Setting>
     <Setting Name="ApplicationVersion" Type="System.String" Scope="User">
-      <Value Profile="(Default)">1.2.1.0</Value>
+      <Value Profile="(Default)">1.2.2.0</Value>
     </Setting>
     <Setting Name="ClientDownloadPath" Type="System.String" Scope="User">
       <Value Profile="(Default)" />
@@ -57,6 +57,9 @@
     </Setting>
     <Setting Name="ChangeLogActivated" Type="System.Boolean" Scope="User">
       <Value Profile="(Default)">False</Value>
+    </Setting>
+    <Setting Name="UpgradeRequired" Type="System.Boolean" Scope="User">
+      <Value Profile="(Default)">True</Value>
     </Setting>
   </Settings>
 </SettingsFile>
