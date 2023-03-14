@@ -73,6 +73,20 @@ public class ThemeService : ObservableObject, IThemeService
 
         ActiveScheme = ColorScheme.Primary;
         SelectedColor = theme.PrimaryMid.Color;
+
+        OnThemeChanged(themeItem);
+    }
+
+    public event ThemeChangedEventHandler ThemeChanged;
+    public event SchemeChangedEventHandler SchemeChanged;
+
+    private void OnThemeChanged(object? theme)
+    {
+        ThemeChanged?.Invoke(theme);
+    }
+    private void OnSchemeChanged(ColorScheme scheme, object? color)
+    {
+        SchemeChanged?.Invoke(scheme, color);
     }
 
     public List<object> Presets => _themeSettings.DefaultThemes.Cast<object>().ToList();
@@ -268,6 +282,8 @@ public class ThemeService : ObservableObject, IThemeService
             //    SelectedColor = _secondaryForegroundColor;
             //    break;
         }
+
+        OnSchemeChanged(scheme, scheme == ColorScheme.Primary ? _primaryColor : _primaryForegroundColor);
     }
 
     private void SetPrimaryForegroundToSingleColor(ITheme theme, object? color)

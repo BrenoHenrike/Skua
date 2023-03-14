@@ -1,8 +1,13 @@
 ﻿using Skua.Core.Models;
 
 namespace Skua.Core.Interfaces;
+
+public delegate void ThemeChangedEventHandler(object? theme);
+public delegate void SchemeChangedEventHandler(ColorScheme scheme, object? color);
 public interface IThemeService
 {
+    event ThemeChangedEventHandler ThemeChanged;
+    event SchemeChangedEventHandler SchemeChanged;
     List<object> Presets { get; }
     List<object> UserThemes { get; }
     IEnumerable<object> ColorSelectionValues { get; }
