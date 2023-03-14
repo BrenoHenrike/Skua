@@ -1,3 +1,18 @@
+# Skua 1.2.2.0
+## Fixes
+- Hunt methods work as intended again;
+- Server objects have their JsonConverters again;
+- CustomWindow now respects the Min* and Max* properties;
+
+## Additions
+- Account Manager accounts list has the option to show more/less columns;
+- Account Manager label to show how many accounts are selected;
+- Account Manager now allows to launch accounts and start the specified script;
+- Settings from Skua and Skua Manager now persist between versions. No more need to add accounts again;
+- ThemeService now has 2 events to help changing themes in plugins.
+
+---
+
 # Skua 1.2.1.0
 ## What's new?
 - **Change logs**; you can now see the changelogs from the Skua Manager.
