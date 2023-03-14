@@ -31,6 +31,13 @@ public partial class App : Application
         InitializeComponent();
         SingleInstanceWatcher();
 
+        if (Settings.Default.UpgradeRequired)
+        {
+            Settings.Default.Upgrade();
+            Settings.Default.UpgradeRequired = false;
+            Settings.Default.Save();
+        }
+
         var args = Environment.GetCommandLineArgs();
         Services = ConfigureServices();
         Services.GetRequiredService<IClientFilesService>().CreateDirectories();

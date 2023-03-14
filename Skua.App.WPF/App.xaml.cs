@@ -14,6 +14,7 @@ using Skua.Core.Utils;
 using Westwind.Scripting;
 using Skua.Core.AppStartup;
 using Skua.WPF;
+using Skua.Core.Messaging;
 
 namespace Skua.App.WPF;
 
@@ -25,6 +26,13 @@ public sealed partial class App : Application
     public App()
     {
         InitializeComponent();
+
+        if (Settings.Default.UpgradeRequired)
+        {
+            Settings.Default.Upgrade();
+            Settings.Default.UpgradeRequired = false;
+            Settings.Default.Save();
+        }
 
         Services = ConfigureServices();
         Services.GetRequiredService<IClientFilesService>().CreateDirectories();
@@ -43,12 +51,15 @@ public sealed partial class App : Application
             switch(args[i])
             {
                 case "--usr":
-                    if (args[i + 2] != "--psw")
+                    if (args.Length > i + 2 && args[i + 2] != "--psw")
                         break;
-                    if (args[i + 4] == "--sv")
+                    if (args.Length > i + 4 && args[i + 4] == "--sv")
                         _server = args[i + 5];
                     _bot.Servers.SetLoginInfo(args[++i], args[++i + 1]);
                     _login = true;
+                    break;
+                case "--run-script":
+                    _script = args[++i];
                     break;
                 case "--use-theme":
                     string theme = args[++i];
@@ -104,6 +115,7 @@ public sealed partial class App : Application
     private readonly IScriptInterface _bot;
     private bool _login = false;
     private string _server = string.Empty;
+    private string _script = string.Empty;
     
     private void Application_Startup(object sender, StartupEventArgs e)
     {
@@ -208,12 +220,12 @@ public sealed partial class App : Application
                 Task.Factory.StartNew(() =>
                 {
                     if (string.IsNullOrEmpty(_server))
-                    {
                         _bot.Servers.Relogin("Twilly");
-                        return;
-                    }
-                    
-                    _bot.Servers.Relogin(_server);
+                    else
+                        _bot.Servers.Relogin(_server);
+
+                    if (!string.IsNullOrEmpty(_script))
+                        StrongReferenceMessenger.Default.Send<StartScriptMessage, int>(new(_script), (int)MessageChannels.ScriptStatus);
                 });
                 break;
         }
