@@ -404,7 +404,6 @@ package skua
 			
 			function connectingServer(e:Event):void
 			{
-				instance.external.debug(JSON.stringify(objLogin));
 				if (objLogin != null)
 				{
 					connectServer(serverData, objLogin);
@@ -616,7 +615,7 @@ package skua
 			for each (var monster:* in instance.game.world.getMonstersByCell(instance.game.world.strFrame))
 			{
 				var monName:String = monster.objData.strMonName.toLowerCase();
-				if ((monName.indexOf(name.toLowerCase()) > -1 || name == '*') && monster.pMC != null && monster.dataLeaf.intState > 0)
+				if ((monName.indexOf(name.toLowerCase()) > -1 || name == '*') && monster.pMC != null)
 				{
 					return monster;
 				}
