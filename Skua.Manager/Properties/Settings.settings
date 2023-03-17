@@ -29,7 +29,7 @@
       <Value Profile="(Default)">False</Value>
     </Setting>
     <Setting Name="ApplicationVersion" Type="System.String" Scope="User">
-      <Value Profile="(Default)">1.2.2.1</Value>
+      <Value Profile="(Default)">1.2.3.0</Value>
     </Setting>
     <Setting Name="ClientDownloadPath" Type="System.String" Scope="User">
       <Value Profile="(Default)" />
