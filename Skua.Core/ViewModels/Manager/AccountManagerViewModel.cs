@@ -101,14 +101,20 @@ public sealed partial class AccountManagerViewModel : BotControlViewModelBase
         // TODO manage ids for sync in the future
 
         foreach (var acc in Accounts.Where(a => a.UseCheck))
+        {
             _LaunchAcc(acc.Username, acc.Password);
+            await Task.Delay(1000);
+        }
     }
 
     [RelayCommand]
     public async Task StartAllAccounts()
     {
         foreach (var acc in Accounts)
+        {
             _LaunchAcc(acc.Username, acc.Password);
+            await Task.Delay(1000);
+        }
     }
 
     [RelayCommand]
@@ -138,12 +144,19 @@ public sealed partial class AccountManagerViewModel : BotControlViewModelBase
     
     private void _LaunchAcc(string username, string password)
     {
-        ProcessStartInfo psi = new(Path.Combine(AppContext.BaseDirectory, "Skua.exe"))
+        try
         {
-            Arguments = $"--usr \"{username}\" --psw \"{password}\" --sv \"{_selectedServer.Name}\"{(_settingsService.Get("SyncThemes", false) ? $" --use-theme \"{_settingsService.Get("CurrentTheme", "no-theme")}\"" : string.Empty)}{(StartWithScript ? $" --run-script \"{ScriptPath ?? string.Empty}\"" : string.Empty)}",
-            WorkingDirectory = AppContext.BaseDirectory
-        };
-        Process.Start(psi);
+            ProcessStartInfo psi = new(Path.Combine(AppContext.BaseDirectory, "Skua.exe"))
+            {
+                Arguments = $"--usr \"{username}\" --psw \"{password}\" --sv \"{_selectedServer?.Name ?? "Twilly"}\"{(_settingsService.Get("SyncThemes", false) ? $" --use-theme \"{_settingsService.Get("CurrentTheme", "no-theme")}\"" : string.Empty)}{(StartWithScript ? $" --run-script \"{ScriptPath ?? string.Empty}\"" : string.Empty)}",
+                WorkingDirectory = AppContext.BaseDirectory
+            };
+            Process.Start(psi);
+        }
+        catch (Exception ex)
+        {
+            _dialogService.ShowMessageBox($"Error while starting process: {ex.Message}", "Launch Error");
+        }
     }
 
     private void _GetSavedAccounts()
@@ -177,6 +190,7 @@ public sealed partial class AccountManagerViewModel : BotControlViewModelBase
 
         _cachedServers = JsonConvert.DeserializeObject<List<Server>>(response)!;
         ServerList.AddRange(_cachedServers);
+        SelectedServer = ServerList[0];
     }
 
     private void AccountSelected(AccountManagerViewModel recipient, AccountSelectedMessage message)
