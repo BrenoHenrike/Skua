@@ -107,6 +107,7 @@ public class ScriptHunt : IScriptHunt
                     {
                         if (!Combat.Attack(mon))
                             continue;
+                        Thread.Sleep(Options.ActionDelay);
                         Kill.Monster(mon, token);
                         return;
                     }
@@ -141,6 +142,7 @@ public class ScriptHunt : IScriptHunt
                 {
                     if (!Combat.Attack(id))
                         continue;
+                    Thread.Sleep(Options.ActionDelay);
                     Kill.Monster(id, token);
                     return;
                 }

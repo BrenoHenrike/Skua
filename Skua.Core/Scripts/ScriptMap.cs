@@ -72,6 +72,7 @@ public partial class ScriptMap : IScriptMap
     [MethodCallBinding("jumpCorrectRoom", RunMethodPost = true)]
     private void _jump(string cell, string pad, bool autoCorrect = true, bool clientOnly = false)
     {
+        Thread.Sleep(Options.ActionDelay);
         if (Options.SafeTimings)
             Wait.ForCellChange(cell);
     }

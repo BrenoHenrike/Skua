@@ -27,10 +27,7 @@ public interface IScriptMonster
     /// <returns><see langword="true"/> if the specified monster exists and is alive in the current cell.</returns>
     bool Exists(string name)
     {
-        if (TryGetMonster(name, out Monster? monster) && monster != null)
-            return MapMonstersDataLeaf.Any(m => name == "*" || (monster.Name.Trim() == name.Trim() && m.Alive));
-
-        return false;
+        return CurrentAvailableMonsters.Any(m => name == "*" || (m.Name.Trim() == name.Trim()));
     }
     /// <summary>
     /// Checks whether the specified <paramref name="id"/> exists in the current cell.
@@ -39,7 +36,7 @@ public interface IScriptMonster
     /// <returns><see langword="true"/> if the specified monster exists and is alive in the current cell.</returns>
     bool Exists(int id)
     {
-        return MapMonstersDataLeaf.Any(m => m.ID == id && m.Alive);
+        return CurrentAvailableMonsters.Any(m => m.ID == id);
     }
     /// <summary>
     /// Gets a dictionary which maps cell names of the current map to all monsters in that cell.
