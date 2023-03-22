@@ -38,44 +38,12 @@ public partial class App : Application
             Settings.Default.Save();
         }
 
-        var args = Environment.GetCommandLineArgs();
         Services = ConfigureServices();
         Services.GetRequiredService<IClientFilesService>().CreateDirectories();
         Services.GetRequiredService<IClientFilesService>().CreateFiles();
 
         _ = Services.GetRequiredService<IThemeService>();
         var settings = Services.GetRequiredService<ISettingsService>();
-
-        for (int i = 0; i < args.Length; i++)
-        {
-            switch(args[i])
-            {
-                case "--user-themes":
-                    StringCollection themes = new();
-                    themes.AddRange(args[i+1].Split('|'));
-                    settings.Set("UserThemes", themes);
-                    i++;
-                    break;
-                case "--curr-theme":
-                    settings.Set("CurrentTheme", args[++i]);
-                    break;
-                case "--gh-token":
-                    settings.Set("UserGitHubToken", args[++i]);
-                    break;
-                case "--download-path":
-                    settings.Set("ClientDownloadPath", args[++i]);
-                    break;
-                case "--client-releases":
-                    settings.Set("CheckClientUpdates", Convert.ToBoolean(args[++i]));
-                    break;
-                case "--client-pre-releases":
-                    settings.Set("CheckClientPrereleases", Convert.ToBoolean(args[++i]));
-                    break;
-                case "--delete-zip":
-                    settings.Set("DeleteZipFileAfter", Convert.ToBoolean(args[++i]));
-                    break;
-            }
-        }   
 
         Dispatcher.ShutdownStarted += Dispatcher_ShutdownStarted;
         StrongReferenceMessenger.Default.Register<App, UpdateFinishedMessage>(this, CloseManager);

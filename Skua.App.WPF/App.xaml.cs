@@ -10,11 +10,9 @@ using Skua.WPF.Services;
 using Skua.App.WPF.Properties;
 using Skua.App.WPF.Services;
 using Skua.Core.Interfaces;
-using Skua.Core.Utils;
 using Westwind.Scripting;
 using Skua.Core.AppStartup;
 using Skua.WPF;
-using Skua.Core.Messaging;
 
 namespace Skua.App.WPF;
 
@@ -23,6 +21,13 @@ namespace Skua.App.WPF;
 /// </summary>
 public sealed partial class App : Application
 {
+    /// <summary>
+    /// Gets the current <see cref="App"/> instance in use
+    /// </summary>
+    public new static App Current => (App)Application.Current;
+    public IServiceProvider Services { get; }
+    private readonly IScriptInterface _bot;
+    
     public App()
     {
         InitializeComponent();
@@ -40,51 +45,11 @@ public sealed partial class App : Application
         Task.Factory.StartNew(async () => await Services.GetRequiredService<IScriptServers>().GetServers());
         
         _bot = Services.GetRequiredService<IScriptInterface>();
-        _bot.Flash.FlashCall += Flash_FlashCall;
         _ = Services.GetRequiredService<ILogService>();
         
-        var themes = Services.GetRequiredService<IThemeService>();
-        var settings = Services.GetRequiredService<ISettingsService>();
         var args = Environment.GetCommandLineArgs();
-        for(int i = 0; i < args.Length; i++)
-        {
-            switch(args[i])
-            {
-                case "--usr":
-                    if (args.Length > i + 2 && args[i + 2] != "--psw")
-                        break;
-                    if (args.Length > i + 4 && args[i + 4] == "--sv")
-                        _server = args[i + 5];
-                    _bot.Servers.SetLoginInfo(args[++i], args[++i + 1]);
-                    _login = true;
-                    break;
-                case "--run-script":
-                    _script = args[++i];
-                    break;
-                case "--use-theme":
-                    string theme = args[++i];
-                    if (!string.IsNullOrWhiteSpace(theme) && theme != "no-theme")
-                        themes.SetCurrentTheme(ThemeItem.FromString(theme));
-                    break;
-                case "--gh-token":
-                    if (string.IsNullOrEmpty(Settings.Default.UserGitHubToken))
-                        Settings.Default.UserGitHubToken = args[++i];
-                    Settings.Default.Save();
-                    break;
-                case "--bot-script-updates":
-                    settings.Set("CheckBotScriptsUpdates", Convert.ToBoolean(args[++i]));
-                    break;
-                case "--auto-update-bot-scripts":
-                    settings.Set("AutoUpdateBotScripts", Convert.ToBoolean(args[++i]));
-                    break;
-                case "--auto-update-advanceskill-sets":
-                    settings.Set("AutoUpdateAdvanceSkillSetsUpdates", Convert.ToBoolean(args[++i]));
-                    break;
-                case "--advanceskill-sets-updates":
-                    settings.Set("CheckAdvanceSkillSetsUpdates", Convert.ToBoolean(args[++i]));
-                    break;
-            }
-        }
+        var startup = new SkuaStartupHandler(args, _bot, Services.GetRequiredService<ISettingsService>(), Services.GetRequiredService<IThemeService>());
+        startup.Execute();
 
         RoslynLifetimeManager.WarmupRoslyn();
         Timeline.DesiredFrameRateProperty.OverrideMetadata(typeof(Timeline), new FrameworkPropertyMetadata { DefaultValue = Services.GetRequiredService<ISettingsService>().Get<int>("AnimationFrameRate") });
@@ -112,11 +77,6 @@ public sealed partial class App : Application
         Application.Current.Exit -= App_Exit;
     }
 
-    private readonly IScriptInterface _bot;
-    private bool _login = false;
-    private string _server = string.Empty;
-    private string _script = string.Empty;
-    
     private void Application_Startup(object sender, StartupEventArgs e)
     {
         if (!Directory.Exists(Path.Combine(AppContext.BaseDirectory, "VSCode")))
@@ -173,15 +133,8 @@ public sealed partial class App : Application
     }
 
     /// <summary>
-    /// Gets the current <see cref="App"/> instance in use
-    /// </summary>
-    public new static App Current => (App)Application.Current;
-
-    public IServiceProvider Services { get; }
-    /// <summary>
     /// Configures the services for the application.
     /// </summary>
-
     private IServiceProvider ConfigureServices()
     {
         IServiceCollection services = new ServiceCollection();
@@ -202,32 +155,5 @@ public sealed partial class App : Application
         Ioc.Default.ConfigureServices(provider);
 
         return provider;
-    }
-
-    private void Flash_FlashCall(string function, params object[] args)
-    {
-        switch (function)
-        {
-            case "requestLoadGame":
-                _bot.Flash.Call("loadClient");
-                break;
-            case "loaded":
-                _bot.Flash.FlashCall -= Flash_FlashCall;
-                
-                if (!_login)
-                    break;
-
-                Task.Factory.StartNew(() =>
-                {
-                    if (string.IsNullOrEmpty(_server))
-                        _bot.Servers.Relogin("Twilly");
-                    else
-                        _bot.Servers.Relogin(_server);
-
-                    if (!string.IsNullOrEmpty(_script))
-                        StrongReferenceMessenger.Default.Send<StartScriptMessage, int>(new(_script), (int)MessageChannels.ScriptStatus);
-                });
-                break;
-        }
     }
 }

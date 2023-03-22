@@ -107,60 +107,9 @@ public class ClientUpdateService : IClientUpdateService
                         return;
                     }
 
-                    List<string> args = new();
-
-                    StringCollection? themes = _settingsService.Get<StringCollection>("UserThemes");
-                    if (themes is not null)
-                    {
-                        args.Add("--user-themes");
-                        args.Add(string.Join('|', themes));
-                    }
-
-                    string? currTheme = _settingsService.Get<string>("CurrentTheme");
-                    if (!string.IsNullOrEmpty(currTheme))
-                    {
-                        args.Add("--curr-theme");
-                        args.Add(currTheme);
-                    }
-
-                    string? ghToken = _settingsService.Get<string>("UserGitHubToken");
-                    if (!string.IsNullOrEmpty(ghToken))
-                    {
-                        args.Add("--gh-token");
-                        args.Add(ghToken);
-                    }
-
-                    string? downloadPath = _settingsService.Get<string>("ClientDownloadPath");
-                    if (!string.IsNullOrEmpty(downloadPath))
-                    {
-                        args.Add("--download-path");
-                        args.Add(downloadPath);
-                    }
-
-                    args.Add("--client-releases");
-                    args.Add(_settingsService.Get<bool>("CheckClientUpdates").ToString());
-
-                    args.Add("--client-pre-releases");
-                    args.Add(_settingsService.Get<bool>("CheckClientPrereleases").ToString());
-
-                    args.Add("--auto-update-bot-scripts");
-                    args.Add(_settingsService.Get<bool>("AutoUpdateBotScripts").ToString());
-
-                    args.Add("--bot-script-updates");
-                    args.Add(_settingsService.Get<bool>("CheckBotScriptsUpdates").ToString());
-
-                    args.Add("--auto-update-advanceskill-sets");
-                    args.Add(_settingsService.Get<bool>("AutoUpdateAdvanceSkillSetsUpdates").ToString());
-
-                    args.Add("--advanceskill-sets-updates");
-                    args.Add(_settingsService.Get<bool>("CheckAdvanceSkillSetsUpdates").ToString());
-
-                    args.Add("--delete-zip");
-                    args.Add(_settingsService.Get<bool>("DeleteZipFileAfter").ToString());
-
                     progress?.Report("Starting updated version...");
 
-                    Process.Start(Path.Combine(path, updateFolder, "Skua.Manager.exe"), args);
+                    Process.Start(Path.Combine(path, updateFolder, "Skua.Manager.exe"));
                     //StrongReferenceMessenger.Default.Send<UpdateFinishedMessage>();
                     return;
                 }
