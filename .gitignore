@@ -380,3 +380,4 @@ FodyWeavers.xsd
 /Skua.gRPC.Server
 /Build
 /Assets
+/Skua.App.WPF/Properties/launchSettings.json
