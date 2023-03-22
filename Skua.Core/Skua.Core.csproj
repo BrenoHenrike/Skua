@@ -16,13 +16,11 @@
 
   <ItemGroup>
     <PackageReference Include="Caseless.Fody" Version="1.9.1" />
-    <PackageReference Include="CliWrap" Version="3.4.4" />
-    <PackageReference Include="CommunityToolkit.Mvvm" Version="8.0.0" />
+    <PackageReference Include="CommunityToolkit.Mvvm" Version="8.1.0" />
     <PackageReference Include="CoreHook" Version="1.0.4" />
-    <PackageReference Include="Grpc.Net.Client" Version="2.48.0" />
-    <PackageReference Include="Microsoft.Extensions.DependencyInjection" Version="6.0.0" />
-    <PackageReference Include="Newtonsoft.Json" Version="13.0.2" />
-    <PackageReference Include="Westwind.Scripting" Version="1.1.5" />
+    <PackageReference Include="Microsoft.Extensions.DependencyInjection" Version="7.0.0" />
+    <PackageReference Include="Newtonsoft.Json" Version="13.0.3" />
+    <PackageReference Include="Westwind.Scripting" Version="1.2.1" />
   </ItemGroup>
 
   <ItemGroup>
