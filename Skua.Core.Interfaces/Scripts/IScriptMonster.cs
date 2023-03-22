@@ -47,14 +47,26 @@ public interface IScriptMonster
     /// </summary>
     List<string> GetLivingMonsterCells(string name)
     {
-        return MapMonsters.Where(m => m.Alive && (name == "*" || m.Name.Trim() == name.Trim())).Select(m => m.Cell).Distinct().ToList();
+        try 
+        { 
+            return MapMonsters.Where(m => m.Alive && (name == "*" || m.Name.Trim() == name.Trim())).Select(m => m.Cell).Distinct().ToList();
+        }
+        catch
+        {
+            return new();
+        }
     }
     /// <summary>
     /// Gets all of the cells with a living monster of the specified <paramref name="id"/>.
     /// </summary>
     List<string> GetLivingMonsterCells(int id)
     {
-        return MapMonstersDataLeaf.Where(m => m.Alive && m.ID == id).Select(m => m.Cell).Distinct().ToList();
+        try
+        {
+            return MapMonstersDataLeaf.Where(m => m.Alive && m.ID == id).Select(m => m.Cell).Distinct().ToList();
+        }
+        catch { }
+        return new();
     }
     /// <summary>
     /// Gets all of the cells with a living monster of the spacified <paramref name="name"/>
@@ -66,7 +78,13 @@ public interface IScriptMonster
             return MapMonstersDataLeaf.Where(m => m.Alive).Select(m => m.Cell).Distinct().ToList();
 
         if (TryGetMonster(name, out Monster? monster) && monster != null)
-            return MapMonstersDataLeaf.Where(m => m.Alive && m.ID == monster.ID).Select(m => m.Cell).Distinct().ToList();
+        {
+            try
+            {
+                return MapMonstersDataLeaf.Where(m => m.Alive && m.ID == monster.ID).Select(m => m.Cell).Distinct().ToList();
+            }
+            catch { }
+        }
 
         return new();
     }
@@ -76,7 +94,12 @@ public interface IScriptMonster
     /// </summary>
     List<string> GetLivingMonsterDataLeafCells(int id)
     {
-        return MapMonstersDataLeaf.Where(m => m.Alive && m.ID == id).Select(m => m.Cell).Distinct().ToList();
+        try
+        {
+            return MapMonstersDataLeaf.Where(m => m.Alive && m.ID == id).Select(m => m.Cell).Distinct().ToList();
+        }
+        catch { }
+        return new();
     }
     /// <summary>
     /// Gets all of the cells with the desired monster in.
@@ -84,7 +107,12 @@ public interface IScriptMonster
     /// <param name="name">Name of the monster to get.</param>
     List<string> GetMonsterCells(string name)
     {
-        return MapMonsters.Where(m => m.Name.Trim() == name.Trim()).Select(m => m.Cell).Distinct().ToList();
+        try
+        {
+            return MapMonsters.Where(m => m.Name.Trim() == name.Trim()).Select(m => m.Cell).Distinct().ToList();
+        }
+        catch { }
+        return new();
     }
     /// <summary>
     /// Gets all of the cells with the desired monster in.
@@ -92,7 +120,12 @@ public interface IScriptMonster
     /// <param name="id">ID of the monster to get.</param>
     List<string> GetMonsterCells(int id)
     {
-        return MapMonsters.Where(m => m.ID == id).Select(m => m.Cell).Distinct().ToList();
+        try
+        {
+            return MapMonsters.Where(m => m.ID == id).Select(m => m.Cell).Distinct().ToList();
+        }
+        catch { }
+        return new();
     }
     /// <summary>
     /// Gets all of the monsters in the specified <paramref name="cell"/>.
