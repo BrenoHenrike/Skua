@@ -14,7 +14,7 @@
     <Platforms>AnyCPU;x64;x86</Platforms>
     <Company>Skua</Company>
     <Description>Scriptable C# bot for AdventureQuest Worlds</Description>
-    <AssemblyVersion>1.2.2.0</AssemblyVersion>
+    <AssemblyVersion>1.2.3.0</AssemblyVersion>
     <ApplicationIcon>SkuaIcon.ico</ApplicationIcon>
     <GenerateDocumentationFile>False</GenerateDocumentationFile>
     <BaseOutputPath>bin\</BaseOutputPath>
@@ -44,13 +44,12 @@
 
     <ItemGroup>
     <PackageReference Include="Caseless.Fody" Version="1.9.1" />
-    <PackageReference Include="CliWrap" Version="3.4.4" />
-    <PackageReference Include="CommunityToolkit.Mvvm" Version="8.0.0" />
+    <PackageReference Include="CommunityToolkit.Mvvm" Version="8.1.0" />
     <PackageReference Include="Hardcodet.NotifyIcon.Wpf" Version="1.1.0" />
-    <PackageReference Include="MaterialDesignThemes" Version="4.5.0" />
-    <PackageReference Include="Microsoft.Extensions.DependencyInjection" Version="6.0.0" />
+    <PackageReference Include="MaterialDesignThemes" Version="4.8.0" />
+    <PackageReference Include="Microsoft.Extensions.DependencyInjection" Version="7.0.0" />
     <PackageReference Include="Microsoft.Xaml.Behaviors.Wpf" Version="1.1.39" />
-    <PackageReference Include="Newtonsoft.Json" Version="13.0.2" />
+    <PackageReference Include="Newtonsoft.Json" Version="13.0.3" />
   </ItemGroup>
 
   <ItemGroup>

@@ -25,12 +25,13 @@ public sealed partial class AccountManagerViewModel : BotControlViewModelBase
         Task.Run(async () => await _GetServers());
         Accounts = new();
         _GetSavedAccounts();
-
+        _syncThemes = _settingsService.Get("SyncThemes", false);
         // TODO different clients path
     }
 
     private const string _separator = "{=}";
     private readonly string[] _arrSeparator = { _separator };
+    private readonly string _exePath = Path.Combine(AppContext.BaseDirectory, "Skua.exe");
 
     private readonly ISettingsService _settingsService;
     private readonly IDialogService _dialogService;
@@ -57,6 +58,7 @@ public sealed partial class AccountManagerViewModel : BotControlViewModelBase
     private List<Server> _cachedServers = new();
     [ObservableProperty]
     private RangedObservableCollection<Server> _serverList;
+    private bool _syncThemes;
 
     public string PasswordInput { private get; set; }
 
@@ -100,15 +102,23 @@ public sealed partial class AccountManagerViewModel : BotControlViewModelBase
         // TODO show dialog to choose between clients
         // TODO manage ids for sync in the future
 
+        _syncThemes = _settingsService.Get("SyncThemes", false);
         foreach (var acc in Accounts.Where(a => a.UseCheck))
+        {
             _LaunchAcc(acc.Username, acc.Password);
+            await Task.Delay(1000);
+        }
     }
 
     [RelayCommand]
     public async Task StartAllAccounts()
     {
+        _syncThemes = _settingsService.Get("SyncThemes", false);
         foreach (var acc in Accounts)
+        {
             _LaunchAcc(acc.Username, acc.Password);
+            await Task.Delay(1000);
+        }
     }
 
     [RelayCommand]
@@ -123,6 +133,7 @@ public sealed partial class AccountManagerViewModel : BotControlViewModelBase
     private void _RemoveAccount(AccountItemViewModel account)
     {
         Accounts.Remove(account);
+        SelectedAccountQuant--;
 
         _SaveAccounts();
     }
@@ -138,12 +149,40 @@ public sealed partial class AccountManagerViewModel : BotControlViewModelBase
     
     private void _LaunchAcc(string username, string password)
     {
-        ProcessStartInfo psi = new(Path.Combine(AppContext.BaseDirectory, "Skua.exe"))
+        try
         {
-            Arguments = $"--usr \"{username}\" --psw \"{password}\" --sv \"{_selectedServer.Name}\"{(_settingsService.Get("SyncThemes", false) ? $" --use-theme \"{_settingsService.Get("CurrentTheme", "no-theme")}\"" : string.Empty)}{(StartWithScript ? $" --run-script \"{ScriptPath ?? string.Empty}\"" : string.Empty)}",
-            WorkingDirectory = AppContext.BaseDirectory
-        };
-        Process.Start(psi);
+            ProcessStartInfo psi = new(_exePath)
+            {
+                ArgumentList =
+                {
+                    "-u",
+                    username,
+                    "-p",
+                    password,
+                    "-s",
+                    SelectedServer?.Name ?? "Twilly"
+                },
+                WorkingDirectory = AppContext.BaseDirectory
+            };
+
+            if(_syncThemes)
+            {
+                psi.ArgumentList.Add("--use-theme");
+                psi.ArgumentList.Add(_settingsService.Get("CurrentTheme", "no-theme"));
+            }
+
+            if(StartWithScript)
+            {
+                psi.ArgumentList.Add("--run-script");
+                psi.ArgumentList.Add(ScriptPath);
+            }
+
+            Process.Start(psi);
+        }
+        catch (Exception ex)
+        {
+            _dialogService.ShowMessageBox($"Error while starting process: {ex.Message}", "Launch Error");
+        }
     }
 
     private void _GetSavedAccounts()
@@ -177,6 +216,7 @@ public sealed partial class AccountManagerViewModel : BotControlViewModelBase
 
         _cachedServers = JsonConvert.DeserializeObject<List<Server>>(response)!;
         ServerList.AddRange(_cachedServers);
+        SelectedServer = ServerList[0];
     }
 
     private void AccountSelected(AccountManagerViewModel recipient, AccountSelectedMessage message)

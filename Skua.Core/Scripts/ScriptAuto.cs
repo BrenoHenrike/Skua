@@ -78,6 +78,7 @@ public partial class ScriptAuto : ObservableObject, IScriptAuto
         }
         
         _ctsAuto?.Cancel();
+        _autoTask?.Wait();
         _wait.ForTrue(() => _ctsAuto is null, 20);
         _autoTask?.Dispose();
         IsRunning = false;
@@ -92,7 +93,7 @@ public partial class ScriptAuto : ObservableObject, IScriptAuto
         }
         
         _ctsAuto?.Cancel();
-        await _wait.ForTrueAsync(() => _ctsAuto is null, 20);
+        await _wait.ForTrueAsync(() => _ctsAuto is null && (_autoTask?.IsCompleted ?? true), 40);
         _autoTask?.Dispose();
         IsRunning = false;
     }

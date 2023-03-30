@@ -1,8 +1,0 @@
-{
-  "profiles": {
-    "Skua.App.WPF": {
-      "commandName": "Project",
-      "commandLineArgs": "--gh-token ghu_W0pCEZ0dR9MRJjBNlhGGi5CGyaaLCK2UJiea"
-    }
-  }
-}
