@@ -65,7 +65,7 @@ public interface IScriptMap
     /// <param name="cell">Cell to be placed at.</param>
     /// <param name="pad">Pad to be placed at.</param>
     /// <param name="ignoreCheck">Whether to ignore if the player is in the specified map.</param>
-    void Join(string map, string cell = "Enter", string pad = "Spawn", bool ignoreCheck = false);
+    void Join(string map, string cell = "Enter", string pad = "Spawn", bool ignoreCheck = false, bool autoCorrect = true);
     /// <summary>
     /// Joins the specified <paramref name="map"/>, ignoring whether or not you are in that map.
     /// </summary>

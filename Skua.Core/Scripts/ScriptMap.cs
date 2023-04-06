@@ -77,12 +77,12 @@ public partial class ScriptMap : IScriptMap
             Wait.ForCellChange(cell);
     }
 
-    public void Join(string map, string cell = "Enter", string pad = "Spawn", bool ignoreCheck = false)
+    public void Join(string map, string cell = "Enter", string pad = "Spawn", bool ignoreCheck = false, bool autoCorrect = true)
     {
-        _Join(map, cell, pad, ignoreCheck);
+        _Join(map, cell, pad, ignoreCheck, autoCorrect);
     }
 
-    private void _Join(string map, string cell = "Enter", string pad = "Spawn", bool ignoreCheck = false)
+    private void _Join(string map, string cell = "Enter", string pad = "Spawn", bool ignoreCheck = false, bool autoCorrect = true)
     {
         string mapName = map.Split('-')[0];
         LastMap = mapName;
@@ -99,9 +99,9 @@ public partial class ScriptMap : IScriptMap
             if (Options.SafeTimings)
             {
                 if (!Wait.ForMapLoad(map, 20) && !Manager.ShouldExit)
-                    Jump(Player.Cell, Player.Pad);
+                    Jump(Player.Cell, Player.Pad, autoCorrect);
                 else
-                    Jump(cell, pad);
+                    Jump(cell, pad, autoCorrect);
                 Thread.Sleep(Options.ActionDelay);
             }
         }
