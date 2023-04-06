@@ -60,7 +60,7 @@ In order for Skua to run *correctly*, you will need to download and install the 
 - **Logs Tab**
     - Logs what the bot is doing, this is also shown in the "Scripts" button window.
 - **Plugins Tab** 
-    - Where you can load `*.dll` files that follows the Skua Plugin Template. Or even existing skua plugin from the [Skua Discord](https://discord.gg/hstRRK9G7w).
+    - Where you can load `*.dll` files that follows the Skua Plugin Template. Or even existing skua plugin from the [Skua Discord](https://discord.gg/CKKbk2zr3p).
 - **Auto Tab**
     - **Auto-Attack** will automatically attack any of the monster in the current cell.
     - **Auto-Hunt** will automatically hunt the selected monster across the entire map.
@@ -69,7 +69,7 @@ In order for Skua to run *correctly*, you will need to download and install the 
 
 ### For questions or help join the discord & go to the [#skua-chat](https://discord.com/channels/1078578570026291262/1078663021024510004) channel.
 
-### [Skua Discord](https://discord.gg/hstRRK9G7w) join the community and get help with Skua.
+### [Skua Discord](https://discord.gg/CKKbk2zr3p) join the community and get help with Skua.
 
 # Sponsorship & Donation ❤️
 For us to make the Skua better, skua developers need your support. You can support us by donating or sponsor us by clicking the PayPal link below. Thank you for your support.

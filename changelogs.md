@@ -181,7 +181,7 @@ Fixes, additions and subtractions:
 - Goals can be tracked in the Manager;
 - Themes can be propagated from the Manager to other Launchers;
 
-If you want to help the development of Skua you can donate clicking in the button below, to select any of the options, put a message in the donation or message me in the Skua chat in [Discord](https://discord.io/AQWBots):
+If you want to help the development of Skua you can donate clicking in the button below, to select any of the options, put a message in the donation or message me in the Skua chat in [Discord](https://discord.gg/CKKbk2zr3p):
 
 ---
 
