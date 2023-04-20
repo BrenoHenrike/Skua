@@ -30,13 +30,15 @@
             </DataTemplate>
 
             <DataTemplate x:Key="IntTemplate">
-                <DockPanel Height="32" Margin="6,0">
+                <DockPanel Height="32" Margin="6,3">
                     <TextBox
                         x:Name="NumberTextBox"
                         Width="70"
                         materialDesign:TextFieldAssist.CharacterCounterVisibility="Collapsed"
                         materialDesign:TextFieldAssist.DecorationVisibility="Collapsed"
                         materialDesign:TextFieldAssist.HasFilledTextField="True"
+                        materialDesign:TextFieldAssist.SuffixText="FPS"
+                        materialDesign:TextFieldAssist.TextBoxViewMargin="10 0 0 0"
                         materialDesign:TextFieldAssist.TextFieldCornerRadius="16 0 0 16"
                         DockPanel.Dock="Left"
                         Style="{StaticResource MaterialDesignTextBox}"
@@ -83,7 +85,7 @@
             <DataTemplate x:Key="ActionTemplate">
                 <Button
                     Height="32"
-                    Margin="6,0"
+                    Margin="6,3"
                     materialDesign:ButtonAssist.CornerRadius="16"
                     Command="{Binding Command}"
                     Content="{Binding Content}"

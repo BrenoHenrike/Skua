@@ -20,14 +20,16 @@
         </Grid.RowDefinitions>
         <TextBox
             Grid.Row="0"
-            Margin="0,0,0,3"
+            VerticalContentAlignment="Top"
             materialDesign:TextFieldAssist.HasFilledTextField="True"
+            materialDesign:TextFieldAssist.TextBoxViewMargin="10 0 0 0"
             AcceptsReturn="True"
             AcceptsTab="True"
             Text="{Binding SnippetText, UpdateSourceTrigger=PropertyChanged}" />
         <Button
             Grid.Row="1"
-            Margin="0,3,0,0"
+            Grid.Column="0"
+            Margin="0,6,0,0"
             Command="{Binding RunCommand}"
             Content="Run" />
     </Grid>

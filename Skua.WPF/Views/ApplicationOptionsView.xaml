@@ -7,6 +7,7 @@
     xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
     xmlns:usercontrols="clr-namespace:Skua.WPF.UserControls"
     xmlns:vms="clr-namespace:Skua.Core.ViewModels;assembly=Skua.Core"
+    Height="auto"
     d:DataContext="{d:DesignInstance vms:ApplicationOptionsViewModel}"
     d:DesignHeight="450"
     d:DesignWidth="800"
