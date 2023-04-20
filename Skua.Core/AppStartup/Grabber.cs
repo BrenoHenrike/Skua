@@ -302,19 +302,7 @@ internal class Grabber
             }
             try
             {
-                if (result == 1)
-                {
-                    await Task.Run(() => shop.BuyItem(item.ID, item.ShopItemID), t);
-                    p.Report($"Bought {result} {item.Name}");
-                    return;
-                }
-                for (int index = 0; index < result; index++)
-                {
-                    await Task.Run(() => shop.BuyItem(item.ID, item.ShopItemID), t);
-                    p.Report($"Bought {index + 1}");
-                    if (index != result - 1)
-                        await Task.Delay(1000, t);
-                }
+                await Task.Run(() => shop.BuyItem(item.ID, item.ShopItemID, result), t);
                 p.Report($"Bought {result} {item.Name}");
                 return;
             }
@@ -444,14 +432,14 @@ internal class Grabber
             if (items.Count == 1)
             {
                 p.Report($"{identifier} {items[0].Name}.");
-                action(items[0].ID);
+                await Task.Run(() => action(items[0].ID), token);
                 return;
             }
 
             for (int index = 0; index < items.Count; index++)
             {
                 p.Report($"{identifier} {items[index].Name}.");
-                action(items[index].ID);
+                await Task.Run(() => action(items[index].ID), token);
                 if(index != items.Count - 1)
                     await Task.Delay(1000, token);
             }
