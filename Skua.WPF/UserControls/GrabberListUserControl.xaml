@@ -120,7 +120,7 @@
                 Command="{Binding GrabCommand}"
                 Content="Grab" />
         </Grid>
-        <materialDesing:Snackbar IsActive="{Binding IsBusy}">
+        <materialDesing:Snackbar IsActive="{Binding ShowMessage}">
             <materialDesing:SnackbarMessage
                 ActionCommand="{Binding CancelTaskCommand}"
                 ActionContent="{materialDesing:PackIcon Kind=Cancel}"

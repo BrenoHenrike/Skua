@@ -33,9 +33,9 @@ public partial class GrabberTaskViewModel : ObservableRecipient
         IsBusy = true;
         Progress<string> progress = new(ProgressReport);
         await _command(items, progress, token);
-        await Task.Delay(1000);
-        ProgressReportMessage = string.Empty;
         IsBusy = false;
+        await Task.Delay(1000, token);
+        ProgressReportMessage = string.Empty;
     }
 
     private void ProgressReport(string progress)

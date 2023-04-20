@@ -46,6 +46,8 @@ public partial class GrabberListViewModel : ObservableRecipient
     [ObservableProperty]
     private bool _isBusy = false;
     [ObservableProperty]
+    private bool _showMessage = false;
+    [ObservableProperty]
     private string _progressReportMessage = string.Empty;
     [ObservableProperty]
     private ObservableCollection<GrabberTaskViewModel> _grabberCommands;
@@ -61,6 +63,7 @@ public partial class GrabberListViewModel : ObservableRecipient
     {
         IsBusy = true;
         ProgressReportMessage = "Working...";
+        ShowMessage = true;
         try
         {
             IEnumerable<object> items = await Task.Run(() => _grabberService.Grab(_grabType));
@@ -72,6 +75,7 @@ public partial class GrabberListViewModel : ObservableRecipient
             IsBusy = false;
             ProgressReportMessage = "Finished.";
             await Task.Delay(1000);
+            ShowMessage = false;
             ProgressReportMessage = string.Empty;
         }
     }
@@ -110,6 +114,9 @@ public partial class GrabberListViewModel : ObservableRecipient
     {
         if (message.Sender.GetType() == typeof(GrabberTaskViewModel)
             && message.PropertyName == nameof(GrabberTaskViewModel.ProgressReportMessage))
+        {
+            ShowMessage = !string.IsNullOrEmpty(message.NewValue);
             receiver.ProgressReportMessage = message.NewValue;
+        }
     }
 }
