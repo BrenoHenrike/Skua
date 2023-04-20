@@ -51,7 +51,30 @@ public partial class ScriptLoaderViewModel : BotControlViewModelBase
     [ObservableProperty]
     private string _scriptStatus = "[No Script Loaded]";
     [ObservableProperty]
+    private bool _hasOptions;
     private string _loadedScript = string.Empty;
+    public string LoadedScript
+    {
+        get { return _loadedScript; }
+        set
+        {
+            if (SetProperty(ref _loadedScript, value))
+                HasOptionsCheck();
+        }
+    }
+
+    private void HasOptionsCheck()
+    {
+        HasOptions = false;
+        foreach (var line in File.ReadLines(ScriptManager.LoadedScript))
+        {
+            if (line.Contains("List<IOption>"))
+            {
+                HasOptions = true;
+                break;
+            }
+        }
+    }
 
     [RelayCommand]
     private void OpenBrowserForm()
@@ -151,6 +174,12 @@ public partial class ScriptLoaderViewModel : BotControlViewModelBase
         if (string.IsNullOrWhiteSpace(ScriptManager.LoadedScript))
         {
             _dialogService.ShowMessageBox("No script is currently loaded. Please load a script to edit its options.", "No Script Loaded");
+            return;
+        }
+        
+        if (ScriptManager.ScriptRunning)
+        {
+            _dialogService.ShowMessageBox("Script currently running. Stop the script to change its options.", "Script Running");
             return;
         }
 
