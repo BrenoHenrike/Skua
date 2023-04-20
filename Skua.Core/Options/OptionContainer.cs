@@ -34,10 +34,8 @@ public class OptionContainer : ObservableObject, IOptionContainer
 
     public T? Get<T>(string category, string name) where T : IConvertible
     {
-
         return category == "Options" ? Get<T>(name) : Get<T>(MultipleOptions[category].Find(o => o.Name == name));
     }
-
 
     public T? Get<T>(IOption? option) where T : IConvertible
     {
@@ -46,8 +44,12 @@ public class OptionContainer : ObservableObject, IOptionContainer
 
         if (OptionValues.TryGetValue(option, out string? value))
         {
+            if (string.IsNullOrEmpty(value))
+                return default;
+
             if (typeof(T).IsEnum)
                 return (T)Enum.Parse(typeof(T), value.Replace(' ', '_'));
+
             return (T)Convert.ChangeType(value, typeof(T));
         }
 
@@ -77,7 +79,6 @@ public class OptionContainer : ObservableObject, IOptionContainer
         if (!option.Transient)
             Save();
     }
-
 
     public void Configure()
     {
