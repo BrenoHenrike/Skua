@@ -71,20 +71,20 @@ public partial class ScriptShop : IScriptShop
             Wait.ForTrue(() => ID == id, 10);
     }
 
-    public void BuyItem(string name)
+    public void BuyItem(string name, int quantity = -1)
     {
         if (Options.SafeTimings)
             Wait.ForActionCooldown(GameActions.BuyItem);
-        Flash.Call("buyItemByName", name);
+        Flash.Call("buyItemByName", name, quantity);
         if (Options.SafeTimings)
             Wait.ForItemBuy();
     }
 
-    public void BuyItem(int id, int shopItemId = 0)
+    public void BuyItem(int id, int shopItemId = 0, int quantity = -1)
     {
         if (Options.SafeTimings)
             Wait.ForActionCooldown(GameActions.BuyItem);
-        Flash.Call("buyItemByID", id, shopItemId);
+        Flash.Call("buyItemByID", id, shopItemId, quantity);
         if (Options.SafeTimings)
             Wait.ForItemBuy();
     }

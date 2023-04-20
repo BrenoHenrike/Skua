@@ -28,33 +28,38 @@ public interface IScriptShop
     /// Buys the item with specified <paramref name="name"/> from the <see cref="ID">currently loaded shop</see>.
     /// </summary>
     /// <param name="name">Name of the item to buy.</param>
-    void BuyItem(string name);
+    /// <param name="quantity">Quantity to buy of the item, if -1 it will buy the default quantity.</param>
+    void BuyItem(string name, int quantity = -1);
     /// <summary>
     /// Buys the item with specified <paramref name="id"/> from the <see cref="ID">currently loaded shop</see>.
     /// </summary>
-    /// <param name="id">Name of the item to buy.</param>
-    void BuyItem(int id, int shopItemId = 0);
+    /// <param name="id">ID of the item to buy.</param>
+    /// <param name="shopItemId">ID of the item inside the shop.</param>
+    /// <param name="quantity">Quantity to buy of the item, if -1 it will buy the default quantity.</param>
+    void BuyItem(int id, int shopItemId = 0, int quantity = -1);
     /// <summary>
     /// Buys the item with specified <paramref name="name"/> from the specified <paramref name="shopId"/>.
     /// </summary>
     /// <param name="shopId">Shop to buy the item from.</param>
     /// <param name="name">Name of the item to buy.</param>
+    /// <param name="quantity">Quantity to buy of the item, if -1 it will buy the default quantity.</param>
     /// <remarks>This loads the shop, waits until it is fully loaded, and then sends the buy item request.</remarks>
-    void BuyItem(int shopId, string name)
+    void LoadAndBuyItem(int shopId, string name, int quantity = -1)
     {
         Load(shopId);
-        BuyItem(name);
+        BuyItem(name, quantity);
     }
     /// <summary>
     /// Buys the item with specified <paramref name="itemId"/> from the specified <paramref name="shopId"/>.
     /// </summary>
     /// <param name="shopId">ID of the shop to buy the item from.</param>
     /// <param name="itemId">ID of the item to buy.</param>
+    /// <param name="quantity">Quantity to buy of the item, if -1 it will buy the default quantity.</param>
     /// <remarks>This loads the shop, waits until it is fully loaded, and then sends the buy item request.</remarks>
-    void BuyItem(int shopId, int itemId, int shopItemId = 0)
+    void LoadAndBuyItem(int shopId, int itemId, int shopItemId = 0, int quantity = -1)
     {
         Load(shopId);
-        BuyItem(itemId, shopItemId);
+        BuyItem(itemId, shopItemId, quantity);
     }
     /// <summary>
     /// Loads the shop with specified <paramref name="id"/>.

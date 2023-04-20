@@ -655,7 +655,7 @@ package skua
 		public static function useSkill(index:int):String
 		{
 			var skill:* = instance.game.world.actions.active[index];
-			if (skua.ExtractedFuncs.actionTimeCheck(skill) && instance.game.world.myAvatar.target.dataLeaf.intHP > 0)
+			if (skua.ExtractedFuncs.actionTimeCheck(skill))
 			{
 				instance.game.world.testAction(skill);
 				return true.toString();
@@ -738,25 +738,47 @@ package skua
 			}
 		}
 		
-		public static function buyItemByName(name:String):void
+		public static function buyItemByName(name:String, quantity:int = -1):void
 		{
 			for each (var item:* in instance.game.world.shopinfo.items)
 			{
 				if (item.sName.toLowerCase() == name.toLowerCase())
 				{
-					instance.game.world.sendBuyItemRequest(item);
+					if (quantity == -1)
+						instance.game.world.sendBuyItemRequest(item);
+					else
+					{
+						var buyItem:* = new Object();
+						buyItem = item;
+						buyItem.iSel = item;
+						buyItem.iQty = quantity;
+						buyItem.iSel.iQty = quantity;
+						buyItem.accept = 1;
+						instance.game.world.sendBuyItemRequestWithQuantity(buyItem);
+					}
 					break;
 				}
 			}
 		}
 		
-		public static function buyItemByID(id:int, shopItemID:int):void
+		public static function buyItemByID(id:int, shopItemID:int, quantity:int = -1):void
 		{
 			for each (var item:* in instance.game.world.shopinfo.items)
 			{
 				if (item.ItemID == id && (shopItemID == 0 || item.ShopItemID == shopItemID))
 				{
-					instance.game.world.sendBuyItemRequest(item);
+					if (quantity == -1)
+						instance.game.world.sendBuyItemRequest(item);
+					else
+					{
+						var buyItem:* = new Object();
+						buyItem = item;
+						buyItem.iSel = item;
+						buyItem.iQty = quantity;
+						buyItem.iSel.iQty = quantity;
+						buyItem.accept = 1;
+						instance.game.world.sendBuyItemRequestWithQuantity(buyItem);
+					}
 					break;
 				}
 			}
