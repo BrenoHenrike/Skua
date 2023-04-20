@@ -36,7 +36,7 @@ public interface IScriptMonster
     /// <returns><see langword="true"/> if the specified monster exists and is alive in the current cell.</returns>
     bool Exists(int id)
     {
-        return CurrentAvailableMonsters.Any(m => m.ID == id);
+        return CurrentAvailableMonsters.Any(m => m.ID == id || m.MapID == id);
     }
     /// <summary>
     /// Gets a dictionary which maps cell names of the current map to all monsters in that cell.
