@@ -1,4 +1,5 @@
 ﻿using CommunityToolkit.Mvvm.Messaging;
+using Newtonsoft.Json.Linq;
 using Skua.Core.Interfaces;
 using Skua.Core.Messaging;
 using Skua.Core.Models;
@@ -233,19 +234,57 @@ public class ScriptHunt : IScriptHunt
 
     public void ForItem(string name, string item, int quantity, bool tempItem = false)
     {
+        if ((!tempItem && Inventory.Contains(item, quantity)) || (tempItem && TempInv.Contains(item, quantity)))
+            return;
+
         _ctsHunt = new();
         _item = (item, quantity, tempItem);
+        string[] names = name.Split('|');
+        List<string> cells = names.SelectMany(n => Monsters.GetLivingMonsterDataLeafCells(n)).Distinct().ToList();
+
+        StrongReferenceMessenger.Default.Register<ScriptHunt, ItemDroppedMessage, int>(this, (int)MessageChannels.GameEvents, ItemDropped);
         try
         {
-            StrongReferenceMessenger.Default.Register<ScriptHunt, ItemDroppedMessage, int>(this, (int)MessageChannels.GameEvents, ItemHunted);
-            while (!Manager.ShouldExit
-                && (tempItem || !Inventory.Contains(item, quantity))
-                && (!tempItem || !TempInv.Contains(item, quantity)))
+            while (!Manager.ShouldExit && !_ctsHunt.IsCancellationRequested)
             {
                 if (_ctsHunt.IsCancellationRequested)
                     break;
-                _HuntWithPriority(name, Options.HuntPriority, _ctsHunt.Token);
-                Drops.Pickup(item);
+
+                for (int i = cells.Count -1; i >= 0; i--)
+                {
+                    if (Player.Cell != cells[i] && !_ctsHunt.IsCancellationRequested)
+                    {
+                        if (Environment.TickCount - _lastHuntTick < Options.HuntDelay)
+                            Thread.Sleep(Options.HuntDelay - Environment.TickCount + _lastHuntTick);
+                        Map.Jump(cells[i], "Left");
+                        _lastHuntTick = Environment.TickCount;
+                    }
+
+                    if (_ctsHunt.IsCancellationRequested)
+                        break;
+
+                    foreach (string mon in names)
+                    {
+                        if (_ctsHunt.IsCancellationRequested)
+                            break;
+
+                        if(Monsters.Exists(mon) && !_ctsHunt.IsCancellationRequested)
+                        {
+                            if(!Combat.Attack(mon))
+                            {
+                                cells.RemoveAt(i);
+                                continue;
+                            }
+                            Thread.Sleep(Options.ActionDelay);
+                            Kill.Monster(mon, _ctsHunt.Token);
+                            break;
+                        }
+                        else
+                        {
+                            cells.RemoveAt(i);
+                        }
+                    }
+                }
             }
         }
         finally
@@ -256,7 +295,7 @@ public class ScriptHunt : IScriptHunt
         }
     }
 
-    private void ItemHunted(ScriptHunt recipient, ItemDroppedMessage message)
+    private void ItemDropped(ScriptHunt recipient, ItemDroppedMessage message)
     {
         if (message.Item.Name != recipient._item.name)
             return;

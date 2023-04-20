@@ -16,7 +16,8 @@ public class ScriptKill : IScriptKill
         Lazy<IScriptTempInv> tempInv,
         Lazy<IScriptManager> manager,
         Lazy<IScriptMap> map,
-        ILogService logger)
+        ILogService logger,
+        Lazy<IScriptMonster> monsters)
     {
         _lazyWait = wait;
         _lazyOptions = options;
@@ -28,6 +29,7 @@ public class ScriptKill : IScriptKill
         _lazyManager = manager;
         _lazyMap = map;
         _logger = logger;
+        _lazyMonsters = monsters;
     }
 
     internal string _saveCell = "Enter", _savePad = "Spawn";
@@ -40,6 +42,7 @@ public class ScriptKill : IScriptKill
     private readonly Lazy<IScriptTempInv> _lazyTempInv;
     private readonly Lazy<IScriptManager> _lazyManager;
     private readonly Lazy<IScriptMap> _lazyMap;
+    private readonly Lazy<IScriptMonster> _lazyMonsters;
     private readonly ILogService _logger;
 
     private IScriptWait Wait => _lazyWait.Value;
@@ -51,6 +54,7 @@ public class ScriptKill : IScriptKill
     private IScriptTempInv TempInv => _lazyTempInv.Value;
     private IScriptMap Map => _lazyMap.Value;
     private IScriptManager Manager => _lazyManager.Value;
+    private IScriptMonster Monsters => _lazyMonsters.Value;
 
 
     public void Player(string name)
@@ -71,47 +75,88 @@ public class ScriptKill : IScriptKill
     {
         if (Options.SafeTimings)
             Wait.ForMonsterSpawn(name);
-        Combat.Attack(name);
-        if (token is null)
+        if(Combat.Attack(name))
         {
-            Wait.ForMonsterDeath();
-            return;
+            Thread.Sleep(Options.ActionDelay);
+            if (token is null)
+            {
+                Wait.ForMonsterDeath();
+                return;
+            }
+            WaitMonsterDeathOrCancellation((CancellationToken)token);
         }
-        WaitMonsterDeathOrCancellation((CancellationToken)token);
     }
 
     private void _Kill(int id, CancellationToken? token)
     {
         if (Options.SafeTimings)
             Wait.ForMonsterSpawn(id);
-        Combat.Attack(id);
-        if (token is null)
+        if(Combat.Attack(id))
         {
-            Wait.ForMonsterDeath();
-            return;
+            Thread.Sleep(Options.ActionDelay);
+            if (token is null)
+            {
+                Wait.ForMonsterDeath();
+                return;
+            }
+            WaitMonsterDeathOrCancellation((CancellationToken)token);
         }
-        WaitMonsterDeathOrCancellation((CancellationToken)token);
     }
+
+    private (string name, int quantity, bool isTemp) _item = (string.Empty, 0, false);
+    private CancellationTokenSource? _ctsKill;
 
     public void ForItem(string name, string item, int quantity, bool tempItem = false)
     {
+        if ((!tempItem && Inventory.Contains(item, quantity)) || (tempItem && TempInv.Contains(item, quantity)))
+            return;
+
         _saveCell = _player.Cell;
         _savePad = _player.Pad;
+        _ctsKill = new();
+        _item = (item, quantity, tempItem);
+        string[] names = name.Split('|');
+
+        StrongReferenceMessenger.Default.Register<ScriptKill, CellChangedMessage, int>(this, (int)MessageChannels.GameEvents, CellChanged);
+        StrongReferenceMessenger.Default.Register<ScriptKill, ItemDroppedMessage, int>(this, (int)MessageChannels.GameEvents, ItemDropped);
         try
         {
-            StrongReferenceMessenger.Default.Register<ScriptKill, CellChangedMessage, int>(this, (int)MessageChannels.GameEvents, CellChanged);
-            while (!Manager.ShouldExit
-                && (tempItem || !Inventory.Contains(item, quantity))
-                && (!tempItem || !TempInv.Contains(item, quantity)))
+            if (name == "*")
             {
-                Combat.Attack(name);
-                Drops.Pickup(item);
+                while (!Manager.ShouldExit && !_ctsKill.IsCancellationRequested)
+                {
+                    foreach (var mon in Monsters.CurrentAvailableMonsters)
+                    {
+                        if (_ctsKill.IsCancellationRequested)
+                            break;
+
+                        Monster(mon, _ctsKill.Token);
+                        Thread.Sleep(Options.ActionDelay);
+                    }
+                }
+            }
+            else
+            {
+                while (!Manager.ShouldExit && !_ctsKill.IsCancellationRequested)
+                {
+                    foreach (var mon in names)
+                    {
+                        if (_ctsKill.IsCancellationRequested)
+                            break;
+
+                        Monster(mon, _ctsKill.Token);
+                        Thread.Sleep(Options.ActionDelay);
+                    }
+                }
             }
         }
         finally
         {
             _saveCell = _savePad = string.Empty;
+            _ctsKill?.Dispose();
+            _ctsKill = null;
             StrongReferenceMessenger.Default.Unregister<CellChangedMessage, int>(this, (int)MessageChannels.GameEvents);
+            StrongReferenceMessenger.Default.Unregister<ItemDroppedMessage, int>(this, (int)MessageChannels.GameEvents);
         }
 
         void CellChanged(ScriptKill recipient, CellChangedMessage message)
@@ -119,6 +164,22 @@ public class ScriptKill : IScriptKill
             if(message.Cell != recipient._saveCell)
                 recipient.Map.Jump(recipient._saveCell, recipient._savePad);
         }
+    }
+
+    private void ItemDropped(ScriptKill recipient, ItemDroppedMessage message)
+    {
+        if (message.Item.Name != recipient._item.name)
+            return;
+
+        if (message.AddedToInv && !message.Item.Temp && message.QuantityNow >= recipient._item.quantity)
+        {
+            recipient._ctsKill?.Cancel();
+            return;
+        }
+        recipient.Drops.Pickup(message.Item.Name);
+        int quant = recipient._item.isTemp ? recipient.TempInv.GetQuantity(message.Item.Name) : recipient.Inventory.GetQuantity(message.Item.Name);
+        if (quant >= recipient._item.quantity)
+            recipient._ctsKill?.Cancel();
     }
 
     public void ForItem(IEnumerable<string> names, string item, int quantity, bool tempItem = false)

@@ -1,7 +1,9 @@
 ﻿using System.Diagnostics;
 using System.Diagnostics.Contracts;
+using System.Numerics;
 using CommunityToolkit.Mvvm.ComponentModel;
 using Skua.Core.Interfaces;
+using Skua.Core.Models.Monsters;
 using Skua.Core.Models.Skills;
 
 namespace Skua.Core.Scripts;
@@ -16,8 +18,9 @@ public partial class ScriptAuto : ObservableObject, IScriptAuto
         Lazy<IScriptOption> options,
         Lazy<IScriptMonster> monsters,
         Lazy<IScriptKill> kill,
-        Lazy<IScriptHunt> hunt,
-        Lazy<IScriptWait> wait)
+        Lazy<IScriptWait> wait,
+        Lazy<IScriptCombat> lazyCombat,
+        Lazy<IScriptMap> lazyMap)
     {
         _logger = logger;
         _lazyPlayer = player;
@@ -27,10 +30,12 @@ public partial class ScriptAuto : ObservableObject, IScriptAuto
         _lazyOptions = options;
         _lazyMonsters = monsters;
         _lazyKill = kill;
-        _lazyHunt = hunt;
         _lazyWait = wait;
+        _lazyCombat = lazyCombat;
+        _lazyMap = lazyMap;
+        _lastHuntTick = Environment.TickCount;
     }
-   
+
     private readonly ILogService _logger;
     private readonly Lazy<IScriptPlayer> _lazyPlayer;
     private readonly Lazy<IScriptDrop> _lazyDrops;
@@ -39,17 +44,19 @@ public partial class ScriptAuto : ObservableObject, IScriptAuto
     private readonly Lazy<IScriptOption> _lazyOptions;
     private readonly Lazy<IScriptKill> _lazyKill;
     private readonly Lazy<IScriptMonster> _lazyMonsters;
-    private readonly Lazy<IScriptHunt> _lazyHunt;
     private readonly Lazy<IScriptWait> _lazyWait;
-    private IScriptPlayer _player => _lazyPlayer.Value;
-    private IScriptDrop _drops => _lazyDrops.Value;
-    private IScriptSkill _skills => _lazySkills.Value;
-    private IScriptBoost _boosts => _lazyBoosts.Value;
-    private IScriptOption _options => _lazyOptions.Value;
-    private IScriptKill _kill => _lazyKill.Value;
-    private IScriptMonster _monsters => _lazyMonsters.Value;
-    private IScriptHunt _hunt => _lazyHunt.Value;
-    private IScriptWait _wait => _lazyWait.Value;
+    private readonly Lazy<IScriptCombat> _lazyCombat;
+    private readonly Lazy<IScriptMap> _lazyMap;
+    private IScriptPlayer Player => _lazyPlayer.Value;
+    private IScriptDrop Drops => _lazyDrops.Value;
+    private IScriptSkill Skills => _lazySkills.Value;
+    private IScriptBoost Boosts => _lazyBoosts.Value;
+    private IScriptOption Options => _lazyOptions.Value;
+    private IScriptKill Kill => _lazyKill.Value;
+    private IScriptMonster Monsters => _lazyMonsters.Value;
+    private IScriptWait Wait => _lazyWait.Value;
+    private IScriptCombat Combat => _lazyCombat.Value;
+    private IScriptMap Map => _lazyMap.Value;
 
     [ObservableProperty]
     private bool _isRunning;
@@ -79,7 +86,7 @@ public partial class ScriptAuto : ObservableObject, IScriptAuto
         
         _ctsAuto?.Cancel();
         _autoTask?.Wait();
-        _wait.ForTrue(() => _ctsAuto is null, 20);
+        Wait.ForTrue(() => _ctsAuto is null, 20);
         _autoTask?.Dispose();
         IsRunning = false;
     }
@@ -93,7 +100,7 @@ public partial class ScriptAuto : ObservableObject, IScriptAuto
         }
         
         _ctsAuto?.Cancel();
-        await _wait.ForTrueAsync(() => _ctsAuto is null && (_autoTask?.IsCompleted ?? true), 40);
+        await Wait.ForTrueAsync(() => _ctsAuto is null && (_autoTask?.IsCompleted ?? true), 40);
         _autoTask?.Dispose();
         IsRunning = false;
     }
@@ -103,14 +110,14 @@ public partial class ScriptAuto : ObservableObject, IScriptAuto
         if (_autoTask != null && !_autoTask.IsCompleted)
             return;
 
-        if (!_player.LoggedIn)
+        if (!Player.LoggedIn)
             return;
 
         CheckDropsandBoosts();
         if (className is not null)
-            _skills.StartAdvanced(className, true, classUseMode);
+            Skills.StartAdvanced(className, true, classUseMode);
         else
-            _skills.StartAdvanced(_player.CurrentClass?.Name ?? "Generic", true);
+            Skills.StartAdvanced(Player.CurrentClass?.Name ?? "Generic", true);
 
         _autoTask = Task.Run(async () =>
         {
@@ -124,9 +131,9 @@ public partial class ScriptAuto : ObservableObject, IScriptAuto
             catch { }
             finally
             {
-                _drops.Stop();
-                _skills.Stop();
-                _boosts.Stop();
+                Drops.Stop();
+                Skills.Stop();
+                Boosts.Stop();
                 _ctsAuto?.Dispose();
                 _ctsAuto = null;
                 IsRunning = false;
@@ -139,46 +146,77 @@ public partial class ScriptAuto : ObservableObject, IScriptAuto
     private async Task _Attack(CancellationToken token)
     {
         Trace.WriteLine("Auto attack started.");
-        _player.SetSpawnPoint();
+        Player.SetSpawnPoint();
+
+        var monsters = Monsters.CurrentMonsters;
+
         while (!token.IsCancellationRequested)
         {
-            if (!_options.AttackWithoutTarget)
-                _kill.Monster("*", token);
-            try
+            foreach (var monster in monsters)
             {
-                await Task.Delay(500, token);
-            }
-            catch (TaskCanceledException)
-            {
-                break;
+                if (token.IsCancellationRequested)
+                    return;
+
+                if (!Combat.Attack(monster.MapID))
+                    continue;
+
+                Kill.Monster(monster.MapID, token);
             }
         }
         Trace.WriteLine("Auto attack stopped.");
     }
 
+    private int _lastHuntTick;
+
     private async Task _Hunt(CancellationToken token)
     {
         Trace.WriteLine("Auto hunt started.");
 
-        if (_player.HasTarget)
-            _target = _player.Target?.Name ?? "*";
+        if (Player.HasTarget)
+            _target = Player.Target?.Name ?? "*";
         else
         {
-            List<string> monsters = _monsters.CurrentMonsters.Select(m => m.Name).ToList();
+            List<string> monsters = Monsters.CurrentMonsters.Select(m => m.Name).ToList();
             _target = string.Join('|', monsters);
         }
+
+        var names = _target.Split('|');
+        List<string> cells = names.SelectMany(n => Monsters.GetLivingMonsterDataLeafCells(n)).Distinct().ToList();
 
         _logger.ScriptLog($"[Auto Hunt] Hunting for {_target}");
         while (!token.IsCancellationRequested)
         {
-            _hunt.Monster(_target, token);
-            try
+            for (int i = cells.Count - 1; i >= 0; i--)
             {
-                await Task.Delay(500, token);
-            }
-            catch (TaskCanceledException)
-            {
-                break;
+                if (Player.Cell != cells[i] && !token.IsCancellationRequested)
+                {
+                    if (Environment.TickCount - _lastHuntTick < Options.HuntDelay)
+                        Thread.Sleep(Options.HuntDelay - Environment.TickCount + _lastHuntTick);
+                    Map.Jump(cells[i], "Left");
+                    _lastHuntTick = Environment.TickCount;
+                }
+
+                foreach (string mon in names)
+                {
+                    if (token.IsCancellationRequested)
+                        break;
+
+                    if (Monsters.Exists(mon) && !token.IsCancellationRequested)
+                    {
+                        if (!Combat.Attack(mon))
+                        {
+                            cells.RemoveAt(i);
+                            continue;
+                        }
+                        Thread.Sleep(Options.ActionDelay);
+                        Kill.Monster(mon, token);
+                        break;
+                    }
+                    else
+                    {
+                        cells.RemoveAt(i);
+                    }
+                }
             }
         }
         Trace.WriteLine("Auto hunt stopped.");
@@ -186,10 +224,10 @@ public partial class ScriptAuto : ObservableObject, IScriptAuto
 
     private void CheckDropsandBoosts()
     {
-        if (_drops.ToPickup.Any())
-            _drops.Start();
+        if (Drops.ToPickup.Any())
+            Drops.Start();
 
-        if (_boosts.UsingBoosts)
-            _boosts.Start();
+        if (Boosts.UsingBoosts)
+            Boosts.Start();
     }
 }
