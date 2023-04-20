@@ -67,21 +67,21 @@
                                             Orientation="Horizontal">
                                             <!--  Minimize  -->
                                             <Button
-                                                x:Name="btnMinimize"
+                                                x:Name="PART_Minimize"
                                                 materialdesign:ButtonAssist.CornerRadius="0 0 0 10"
                                                 Content="{materialdesign:PackIcon Kind=WindowMinimize}"
                                                 Style="{StaticResource MaterialDesignFlatButton}"
                                                 WindowChrome.IsHitTestVisibleInChrome="True" />
                                             <!--  Maximize  -->
                                             <Button
-                                                x:Name="btnMaximize"
+                                                x:Name="PART_Maximize"
                                                 materialdesign:ButtonAssist.CornerRadius="0"
                                                 Content="{materialdesign:PackIcon Kind=WindowMaximize}"
                                                 Style="{StaticResource MaterialDesignFlatButton}"
                                                 WindowChrome.IsHitTestVisibleInChrome="True" />
                                             <!--  Close  -->
                                             <Button
-                                                x:Name="btnClose"
+                                                x:Name="PART_Close"
                                                 materialdesign:ButtonAssist.CornerRadius="0"
                                                 Content="{materialdesign:PackIcon Kind=WindowClose}"
                                                 Style="{StaticResource MaterialDesignFlatButton}"
