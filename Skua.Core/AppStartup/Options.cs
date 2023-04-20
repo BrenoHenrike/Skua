@@ -69,7 +69,17 @@ internal class Options
                 if (!int.TryParse(value, out int result) || result < 1)
                     return;
                 Ioc.Default.GetRequiredService<ISettingsService>().Set("AnimationFrameRate", result);
-            }), s.GetRequiredService<ISettingsService>().Get<int>("AnimationFrameRate"))
+            }), s.GetRequiredService<ISettingsService>().Get<int>("AnimationFrameRate")),
+            new CommandOptionItemViewModel<IRelayCommand>("Clear Flash Cache", new RelayCommand(() =>
+            {
+                string flash = Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData), "Adobe", "Flash Player");
+                string macromedia = Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData), "Macromedia", "Flash Player");
+
+                if (Directory.Exists(flash))
+                    Directory.Delete(flash, true);
+                if (Directory.Exists(macromedia))
+                    Directory.Delete(macromedia, true);
+            }))
         };
 
         return new ApplicationOptionsViewModel(appOptions);
