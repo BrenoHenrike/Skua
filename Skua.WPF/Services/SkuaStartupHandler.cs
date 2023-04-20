@@ -16,23 +16,27 @@ public sealed class SkuaStartupHandler
 
     public SkuaStartupHandler(string[] args, IScriptInterface bot, ISettingsService settingsService, IThemeService themeService)
     {
-        _result = Parser.Default.ParseArguments<SkuaOptions>(args);
         _bot = bot;
+        _bot.Flash.FlashCall += LoadGame;
+        _result = Parser.Default.ParseArguments<SkuaOptions>(args);
         _settingsService = settingsService;
         _themeService = themeService;
     }
 
-    private void Flash_FlashCall(string function, params object[] args)
+    private void LoadGame(string function, params object[] args)
     {
-        if(function == "requestLoadGame")
+        if (function == "requestLoadGame")
         {
             _bot.Flash.Call("loadClient");
-            return;
+            _bot.Flash.FlashCall -= LoadGame;
         }
+    }
 
+    private void Login(string function, params object[] args)
+    {
         if (function == "loaded")
         {
-            _bot.Flash.FlashCall -= Flash_FlashCall;
+            _bot.Flash.FlashCall -= Login;
             Task.Factory.StartNew(() =>
             {
                 _bot.Servers.Relogin(_result.Value.Server);
@@ -58,7 +62,7 @@ public sealed class SkuaStartupHandler
 
         if (!string.IsNullOrEmpty(options.Username) && !string.IsNullOrEmpty(options.Password))
         {
-            _bot.Flash.FlashCall += Flash_FlashCall;
+            _bot.Flash.FlashCall += Login;
             _bot.Servers.SetLoginInfo(options.Username, options.Password);
         }
 
