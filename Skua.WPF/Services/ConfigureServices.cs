@@ -1,11 +1,6 @@
 ﻿using Microsoft.Extensions.DependencyInjection;
 using Skua.Core.Interfaces;
 using Skua.WPF.Flash;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace Skua.WPF.Services;
 public static class ConfigureServices
@@ -21,6 +16,7 @@ public static class ConfigureServices
         services.AddSingleton<IFileDialogService, FileDialogService>();
         services.AddSingleton<IHotKeyService, HotKeyService>();
         services.AddSingleton<IThemeService, ThemeService>();
+        services.AddSingleton<ISoundService, SoundService>();
         services.AddSingleton<ThemeUserSettingsService>();
 
         return services;
