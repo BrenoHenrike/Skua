@@ -20,6 +20,7 @@ internal class ManagedWindows
         windowService.RegisterManagedWindow("HotKeys", s.GetRequiredService<HotKeysViewModel>());
 
         windowService.RegisterManagedWindow("Runtime", s.GetRequiredService<RuntimeHelpersViewModel>());
+        windowService.RegisterManagedWindow("Notify Drop", s.GetRequiredService<NotifyDropViewModel>());
         windowService.RegisterManagedWindow("Fast Travel", s.GetRequiredService<FastTravelViewModel>());
         windowService.RegisterManagedWindow("Current Drops", s.GetRequiredService<CurrentDropsViewModel>());
 

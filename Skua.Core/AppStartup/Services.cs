@@ -165,6 +165,7 @@ public static class Services
         services.AddSingleton<BoostsViewModel>();
         services.AddSingleton<ScriptStatsViewModel>();
         services.AddSingleton<RuntimeHelpersViewModel>();
+        services.AddSingleton<NotifyDropViewModel>();
         services.AddSingleton<ToPickupDropsViewModel>();
         services.AddSingleton<RegisteredQuestsViewModel>();
         services.AddSingleton<CurrentDropsViewModel>();

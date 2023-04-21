@@ -8,10 +8,13 @@ namespace Skua.Core.ViewModels;
 public partial class ToPickupDropsViewModel : ObservableRecipient
 {
     private readonly char[] _dropsSeparator = { '|' };
-    public ToPickupDropsViewModel(IScriptDrop drops, IScriptOption options)
+    private readonly IWindowService _windowService;
+
+    public ToPickupDropsViewModel(IScriptDrop drops, IScriptOption options, IWindowService windowService)
     {
         Drops = drops;
         Options = options;
+        _windowService = windowService;
         RemoveAllDropsCommand = new RelayCommand(Drops.Clear);
     }
 
@@ -65,5 +68,11 @@ public partial class ToPickupDropsViewModel : ObservableRecipient
     {
         if (message.PropertyName == nameof(IScriptDrop.ToPickup))
             recipient.OnPropertyChanged(nameof(recipient.ToPickup));
+    }
+
+    [RelayCommand]
+    private void OpenNotifyDrop()
+    {
+        _windowService.ShowManagedWindow("Notify Drop");
     }
 }

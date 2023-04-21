@@ -122,8 +122,11 @@
     <DataTemplate DataType="{x:Type vms:ChangeLogsViewModel}">
         <views:ChangeLogsView />
     </DataTemplate>
+    <DataTemplate DataType="{x:Type vms:NotifyDropViewModel}">
+        <usercontrols:DropNotifyUserControl />
+    </DataTemplate>
 
-    
+
     <DataTemplate DataType="{x:Type managerVms:ClientUpdatesViewModel}">
         <usercontrols:ClientUpdateUserControl />
     </DataTemplate>
