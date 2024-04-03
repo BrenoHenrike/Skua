@@ -1,10 +1,8 @@
 ﻿using CommunityToolkit.Mvvm.DependencyInjection;
-using Grpc.Net.Client;
 using Microsoft.Extensions.DependencyInjection;
 using Skua.App.WPF.Follower;
 using Skua.Core.AppStartup;
 using Skua.Core.Interfaces;
-using Skua.gRPC.Server;
 using Skua.WPF.Services;
 using System;
 using System.Collections.Generic;

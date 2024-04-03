@@ -1,6 +1,7 @@
 ﻿using CommunityToolkit.Mvvm.Messaging;
 using Skua.Core.Interfaces;
 using Skua.Core.Messaging;
+using Skua.Core.Models;
 
 namespace Skua.Core.Scripts;
 public class ScriptEvent : IScriptEvent
@@ -138,6 +139,8 @@ public class ScriptEvent : IScriptEvent
 
     public void OnMonsterKilled(ScriptEvent recipient, MonsterKilledMessage message)
     {
+        if (IScriptInterface.Instance.Monsters.MapMonsters.Any(m => m.MapID == message.MapID))
+            IScriptInterface.Instance.Monsters.MapMonsters.First(m => m.MapID == message.MapID).Alive = false;
         recipient.MonsterKilled?.Invoke(message.MapID);
     }
 

@@ -47,8 +47,8 @@ public interface IScriptMonster
     /// </summary>
     List<string> GetLivingMonsterCells(string name)
     {
-        try 
-        { 
+        try
+        {
             return MapMonsters.Where(m => m.Alive && (name == "*" || m.Name.Trim() == name.Trim())).Select(m => m.Cell).Distinct().ToList();
         }
         catch
