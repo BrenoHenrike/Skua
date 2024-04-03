@@ -1,7 +1,7 @@
 ﻿<Wix xmlns="http://wixtoolset.org/schemas/v4/wxs">
 
     <!-- Fixed upgrade Id -->
-    <?define UpgradeCode = "{ec9c3c05-092c-4607-a41d-c2f3600f43de}" ?>
+    <?define UpgradeCode = "{ef6842a7-5374-4ea6-9adf-ddd359b2e305}" ?>
 
     <!-- Define main product -->
     <Package Name="!(loc.ProductName_$(var.Platform))" Language="!(loc.Language)" Version="$(var.BuildVersion)" Manufacturer="!(loc.Company)" UpgradeCode="$(var.UpgradeCode)" InstallerVersion="200">

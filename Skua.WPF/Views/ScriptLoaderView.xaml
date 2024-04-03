@@ -75,18 +75,8 @@
                 Grid.ColumnSpan="2"
                 Margin="0,3"
                 Command="{Binding EditScriptConfigCommand}"
-                IsEnabled="{Binding HasOptions, UpdateSourceTrigger=PropertyChanged}"
-                Visibility="{Binding HasOptions, Converter={StaticResource BooleanToVisibilityConverter}}">
-                <Button.Content>
-                    <StackPanel Orientation="Horizontal">
-                        <materialDesign:PackIcon VerticalAlignment="Center" Kind="Cog" />
-                        <TextBlock
-                            Margin="6,0,0,0"
-                            VerticalAlignment="Center"
-                            Text="Edit Script Options" />
-                    </StackPanel>
-                </Button.Content>
-            </Button>
+                Content="Edit Script Options"
+                IsEnabled="{Binding ToggleScriptEnabled, UpdateSourceTrigger=PropertyChanged}" />
             <Button
                 Grid.Row="3"
                 Grid.Column="0"
