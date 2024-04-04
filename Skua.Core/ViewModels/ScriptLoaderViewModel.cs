@@ -51,30 +51,7 @@ public partial class ScriptLoaderViewModel : BotControlViewModelBase
     [ObservableProperty]
     private string _scriptStatus = "[No Script Loaded]";
     [ObservableProperty]
-    private bool _hasOptions;
     private string _loadedScript = string.Empty;
-    public string LoadedScript
-    {
-        get { return _loadedScript; }
-        set
-        {
-            if (SetProperty(ref _loadedScript, value))
-                HasOptionsCheck();
-        }
-    }
-
-    private void HasOptionsCheck()
-    {
-        HasOptions = false;
-        foreach (var line in File.ReadLines(ScriptManager.LoadedScript))
-        {
-            if (line.Contains("List<IOption>"))
-            {
-                HasOptions = true;
-                break;
-            }
-        }
-    }
 
     [RelayCommand]
     private void OpenBrowserForm()
@@ -208,7 +185,7 @@ public partial class ScriptLoaderViewModel : BotControlViewModelBase
         var startNew = false;
         var msgPathFileName = Path.GetFileName(message.Path) ?? string.Empty;
         var runningScriptMessage = $"Script {LoadedScript} is already running. Do you want to stop it?";
-        
+
         ToggleScriptEnabled = false;
 
         if (ScriptManager.ScriptRunning)
@@ -218,14 +195,14 @@ public partial class ScriptLoaderViewModel : BotControlViewModelBase
                 runningScriptMessage = $"{LoadedScript} is running. Do you want to stop it and start {msgPathFileName}?";
                 startNew = true;
             }
-               
+
             var dialogResult = _dialogService.ShowMessageBox(runningScriptMessage, "Script Error", "No", "Yes");
 
             if (dialogResult.Text == "Yes")
             {
                 ToggleScriptEnabled = false;
                 await ScriptManager.StopScriptAsync();
-                
+
                 if (startNew)
                 {
                     LoadedScript = Path.GetFileName(message.Path) ?? string.Empty;
