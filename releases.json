@@ -1,5 +1,47 @@
 [
   {
+    "url": "https://api.github.com/repos/BrenoHenrike/Skua/releases/149703971",
+    "assets_url": "https://api.github.com/repos/BrenoHenrike/Skua/releases/149703971/assets",
+    "upload_url": "https://uploads.github.com/repos/BrenoHenrike/Skua/releases/149703971/assets{?name,label}",
+    "html_url": "https://github.com/BrenoHenrike/Skua/releases/tag/untagged-8eba1be84b52ab624fe5",
+    "id": 149703971,
+    "author": {
+      "login": "SharpTheNightmare",
+      "id": 36904564,
+      "node_id": "MDQ6VXNlcjM2OTA0NTY0",
+      "avatar_url": "https://avatars.githubusercontent.com/u/36904564?v=4",
+      "gravatar_id": "",
+      "url": "https://api.github.com/users/SharpTheNightmare",
+      "html_url": "https://github.com/SharpTheNightmare",
+      "followers_url": "https://api.github.com/users/SharpTheNightmare/followers",
+      "following_url": "https://api.github.com/users/SharpTheNightmare/following{/other_user}",
+      "gists_url": "https://api.github.com/users/SharpTheNightmare/gists{/gist_id}",
+      "starred_url": "https://api.github.com/users/SharpTheNightmare/starred{/owner}{/repo}",
+      "subscriptions_url": "https://api.github.com/users/SharpTheNightmare/subscriptions",
+      "organizations_url": "https://api.github.com/users/SharpTheNightmare/orgs",
+      "repos_url": "https://api.github.com/users/SharpTheNightmare/repos",
+      "events_url": "https://api.github.com/users/SharpTheNightmare/events{/privacy}",
+      "received_events_url": "https://api.github.com/users/SharpTheNightmare/received_events",
+      "type": "User",
+      "site_admin": false
+    },
+    "node_id": "RE_kwDOHV_p4M4I7E0j",
+    "tag_name": "1.2.4.0",
+    "target_commitish": "master",
+    "name": "Skua 1.2.4",
+    "draft": true,
+    "prerelease": false,
+    "created_at": "2024-04-04T05:55:51Z",
+    "published_at": null,
+    "assets": [
+
+    ],
+    "tarball_url": null,
+    "zipball_url": null,
+    "body": "## What's Changed\r\n* New discord links by @LordExelot in https://github.com/BrenoHenrike/Skua/pull/46\r\n* Auto attack fix by @SharpTheNightmare in https://github.com/BrenoHenrike/Skua/pull/52\r\n* Change the Kill/Hunt For Item method so it kills multiple monsters that may exist in the same room.\r\n* Changed grabber according to changes in Shops.BuyItem. Also got rid of equip freeze.\r\n* Added quantity parameter to BuyItem and renamed methods that loaded the shop first.\r\n* Make Exists method check for MapID too.\r\n* Added Sound Service, for now, it only beeps.\r\n* Added Notify Drop Window. (Not in enabled (yet?))\r\n\r\n\r\n**Full Changelog**: https://github.com/BrenoHenrike/Skua/compare/1.2.3.0...1.2.4.0\r\n\r\n\r\n\r\n## New Contributors\r\n* @SharpTheNightmare made their first contribution in https://github.com/BrenoHenrike/Skua/pull/52\r\n\r\n\r\nIf you want to help the development of Skua you can donate by clicking on the button below:\r\n\r\n### [Skua Creator] Breno Henrike \r\n[![Donate](https://img.shields.io/badge/Donate-PayPal-green.svg)](https://www.paypal.com/donate?hosted_button_id=QVQ4Q7XSH9VBY)",
+    "mentions_count": 2
+  },
+  {
     "url": "https://api.github.com/repos/BrenoHenrike/Skua/releases/96020901",
     "assets_url": "https://api.github.com/repos/BrenoHenrike/Skua/releases/96020901/assets",
     "upload_url": "https://uploads.github.com/repos/BrenoHenrike/Skua/releases/96020901/assets{?name,label}",
@@ -63,7 +105,7 @@
         "content_type": "application/octet-stream",
         "state": "uploaded",
         "size": 40521693,
-        "download_count": 29653,
+        "download_count": 29671,
         "created_at": "2023-03-17T19:27:17Z",
         "updated_at": "2023-03-17T19:28:06Z",
         "browser_download_url": "https://github.com/BrenoHenrike/Skua/releases/download/1.2.3.0/Skua-1.2.3.0-Release-x64.msi"
@@ -97,7 +139,7 @@
         "content_type": "application/octet-stream",
         "state": "uploaded",
         "size": 60219512,
-        "download_count": 7296,
+        "download_count": 7304,
         "created_at": "2023-03-17T19:27:14Z",
         "updated_at": "2023-03-17T19:28:17Z",
         "browser_download_url": "https://github.com/BrenoHenrike/Skua/releases/download/1.2.3.0/Skua-1.2.3.0-Release-x86.msi"
@@ -2549,7 +2591,7 @@
         "content_type": "application/x-msdownload",
         "state": "uploaded",
         "size": 315364257,
-        "download_count": 28789,
+        "download_count": 28793,
         "created_at": "2022-08-20T16:14:27Z",
         "updated_at": "2022-08-20T16:15:08Z",
         "browser_download_url": "https://github.com/BrenoHenrike/Skua/releases/download/1.0.0.0/Skua.Dependencies.exe"
