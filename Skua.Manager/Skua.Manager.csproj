@@ -7,7 +7,7 @@
     <UseWPF>true</UseWPF>
     <Platforms>AnyCPU;x64;x86</Platforms>
     <StartupObject>Skua.Manager.Program</StartupObject>
-    <AssemblyVersion>1.2.3.1</AssemblyVersion>
+    <AssemblyVersion>1.2.4.0</AssemblyVersion>
     <SatelliteResourceLanguages>en</SatelliteResourceLanguages>
     <WithCulture>false</WithCulture>
     <NeutralLanguage>en</NeutralLanguage>

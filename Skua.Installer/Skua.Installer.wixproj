@@ -55,7 +55,8 @@
       <Output TaskParameter="Assemblies" ItemName="AssemblyVersion" />
     </GetAssemblyIdentity>
     <!-- Rename and move final MSI -->
-    <Exec Command="if not exist Installs mkdir Installs" />
-    <Exec Command="move bin\$(Configuration)\$(OutputName).msi ..\Build\Skua-%(AssemblyVersion.Version)-$(Configuration)-$(Platform).msi" />
+  </Target>
+  <Target Name="PostBuild" AfterTargets="PostBuildEvent">
+    <Exec Command="if  not exist ..\Build\Installs mkdir ..\Build\Installs&#xD;&#xA;move $(OutDir)\$(OutputName).msi ..\Build\Installs\Skua-%(AssemblyVersion.Version)-$(Configuration)-$(Platform).msi" />
   </Target>
 </Project>
