@@ -1,26 +1,51 @@
-﻿<Wix xmlns="http://wixtoolset.org/schemas/v4/wxs">
+<?xml version="1.0" encoding="UTF-8"?>
+<Wix xmlns="http://schemas.microsoft.com/wix/2006/wi">
 
     <!-- Fixed upgrade Id -->
-    <?define UpgradeCode = "{ef6842a7-5374-4ea6-9adf-ddd359b2e305}" ?>
+    <?define UpgradeCode = "{8C197FE6-57DF-41FD-A0CD-84B5D3B97BDC}" ?>
 
     <!-- Define main product -->
-    <Package Name="!(loc.ProductName_$(var.Platform))" Language="!(loc.Language)" Version="$(var.BuildVersion)" Manufacturer="!(loc.Company)" UpgradeCode="$(var.UpgradeCode)" InstallerVersion="200">
+    <Product Id="*"
+           Name="!(loc.ProductName_$(var.Platform))"
+           Language="!(loc.Language)"
+           Version="$(var.BuildVersion)"
+           Manufacturer="!(loc.Company)"
+           UpgradeCode="$(var.UpgradeCode)">
 
         <!-- Provide package details -->
-        <SummaryInformation Manufacturer="!(loc.Company)" Description="!(loc.Description)" Keywords="!(loc.Keywords)" />
+        <Package InstallerVersion="200"
+             Compressed="yes"
+             InstallScope="perMachine"
+             Platform="$(var.Platform)"
+             Manufacturer="!(loc.Company)"
+             Description="!(loc.Description)"
+             Keywords="!(loc.Keywords)"
+             Comments="!(loc.Comments)"
+             Languages="!(loc.Language)"
+             />
 		
 		<Upgrade Id="$(var.UpgradeCode)">
 			<!-- Downgrade Protection -->
-			<UpgradeVersion Minimum="$(var.BuildVersion)" OnlyDetect="yes" IncludeMinimum="yes" Property="DOWNGRADE_DETECTED" />
+			<UpgradeVersion Minimum="$(var.BuildVersion)" 
+				OnlyDetect="yes" 
+				IncludeMinimum="yes" 
+				Property="DOWNGRADE_DETECTED"  />
 			<!-- Major Upgrade Configuration -->
-			<UpgradeVersion IncludeMinimum="no" Maximum="$(var.BuildVersion)" IncludeMaximum="no" MigrateFeatures="yes" Property="UPGRADE_DETECTED" />
+			<UpgradeVersion 
+				IncludeMinimum="no" 
+				Maximum="$(var.BuildVersion)" 
+				IncludeMaximum="no" 
+				MigrateFeatures="yes" 
+				Property="UPGRADE_DETECTED"   />
     </Upgrade>
 
         <InstallExecuteSequence>
           <RemoveExistingProducts After="InstallInitialize" />
         </InstallExecuteSequence>
 
-      <Launch Condition="NOT DOWNGRADE_DETECTED" Message="!(loc.DowngradeErrorMessage)" />
+      <Condition Message="!(loc.DowngradeErrorMessage)">
+        NOT DOWNGRADE_DETECTED
+      </Condition>
 		
         <!-- Include .cab file into .msi file -->
         <MediaTemplate EmbedCab="yes" />
@@ -34,9 +59,9 @@
         <Icon Id="icon.ico" SourceFile="$(var.ProjectDir)SkuaIcon.ico" />
 
         <!-- Use the icon.ico icon for this installer (shows up in Add/Remove programs) -->
-        <Property Id="ARPPRODUCTICON" Value="icon.ico" />
+        <Property Id="ARPPRODUCTICON">icon.ico</Property>
         <!-- Help/Support website (shows in the Add/Remove programs) -->
-        <Property Id="ARPURLINFOABOUT" Value="https://github.com/BrenoHenrike/Skua" />
+        <Property Id="ARPURLINFOABOUT">https://github.com/BrenoHenrike/Skua</Property>
 
         <!-- Create a basic UI for the installer -->
         <!--<UIRef Id="WixUI_Minimal" />-->
@@ -58,5 +83,5 @@
         <ComponentRef Id="SkuaDesktopShortcut" />
         <ComponentRef Id="SkuaManagerDesktopShortcut" />
       </Feature>	
-    </Package>
+    </Product>
 </Wix>
