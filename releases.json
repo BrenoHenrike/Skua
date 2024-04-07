@@ -63,7 +63,7 @@
         "content_type": "application/octet-stream",
         "state": "uploaded",
         "size": 20744911,
-        "download_count": 0,
+        "download_count": 324,
         "created_at": "2024-04-05T10:45:12Z",
         "updated_at": "2024-04-05T10:45:37Z",
         "browser_download_url": "https://github.com/BrenoHenrike/Skua/releases/download/1.2.4.0/Skua-1.2.4.0-Release-x64.msi"
@@ -97,7 +97,7 @@
         "content_type": "application/octet-stream",
         "state": "uploaded",
         "size": 20720341,
-        "download_count": 0,
+        "download_count": 78,
         "created_at": "2024-04-05T10:45:37Z",
         "updated_at": "2024-04-05T10:46:01Z",
         "browser_download_url": "https://github.com/BrenoHenrike/Skua/releases/download/1.2.4.0/Skua-1.2.4.0-Release-x86.msi"
@@ -172,7 +172,7 @@
         "content_type": "application/octet-stream",
         "state": "uploaded",
         "size": 40521693,
-        "download_count": 29738,
+        "download_count": 29752,
         "created_at": "2023-03-17T19:27:17Z",
         "updated_at": "2023-03-17T19:28:06Z",
         "browser_download_url": "https://github.com/BrenoHenrike/Skua/releases/download/1.2.3.0/Skua-1.2.3.0-Release-x64.msi"
@@ -206,7 +206,7 @@
         "content_type": "application/octet-stream",
         "state": "uploaded",
         "size": 60219512,
-        "download_count": 7330,
+        "download_count": 7332,
         "created_at": "2023-03-17T19:27:14Z",
         "updated_at": "2023-03-17T19:28:17Z",
         "browser_download_url": "https://github.com/BrenoHenrike/Skua/releases/download/1.2.3.0/Skua-1.2.3.0-Release-x86.msi"
@@ -400,7 +400,7 @@
         "content_type": "application/octet-stream",
         "state": "uploaded",
         "size": 20733768,
-        "download_count": 4864,
+        "download_count": 4869,
         "created_at": "2023-02-06T21:29:55Z",
         "updated_at": "2023-02-06T21:30:00Z",
         "browser_download_url": "https://github.com/BrenoHenrike/Skua/releases/download/1.2.1.0/Skua-1.2.1.0-Release-x64.msi"
@@ -2658,7 +2658,7 @@
         "content_type": "application/x-msdownload",
         "state": "uploaded",
         "size": 315364257,
-        "download_count": 28794,
+        "download_count": 28797,
         "created_at": "2022-08-20T16:14:27Z",
         "updated_at": "2022-08-20T16:15:08Z",
         "browser_download_url": "https://github.com/BrenoHenrike/Skua/releases/download/1.0.0.0/Skua.Dependencies.exe"
