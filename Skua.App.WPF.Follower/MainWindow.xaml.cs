@@ -2,7 +2,6 @@
 using Grpc.Net.Client;
 using Skua.Core.Interfaces;
 using Skua.Core.Models.Servers;
-using Skua.gRPC.Server;
 using Skua.WPF;
 using System;
 using System.Collections.Generic;
