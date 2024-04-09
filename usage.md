@@ -85,16 +85,16 @@
 
     - `RunTime`
       - This is where you can:
-        - **Manualy** set up Quests to automaticaly be accepted and turned in
+        - **Manually** set up Quests to automatically be accepted and turned in
         - Add drops to the droplist, to be picked up
-        - Toggle accepting of ac drops / rejecting things that *aren't* in the drop list.
+        - Toggle accepting of AC drops / rejecting things that *aren't* in the drop list.
         - Toggle usage of boosts (if you aren't currently running a script.)
 
     - `Fast Travel`
         - Add or Use Preset/Custom Made *Fast Travel points* to get Around AQW
 
     - `Current Drops`
-        - This is where the Rejected Drops (as long as you havent been Disconnected/Logged out) will be for you to pickup if u missed someting you want.
+        - This is where the Rejected Drops (as long as you haven't been Disconnected/Logged out) will be for you to pick up if you missed something you want.
 
 4. `Tools`
 
@@ -105,22 +105,22 @@
     - `Grabber` **Pressing `Grab` on any of these tabs will grab the information**
 
         1. **Shop Items**: Gets the item of the currently loaded shop
-        2. **Shop IDs**: gets the ShopID's of the shops that have been loaded *so far* this login session.
-        3. **Quests**: shows the QuestData for the quets that have been loaded in thh current session
-        4. **Inventory**: All the current item in your `Inventory`
-        5. **House Inventory**: All the current item in your `House Inventory`
-        6. **Temp Inventory**: All the current item in your `TempInventory` (mostly Quest Items)
-        7. **Bank Items**: All the current item in your `Bank`
-        8. **Cell Monsters**: Data for All the Mobs in the current Cell (the room your in)
+        2. **Shop IDs**: gets the ShopIDs of the shops that have been loaded *so far* this login session.
+        3. **Quests**: shows the QuestData for the quests that have been loaded in the current session
+        4. **Inventory**: All the current items in your `Inventory`
+        5. **House Inventory**: All the current items in your `House Inventory`
+        6. **Temp Inventory**: All the current items in your `TempInventory` (mostly Quest Items)
+        7. **Bank Items**: All the current items in your `Bank`
+        8. **Cell Monsters**: Data for All the Mobs in the current Cell (the room you're in)
         9. **Map Mosnters**:Data for All the Mobs in the current Map
         10. **GetMap Item IDs**: This gets the Quests Items that are clickable on the map. (may or may not work)
 
-    - `Status` - Shows the Current (unless reset) kills, deaths, Quests [Accpeted/Compelted], pickups, relogins, and Current session time.
+    - `Status` - Shows the Current (unless reset) kills, deaths, Quests [Accepted/Compeleted], pickups, relogins, and Current session time.
 
     - `Console` - **you will not use this unless told by a developer or know how to use it**
 
 5. `Skills`
-    - this is where you can edit our *PreMade* `SKillsets` to your liking (skill #'s shifted -1 what they are ingame so: 1-2-3-4-5-6 will become 0-1-2-3-4-5)
+    - this is where you can edit our *PreMade* `SKillsets` to your liking (skill #'s shifted -1 what they are in-game so: 1-2-3-4-5-6 will become 0-1-2-3-4-5)
 
 6. `Packets`
     - **you will not use this unless told by a developer or know how to use it**
@@ -129,7 +129,7 @@
     - Will Load your bank, this can also be brought up by pressing `B` (check hotkeys)
 
 8. `Logs` - (preferably the `Scripts` tab)
-    - Usualy what the devs will ask for if you're having script issues (before crying to a script dev, please do these:
+    - Usually what the devs will ask for if you're having script issues (before crying to a script dev, please do these:
       1. Relog & restart the script
       2. in the 3rd tab in the `Skua Manager` press `Updates`, then `Scripts`, then `Reset Scripts`
       3. If none of this worked you may now come to us with your issue and provide screenshots and a good explanation of the issue.
@@ -138,13 +138,13 @@
     - this will be Empty as of Current (unless you have the `Cosmetics Plugin [Beta]` by Lord Exelot [CosmeticsPlugin](<https://drive.google.com/file/d/1scL9o5bgaQLNZe-dRwrZbS-LOKx4jKeR/view?usp=share_link>))
 
 10. `Auto`
-    - **Auto-Attack** will automatically attack any of the monster in the current cell.
+    - **Auto-Attack** will automatically attack any of the monsters in the current cell.
     - **Auto-Hunt** will automatically hunt the selected monster across the entire map.
-        - ***How to use:*** Click the monster in game to select it. Then start Auto-Hunt. The bot will jump across the map to kill all instances of your selected monster. If no monster is selected before starting Auto-Hunt, it will consider all monsters in your current cell as selected and will hunt all of those in stead.
+        - ***How to use:*** Click the monster in-game to select it. Then start Auto-Hunt. The bot will jump across the map to kill all instances of your selected monster. If no monster is selected before starting Auto-Hunt, it will consider all monsters in your current cell as selected and will hunt all of those instead.
     - **Class use mode** Press the refresh icon to reload the list of your class and skill mode to select. Then click "use select", and then hit either button to start. The Auto-Attack or Auto-Hunt will then use that skillset for its abilities.
 
 11. `Jump`
-    - Start by hitting `⟳` to get all cell and pads in the map.
+    - Start by hitting `⟳` to get all cells and pads in the map.
     - **Current** gets the current cell and pad you're in.
     - **Jump** Jumps to selected cell and pad.
 
@@ -160,4 +160,4 @@
 8. Repeat step 7 every time you wish to access the plugin.
 
 
-### ***For futher information or questions, Join the [Discord](https://discord.gg/pearlharbor)***
+### ***For further information or questions, Join the [Discord](https://discord.gg/pearlharbor)***
