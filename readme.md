@@ -10,7 +10,7 @@ Skua is the successor to RBot (originally made by "[rodit](https://github.com/ro
 
 The *only* things that get recorded are; the auto-generated number **(not your actual game user ID)** to identify you, the amount of scripts ran (stopped & started), and the start and stop timestamps. This can be completely opted out of when first running a script, or you can edit the text file ***“DataCollectionSettings”*** in your `Documents\Skua > DataCollectionSettings.txt`. If you make it look as shown below, it will send absolutely nothing 👍
 
-```cs
+```txt
 UserID: null
 genericDataConsent: false
 scriptNameConsent: false
