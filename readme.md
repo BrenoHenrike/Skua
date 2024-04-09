@@ -8,7 +8,7 @@ Skua is the successor to RBot (originally made by "[rodit](https://github.com/ro
 
 ## Do we store information online?
 
-The *only* things that get recorded are; auto-generated number **(not your actual game user ID)** to identify you, the amount of scripts ran (stopped & started), and for the start and stop timestamps. This can be completely opted out of when first running a script, or you can edit the text file ***“DataCollectionSettings”*** in your `Documents\Skua > DataCollectionSettings.txt`. If you make it look as shown below, it will send absolutely nothing 👍
+The *only* things that get recorded are; the auto-generated number **(not your actual game user ID)** to identify you, the amount of scripts ran (stopped & started), and the start and stop timestamps. This can be completely opted out of when first running a script, or you can edit the text file ***“DataCollectionSettings”*** in your `Documents\Skua > DataCollectionSettings.txt`. If you make it look as shown below, it will send absolutely nothing 👍
 
 ```cs
 UserID: null
@@ -19,24 +19,24 @@ stopTimeConsent: false
 
 ## For Account Manager
 
-Your **Account Info** will be stored only in your **local appdata** and never shown anywhere nor in a text file. We **DO NOT** store it online because we intended to make account manager with **no database**.
+Your **Account Info** will be stored only in your **local appdata** and never shown anywhere nor in a text file. We **DO NOT** store it online because we intended to make an account manager with **no database**.
 
 ## What do we use this data for?
 
-To keep track of what bots are run, how often, how long, and really just how popular some bots are.
+To keep track of what bots are run, how often, how long, and just how popular some bots are.
 
-## Some example of the types of scripts Skua has
+## Some examples of the types of scripts Skua has
 
 - **Story scripts** found in the `Story` folder.
 - **Merge scripts** found in the `Other > MergeShops` folder.
-- **Farming scripts** found in the `Farm` folder. These include but are not limited by: Gold, Experience, Class Points, Reputation.
+- **Farming scripts** found in the `Farm` folder. These include but are not limited to Gold, Experience, Class Points, and Reputation.
 - **Faction-specific** (nation/legion/etc) can be found in their respective folders.
-- Specific tools such as **Butler** (a follow and kill [doesnt support quests]), "ChooseBestGear" (a script that will look at your inv, and equip the appropriate setting for the race type you select.), BuyOut ( will either buy **all/non-ac/ac** (will prompt due to acs) from a specified shop)
+- Specific tools such as **Butler** (a follow and kill [doesnt support quests]), "ChooseBestGear" (a script that will look at your inv, and equip the appropriate setting for the race type you select.), BuyOut ( will either buy **all/non-ac/ac** (will prompt due to ACs) from a specified shop)
 - **Core Script Files** are not meant to be run.
 - **0ScriptName.cs** are basically "Do everything required for this script.."
-- If you wanted to have a new farming script that they don't exist though please request them [here](https://forms.gle/casF8pCNsP2qMGZS6)
+- If you wanted to have a new farming script that doesn't exist though please request them [here](https://forms.gle/casF8pCNsP2qMGZS6)
 
-### [Skua Discord](https://discord.gg/pearlharbor) join the community and get help with Skua
+### [Skua Discord](https://discord.gg/pearlharbor) Join the community and get help with Skua
 
 ### For questions or help join the discord & go to the [#skua-help](https://discord.com/channels/1090693457586176013/1090741396970938399) channel
 
@@ -44,7 +44,7 @@ To keep track of what bots are run, how often, how long, and really just how pop
 
 ## Skua Developers
 
-For us to make the Skua better, skua developers need your support. You can support us by donating or sponsor us by clicking the PayPal link below. Thank you for your support.
+For us to make Skua better, skua developers need your support. You can support us by donating or sponsoring us by clicking the PayPal link below. Thank you for your support.
 
 ### Breno Henrike's PayPal [![Donate](https://img.shields.io/badge/Donate-PayPal-green.svg)](https://www.paypal.com/donate?hosted_button_id=QVQ4Q7XSH9VBY)
 
@@ -54,9 +54,9 @@ For us to make the Skua better, skua developers need your support. You can suppo
 
 - **Breno Henrike** the artist of Skua.
 - **Lord Exelot** the scripts manager and Skua Discord owner.
-- **tato** the scripts writer, also the writer of this about content.
+- **Tato** the script writer, is also the writer of this about content.
 - **Skua Heroes** the script makers and helpers.
-- **Boaters** the ones who sail overnight using Skua and help the Skua team to improve, thanks to their feedback and suggestions **which is you**.
+- **Boaters** are the ones who sail overnight using Skua and help the Skua team to improve, thanks to their feedback and suggestions **which is you**.
 
 ## How to build [ For Client Developers and Contributors]
 
@@ -73,6 +73,8 @@ For us to make the Skua better, skua developers need your support. You can suppo
 - [WiX Visual Studio Extension also for building installer](<https://wixtoolset.org/docs/wix3/>)
 
 #### Building
+
+***Ignore this if you are not a developer***
 
 Building for production do a batch build using all of the (`x64`) and (`x86`) projects except for:
 
