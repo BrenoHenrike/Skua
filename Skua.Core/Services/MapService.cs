@@ -70,6 +70,6 @@ public partial class MapService : ObservableObject, IMapService
     {
         if (!Player.LoggedIn)
             return;
-        Map.Jump(cell, pad);
+        Map.Jump(cell, pad, false);
     }
 }
