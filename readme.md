@@ -60,6 +60,8 @@ For us to make Skua better, skua developers need your support. You can support u
 
 ## How to build [ For Client Developers and Contributors]
 
+***Ignore this if you are not a developer***
+
 #### Pre-requisites
 
 - [Learn C#](<https://www.codecademy.com/learn/learn-c-sharp>)
@@ -74,7 +76,6 @@ For us to make Skua better, skua developers need your support. You can support u
 
 #### Building
 
-***Ignore this if you are not a developer***
 
 Building for production do a batch build using all of the (`x64`) and (`x86`) projects except for:
 
