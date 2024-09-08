@@ -60,11 +60,11 @@ public class Monster
     {
         get
         {
-            return isKilled ? HP > 0 : true;
+            return HP > 0;
         }
         set
         {
-            isKilled = true;
+            isKilled = !value;
         }
     }
 
