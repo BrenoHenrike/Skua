@@ -16,7 +16,7 @@ public partial class ScriptLoaderViewModel : BotControlViewModelBase
         IScriptManager scriptManager,
         IWindowService windowService,
         IDialogService dialogService,
-        IEnumerable<LogTabViewModel> logs) 
+        IEnumerable<LogTabViewModel> logs)
         : base("Load Script", 350, 450)
     {
         StrongReferenceMessenger.Default.Register<ScriptLoaderViewModel, LoadScriptMessage, int>(this, (int)MessageChannels.ScriptStatus, LoadScript);
@@ -52,6 +52,8 @@ public partial class ScriptLoaderViewModel : BotControlViewModelBase
     private string _scriptStatus = "[No Script Loaded]";
     [ObservableProperty]
     private string _loadedScript = string.Empty;
+    [ObservableProperty]
+    private bool _scriptPaused;
 
     [RelayCommand]
     private void OpenBrowserForm()
@@ -118,6 +120,7 @@ public partial class ScriptLoaderViewModel : BotControlViewModelBase
                 ToggleScriptEnabled = true;
             }
             ScriptStatus = "[Running]";
+            ToggleScriptEnabled = true;
         });
     }
 
@@ -153,7 +156,7 @@ public partial class ScriptLoaderViewModel : BotControlViewModelBase
             _dialogService.ShowMessageBox("No script is currently loaded. Please load a script to edit its options.", "No Script Loaded");
             return;
         }
-        
+
         if (ScriptManager.ScriptRunning)
         {
             _dialogService.ShowMessageBox("Script currently running. Stop the script to change its options.", "Script Running");
@@ -172,6 +175,23 @@ public partial class ScriptLoaderViewModel : BotControlViewModelBase
         catch (Exception ex)
         {
             _dialogService.ShowMessageBox($"Script cannot be configured as it has compilation errors:\r\n{ex}", "Script Error");
+        }
+    }
+
+    [RelayCommand]
+    private void PauseResumeScript()
+    {
+        if (ScriptManager.ScriptPaused)
+        {
+            ScriptManager.ResumeScript();
+            ScriptPaused = false;
+            ScriptStatus = "[Running]";
+        }
+        else
+        {
+            ScriptManager.PauseScript();
+            ScriptPaused = true;
+            ScriptStatus = "[Paused]";
         }
     }
 

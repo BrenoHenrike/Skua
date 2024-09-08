@@ -149,23 +149,35 @@ public class ScriptInterface : IScriptInterface, IScriptInterfaceManager
 
     public Task Schedule(int delay, Func<IScriptInterface, Task> function)
     {
-        return Task.Run(async () => { await Task.Delay(delay); await function(this); });
+        return Task.Run(async () => 
+        {
+            await Task.Delay(delay);
+            ((IScriptManager)Manager).CheckPause();
+            await function(this);
+        });
     }
 
     public Task Schedule(int delay, Action<IScriptInterface> action)
     {
-        return Task.Run(async () => { await Task.Delay(delay); action(this); });
+        return Task.Run(async () => 
+        {
+            await Task.Delay(delay);
+            ((IScriptManager)Manager).CheckPause();
+            action(this);
+        });
     }
 
     public void Log(string message)
     {
         CheckScriptTermination();
+        ((IScriptManager)Manager).CheckPause();
         _logger.ScriptLog(message);
     }
 
     public void Sleep(int ms)
     {
         CheckScriptTermination();
+        ((IScriptManager)Manager).CheckPause();
         Thread.Sleep(ms);
     }
 
@@ -174,13 +186,18 @@ public class ScriptInterface : IScriptInterface, IScriptInterfaceManager
         if (Manager.ShouldExit && Thread.CurrentThread.Name == "Script Thread")
             throw new OperationCanceledException();
     }
+
     public bool? ShowMessageBox(string message, string caption, bool yesAndNo = false)
     {
+        CheckScriptTermination();
+        ((IScriptManager)Manager).CheckPause();
         return _dialogService.ShowMessageBox(message, caption, yesAndNo);
     }
 
     public DialogResult ShowMessageBox(string message, string caption, params string[] buttons)
     {
+        CheckScriptTermination();
+        ((IScriptManager)Manager).CheckPause();
         return _dialogService.ShowMessageBox(message, caption, buttons);
     }
 
@@ -234,7 +251,10 @@ public class ScriptInterface : IScriptInterface, IScriptInterfaceManager
                 _limit.LimitedRun("connDetail", 100, () => (lastConnChange, lastConnDetail) = CheckStuckonLoading(lastConnChange, lastConnDetail));
 
                 if (Manager.ScriptRunning)
+                {
+                    ((IScriptManager)Manager).CheckPause();
                     RunScriptHandlers();
+                }
 
                 sw.Stop();
                 Thread.Sleep(Math.Max(10, _timerDelay - (int)sw.Elapsed.TotalMilliseconds));
@@ -248,6 +268,8 @@ public class ScriptInterface : IScriptInterface, IScriptInterfaceManager
 
     private void CheckOptions()
     {
+        ((IScriptManager)Manager).CheckPause();
+
         if (Options.LagKiller)
             Flash.Call("killLag", true);
 
@@ -280,6 +302,8 @@ public class ScriptInterface : IScriptInterface, IScriptInterfaceManager
     /// <returns>The last loading message and its time</returns>
     private (int newTime, string newText) CheckStuckonLoading(int lastConnChange, string lastConnDetail)
     {
+        ((IScriptManager)Manager).CheckPause();
+
         string connDetail = Flash.IsNull("mcConnDetail.stage") ? "null" : Flash.GetGameObject("mcConnDetail.txtDetail.text", "null")!;
         if (connDetail == "null")
             return (Environment.TickCount, connDetail);
@@ -316,6 +340,8 @@ public class ScriptInterface : IScriptInterface, IScriptInterfaceManager
     /// </summary>
     private void RunScriptHandlers()
     {
+        ((IScriptManager)Manager).CheckPause();
+
         if (!Handlers.CurrentHandlers.Any())
             return;
         List<IHandler> rem = new();
@@ -323,6 +349,7 @@ public class ScriptInterface : IScriptInterface, IScriptInterfaceManager
         {
             _limit.LimitedRun("handler_" + handler.Name, handler.Ticks * _timerDelay, () =>
             {
+                ((IScriptManager)Manager).CheckPause();
                 if (!handler.Function(this))
                     rem.Add(handler);
             });
@@ -499,8 +526,8 @@ public class ScriptInterface : IScriptInterface, IScriptInterfaceManager
                 }
                 Messenger.Send<PacketMessage, int>(new((string)args[0]), (int)MessageChannels.GameEvents);
                 break;
+            }
         }
-    }
 
     private Task? _reloginTask;
     private volatile bool _waitForLogin;
@@ -533,8 +560,10 @@ public class ScriptInterface : IScriptInterface, IScriptInterfaceManager
         _reloginCTS = new CancellationTokenSource();
         _reloginTask = Schedule(delay, async _ =>
         {
+            ((IScriptManager)Manager).CheckPause();
             Stats.Relogins++;
             bool relogged = await Servers.EnsureRelogin(_reloginCTS.Token);
+            ((IScriptManager)Manager).CheckPause();
             if (startScript)
                 await Ioc.Default.GetService<IScriptManager>()!.StartScriptAsync();
             Log($"Relogin was {(relogged ? "successful" : "cancelled or unsuccessful")}.");
