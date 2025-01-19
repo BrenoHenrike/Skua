@@ -40,6 +40,7 @@ public class Script{ public void ScriptMain(IScriptInterface bot){";
             try
             {
                 object? o = _scriptManager.Compile($"{_source}{_snippetText}}}}}");
+                _scriptManager.CheckPause();
                 o!.GetType().GetMethod("ScriptMain")!.Invoke(o, new[] { IScriptInterface.Instance });
             }
             catch (Exception e)

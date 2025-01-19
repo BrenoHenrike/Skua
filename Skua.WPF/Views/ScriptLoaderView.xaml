@@ -77,24 +77,47 @@
                 Command="{Binding EditScriptConfigCommand}"
                 Content="Edit Script Options"
                 IsEnabled="{Binding ToggleScriptEnabled, UpdateSourceTrigger=PropertyChanged}" />
-            <Button
-                Grid.Row="3"
-                Grid.Column="0"
-                Grid.ColumnSpan="2"
-                Margin="0,3,0,0"
-                Command="{Binding ToggleScriptCommand}"
-                IsEnabled="{Binding ToggleScriptEnabled, UpdateSourceTrigger=PropertyChanged}">
-                <Button.Style>
-                    <Style BasedOn="{StaticResource MaterialDesignRaisedButton}" TargetType="Button">
-                        <Setter Property="Content" Value="Start Script" />
-                        <Style.Triggers>
-                            <DataTrigger Binding="{Binding ScriptManager.ScriptRunning, UpdateSourceTrigger=PropertyChanged}" Value="True">
-                                <Setter Property="Content" Value="Stop Script" />
-                            </DataTrigger>
-                        </Style.Triggers>
-                    </Style>
-                </Button.Style>
-            </Button>
+            <Grid Grid.Row="3" Grid.Column="0" Grid.ColumnSpan="2" Margin="0,3">
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="*" />
+                    <ColumnDefinition Width="Auto" />
+                </Grid.ColumnDefinitions>
+                <Button
+                    Grid.Column="0"
+                    Margin="0,3,0,0"
+                    Command="{Binding ToggleScriptCommand}"
+                    IsEnabled="{Binding ToggleScriptEnabled, UpdateSourceTrigger=PropertyChanged}">
+                    <Button.Style>
+                        <Style BasedOn="{StaticResource MaterialDesignRaisedButton}" TargetType="Button">
+                            <Setter Property="Content" Value="Start Script" />
+                            <Style.Triggers>
+                                <DataTrigger Binding="{Binding ScriptManager.ScriptRunning, UpdateSourceTrigger=PropertyChanged}" Value="True">
+                                    <Setter Property="Content" Value="Stop Script" />
+                                </DataTrigger>
+                            </Style.Triggers>
+                        </Style>
+                    </Button.Style>
+                </Button>
+                <Button
+                    Grid.Column="1"
+                    Width="60"
+                    HorizontalContentAlignment="Center" 
+                    Margin="3,3,0,0"
+                    Command="{Binding PauseResumeScriptCommand}"
+                    IsEnabled="{Binding ToggleScriptEnabled, UpdateSourceTrigger=PropertyChanged}"
+                    Visibility="{Binding ScriptManager.ScriptRunning, Converter={StaticResource BooleanToVisibilityConverter}}">
+                    <Button.Style>
+                        <Style BasedOn="{StaticResource MaterialDesignRaisedButton}" TargetType="Button">
+                            <Setter Property="Content" Value="⏸️" />
+                            <Style.Triggers>
+                                <DataTrigger Binding="{Binding ScriptManager.ScriptPaused, UpdateSourceTrigger=PropertyChanged}" Value="True">
+                                    <Setter Property="Content" Value="▶️" />
+                                </DataTrigger>
+                            </Style.Triggers>
+                        </Style>
+                    </Button.Style>
+                </Button>
+            </Grid>
         </Grid>
         <ContentPresenter
             Grid.Row="2"

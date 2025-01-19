@@ -9,6 +9,7 @@ using CommunityToolkit.Mvvm.Messaging;
 using Skua.Core.Interfaces;
 using Skua.Core.Messaging;
 using Skua.Core.Models;
+using Westwind.Scripting;
 
 namespace Skua.Core.Scripts;
 public partial class ScriptManager : ObservableObject, IScriptManager
@@ -53,6 +54,8 @@ public partial class ScriptManager : ObservableObject, IScriptManager
     private string _loadedScript = string.Empty;
     [ObservableProperty]
     private string _compiledScript = string.Empty;
+    [ObservableProperty]
+    private bool _scriptPaused = false;
     
     public IScriptOptionContainer? Config { get; set; }
 
@@ -171,6 +174,7 @@ public partial class ScriptManager : ObservableObject, IScriptManager
     {
         _runScriptStoppingBool = runScriptStoppingEvent;
         _stoppedByScript = true;
+        ScriptPaused = false;
         ScriptCTS?.Cancel();
         if(Thread.CurrentThread.Name == "Script Thread")
         {
@@ -185,6 +189,7 @@ public partial class ScriptManager : ObservableObject, IScriptManager
     {
         _runScriptStoppingBool = runScriptStoppingEvent;
         _stoppedByScript = true;
+        ScriptPaused = false;
         ScriptCTS?.Cancel();
         if (Thread.CurrentThread.Name == "Script Thread")
         {
@@ -358,5 +363,23 @@ public partial class ScriptManager : ObservableObject, IScriptManager
     public void SetLoadedScript(string path)
     {
         LoadedScript = path;
+    }
+
+    public void PauseScript()
+    {
+        ScriptPaused = true;
+    }
+
+    public void ResumeScript()
+    {
+        ScriptPaused = false;
+    }
+
+    public void CheckPause()
+    {
+        while (ScriptPaused)
+        {
+            Thread.Sleep(100); // keeping it simple(and stupid) but hey, if it works, etc :P 
+        }
     }
 }

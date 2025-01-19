@@ -171,55 +171,77 @@ public partial class ScriptAuto : ObservableObject, IScriptAuto
     private async Task _Hunt(CancellationToken token)
     {
         Trace.WriteLine("Auto hunt started.");
-
-        if (Player.HasTarget)
-            _target = Player.Target?.Name ?? "*";
-        else
-        {
-            List<string> monsters = Monsters.CurrentMonsters.Select(m => m.Name).ToList();
-            _target = string.Join('|', monsters);
-        }
-
+    
+        _target = Player.HasTarget ? Player.Target?.Name ?? "*" : GetMonstersTarget();
         var names = _target.Split('|');
-        List<string> cells = names.SelectMany(n => Monsters.GetLivingMonsterDataLeafCells(n)).Distinct().ToList();
-
+        var cells = GetDistinctCells(names);
+    
         _logger.ScriptLog($"[Auto Hunt] Hunting for {_target}");
+
         while (!token.IsCancellationRequested)
         {
-            for (int i = cells.Count - 1; i >= 0; i--)
+            foreach (var cell in cells.ToList())
             {
-                if (Player.Cell != cells[i] && !token.IsCancellationRequested)
+                if (token.IsCancellationRequested) break;
+    
+                if (Player.Cell != cell)
                 {
-                    if (Environment.TickCount - _lastHuntTick < Options.HuntDelay)
-                        Thread.Sleep(Options.HuntDelay - Environment.TickCount + _lastHuntTick);
-                    Map.Jump(cells[i], "Left");
+                    await DelayIfNeeded();
+                    Map.Jump(cell, "Left");
                     _lastHuntTick = Environment.TickCount;
                 }
-
-                foreach (string mon in names)
+    
+                if (!HuntMonstersInCell(names, cell, token))
                 {
-                    if (token.IsCancellationRequested)
-                        break;
-
-                    if (Monsters.Exists(mon) && !token.IsCancellationRequested)
-                    {
-                        if (!Combat.Attack(mon))
-                        {
-                            cells.RemoveAt(i);
-                            continue;
-                        }
-                        Thread.Sleep(Options.ActionDelay);
-                        Kill.Monster(mon, token);
-                        break;
-                    }
-                    else
-                    {
-                        cells.RemoveAt(i);
-                    }
+                    cells.Remove(cell);
                 }
             }
+    
+            names = _target.Split('|');
+            cells = GetDistinctCells(names);
         }
+    
         Trace.WriteLine("Auto hunt stopped.");
+    }
+
+
+    private string GetMonstersTarget()
+    {
+        return string.Join('|', Monsters.CurrentMonsters.Select(m => m.Name));
+    }
+
+    private List<string> GetDistinctCells(string[] names)
+    {
+        return names.SelectMany(n => Monsters.GetLivingMonsterDataLeafCells(n)).Distinct().ToList();
+    }
+    
+    private async Task DelayIfNeeded()
+    {
+        var delay = Options.HuntDelay - (Environment.TickCount - _lastHuntTick);
+        if (delay > 0)
+        {
+            await Task.Delay(delay);
+        }
+    }
+    
+    private bool HuntMonstersInCell(string[] names, string cell, CancellationToken token)
+    {
+        var monstersInCell = Monsters.GetMonstersByCell(Player.Cell);
+        foreach (var name in names)
+        {
+            if (token.IsCancellationRequested) return false;
+    
+            var targetMonster = monstersInCell.FirstOrDefault(m => m.Name == name && m.Alive);
+            if (targetMonster != null)
+            {
+                if (!Combat.Attack(targetMonster)) return false;
+    
+                Thread.Sleep(Options.ActionDelay);
+                Kill.Monster(targetMonster, token);
+                return true;
+            }
+        }
+        return false;
     }
 
     private void CheckDropsandBoosts()
