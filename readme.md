@@ -58,7 +58,7 @@ For us to make Skua better, skua developers need your support. You can support u
 - **Skua Heroes** the script makers and helpers.
 - **Boaters** are the ones who sail overnight using Skua and help the Skua team to improve, thanks to their feedback and suggestions **which is you**.
 
-## How to build [ For Client Developers and Contributors]
+## How to build [ For Client Developers and Contributors ]
 
 ***Ignore this if you are not a developer***
 
