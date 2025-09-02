@@ -27,12 +27,17 @@ public partial class SavedAdvancedSkillsViewModel : ObservableRecipient
     [ObservableProperty]
     private AdvancedSkill? _selectedSkill;
 
-    private ObservableCollection<AdvancedSkill> _loadedSkills = new();
+    private ObservableCollection<AdvancedSkill>? _loadedSkills;
     public ObservableCollection<AdvancedSkill> LoadedSkills
     {
         get
         {
-            return new ObservableCollection<AdvancedSkill>(_advancedSkillContainer.LoadedSkills);
+            // Only create new collection if it doesn't exist or needs refresh
+            if (_loadedSkills == null)
+            {
+                _loadedSkills = new ObservableCollection<AdvancedSkill>(_advancedSkillContainer.LoadedSkills);
+            }
+            return _loadedSkills;
         }
         set
         {
@@ -70,6 +75,10 @@ public partial class SavedAdvancedSkillsViewModel : ObservableRecipient
     private void AdvancedSkillsChanged(SavedAdvancedSkillsViewModel recipient, PropertyChangedMessage<List<AdvancedSkill>> message)
     {
         if (message.PropertyName == nameof(IAdvancedSkillContainer.LoadedSkills))
+        {
+            // Force refresh of the collection
+            recipient._loadedSkills = null;
             recipient.OnPropertyChanged(nameof(recipient.LoadedSkills));
+        }
     }
 }

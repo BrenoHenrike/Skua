@@ -1,13 +1,15 @@
-﻿using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.DependencyInjection;
 using CommunityToolkit.Mvvm.DependencyInjection;
 using Skua.Core.Interfaces;
 using Skua.Core.ViewModels;
 using System;
 using System.Collections.Generic;
+using System.Linq;
 using CommunityToolkit.Mvvm.ComponentModel;
+using System.Windows;
 
 namespace Skua.WPF.Services;
-public class WindowService : IWindowService
+public class WindowService : IWindowService, IDisposable
 {
     private Dictionary<string, HostWindow> _managedWindows = new();
     public WindowService(IServiceProvider services)
@@ -81,6 +83,64 @@ public class WindowService : IWindowService
             DataContext = viewModel,
             WindowStartupLocation = System.Windows.WindowStartupLocation.CenterScreen
         };
+        
+        // Clean up when window is closed
+        void windowClosedHandler(object? sender, EventArgs e)
+        {
+            if (sender is Window w)
+            {
+                w.Closed -= windowClosedHandler;
+                _managedWindows.Remove(key);
+                
+                // Clean up DataContext
+                if (w.DataContext is IDisposable disposable)
+                {
+                    disposable.Dispose();
+                }
+                w.DataContext = null;
+            }
+        }
+        
+        window.Closed += windowClosedHandler;
         _managedWindows.Add(key, window);
+    }
+
+    private bool _disposed = false;
+
+    public void Dispose()
+    {
+        Dispose(true);
+        GC.SuppressFinalize(this);
+    }
+
+    protected virtual void Dispose(bool disposing)
+    {
+        if (!_disposed)
+        {
+            if (disposing)
+            {
+                // Close and dispose all managed windows
+                foreach (var kvp in _managedWindows.ToList())
+                {
+                    try
+                    {
+                        kvp.Value.Close();
+                        if (kvp.Value.DataContext is IDisposable disposable)
+                        {
+                            disposable.Dispose();
+                        }
+                    }
+                    catch { }
+                }
+                _managedWindows.Clear();
+            }
+
+            _disposed = true;
+        }
+    }
+
+    ~WindowService()
+    {
+        Dispose(false);
     }
 }

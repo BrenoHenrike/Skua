@@ -1,0 +1,299 @@
+name: Build Skua
+
+on:
+  push:
+    branches: [ main, master, develop ]
+    tags:
+      - 'v*'
+  pull_request:
+    branches: [ main, master, develop ]
+  workflow_dispatch:
+    inputs:
+      build_installer:
+        description: 'Build WiX Installer'
+        required: false
+        default: 'true'
+        type: choice
+        options:
+          - 'true'
+          - 'false'
+
+env:
+  DOTNET_VERSION: '6.0.x'
+  DOTNET_NOLOGO: true
+  DOTNET_CLI_TELEMETRY_OPTOUT: true
+
+jobs:
+  build:
+    name: Build ${{ matrix.platform }} - ${{ matrix.configuration }}
+    runs-on: windows-latest
+    
+    strategy:
+      matrix:
+        configuration: [Release, Debug]
+        platform: [x64, x86]
+        
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v3
+      with:
+        fetch-depth: 0  # Full history for version calculation
+        
+    - name: Setup .NET
+      uses: actions/setup-dotnet@v3
+      with:
+        dotnet-version: ${{ env.DOTNET_VERSION }}
+        
+    - name: Add MSBuild to PATH
+      uses: microsoft/setup-msbuild@v1.3
+      
+    - name: Cache NuGet packages
+      uses: actions/cache@v3
+      with:
+        path: ~/.nuget/packages
+        key: ${{ runner.os }}-nuget-${{ hashFiles('**/*.csproj') }}
+        restore-keys: |
+          ${{ runner.os }}-nuget-
+          
+    - name: Restore dependencies
+      run: dotnet restore
+      
+    - name: Build solution
+      run: |
+        dotnet build `
+          --configuration ${{ matrix.configuration }} `
+          --platform ${{ matrix.platform }} `
+          --no-restore `
+          -p:WarningLevel=0
+          
+    - name: Run tests
+      run: |
+        dotnet test `
+          --configuration ${{ matrix.configuration }} `
+          --platform ${{ matrix.platform }} `
+          --no-build `
+          --verbosity normal `
+          --logger "trx;LogFileName=test-results-${{ matrix.platform }}-${{ matrix.configuration }}.trx"
+      continue-on-error: true
+      
+    - name: Upload test results
+      uses: actions/upload-artifact@v3
+      if: always()
+      with:
+        name: test-results-${{ matrix.platform }}-${{ matrix.configuration }}
+        path: '**/test-results-*.trx'
+        
+    - name: Prepare artifacts
+      run: |
+        $outputPath = "artifacts/${{ matrix.configuration }}/${{ matrix.platform }}"
+        New-Item -ItemType Directory -Path $outputPath -Force
+        
+        # Copy main applications
+        $projects = @("Skua.App.WPF", "Skua.Manager")
+        foreach ($project in $projects) {
+          $source = "$project/bin/${{ matrix.platform }}/${{ matrix.configuration }}/net6.0-windows"
+          if (-not (Test-Path $source)) {
+            $source = "$project/bin/${{ matrix.configuration }}/net6.0-windows"
+          }
+          if (Test-Path $source) {
+            $dest = "$outputPath/$project"
+            Copy-Item -Path $source -Destination $dest -Recurse -Force
+            Write-Host "Copied $project to $dest"
+          }
+        }
+        
+    - name: Upload build artifacts
+      uses: actions/upload-artifact@v3
+      with:
+        name: Skua-${{ matrix.configuration }}-${{ matrix.platform }}
+        path: artifacts/${{ matrix.configuration }}/${{ matrix.platform }}
+        
+  installer:
+    name: Build Installer ${{ matrix.platform }}
+    runs-on: windows-latest
+    needs: build
+    if: github.event_name == 'push' || github.event.inputs.build_installer == 'true'
+    
+    strategy:
+      matrix:
+        platform: [x64, x86]
+        
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v3
+      
+    - name: Setup .NET
+      uses: actions/setup-dotnet@v3
+      with:
+        dotnet-version: ${{ env.DOTNET_VERSION }}
+        
+    - name: Add MSBuild to PATH
+      uses: microsoft/setup-msbuild@v1.3
+      
+    - name: Download WiX Toolset
+      run: |
+        # Download WiX v3.14
+        $wixUrl = "https://github.com/wixtoolset/wix3/releases/download/wix3141rtm/wix314.exe"
+        $wixInstaller = "wix314.exe"
+        
+        Write-Host "Downloading WiX Toolset..."
+        Invoke-WebRequest -Uri $wixUrl -OutFile $wixInstaller
+        
+        Write-Host "Installing WiX Toolset..."
+        Start-Process -FilePath $wixInstaller -ArgumentList "/quiet" -Wait
+        
+        # Add WiX to PATH for this session
+        $env:PATH += ";${env:ProgramFiles(x86)}\WiX Toolset v3.14\bin"
+        
+    - name: Download build artifacts
+      uses: actions/download-artifact@v3
+      with:
+        name: Skua-Release-${{ matrix.platform }}
+        path: artifacts/Release/${{ matrix.platform }}
+        
+    - name: Restore dependencies
+      run: dotnet restore
+      
+    - name: Build projects for installer
+      run: |
+        dotnet build `
+          --configuration Release `
+          --platform ${{ matrix.platform }} `
+          --no-restore
+          
+    - name: Build WiX installer
+      run: |
+        msbuild Skua.Installer\Skua.Installer.wixproj `
+          /p:Configuration=Release `
+          /p:Platform=${{ matrix.platform }} `
+          /t:Rebuild `
+          /verbosity:normal
+          
+    - name: Sign installer (if certificate available)
+      if: env.SIGNING_CERTIFICATE != ''
+      env:
+        SIGNING_CERTIFICATE: ${{ secrets.SIGNING_CERTIFICATE }}
+        SIGNING_PASSWORD: ${{ secrets.SIGNING_PASSWORD }}
+      run: |
+        # Decode certificate from base64
+        $certBytes = [Convert]::FromBase64String($env:SIGNING_CERTIFICATE)
+        $certPath = "cert.pfx"
+        [IO.File]::WriteAllBytes($certPath, $certBytes)
+        
+        # Sign the MSI
+        $msiPath = Get-ChildItem -Path "Skua.Installer\bin\${{ matrix.platform }}\Release\*.msi" | Select -First 1
+        signtool sign /f $certPath /p $env:SIGNING_PASSWORD /t http://timestamp.digicert.com $msiPath.FullName
+        
+        # Clean up certificate
+        Remove-Item $certPath -Force
+      continue-on-error: true
+      
+    - name: Upload installer
+      uses: actions/upload-artifact@v3
+      with:
+        name: Skua-Installer-${{ matrix.platform }}
+        path: Skua.Installer\bin\${{ matrix.platform }}\Release\*.msi
+        
+  release:
+    name: Create Release
+    runs-on: windows-latest
+    needs: [build, installer]
+    if: startsWith(github.ref, 'refs/tags/v')
+    
+    steps:
+    - name: Download all artifacts
+      uses: actions/download-artifact@v3
+      with:
+        path: release-artifacts
+        
+    - name: Prepare release files
+      run: |
+        $releaseDir = "release"
+        New-Item -ItemType Directory -Path $releaseDir -Force
+        
+        # Zip each platform build
+        Get-ChildItem -Path "release-artifacts" -Directory | Where-Object { $_.Name -like "Skua-Release-*" } | ForEach-Object {
+          $platform = $_.Name -replace "Skua-Release-", ""
+          $zipName = "$releaseDir/Skua-${{ github.ref_name }}-$platform.zip"
+          Compress-Archive -Path "$($_.FullName)\*" -DestinationPath $zipName -Force
+          Write-Host "Created $zipName"
+        }
+        
+        # Copy installers
+        Get-ChildItem -Path "release-artifacts" -Directory | Where-Object { $_.Name -like "Skua-Installer-*" } | ForEach-Object {
+          $platform = $_.Name -replace "Skua-Installer-", ""
+          $msi = Get-ChildItem -Path $_.FullName -Filter "*.msi" | Select -First 1
+          if ($msi) {
+            $newName = "Skua-${{ github.ref_name }}-$platform.msi"
+            Copy-Item -Path $msi.FullName -Destination "$releaseDir/$newName"
+            Write-Host "Copied installer to $newName"
+          }
+        }
+        
+    - name: Generate release notes
+      id: release_notes
+      run: |
+        $notes = @"
+        ## Skua ${{ github.ref_name }}
+        
+        ### Downloads
+        
+        #### Installers (Recommended)
+        - **Windows x64**: Skua-${{ github.ref_name }}-x64.msi
+        - **Windows x86**: Skua-${{ github.ref_name }}-x86.msi
+        
+        #### Portable Versions
+        - **Windows x64**: Skua-${{ github.ref_name }}-x64.zip
+        - **Windows x86**: Skua-${{ github.ref_name }}-x86.zip
+        
+        ### Installation Instructions
+        
+        1. Download the appropriate installer or portable version for your system
+        2. For installers: Run the MSI file and follow the installation wizard
+        3. For portable: Extract the ZIP file to your desired location
+        
+        ### System Requirements
+        
+        - Windows 10 or later (x64 or x86)
+        - .NET 6.0 Runtime (installer will prompt if missing)
+        
+        ### What's New
+        
+        See [CHANGELOG.md](https://github.com/${{ github.repository }}/blob/${{ github.ref_name }}/CHANGELOG.md) for details.
+        "@
+        
+        echo "RELEASE_NOTES<<EOF" >> $env:GITHUB_OUTPUT
+        echo $notes >> $env:GITHUB_OUTPUT
+        echo "EOF" >> $env:GITHUB_OUTPUT
+        
+    - name: Create GitHub Release
+      uses: softprops/action-gh-release@v1
+      with:
+        name: Skua ${{ github.ref_name }}
+        body: ${{ steps.release_notes.outputs.RELEASE_NOTES }}
+        draft: false
+        prerelease: ${{ contains(github.ref_name, 'beta') || contains(github.ref_name, 'alpha') }}
+        files: release/*
+        
+  notify:
+    name: Build Notification
+    runs-on: ubuntu-latest
+    needs: [build, installer]
+    if: always()
+    
+    steps:
+    - name: Build status summary
+      run: |
+        echo "## Build Summary" >> $GITHUB_STEP_SUMMARY
+        echo "" >> $GITHUB_STEP_SUMMARY
+        echo "- **Branch**: ${{ github.ref_name }}" >> $GITHUB_STEP_SUMMARY
+        echo "- **Commit**: ${{ github.sha }}" >> $GITHUB_STEP_SUMMARY
+        echo "- **Build Status**: ${{ needs.build.result }}" >> $GITHUB_STEP_SUMMARY
+        echo "- **Installer Status**: ${{ needs.installer.result }}" >> $GITHUB_STEP_SUMMARY
+        echo "" >> $GITHUB_STEP_SUMMARY
+        
+        if [ "${{ needs.build.result }}" == "success" ]; then
+          echo "✅ Build completed successfully!" >> $GITHUB_STEP_SUMMARY
+        else
+          echo "❌ Build failed or was cancelled." >> $GITHUB_STEP_SUMMARY
+        fi

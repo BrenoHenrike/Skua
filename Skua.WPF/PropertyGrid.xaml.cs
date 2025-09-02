@@ -470,10 +470,16 @@ public partial class PropertyGrid : UserControl
     private static void SelectedObjectPropertyChanged(DependencyObject source, DependencyPropertyChangedEventArgs e)
     {
         var grid = (PropertyGrid)source;
-        var pc = e.OldValue as INotifyPropertyChanged;
-        if (pc != null)
+        
+        // Always try to unsubscribe from old value
+        var oldPc = e.OldValue as INotifyPropertyChanged;
+        if (oldPc != null)
         {
-            pc.PropertyChanged -= grid.OnDispatcherSourcePropertyChanged;
+            try
+            {
+                oldPc.PropertyChanged -= grid.OnDispatcherSourcePropertyChanged;
+            }
+            catch { } // Ignore if already unsubscribed
         }
 
         if (e.NewValue == null)
@@ -492,10 +498,13 @@ public partial class PropertyGrid : UserControl
             grid.IsReadOnly = false;
         }
 
-        pc = e.NewValue as INotifyPropertyChanged;
-        if (pc != null)
+        // Subscribe to new value
+        var newPc = e.NewValue as INotifyPropertyChanged;
+        if (newPc != null)
         {
-            pc.PropertyChanged += grid.OnDispatcherSourcePropertyChanged;
+            // Use weak event pattern to prevent leaks
+            WeakEventManager<INotifyPropertyChanged, PropertyChangedEventArgs>
+                .AddHandler(newPc, "PropertyChanged", grid.OnDispatcherSourcePropertyChanged);
         }
 
         grid.PropertiesSource.Source = grid.CreateDataProvider(e.NewValue);

@@ -69,17 +69,35 @@ public partial class CaptureProxy : ObservableRecipient, ICaptureProxy
         _listener.Start();
         while (!token.IsCancellationRequested)
         {
+            TcpClient? localClient = null;
+            TcpClient? localForwarder = null;
             try
             {
-                _client = _listener.AcceptTcpClient();
-                _forwarder = new TcpClient();
-                _forwarder.Connect(Destination!);
+                localClient = _listener.AcceptTcpClient();
+                localForwarder = new TcpClient();
+                localForwarder.Connect(Destination!);
 
-                Task.Factory.StartNew(() => _DataInterceptor(_client, _forwarder, true, token), token);
-                Task.Factory.StartNew(() => _DataInterceptor(_forwarder, _client, false, token), token);
+                _client = localClient;
+                _forwarder = localForwarder;
+
+                var client = localClient;
+                var forwarder = localForwarder;
+                
+                Task.Factory.StartNew(() => _DataInterceptor(client, forwarder, true, token), token);
+                Task.Factory.StartNew(() => _DataInterceptor(forwarder, client, false, token), token);
             }
-            catch { }
+            catch
+            {
+                // Ensure proper cleanup on error
+                localClient?.Close();
+                localClient?.Dispose();
+                localForwarder?.Close();
+                localForwarder?.Dispose();
+            }
         }
+        
+        // Cleanup when exiting the loop
+        _listener.Stop();
     }
 
     private async Task _DataInterceptor(TcpClient target, TcpClient destination, bool outbound, CancellationToken token)
@@ -87,38 +105,54 @@ public partial class CaptureProxy : ObservableRecipient, ICaptureProxy
         byte[] msgbuf = new byte[4096];
         int read = 0;
         List<byte> cpacket = new();
-        while (!token.IsCancellationRequested)
+        
+        try
         {
-            read = await target.GetStream().ReadAsync(msgbuf, 0, 4096, token);
-
-            if (read == 0)
-                Thread.Sleep(10);
-
-            for (int i = 0; i < read; i++)
+            while (!token.IsCancellationRequested && target.Connected && destination.Connected)
             {
-                if (token.IsCancellationRequested)
-                    break;
+                read = await target.GetStream().ReadAsync(msgbuf, 0, 4096, token);
 
-                byte b = msgbuf[i];
-                if (b > 0)
+                if (read == 0)
                 {
-                    cpacket.Add(b);
+                    await Task.Delay(10, token);
                     continue;
                 }
-                byte[] data = cpacket.ToArray();
-                cpacket.Clear();
 
-                MessageInfo message = new(Encoding.UTF8.GetString(data, 0, data.Length));
-                Interceptors.OrderBy(i => i.Priority).ForEach(i => i.Intercept(message, outbound));
-                if (message.Send)
+                for (int i = 0; i < read; i++)
                 {
-                    byte[]? msg = new byte[message.Content.Length + 1];
-                    Buffer.BlockCopy(_ToBytes(message.Content), 0, msg, 0, message.Content.Length);
-                    //await destination.GetStream().WriteAsync(msg, 0, msg.Length, token);
-                    await destination.GetStream().WriteAsync(msg, token);
-                    msg = null;
+                    if (token.IsCancellationRequested)
+                        break;
+
+                    byte b = msgbuf[i];
+                    if (b > 0)
+                    {
+                        cpacket.Add(b);
+                        continue;
+                    }
+                    byte[] data = cpacket.ToArray();
+                    cpacket.Clear();
+
+                    MessageInfo message = new(Encoding.UTF8.GetString(data, 0, data.Length));
+                    Interceptors.OrderBy(i => i.Priority).ForEach(i => i.Intercept(message, outbound));
+                    if (message.Send)
+                    {
+                        byte[]? msg = new byte[message.Content.Length + 1];
+                        Buffer.BlockCopy(_ToBytes(message.Content), 0, msg, 0, message.Content.Length);
+                        await destination.GetStream().WriteAsync(msg, token);
+                        msg = null;
+                    }
                 }
             }
+        }
+        catch (Exception)
+        {
+            // Connection lost or cancelled
+        }
+        finally
+        {
+            // Ensure connections are closed when done
+            try { target.Close(); } catch { }
+            try { destination.Close(); } catch { }
         }
     }
 

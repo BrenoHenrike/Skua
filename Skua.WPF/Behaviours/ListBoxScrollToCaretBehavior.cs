@@ -24,11 +24,16 @@ public class ListBoxScrollToCaretBehavior : Behavior<ListBox>
         base.OnDetaching();
     }
 
+    private INotifyCollectionChanged? _collectionSource;
+
     private void OnLoaded(object sender, RoutedEventArgs e)
     {
         if (AssociatedObject.ItemsSource is not INotifyCollectionChanged incc)
             return;
-        incc.CollectionChanged += OnCollectionChanged;
+        
+        // Store reference to unsubscribe later
+        _collectionSource = incc;
+        _collectionSource.CollectionChanged += OnCollectionChanged;
 
         if (VisualTreeHelper.GetChildrenCount(AssociatedObject) > 0)
         {
@@ -39,10 +44,14 @@ public class ListBoxScrollToCaretBehavior : Behavior<ListBox>
 
     private void OnUnloaded(object sender, RoutedEventArgs e)
     {
-        if (AssociatedObject.ItemsSource is not INotifyCollectionChanged incc)
-            return;
-
-        incc.CollectionChanged -= OnCollectionChanged;
+        // Unsubscribe from the stored reference
+        if (_collectionSource != null)
+        {
+            _collectionSource.CollectionChanged -= OnCollectionChanged;
+            _collectionSource = null;
+        }
+        
+        _scrollViewer = null;
     }
 
     private void OnCollectionChanged(object? sender, NotifyCollectionChangedEventArgs e)

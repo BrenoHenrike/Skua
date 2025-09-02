@@ -7,8 +7,10 @@ using Skua.Core.Models.Items;
 using Skua.Core.Models.Skills;
 
 namespace Skua.Core.ViewModels;
-public partial class AutoViewModel : BotControlViewModelBase
+public partial class AutoViewModel : BotControlViewModelBase, IDisposable
 {
+    private CancellationTokenSource? _autoCts;
+
     public AutoViewModel(IScriptAuto auto, IScriptInventory inventory, IAdvancedSkillContainer advancedSkills)
         : base("Auto Attack")
     {
@@ -63,29 +65,86 @@ public partial class AutoViewModel : BotControlViewModelBase
     [RelayCommand]
     private async Task StartAutoHunt()
     {
+        // Cancel any existing operation
+        _autoCts?.Cancel();
+        _autoCts?.Dispose();
+        _autoCts = new CancellationTokenSource();
+        
         if (UseSelectedClass && _selectedClass is not null && _selectedClassMode is not null)
         {
-            await Task.Factory.StartNew(() => Auto.StartAutoHunt(_selectedClass, (ClassUseMode)_selectedClassMode));
+            await Task.Factory.StartNew(
+                () => Auto.StartAutoHunt(_selectedClass, (ClassUseMode)_selectedClassMode), 
+                _autoCts.Token,
+                TaskCreationOptions.LongRunning,
+                TaskScheduler.Default);
             return;
         }
 
-        await Task.Factory.StartNew(() => Auto.StartAutoHunt());
+        await Task.Factory.StartNew(
+            () => Auto.StartAutoHunt(),
+            _autoCts.Token,
+            TaskCreationOptions.LongRunning,
+            TaskScheduler.Default);
     }
 
     [RelayCommand]
     private async Task StartAutoAttack()
     {
+        // Cancel any existing operation
+        _autoCts?.Cancel();
+        _autoCts?.Dispose();
+        _autoCts = new CancellationTokenSource();
+        
         if (UseSelectedClass && _selectedClass is not null && _selectedClassMode is not null)
         {
-            await Task.Factory.StartNew(() => Auto.StartAutoAttack(_selectedClass, (ClassUseMode)_selectedClassMode));
+            await Task.Factory.StartNew(
+                () => Auto.StartAutoAttack(_selectedClass, (ClassUseMode)_selectedClassMode),
+                _autoCts.Token,
+                TaskCreationOptions.LongRunning,
+                TaskScheduler.Default);
             return;
         }
 
-        await Task.Factory.StartNew(() => Auto.StartAutoAttack());
+        await Task.Factory.StartNew(
+            () => Auto.StartAutoAttack(),
+            _autoCts.Token,
+            TaskCreationOptions.LongRunning,
+            TaskScheduler.Default);
     }
 
     private async Task StopAutoAsync()
     {
+        _autoCts?.Cancel();
         await Auto.StopAsync();
+        _autoCts?.Dispose();
+        _autoCts = null;
+    }
+    
+    private bool _disposed = false;
+
+    public void Dispose()
+    {
+        Dispose(true);
+        GC.SuppressFinalize(this);
+    }
+
+    protected virtual void Dispose(bool disposing)
+    {
+        if (!_disposed)
+        {
+            if (disposing)
+            {
+                _autoCts?.Cancel();
+                _autoCts?.Dispose();
+                StrongReferenceMessenger.Default.UnregisterAll(this);
+            }
+
+            _disposed = true;
+        }
+    }
+
+    ~AutoViewModel()
+    {
+        Dispose(false);
     }
 }

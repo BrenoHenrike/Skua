@@ -7,11 +7,13 @@ using Skua.Core.Utils;
 
 namespace Skua.Core.Skills;
 
-public class AdvancedSkillContainer : ObservableRecipient, IAdvancedSkillContainer
+public class AdvancedSkillContainer : ObservableRecipient, IAdvancedSkillContainer, IDisposable
 {
     private List<AdvancedSkill> _loadedSkills = new();
     private readonly string _defaultSkillsSetsPath;
     private readonly string _userSkillsSetsPath;
+    private CancellationTokenSource? _saveCts;
+    private Task? _saveTask;
     
     public List<AdvancedSkill> LoadedSkills
     {
@@ -70,11 +72,16 @@ public class AdvancedSkillContainer : ObservableRecipient, IAdvancedSkillContain
 
     public async void SyncSkills()
     {
+        _saveCts?.Cancel();
+        await (_saveTask ?? Task.CompletedTask);
+        _saveCts?.Dispose();
+        _saveCts = new CancellationTokenSource();
+        
         await Task.Factory.StartNew(() =>
         {
             _CopyDefaultSkills();
             LoadSkills();
-        });
+        }, _saveCts.Token);
     }
 
     public void LoadSkills()
@@ -106,10 +113,57 @@ public class AdvancedSkillContainer : ObservableRecipient, IAdvancedSkillContain
 
     public void Save()
     {
-        Task.Factory.StartNew(() =>
+        _saveCts?.Cancel();
+        _saveCts?.Dispose();
+        _saveCts = new CancellationTokenSource();
+        
+        _saveTask = Task.Factory.StartNew(() =>
         {
-            File.WriteAllLines(_userSkillsSetsPath, _loadedSkills.OrderBy(s => s.ClassName).Select(s => s.SaveString));
-            LoadSkills();
-        });
+            try
+            {
+                File.WriteAllLines(_userSkillsSetsPath, _loadedSkills.OrderBy(s => s.ClassName).Select(s => s.SaveString));
+                if (!_saveCts.Token.IsCancellationRequested)
+                {
+                    LoadSkills();
+                }
+            }
+            catch
+            {
+                // Handle save errors gracefully
+            }
+        }, _saveCts.Token);
+    }
+    
+    private bool _disposed = false;
+
+    public void Dispose()
+    {
+        Dispose(true);
+        GC.SuppressFinalize(this);
+    }
+
+    protected virtual void Dispose(bool disposing)
+    {
+        if (!_disposed)
+        {
+            if (disposing)
+            {
+                _saveCts?.Cancel();
+                try
+                {
+                    _saveTask?.Wait(1000);
+                }
+                catch { }
+                _saveCts?.Dispose();
+                _loadedSkills.Clear();
+            }
+
+            _disposed = true;
+        }
+    }
+
+    ~AdvancedSkillContainer()
+    {
+        Dispose(false);
     }
 }

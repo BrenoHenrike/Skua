@@ -10,7 +10,7 @@ using Skua.Core.Models;
 using Skua.Core.Interfaces.Auras;
 
 namespace Skua.Core.Scripts;
-public class ScriptInterface : IScriptInterface, IScriptInterfaceManager
+public class ScriptInterface : IScriptInterface, IScriptInterfaceManager, IDisposable
 {
     private CancellationTokenSource? ScriptInterfaceCTS;
     private readonly Thread ScriptInterfaceThread;
@@ -543,5 +543,61 @@ public class ScriptInterface : IScriptInterface, IScriptInterfaceManager
             _reloginTask = null;
             _waitForLogin = false;
         });
+    }
+
+    private bool _disposed = false;
+
+    public void Dispose()
+    {
+        Dispose(true);
+        GC.SuppressFinalize(this);
+    }
+
+    protected virtual void Dispose(bool disposing)
+    {
+        if (!_disposed)
+        {
+            if (disposing)
+            {
+                // Unsubscribe from Flash events
+                if (Flash != null)
+                {
+                    Flash.FlashCall -= HandleFlashCall;
+                }
+
+                // Cancel and clean up the script interface thread
+                ScriptInterfaceCTS?.Cancel();
+                if (ScriptInterfaceThread != null && ScriptInterfaceThread.IsAlive)
+                {
+                    // Give the thread time to finish gracefully
+                    if (!ScriptInterfaceThread.Join(1000))
+                    {
+                        // Force abort if it doesn't finish in time
+                        try { ScriptInterfaceThread.Interrupt(); } catch { }
+                    }
+                }
+                ScriptInterfaceCTS?.Dispose();
+                ScriptInterfaceCTS = null;
+
+                // Cancel and clean up relogin task
+                _reloginCTS?.Cancel();
+                _reloginCTS?.Dispose();
+                _reloginCTS = null;
+                _reloginTask = null;
+
+                // Clear the static instance reference
+                if (IScriptInterface.Instance == this)
+                {
+                    IScriptInterface.Instance = null;
+                }
+            }
+
+            _disposed = true;
+        }
+    }
+
+    ~ScriptInterface()
+    {
+        Dispose(false);
     }
 }

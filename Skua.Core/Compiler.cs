@@ -11,6 +11,7 @@ namespace Skua.Core;
 /// </summary>
 public class Compiler : CSharpScriptExecution
 {
+    private const int MaxCachedAssemblies = 50; // Limit cache size to prevent unbounded growth
     /// <summary>
     /// This method compiles a class and hands back a
     /// dynamic reference to that class that you can
@@ -50,6 +51,13 @@ public class Compiler : CSharpScriptExecution
         {
             if (!CompileAssembly(code))
                 return null;
+
+            // Limit cache size to prevent unbounded memory growth
+            if (CachedAssemblies.Count >= MaxCachedAssemblies)
+            {
+                // Clear half of the cache when limit is reached
+                CachedAssemblies.Clear();
+            }
 
             CachedAssemblies[hash] = Assembly;
         }
@@ -156,5 +164,13 @@ public class Compiler : CSharpScriptExecution
 
         if (ThrowExceptions)
             throw LastException;
+    }
+
+    /// <summary>
+    /// Clears the cached assemblies to free memory
+    /// </summary>
+    public static void ClearAssemblyCache()
+    {
+        CachedAssemblies?.Clear();
     }
 }

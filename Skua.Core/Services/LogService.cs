@@ -6,11 +6,14 @@ using Skua.Core.Messaging;
 using Skua.Core.Models;
 
 namespace Skua.Core.Services;
-public class LogService : ObservableRecipient, ILogService
+public class LogService : ObservableRecipient, ILogService, IDisposable
 {
+    private readonly DebugListener _debugListener;
+
     public LogService()
     {
-        Trace.Listeners.Add(new DebugListener(this));
+        _debugListener = new DebugListener(this);
+        Trace.Listeners.Add(_debugListener);
         Messenger.Register<LogService, FlashErrorMessage>(this, LogFlashError);
     }
 
@@ -74,6 +77,44 @@ public class LogService : ObservableRecipient, ILogService
             LogType.Flash => _flashLogs,
             _ => new()
         };
+    }
+
+    private bool _disposed = false;
+
+    public void Dispose()
+    {
+        Dispose(true);
+        GC.SuppressFinalize(this);
+    }
+
+    protected virtual void Dispose(bool disposing)
+    {
+        if (!_disposed)
+        {
+            if (disposing)
+            {
+                // Remove the trace listener
+                if (_debugListener != null)
+                {
+                    Trace.Listeners.Remove(_debugListener);
+                }
+
+                // Unregister from messenger
+                Messenger.UnregisterAll(this);
+
+                // Clear log collections
+                _debugLogs.Clear();
+                _scriptLogs.Clear();
+                _flashLogs.Clear();
+            }
+
+            _disposed = true;
+        }
+    }
+
+    ~LogService()
+    {
+        Dispose(false);
     }
 }
 

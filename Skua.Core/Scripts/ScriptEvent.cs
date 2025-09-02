@@ -1,10 +1,10 @@
-﻿using CommunityToolkit.Mvvm.Messaging;
+using CommunityToolkit.Mvvm.Messaging;
 using Skua.Core.Interfaces;
 using Skua.Core.Messaging;
 using Skua.Core.Models;
 
 namespace Skua.Core.Scripts;
-public class ScriptEvent : IScriptEvent
+public class ScriptEvent : IScriptEvent, IDisposable
 {
     public ScriptEvent()
     {
@@ -187,5 +187,42 @@ public class ScriptEvent : IScriptEvent
     public void OnTryBuyItem(ScriptEvent recipient, TryBuyItemMessage message)
     {
         recipient.TryBuyItem?.Invoke(message.ShopID, message.ItemID, message.ShopItemID);
+    }
+
+    private bool _disposed = false;
+
+    public void Dispose()
+    {
+        Dispose(true);
+        GC.SuppressFinalize(this);
+    }
+
+    protected virtual void Dispose(bool disposing)
+    {
+        if (!_disposed)
+        {
+            if (disposing)
+            {
+                // Unregister from all messenger events
+                _messenger.UnregisterAll(this);
+                
+                // Clear all event handlers
+                ClearHandlers();
+                
+                // Clear additional handlers that weren't in ClearHandlers
+                Logout = null;
+                PacketReceived = null;
+                ItemBought = null;
+                ItemSold = null;
+                ItemAddedToBank = null;
+            }
+
+            _disposed = true;
+        }
+    }
+
+    ~ScriptEvent()
+    {
+        Dispose(false);
     }
 }

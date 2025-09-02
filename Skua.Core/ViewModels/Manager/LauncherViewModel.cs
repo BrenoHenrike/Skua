@@ -1,4 +1,4 @@
-﻿using CommunityToolkit.Mvvm.Messaging;
+using CommunityToolkit.Mvvm.Messaging;
 using CommunityToolkit.Mvvm.Input;
 using Skua.Core.Interfaces;
 using Skua.Core.Messaging;
@@ -7,12 +7,13 @@ using System.Diagnostics;
 using Timer = System.Timers.Timer;
 
 namespace Skua.Core.ViewModels.Manager;
-public partial class LauncherViewModel : BotControlViewModelBase
+public partial class LauncherViewModel : BotControlViewModelBase, IDisposable
 {
     private readonly ISettingsService _settingsService;
     private readonly IDispatcherService _dispatcherService;
     public RangedObservableCollection<Process> SkuaProcesses { get; } = new();
     private Timer _timer;
+    private bool _disposed;
 
     public LauncherViewModel(ISettingsService settingsService, IDispatcherService dispatcherService)
         : base("Launcher")
@@ -97,5 +98,41 @@ public partial class LauncherViewModel : BotControlViewModelBase
             process.Kill();
             _dispatcherService.Invoke(() => SkuaProcesses.Remove(process));
         });
+    }
+
+    public void Dispose()
+    {
+        Dispose(true);
+        GC.SuppressFinalize(this);
+    }
+
+    protected virtual void Dispose(bool disposing)
+    {
+        if (!_disposed)
+        {
+            if (disposing)
+            {
+                // Stop and dispose timer
+                _timer?.Stop();
+                _timer.Elapsed -= RemoveStoppedCurrentProcess!;
+                _timer?.Dispose();
+
+                // Unregister from messenger
+                StrongReferenceMessenger.Default.Unregister<UpdateStartedMessage>(this);
+
+                // Clear and kill any remaining processes
+                foreach (var proc in SkuaProcesses)
+                {
+                    try
+                    {
+                        if (!proc.HasExited)
+                            proc.Kill();
+                    }
+                    catch { }
+                }
+                SkuaProcesses?.Clear();
+            }
+            _disposed = true;
+        }
     }
 }

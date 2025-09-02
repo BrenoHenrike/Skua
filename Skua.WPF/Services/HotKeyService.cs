@@ -1,9 +1,10 @@
-﻿using CommunityToolkit.Mvvm.Input;
+using CommunityToolkit.Mvvm.Input;
 using CommunityToolkit.Mvvm.Messaging;
 using Skua.Core.Interfaces;
 using Skua.Core.Messaging;
 using Skua.Core.Models;
 using Skua.Core.Utils;
+using System;
 using System.Collections.Generic;
 using System.Collections.Specialized;
 using System.Globalization;
@@ -11,25 +12,33 @@ using System.Windows;
 using System.Windows.Input;
 
 namespace Skua.WPF.Services;
-public class HotKeyService : IHotKeyService
+public class HotKeyService : IHotKeyService, IDisposable
 {
     public HotKeyService(Dictionary<string, IRelayCommand> hotKeys, ISettingsService settingsService, IDecamelizer decamelizer)
     {
         _hotKeys = hotKeys;
         _settingsService = settingsService;
         _decamelizer = decamelizer;
+        _registeredBindings = new List<KeyBinding>();
     }
 
     private readonly Dictionary<string, IRelayCommand> _hotKeys;
     private readonly ISettingsService _settingsService;
     private readonly IDecamelizer _decamelizer;
+    private readonly List<KeyBinding> _registeredBindings;
 
     public void Reload()
     {
-        Application.Current.MainWindow.InputBindings.Clear();
+        // Clear previous bindings
+        ClearRegisteredBindings();
+        
+        if (Application.Current?.MainWindow == null)
+            return;
+            
         StringCollection? hotkeys = _settingsService.Get<StringCollection>("HotKeys");
         if (hotkeys is null)
             return;
+            
         foreach (string? hk in hotkeys)
         {
             if (string.IsNullOrEmpty(hk))
@@ -46,8 +55,21 @@ public class HotKeyService : IHotKeyService
                 }
                 kb.Command = _hotKeys[split[0]];
                 Application.Current.MainWindow.InputBindings.Add(kb);
+                _registeredBindings.Add(kb);
             }
         }
+    }
+    
+    private void ClearRegisteredBindings()
+    {
+        if (Application.Current?.MainWindow != null)
+        {
+            foreach (var binding in _registeredBindings)
+            {
+                Application.Current.MainWindow.InputBindings.Remove(binding);
+            }
+        }
+        _registeredBindings.Clear();
     }
 
     public List<T> GetHotKeys<T>()
@@ -106,5 +128,32 @@ public class HotKeyService : IHotKeyService
             return null;
 
         return kb;
+    }
+    
+    private bool _disposed = false;
+
+    public void Dispose()
+    {
+        Dispose(true);
+        GC.SuppressFinalize(this);
+    }
+
+    protected virtual void Dispose(bool disposing)
+    {
+        if (!_disposed)
+        {
+            if (disposing)
+            {
+                ClearRegisteredBindings();
+                _hotKeys.Clear();
+            }
+
+            _disposed = true;
+        }
+    }
+
+    ~HotKeyService()
+    {
+        Dispose(false);
     }
 }

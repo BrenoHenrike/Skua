@@ -34,11 +34,12 @@ To keep track of what bots are run, how often, how long, and just how popular so
 - Specific tools such as **Butler** (a follow and kill [doesn't support quests]), "ChooseBestGear" (a script that will look at your inv, and equip the appropriate setting for the race type you select.), BuyOut ( will either buy **all/non-ac/ac** (will prompt due to ACs) from a specified shop)
 - **Core Script Files** are not meant to be run.
 - **0ScriptName.cs** are basically "Do everything required for this script."
-- If you wanted to have a new farming script that doesn't exist, though, please request it [here](https://forms.gle/casF8pCNsP2qMGZS6)
+- If you wanted to have a new farming script that doesn't exist, though, please request it
+in the discord
 
 ### [Skua Discord](https://discord.com/invite/CKKbk2zr3p) Join the community and get help with Skua
 
-### For questions or help join the discord & go to the [#skua-help](https://discord.com/channels/1090693457586176013/1090741396970938399) channel
+### For questions or help go to the [#skua-help](https://discord.com/channels/1090693457586176013/1090741396970938399) channel
 
 
 
@@ -60,29 +61,4 @@ Skua developers need your support to improve Skua. You can donate or sponsor us 
 - **Skua Heroes*,* the script makers and helpers.
 - **Boaters** are the ones who sail overnight using Skua and help the Skua team to improve, thanks to their feedback and suggestions **which is you**.
 
-## How to build [ For Client Developers and Contributors ]
-
-***Ignore this if you are not a developer***
-
-#### Pre-requisites
-
-- [Learn C#](<https://www.codecademy.com/learn/learn-c-sharp>)
-
-- [Visual Studio](<https://visualstudio.microsoft.com/vs/>)
-
-- [.net 6 SDK (x64)](<https://dotnet.microsoft.com/en-us/download/dotnet/thank-you/sdk-6.0.420-windows-x64-installer>)
-
-- [WiX Toolset v3 for Building installer](<https://github.com/wixtoolset/wix3/releases/download/wix3141rtm/wix314.exe>)
-
-- [WiX Visual Studio Extension also for building installer](<https://wixtoolset.org/docs/wix3/>)
-
-#### Building
-
-
-Building for production, do a batch build using all of the (`x64`) and (`x86`) projects except for:
-
-- Skua.App.WPF.Follower
-
-- Skua.App.WPF.Sync
-
-If you're building for just yourself, you can batch build on `Any CPU`
+## [Build Guide](./BUILD.md) **Ignore this if you are not a developer**

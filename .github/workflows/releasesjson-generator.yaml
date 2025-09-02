@@ -1,16 +1,18 @@
-name: Get Releases
+name: Update Releases JSON
 
 on:
   push:
     branches:
       - master
+      - main
       - dev
-      - 'op-version'
-      - 'feature/*'
   pull_request:
-      types: [closed]
+    types: [closed]
+    branches:
+      - master
+      - main
   release:
-      types: [published]
+    types: [published, edited, deleted]
 
 jobs:
   build:
@@ -20,12 +22,16 @@ jobs:
     - name: Checkout repository
       uses: actions/checkout@v3
       with:
-        ref: ${{ github.head_ref }}
+        ref: ${{ github.ref }}
+        token: ${{ secrets.GITHUB_TOKEN }}
 
     - name: Get Releases
       id: get_releases
       run: |
-        curl -H "Authorization: token ${{ secrets.GITHUB_TOKEN }}" https://api.github.com/repos/brenohenrike/skua/releases > releases.json
+        curl -H "Authorization: token ${{ secrets.GITHUB_TOKEN }}" \
+             -H "Accept: application/vnd.github.v3+json" \
+             https://api.github.com/repos/${{ github.repository }}/releases \
+             > releases.json
 
     - name: Upload Artifact
       uses: actions/upload-artifact@v2
@@ -36,11 +42,11 @@ jobs:
     - name: Commit and push changes
       uses: stefanzweifel/git-auto-commit-action@v4
       with:
-        branch: ${{ github.head_ref }}
-        commit_message: 'Automatic commit by GitHub Actions'
-        files: 'releases.json'
-        push: true
-        push_options: '--force'
+        branch: ${{ github.ref_name }}
+        commit_message: 'Update releases.json [skip ci]'
+        file_pattern: 'releases.json'
+        commit_user_name: 'github-actions[bot]'
+        commit_user_email: 'github-actions[bot]@users.noreply.github.com'
 
     - name: Delete artifact
       uses: geekyeggo/delete-artifact@v2

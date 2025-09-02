@@ -44,12 +44,29 @@ public class DialogService : IDialogService
 
             void closeHandler(object? s, EventArgs e)
             {
-                callback(viewModel);
                 dialog.Closed -= closeHandler;
+                try
+                {
+                    callback(viewModel);
+                }
+                catch
+                {
+                    // Ensure handler is removed even if callback throws
+                }
             }
+            
             dialog.Closed += closeHandler;
 
-            return dialog.ShowDialog();
+            try
+            {
+                return dialog.ShowDialog();
+            }
+            catch
+            {
+                // Ensure cleanup if ShowDialog throws
+                dialog.Closed -= closeHandler;
+                throw;
+            }
         });
     }
 
