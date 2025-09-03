@@ -1,0 +1,164 @@
+name: Update Changelog
+
+on:
+  release:
+    types: [published]
+  workflow_dispatch:  # Allow manual triggering for testing
+
+jobs:
+  update-changelog:
+    name: Update changelogs.md
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+      
+    steps:
+    - name: 📋 Checkout repository
+      uses: actions/checkout@v4
+      with:
+        fetch-depth: 0
+        token: ${{ secrets.GITHUB_TOKEN }}
+        
+    - name: 📄 Get release information
+      id: release
+      run: |
+        if [ "${{ github.event_name }}" = "release" ]; then
+          echo "RELEASE_TAG=${{ github.event.release.tag_name }}" >> $GITHUB_OUTPUT
+          echo "RELEASE_NAME=${{ github.event.release.name }}" >> $GITHUB_OUTPUT
+          echo "RELEASE_BODY<<EOF" >> $GITHUB_OUTPUT
+          echo "${{ github.event.release.body }}" >> $GITHUB_OUTPUT
+          echo "EOF" >> $GITHUB_OUTPUT
+          echo "RELEASE_PUBLISHED_AT=${{ github.event.release.published_at }}" >> $GITHUB_OUTPUT
+        else
+          # Manual trigger - get latest release
+          LATEST_RELEASE=$(curl -s -H "Authorization: token ${{ secrets.GITHUB_TOKEN }}" \
+            "https://api.github.com/repos/${{ github.repository }}/releases/latest")
+          echo "RELEASE_TAG=$(echo "$LATEST_RELEASE" | jq -r '.tag_name')" >> $GITHUB_OUTPUT
+          echo "RELEASE_NAME=$(echo "$LATEST_RELEASE" | jq -r '.name')" >> $GITHUB_OUTPUT
+          echo "RELEASE_BODY<<EOF" >> $GITHUB_OUTPUT
+          echo "$LATEST_RELEASE" | jq -r '.body' >> $GITHUB_OUTPUT
+          echo "EOF" >> $GITHUB_OUTPUT
+          echo "RELEASE_PUBLISHED_AT=$(echo "$LATEST_RELEASE" | jq -r '.published_at')" >> $GITHUB_OUTPUT
+        fi
+        
+    - name: 🔄 Update changelogs.md
+      run: |
+        # Get release information
+        RELEASE_TAG="${{ steps.release.outputs.RELEASE_TAG }}"
+        RELEASE_NAME="${{ steps.release.outputs.RELEASE_NAME }}"
+        RELEASE_BODY="${{ steps.release.outputs.RELEASE_BODY }}"
+        RELEASE_DATE=$(date -d "${{ steps.release.outputs.RELEASE_PUBLISHED_AT }}" +"%B %d, %Y")
+        
+        # Create new changelog entry
+        NEW_ENTRY="# Skua $RELEASE_TAG
+## Released: $RELEASE_DATE
+
+$RELEASE_BODY
+
+---
+
+"
+        
+        # Check if changelogs.md exists
+        if [ ! -f "changelogs.md" ]; then
+          echo "🆕 Creating new changelogs.md file..."
+          # Create with header
+          cat > changelogs.md << 'EOF'
+# Skua Release Changelog
+
+This file is automatically updated when new releases are published.
+
+---
+
+EOF
+          echo "$NEW_ENTRY" >> changelogs.md
+        else
+          # Check if this release is already in the changelog
+          if grep -q "^# Skua $RELEASE_TAG$" changelogs.md; then
+            echo "🔄 Release $RELEASE_TAG already exists in changelog. Updating entry..."
+            # Replace existing entry with updated content
+            awk -v tag="$RELEASE_TAG" -v entry="$NEW_ENTRY" '
+              BEGIN { in_release = 0; updated = 0 }
+              /^# Skua / {
+                if ($0 == "# Skua " tag && !updated) {
+                  printf "%s", entry
+                  updated = 1
+                  in_release = 1
+                  next
+                }
+                if (in_release) {
+                  in_release = 0
+                }
+                print
+                next
+              }
+              /^---$/ && in_release {
+                in_release = 0
+                next
+              }
+              !in_release { print }
+            ' changelogs.md > changelogs_temp.md
+            mv changelogs_temp.md changelogs.md
+            echo "✅ Updated existing release entry"
+          else
+            echo "➕ Adding new release $RELEASE_TAG to changelog..."
+            # Insert new entry after the header (after first ---)
+            if grep -q "^---$" changelogs.md; then
+              awk -v entry="$NEW_ENTRY" '
+                BEGIN { found_separator = 0 }
+                /^---$/ && found_separator == 0 {
+                  print
+                  print ""
+                  printf "%s", entry
+                  found_separator = 1
+                  next
+                }
+                { print }
+              ' changelogs.md > changelogs_temp.md
+              mv changelogs_temp.md changelogs.md
+            else
+              # No separator found, add to beginning
+              echo "$NEW_ENTRY" | cat - changelogs.md > changelogs_temp.md
+              mv changelogs_temp.md changelogs.md
+            fi
+            echo "✅ Added new release entry"
+          fi
+        fi
+        
+        echo "📊 Changelog now contains $(grep -c '^# Skua ' changelogs.md || echo 0) releases"
+        
+    - name: 📝 Commit and push changes
+      run: |
+        git config --local user.email "action@github.com"
+        git config --local user.name "GitHub Action"
+        
+        if git diff --quiet changelogs.md; then
+          echo "No changes to commit"
+        else
+          git add changelogs.md
+          git commit -m "Update changelog for release ${{ steps.release.outputs.RELEASE_TAG }} [skip ci]"
+          git push origin ${{ github.ref_name }}
+          echo "✅ Changelog updated and committed"
+        fi
+        
+    - name: 📤 Update op-version branch (for compatibility)
+      run: |
+        # Update the op-version branch with the latest changelog
+        git fetch origin
+        if git branch -r | grep -q "origin/op-version"; then
+          git checkout -B op-version origin/op-version
+          cp changelogs.md changelogs_op.md
+          
+          # Check if op-version branch has differences
+          if git diff --quiet changelogs.md; then
+            echo "op-version branch already up to date"
+          else
+            git add changelogs.md
+            git commit -m "Sync changelog from master for release ${{ steps.release.outputs.RELEASE_TAG }} [skip ci]" || true
+            git push origin op-version
+            echo "✅ op-version branch updated"
+          fi
+        else
+          echo "op-version branch does not exist, skipping compatibility update"
+        fi
+      continue-on-error: true  # Don't fail the entire workflow if this step fails

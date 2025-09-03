@@ -1,0 +1,158 @@
+name: Populate Changelog with Existing Releases
+
+on:
+  workflow_dispatch:  # Manual trigger only
+    inputs:
+      max_releases:
+        description: 'Maximum number of releases to include'
+        required: false
+        default: '10'
+        type: string
+
+jobs:
+  populate-changelog:
+    name: Populate changelogs.md with existing releases
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+      
+    steps:
+    - name: 📋 Checkout repository
+      uses: actions/checkout@v4
+      with:
+        fetch-depth: 0
+        token: ${{ secrets.GITHUB_TOKEN }}
+        
+    - name: 📄 Get all releases
+      id: releases
+      run: |
+        MAX_RELEASES="${{ github.event.inputs.max_releases || '10' }}"
+        echo "Getting up to $MAX_RELEASES releases..."
+        
+        # Get releases from GitHub API
+        curl -s -H "Authorization: token ${{ secrets.GITHUB_TOKEN }}" \
+          "https://api.github.com/repos/${{ github.repository }}/releases?per_page=$MAX_RELEASES" \
+          | jq -r '.[] | select(.draft == false and .prerelease == false) | "\(.tag_name)|\(.name)|\(.published_at)|\(.body)"' \
+          > releases.txt
+          
+        echo "Found $(wc -l < releases.txt) releases"
+        cat releases.txt
+        
+    - name: 🔄 Update changelogs.md (avoiding duplicates)
+      run: |
+        # Backup existing changelog if it exists
+        if [ -f "changelogs.md" ]; then
+          cp changelogs.md changelogs.md.backup
+          echo "📁 Backed up existing changelog"
+        else
+          # Create new changelog header if file doesn't exist
+          cat > changelogs.md << 'EOF'
+# Skua Release Changelog
+
+This file is automatically updated when new releases are published.
+
+---
+
+EOF
+        fi
+        
+        # Create a temporary file for processing
+        cp changelogs.md changelogs_temp.md
+        
+        # Process each release and check for duplicates
+        releases_added=0
+        releases_skipped=0
+        
+        while IFS='|' read -r tag name published_at body; do
+          if [ -n "$tag" ]; then
+            # Check if this release already exists in the changelog
+            if grep -q "^# Skua $tag" changelogs_temp.md; then
+              echo "⏭️ Skipping release $tag (already exists)"
+              releases_skipped=$((releases_skipped + 1))
+            else
+              echo "➕ Adding release: $tag"
+              
+              # Format the date
+              release_date=$(date -d "$published_at" +"%B %d, %Y" 2>/dev/null || echo "$published_at")
+              
+              # Create new entry
+              NEW_ENTRY="# Skua $tag
+## Released: $release_date
+
+$body
+
+---
+
+"
+              
+              # Insert at the top of the file (after header)
+              if grep -q "^---$" changelogs_temp.md; then
+                # Find the first --- line and insert after it
+                awk -v entry="$NEW_ENTRY" '
+                  BEGIN { found_separator = 0 }
+                  /^---$/ && found_separator == 0 {
+                    print
+                    print ""
+                    printf "%s", entry
+                    found_separator = 1
+                    next
+                  }
+                  { print }
+                ' changelogs_temp.md > changelogs_new.md
+                mv changelogs_new.md changelogs_temp.md
+              else
+                # No separator found, append to end
+                echo "$NEW_ENTRY" >> changelogs_temp.md
+              fi
+              
+              releases_added=$((releases_added + 1))
+            fi
+          fi
+        done < releases.txt
+        
+        # Replace the original with the updated version
+        mv changelogs_temp.md changelogs.md
+        
+        echo "✅ Processed releases: $releases_added added, $releases_skipped skipped"
+        echo "📊 Total releases in changelog: $(grep -c '^# Skua ' changelogs.md || echo 0)"
+        
+    - name: 🔍 Show changelog preview
+      run: |
+        echo "📄 Changelog preview (first 50 lines):"
+        head -50 changelogs.md
+        echo ""
+        echo "📊 Changelog statistics:"
+        echo "- Total lines: $(wc -l < changelogs.md)"
+        echo "- Number of releases: $(grep -c '^# Skua ' changelogs.md || echo 0)"
+        echo "- File size: $(du -h changelogs.md | cut -f1)"
+        
+    - name: 📝 Commit and push changes
+      run: |
+        git config --local user.email "action@github.com"
+        git config --local user.name "GitHub Action"
+        
+        if git diff --quiet changelogs.md; then
+          echo "No changes to commit"
+        else
+          git add changelogs.md
+          git commit -m "Populate changelog with existing releases [skip ci]"
+          git push origin ${{ github.ref_name }}
+          echo "✅ Changelog populated and committed"
+          
+          # Also update op-version branch for compatibility
+          if git branch -r | grep -q "origin/op-version"; then
+            git checkout -B op-version origin/op-version
+            cp changelogs.md changelogs_op_temp.md
+            if ! git diff --quiet changelogs.md; then
+              git add changelogs.md
+              git commit -m "Sync populated changelog from master [skip ci]" || true
+              git push origin op-version
+              echo "✅ op-version branch also updated"
+            fi
+          fi
+        fi
+        
+    - name: 🗑️ Cleanup
+      run: |
+        rm -f releases.txt changelogs.md.backup changelogs_op_temp.md
+        echo "✅ Cleanup completed"
