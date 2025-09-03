@@ -1,0 +1,16 @@
+<?xml version="1.0" encoding="utf-8"?>
+<Project>
+  <!-- Read version from skuaVersion file -->
+  <PropertyGroup>
+    <SkuaVersionFile>$(MSBuildThisFileDirectory)skuaVersion</SkuaVersionFile>
+    <SkuaVersion Condition="Exists('$(SkuaVersionFile)')">$([System.IO.File]::ReadAllText('$(SkuaVersionFile)').Trim())</SkuaVersion>
+    <SkuaVersion Condition="'$(SkuaVersion)' == ''">1.0.0.0</SkuaVersion>
+  </PropertyGroup>
+  
+  <!-- Apply version to all projects -->
+  <PropertyGroup>
+    <AssemblyVersion>$(SkuaVersion)</AssemblyVersion>
+    <FileVersion>$(SkuaVersion)</FileVersion>
+    <Version>$(SkuaVersion)</Version>
+  </PropertyGroup>
+</Project>

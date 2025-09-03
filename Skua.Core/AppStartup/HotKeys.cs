@@ -27,7 +27,7 @@ internal class HotKeys
 
     private static bool CanExecuteHotKey()
     {
-        return Ioc.Default.GetRequiredService<IFlashUtil>().GetGameObject("stage.focus") == "null";
+        return Ioc.Default.GetRequiredService<IFlashUtil>().GetGameObject("stage.focus") != "null";
     }
 
     private static void ToggleAutoHunt()

@@ -9,6 +9,19 @@ on:
     branches: [ main, master, develop ]
   workflow_dispatch:
     inputs:
+      configuration:
+        description: 'Build configuration'
+        required: false
+        default: 'Release'
+        type: choice
+        options:
+          - 'Release'
+          - 'Debug'
+      platforms:
+        description: 'Platforms to build (comma-separated)'
+        required: false
+        default: 'x64,x86'
+        type: string
       build_installer:
         description: 'Build WiX Installer'
         required: false
@@ -17,182 +30,516 @@ on:
         options:
           - 'true'
           - 'false'
+      clean:
+        description: 'Clean before build'
+        required: false
+        default: 'true'
+        type: choice
+        options:
+          - 'true'
+          - 'false'
 
 env:
-  DOTNET_VERSION: '6.0.x'
+  DOTNET_VERSION: '6.0.x'  # Required for WiX v6.0.2 compatibility
   DOTNET_NOLOGO: true
   DOTNET_CLI_TELEMETRY_OPTOUT: true
+  # WiX v6.0.2 requires .NET 6 and is installed as a .NET tool
 
 jobs:
   build:
-    name: Build ${{ matrix.platform }} - ${{ matrix.configuration }}
+    name: Skua Build Automation
     runs-on: windows-latest
     
-    strategy:
-      matrix:
-        configuration: [Release, Debug]
-        platform: [x64, x86]
-        
     steps:
-    - name: Checkout code
-      uses: actions/checkout@v3
+    - name: 📋 Checkout code
+      uses: actions/checkout@v4
       with:
-        fetch-depth: 0  # Full history for version calculation
+        fetch-depth: 0
         
-    - name: Setup .NET
-      uses: actions/setup-dotnet@v3
+    - name: 📄 Read version from skuaVersion file
+      id: version
+      run: |
+        if (Test-Path "skuaVersion") {
+          $SkuaVersion = (Get-Content "skuaVersion" -Raw).Trim()
+          Write-Host "✓ Using version from skuaVersion file: $SkuaVersion" -ForegroundColor Green
+          echo "SKUA_VERSION=$SkuaVersion" >> $env:GITHUB_OUTPUT
+          echo "SKUA_VERSION=$SkuaVersion" >> $env:GITHUB_ENV
+        } else {
+          $SkuaVersion = "1.0.0.0"
+          Write-Host "⚠ skuaVersion file not found, using default: $SkuaVersion" -ForegroundColor Yellow
+          echo "SKUA_VERSION=$SkuaVersion" >> $env:GITHUB_OUTPUT
+          echo "SKUA_VERSION=$SkuaVersion" >> $env:GITHUB_ENV
+        }
+        
+    - name: ⚙ Setup .NET 6
+      uses: actions/setup-dotnet@v4
       with:
         dotnet-version: ${{ env.DOTNET_VERSION }}
         
-    - name: Add MSBuild to PATH
-      uses: microsoft/setup-msbuild@v1.3
+    - name: 🔧 Add MSBuild to PATH
+      uses: microsoft/setup-msbuild@v2
       
-    - name: Cache NuGet packages
-      uses: actions/cache@v3
-      with:
-        path: ~/.nuget/packages
-        key: ${{ runner.os }}-nuget-${{ hashFiles('**/*.csproj') }}
-        restore-keys: |
-          ${{ runner.os }}-nuget-
-          
-    - name: Restore dependencies
-      run: dotnet restore
-      
-    - name: Build solution
+    - name: ✅ Check Prerequisites
       run: |
-        dotnet build `
-          --configuration ${{ matrix.configuration }} `
-          --platform ${{ matrix.platform }} `
-          --no-restore `
-          -p:WarningLevel=0
-          
-    - name: Run tests
-      run: |
-        dotnet test `
-          --configuration ${{ matrix.configuration }} `
-          --platform ${{ matrix.platform }} `
-          --no-build `
-          --verbosity normal `
-          --logger "trx;LogFileName=test-results-${{ matrix.platform }}-${{ matrix.configuration }}.trx"
-      continue-on-error: true
-      
-    - name: Upload test results
-      uses: actions/upload-artifact@v3
-      if: always()
-      with:
-        name: test-results-${{ matrix.platform }}-${{ matrix.configuration }}
-        path: '**/test-results-*.trx'
+        Write-Host "`n========================================" -ForegroundColor Cyan
+        Write-Host "Checking Prerequisites" -ForegroundColor Cyan
+        Write-Host "========================================`n" -ForegroundColor Cyan
         
-    - name: Prepare artifacts
-      run: |
-        $outputPath = "artifacts/${{ matrix.configuration }}/${{ matrix.platform }}"
-        New-Item -ItemType Directory -Path $outputPath -Force
-        
-        # Copy main applications
-        $projects = @("Skua.App.WPF", "Skua.Manager")
-        foreach ($project in $projects) {
-          $source = "$project/bin/${{ matrix.platform }}/${{ matrix.configuration }}/net6.0-windows"
-          if (-not (Test-Path $source)) {
-            $source = "$project/bin/${{ matrix.configuration }}/net6.0-windows"
+        # Check for .NET 6 SDK
+        try {
+          $dotnetList = dotnet --list-sdks 2>$null
+          $hasNet6 = $dotnetList | Where-Object { $_ -match "^6\." }
+          
+          if (-not $hasNet6) {
+            Write-Host "✗ .NET 6 SDK not found. This project requires .NET 6." -ForegroundColor Red
+            exit 1
           }
-          if (Test-Path $source) {
-            $dest = "$outputPath/$project"
-            Copy-Item -Path $source -Destination $dest -Recurse -Force
-            Write-Host "Copied $project to $dest"
+          else {
+            $net6Version = ($hasNet6 | Select-Object -First 1) -split ' ' | Select-Object -First 1
+            Write-Host "✓ .NET 6 SDK found: $net6Version" -ForegroundColor Green
+          }
+        }
+        catch {
+          Write-Host "✗ .NET SDK not found. Please install .NET 6 SDK" -ForegroundColor Red
+          exit 1
+        }
+        
+        Write-Host "✓ All prerequisites met" -ForegroundColor Green
+        
+    - name: 🔄 Update Version in Settings Files
+      run: |
+        Write-Host "ℹ Updating version to $env:SKUA_VERSION in settings files..." -ForegroundColor Yellow
+        
+        # Update Settings.settings files
+        $settingsFiles = Get-ChildItem -Path . -Recurse -Name "Settings.settings" | Where-Object { $_ -like "*Properties*Settings.settings" }
+        foreach ($file in $settingsFiles) {
+          if (Test-Path $file) {
+            $content = Get-Content $file -Raw
+            $updatedContent = $content -replace '<Value Profile="\(Default\)">\d+\.\d+\.\d+\.\d+</Value>', "<Value Profile=`"(Default)`">$env:SKUA_VERSION</Value>"
+            if ($content -ne $updatedContent) {
+              Set-Content $file -Value $updatedContent -NoNewline
+              Write-Host "✓ Updated version in $file" -ForegroundColor Green
+            }
           }
         }
         
-    - name: Upload build artifacts
-      uses: actions/upload-artifact@v3
+        # Update Settings.Designer.cs files
+        $designerFiles = Get-ChildItem -Path . -Recurse -Name "Settings.Designer.cs" | Where-Object { $_ -like "*Properties*Settings.Designer.cs" }
+        foreach ($file in $designerFiles) {
+          if (Test-Path $file) {
+            $content = Get-Content $file -Raw
+            $updatedContent = $content -replace '\[global::System\.Configuration\.DefaultSettingValueAttribute\("\d+\.\d+\.\d+\.\d+"\)\]', "[global::System.Configuration.DefaultSettingValueAttribute(`"$env:SKUA_VERSION`")]"
+            if ($content -ne $updatedContent) {
+              Set-Content $file -Value $updatedContent -NoNewline
+              Write-Host "✓ Updated version in $file" -ForegroundColor Green
+            }
+          }
+        }
+        
+        # Update App.config files
+        $appConfigFiles = Get-ChildItem -Path . -Recurse -Name "App.config"
+        foreach ($file in $appConfigFiles) {
+          if (Test-Path $file) {
+            $content = Get-Content $file -Raw
+            $updatedContent = $content -replace '(<setting name="ApplicationVersion"[^>]*>[^<]*<value>)\d+\.\d+\.\d+\.\d+(<\/value>)', "`${1}$env:SKUA_VERSION`${2}"
+            if ($content -ne $updatedContent) {
+              Set-Content $file -Value $updatedContent -NoNewline
+              Write-Host "✓ Updated version in $file" -ForegroundColor Green
+            }
+          }
+        }
+        
+    - name: 🧹 Clean Previous Builds
+      if: ${{ github.event.inputs.clean != 'false' }}
+      run: |
+        Write-Host "`n========================================" -ForegroundColor Cyan
+        Write-Host "Cleaning Previous Builds" -ForegroundColor Cyan
+        Write-Host "========================================`n" -ForegroundColor Cyan
+        
+        # Clean output directories
+        $dirsToClean = @("bin", "obj", "build", "dist", "publish", "artifacts")
+        foreach ($dir in $dirsToClean) {
+          if (Test-Path $dir) {
+            Write-Host "ℹ Removing $dir..." -ForegroundColor Yellow
+            Remove-Item -Path $dir -Recurse -Force -ErrorAction SilentlyContinue
+          }
+        }
+        
+        # Clean each project
+        Get-ChildItem -Path . -Directory | ForEach-Object {
+          $projectDir = $_.FullName
+          foreach ($dir in @("bin", "obj")) {
+            $targetDir = Join-Path $projectDir $dir
+            if (Test-Path $targetDir) {
+              Write-Host "ℹ Cleaning $($_.Name)\$dir..." -ForegroundColor Yellow
+              Remove-Item -Path $targetDir -Recurse -Force -ErrorAction SilentlyContinue
+            }
+          }
+        }
+        
+        Write-Host "✓ Clean completed" -ForegroundColor Green
+        
+    - name: 📦 Parse Platforms and Build
+      run: |
+        Write-Host "`n========================================" -ForegroundColor Cyan
+        Write-Host "Building Solution" -ForegroundColor Cyan
+        Write-Host "========================================`n" -ForegroundColor Cyan
+        
+        # Get platforms from input or use default
+        $PlatformsInput = "${{ github.event.inputs.platforms }}"
+        if ([string]::IsNullOrWhiteSpace($PlatformsInput)) {
+          $PlatformsInput = "x64,x86"
+        }
+        
+        # Get configuration from input or use default
+        $Configuration = "${{ github.event.inputs.configuration }}"
+        if ([string]::IsNullOrWhiteSpace($Configuration)) {
+          $Configuration = "Release"
+        }
+        
+        $Platforms = $PlatformsInput -split ',' | ForEach-Object { $_.Trim() }
+        Write-Host "ℹ Building platforms: $($Platforms -join ', ')" -ForegroundColor Yellow
+        Write-Host "ℹ Configuration: $Configuration" -ForegroundColor Yellow
+        
+        # Create artifacts directory
+        $ArtifactsDir = "artifacts"
+        New-Item -ItemType Directory -Path $ArtifactsDir -Force | Out-Null
+        
+        foreach ($Platform in $Platforms) {
+          Write-Host "`n--- Building $Platform ($Configuration) ---" -ForegroundColor Magenta
+          
+          # Restore packages first
+          Write-Host "ℹ Restoring NuGet packages..." -ForegroundColor Yellow
+          dotnet restore
+          if ($LASTEXITCODE -ne 0) {
+            Write-Host "✗ Failed to restore NuGet packages" -ForegroundColor Red
+            exit 1
+          }
+          
+          # Build the solution
+          Write-Host "ℹ Building solution for $Platform..." -ForegroundColor Yellow
+          dotnet build --configuration $Configuration --platform $Platform --no-restore -p:WarningLevel=0
+          if ($LASTEXITCODE -ne 0) {
+            Write-Host "✗ Build failed for $Platform" -ForegroundColor Red
+            exit 1
+          }
+          
+          Write-Host "✓ Build completed for $Platform" -ForegroundColor Green
+          
+          # Copy outputs to artifacts directory
+          $PlatformArtifactDir = Join-Path $ArtifactsDir "$Configuration\$Platform"
+          New-Item -ItemType Directory -Path $PlatformArtifactDir -Force | Out-Null
+          
+          # Copy main applications
+          $Projects = @("Skua.App.WPF", "Skua.Manager")
+          foreach ($Project in $Projects) {
+            # Try platform-specific path first, then fallback to configuration-only path
+            $SourcePaths = @(
+              "$Project\bin\$Platform\$Configuration\net6.0-windows",
+              "$Project\bin\$Configuration\net6.0-windows"
+            )
+            
+            $SourcePath = $null
+            foreach ($Path in $SourcePaths) {
+              if (Test-Path $Path) {
+                $SourcePath = $Path
+                break
+              }
+            }
+            
+            if ($SourcePath) {
+              $DestPath = Join-Path $PlatformArtifactDir $Project
+              Write-Host "ℹ Copying $Project from $SourcePath to $DestPath" -ForegroundColor Yellow
+              Copy-Item -Path $SourcePath -Destination $DestPath -Recurse -Force
+              Write-Host "✓ Copied $Project" -ForegroundColor Green
+            } else {
+              Write-Host "⚠ Could not find output for $Project" -ForegroundColor Yellow
+            }
+          }
+        }
+        
+        Write-Host "`n✓ All builds completed successfully" -ForegroundColor Green
+        
+    - name: 🧪 Run Tests
+      run: |
+        Write-Host "`n========================================" -ForegroundColor Cyan
+        Write-Host "Running Tests" -ForegroundColor Cyan
+        Write-Host "========================================`n" -ForegroundColor Cyan
+        
+        # Find test projects
+        $TestProjects = Get-ChildItem -Path . -Recurse -Filter "*.csproj" | Where-Object {
+          $content = Get-Content $_.FullName -Raw
+          $content -match '<PackageReference.*Microsoft\.NET\.Test\.Sdk' -or
+          $content -match '<PackageReference.*xunit' -or
+          $content -match '<PackageReference.*NUnit' -or
+          $content -match '<PackageReference.*MSTest'
+        }
+        
+        if ($TestProjects.Count -eq 0) {
+          Write-Host "ℹ No test projects found, skipping tests" -ForegroundColor Yellow
+        } else {
+          Write-Host "ℹ Found $($TestProjects.Count) test project(s)" -ForegroundColor Yellow
+          
+          foreach ($TestProject in $TestProjects) {
+            Write-Host "ℹ Running tests in $($TestProject.Name)..." -ForegroundColor Yellow
+            dotnet test $TestProject.FullName --configuration ${{ github.event.inputs.configuration || 'Release' }} --no-build --verbosity normal --logger "trx;LogFileName=test-results-$($TestProject.BaseName).trx"
+            
+            if ($LASTEXITCODE -ne 0) {
+              Write-Host "⚠ Tests failed in $($TestProject.Name)" -ForegroundColor Yellow
+            } else {
+              Write-Host "✓ Tests passed in $($TestProject.Name)" -ForegroundColor Green
+            }
+          }
+        }
+        
+    - name: 📤 Upload Build Artifacts
+      uses: actions/upload-artifact@v4
       with:
-        name: Skua-${{ matrix.configuration }}-${{ matrix.platform }}
-        path: artifacts/${{ matrix.configuration }}/${{ matrix.platform }}
+        name: Skua-Build-Artifacts
+        path: artifacts/
+        retention-days: 30
+        
+    - name: 📤 Upload Test Results
+      uses: actions/upload-artifact@v4
+      if: always()
+      with:
+        name: test-results
+        path: '**/test-results-*.trx'
+        retention-days: 30
         
   installer:
-    name: Build Installer ${{ matrix.platform }}
+    name: Build WiX Installer
     runs-on: windows-latest
     needs: build
-    if: github.event_name == 'push' || github.event.inputs.build_installer == 'true'
+    if: github.event.inputs.build_installer != 'false'
     
-    strategy:
-      matrix:
-        platform: [x64, x86]
-        
     steps:
-    - name: Checkout code
-      uses: actions/checkout@v3
+    - name: 📋 Checkout code
+      uses: actions/checkout@v4
+      with:
+        fetch-depth: 0
+        
+    - name: 📄 Read version from skuaVersion file
+      id: version
+      run: |
+        if (Test-Path "skuaVersion") {
+          $SkuaVersion = (Get-Content "skuaVersion" -Raw).Trim()
+          Write-Host "✓ Using version from skuaVersion file: $SkuaVersion" -ForegroundColor Green
+          echo "SKUA_VERSION=$SkuaVersion" >> $env:GITHUB_ENV
+        } else {
+          $SkuaVersion = "1.0.0.0"
+          Write-Host "⚠ skuaVersion file not found, using default: $SkuaVersion" -ForegroundColor Yellow
+          echo "SKUA_VERSION=$SkuaVersion" >> $env:GITHUB_ENV
+        }
       
-    - name: Setup .NET
-      uses: actions/setup-dotnet@v3
+    - name: ⚙ Setup .NET 6
+      uses: actions/setup-dotnet@v4
       with:
         dotnet-version: ${{ env.DOTNET_VERSION }}
         
-    - name: Add MSBuild to PATH
-      uses: microsoft/setup-msbuild@v1.3
+    - name: 🔧 Add MSBuild to PATH
+      uses: microsoft/setup-msbuild@v2
       
-    - name: Download WiX Toolset
-      run: |
-        # Download WiX v3.14
-        $wixUrl = "https://github.com/wixtoolset/wix3/releases/download/wix3141rtm/wix314.exe"
-        $wixInstaller = "wix314.exe"
-        
-        Write-Host "Downloading WiX Toolset..."
-        Invoke-WebRequest -Uri $wixUrl -OutFile $wixInstaller
-        
-        Write-Host "Installing WiX Toolset..."
-        Start-Process -FilePath $wixInstaller -ArgumentList "/quiet" -Wait
-        
-        # Add WiX to PATH for this session
-        $env:PATH += ";${env:ProgramFiles(x86)}\WiX Toolset v3.14\bin"
-        
-    - name: Download build artifacts
-      uses: actions/download-artifact@v3
+    - name: 📦 Download build artifacts
+      uses: actions/download-artifact@v4
       with:
-        name: Skua-Release-${{ matrix.platform }}
-        path: artifacts/Release/${{ matrix.platform }}
+        name: Skua-Build-Artifacts
+        path: artifacts/
         
-    - name: Restore dependencies
-      run: dotnet restore
-      
-    - name: Build projects for installer
+    - name: 🔄 Parse Platforms and Build Installers
       run: |
-        dotnet build `
-          --configuration Release `
-          --platform ${{ matrix.platform }} `
-          --no-restore
+        Write-Host "`n========================================" -ForegroundColor Cyan
+        Write-Host "Building WiX Installers" -ForegroundColor Cyan
+        Write-Host "========================================`n" -ForegroundColor Cyan
+        
+        # Validate .NET 6 is available
+        Write-Host "ℹ Validating .NET 6 SDK..." -ForegroundColor Yellow
+        $dotnetVersion = dotnet --version 2>$null
+        if (-not $dotnetVersion -or -not ($dotnetVersion -match "^6\.")) {
+          Write-Host "✗ .NET 6 SDK is required for WiX v6. Current version: $dotnetVersion" -ForegroundColor Red
+          exit 1
+        }
+        Write-Host "✓ .NET SDK version: $dotnetVersion" -ForegroundColor Green
+        
+        # Check if WiX project exists (.wixproj for both v3 and v6)
+        $WixProject = Get-ChildItem -Path . -Recurse -Filter "*.wixproj" | Select-Object -First 1
+        if (-not $WixProject) {
+          Write-Host "⚠ No WiX project (*.wixproj) found, skipping installer build" -ForegroundColor Yellow
+          exit 0
+        }
+        
+        Write-Host "✓ Found WiX project: $($WixProject.Name)" -ForegroundColor Green
+        
+        # Check if it's a WiX v6 project by examining the project file
+        $projectContent = Get-Content $WixProject.FullName -Raw
+        if ($projectContent -match 'WixToolset\.Sdk') {
+          Write-Host "✓ Detected WiX v6 project (uses WixToolset.Sdk)" -ForegroundColor Green
+        } elseif ($projectContent -match 'Microsoft\.Tools\.WindowsInstallerXml') {
+          Write-Host "⚠ Warning: Detected WiX v3/v4 project. WiX v6 is recommended." -ForegroundColor Yellow
+        } else {
+          Write-Host "ℹ WiX project type could not be determined" -ForegroundColor Yellow
+        }
+        
+        # Get platforms from input or use default
+        $PlatformsInput = "${{ github.event.inputs.platforms }}"
+        if ([string]::IsNullOrWhiteSpace($PlatformsInput)) {
+          $PlatformsInput = "x64,x86"
+        }
+        
+        # Get configuration from input or use default
+        $Configuration = "${{ github.event.inputs.configuration }}"
+        if ([string]::IsNullOrWhiteSpace($Configuration)) {
+          $Configuration = "Release"
+        }
+        
+        $Platforms = $PlatformsInput -split ',' | ForEach-Object { $_.Trim() }
+        Write-Host "ℹ Building installers for platforms: $($Platforms -join ', ')" -ForegroundColor Yellow
+        
+        # Install WiX v6.0.2 as .NET tool
+        Write-Host "ℹ Installing WiX v6.0.2 as .NET tool..." -ForegroundColor Yellow
+        
+        try {
+          # Install WiX as a global .NET tool
+          dotnet tool install --global wix --version 6.0.2
           
-    - name: Build WiX installer
-      run: |
-        msbuild Skua.Installer\Skua.Installer.wixproj `
-          /p:Configuration=Release `
-          /p:Platform=${{ matrix.platform }} `
-          /t:Rebuild `
-          /verbosity:normal
+          if ($LASTEXITCODE -eq 0) {
+            Write-Host "✓ WiX v6.0.2 installed successfully" -ForegroundColor Green
+            
+            # Verify installation
+            $wixVersion = wix --version 2>$null
+            if ($wixVersion) {
+              Write-Host "✓ WiX version: $wixVersion" -ForegroundColor Green
+              
+              # Test WiX command availability
+              $wixHelp = wix --help 2>$null
+              if ($wixHelp) {
+                Write-Host "✓ WiX command-line tools are functional" -ForegroundColor Green
+              } else {
+                Write-Host "⚠ WiX tools may not be fully functional" -ForegroundColor Yellow
+              }
+            } else {
+              Write-Host "✗ WiX version check failed" -ForegroundColor Red
+              exit 1
+            }
+          } else {
+            Write-Host "✗ Failed to install WiX v6.0.2" -ForegroundColor Red
+            exit 1
+          }
+        }
+        catch {
+          Write-Host "✗ Error installing WiX v6.0.2: $_" -ForegroundColor Red
+          exit 1
+        }
+        
+        # Build installer for each platform
+        foreach ($Platform in $Platforms) {
+          Write-Host "`n--- Building installer for $Platform ($Configuration) ---" -ForegroundColor Magenta
           
-    - name: Sign installer (if certificate available)
-      if: env.SIGNING_CERTIFICATE != ''
+          try {
+            Write-Host "ℹ Restoring NuGet packages for WiX project..." -ForegroundColor Yellow
+            dotnet restore $WixProject.FullName
+            
+            if ($LASTEXITCODE -ne 0) {
+              Write-Host "✗ Failed to restore packages for WiX project" -ForegroundColor Red
+              continue
+            }
+            
+            Write-Host "ℹ Building WiX project for $Platform..." -ForegroundColor Yellow
+            
+            # WiX v6 uses dotnet build with MSBuild
+            dotnet build $WixProject.FullName --configuration $Configuration -p:Platform=$Platform --verbosity minimal --no-restore
+            
+            if ($LASTEXITCODE -eq 0) {
+              Write-Host "✓ Installer built successfully for $Platform" -ForegroundColor Green
+              
+              # Find the built MSI - WiX v6 output structure
+              $PossibleDirs = @(
+                "$($WixProject.DirectoryName)\bin\$Configuration\$Platform",
+                "$($WixProject.DirectoryName)\bin\$Platform\$Configuration",
+                "$($WixProject.DirectoryName)\bin\$Configuration"
+              )
+              
+              $MsiFile = $null
+              foreach ($Dir in $PossibleDirs) {
+                if (Test-Path $Dir) {
+                  $MsiFile = Get-ChildItem -Path $Dir -Filter "*.msi" -ErrorAction SilentlyContinue | Select-Object -First 1
+                  if ($MsiFile) {
+                    Write-Host "✓ Found installer: $($MsiFile.Name) in $Dir" -ForegroundColor Green
+                    break
+                  }
+                }
+              }
+              
+              if (-not $MsiFile) {
+                Write-Host "⚠ No MSI file found in expected directories" -ForegroundColor Yellow
+                # List all MSI files for debugging
+                $AllMsiFiles = Get-ChildItem -Path $WixProject.DirectoryName -Recurse -Filter "*.msi" -ErrorAction SilentlyContinue
+                if ($AllMsiFiles) {
+                  Write-Host "ℹ Found MSI files in:" -ForegroundColor Yellow
+                  foreach ($File in $AllMsiFiles) {
+                    Write-Host "  $($File.FullName)" -ForegroundColor Yellow
+                  }
+                }
+              }
+            } else {
+              Write-Host "✗ Installer build failed for $Platform" -ForegroundColor Red
+            }
+          }
+          catch {
+            Write-Host "✗ Error building installer for $Platform`: $_" -ForegroundColor Red
+          }
+        }
+        
+        Write-Host "`n✓ Installer build process completed" -ForegroundColor Green
+        
+    - name: 📝 Sign Installers (Optional)
+      if: vars.SIGNING_CERTIFICATE != ''
       env:
         SIGNING_CERTIFICATE: ${{ secrets.SIGNING_CERTIFICATE }}
         SIGNING_PASSWORD: ${{ secrets.SIGNING_PASSWORD }}
       run: |
-        # Decode certificate from base64
-        $certBytes = [Convert]::FromBase64String($env:SIGNING_CERTIFICATE)
-        $certPath = "cert.pfx"
-        [IO.File]::WriteAllBytes($certPath, $certBytes)
+        Write-Host "ℹ Signing installers..." -ForegroundColor Yellow
         
-        # Sign the MSI
-        $msiPath = Get-ChildItem -Path "Skua.Installer\bin\${{ matrix.platform }}\Release\*.msi" | Select -First 1
-        signtool sign /f $certPath /p $env:SIGNING_PASSWORD /t http://timestamp.digicert.com $msiPath.FullName
-        
-        # Clean up certificate
-        Remove-Item $certPath -Force
+        try {
+          # Decode certificate from base64
+          $certBytes = [Convert]::FromBase64String($env:SIGNING_CERTIFICATE)
+          $certPath = "signing-cert.pfx"
+          [IO.File]::WriteAllBytes($certPath, $certBytes)
+          
+          # Find all MSI files
+          $MsiFiles = Get-ChildItem -Path . -Recurse -Filter "*.msi"
+          
+          foreach ($MsiFile in $MsiFiles) {
+            Write-Host "ℹ Signing $($MsiFile.Name)..." -ForegroundColor Yellow
+            signtool sign /f $certPath /p "$env:SIGNING_PASSWORD" /t http://timestamp.digicert.com /d "Skua Installer" $MsiFile.FullName
+            
+            if ($LASTEXITCODE -eq 0) {
+              Write-Host "✓ Successfully signed $($MsiFile.Name)" -ForegroundColor Green
+            } else {
+              Write-Host "✗ Failed to sign $($MsiFile.Name)" -ForegroundColor Red
+            }
+          }
+          
+          # Clean up certificate
+          if (Test-Path $certPath) {
+            Remove-Item $certPath -Force
+          }
+        }
+        catch {
+          Write-Host "✗ Error during signing process: $_" -ForegroundColor Red
+        }
       continue-on-error: true
       
-    - name: Upload installer
-      uses: actions/upload-artifact@v3
+    - name: 📤 Upload Installers
+      uses: actions/upload-artifact@v4
       with:
-        name: Skua-Installer-${{ matrix.platform }}
-        path: Skua.Installer\bin\${{ matrix.platform }}\Release\*.msi
+        name: Skua-Installers
+        path: |
+          **/bin/**/Release/*.msi
+          **/bin/**/Debug/*.msi
+          **/bin/**/*.msi
+        retention-days: 30
+        if-no-files-found: warn
         
   release:
     name: Create Release
@@ -202,7 +549,7 @@ jobs:
     
     steps:
     - name: Download all artifacts
-      uses: actions/download-artifact@v3
+      uses: actions/download-artifact@v4
       with:
         path: release-artifacts
         
@@ -267,7 +614,7 @@ jobs:
         echo "EOF" >> $env:GITHUB_OUTPUT
         
     - name: Create GitHub Release
-      uses: softprops/action-gh-release@v1
+      uses: softprops/action-gh-release@v2
       with:
         name: Skua ${{ github.ref_name }}
         body: ${{ steps.release_notes.outputs.RELEASE_NOTES }}
