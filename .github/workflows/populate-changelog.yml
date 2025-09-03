@@ -23,136 +23,139 @@ jobs:
         fetch-depth: 0
         token: ${{ secrets.GITHUB_TOKEN }}
         
-    - name: 📄 Get all releases
-      id: releases
+    - name: 📄 Get all releases and create changelog
       run: |
         MAX_RELEASES="${{ github.event.inputs.max_releases || '10' }}"
         echo "Getting up to $MAX_RELEASES releases..."
         
-        # Get releases from GitHub API (sorted by published_at descending to get latest first)
-        curl -s -H "Authorization: token ${{ secrets.GITHUB_TOKEN }}" \
-          "https://api.github.com/repos/${{ github.repository }}/releases?per_page=$MAX_RELEASES" \
-          | jq -r '.[] | select(.draft == false and .prerelease == false) | "\(.tag_name)|\(.name)|\(.published_at)|\(.body)"' \
-          > releases.txt
-          
-        echo "Found $(wc -l < releases.txt) releases"
-        echo "Release data preview:"
-        head -3 releases.txt
-        echo "..."
-        
-        # Show what we're parsing
-        echo "Parsing release data:"
-        head -1 releases.txt | while IFS='|' read -r tag name published_at body; do
-          echo "Tag: $tag"
-          echo "Name: $name"
-          echo "Published: $published_at"
-          echo "Body preview: $(echo "$body" | head -c 100)..."
-        done
-        
-    - name: 🔄 Update changelogs.md (avoiding duplicates)
-      run: |
         # Backup existing changelog if it exists
         if [ -f "changelogs.md" ]; then
           cp changelogs.md changelogs.md.backup
           echo "📁 Backed up existing changelog"
+        fi
+        
+        # Create new changelog with header
+        cat > changelogs.md << 'HEADER_END'
+# Skua Release Changelog
+
+This file is automatically updated when new releases are published.
+
+---
+
+HEADER_END
+        
+        # Get releases from GitHub API and process them directly
+        echo "Fetching releases from GitHub API..."
+        
+        # Create a Python script to handle the JSON processing properly
+        cat > process_releases.py << 'PYTHON_END'
+import json
+import sys
+import requests
+import os
+from datetime import datetime
+
+# Get GitHub token and repository info
+token = os.environ.get('GITHUB_TOKEN')
+repo = os.environ.get('GITHUB_REPOSITORY')
+max_releases = int(os.environ.get('MAX_RELEASES', '10'))
+
+if not token or not repo:
+    print("Error: Missing GitHub token or repository info")
+    sys.exit(1)
+
+# Fetch releases from GitHub API
+url = f"https://api.github.com/repos/{repo}/releases"
+headers = {
+    'Authorization': f'token {token}',
+    'Accept': 'application/vnd.github.v3+json'
+}
+
+response = requests.get(url, headers=headers, params={'per_page': max_releases})
+if response.status_code != 200:
+    print(f"Error fetching releases: {response.status_code}")
+    sys.exit(1)
+
+releases = response.json()
+
+# Filter out drafts and prereleases, then sort by published date (newest first)
+filtered_releases = [r for r in releases if not r.get('draft', False) and not r.get('prerelease', False)]
+filtered_releases.sort(key=lambda x: x.get('published_at', ''), reverse=True)
+
+print(f"Found {len(filtered_releases)} published releases")
+
+# Read existing changelog to check for duplicates
+existing_releases = set()
+if os.path.exists('changelogs.md'):
+    try:
+        with open('changelogs.md', 'r', encoding='utf-8') as f:
+            content = f.read()
+            # Extract existing release headers
+            import re
+            headers = re.findall(r'^# (.+)$', content, re.MULTILINE)
+            existing_releases = set(headers)
+        print(f"Found {len(existing_releases)} existing releases in changelog")
+    except Exception as e:
+        print(f"Error reading existing changelog: {e}")
+        existing_releases = set()
+
+# Process each release and append to changelog
+with open('changelogs.md', 'a', encoding='utf-8') as f:
+    new_releases_added = 0
+    for release in filtered_releases:
+        tag = release.get('tag_name', '')
+        name = release.get('name', '') or tag
+        published_at = release.get('published_at', '')
+        body = release.get('body', '') or 'No release notes provided.'
+        
+        # Check if this release already exists
+        if name in existing_releases:
+            print(f"Skipping existing release: {name}")
+            continue
+        
+        # Format the date
+        try:
+            if published_at:
+                dt = datetime.fromisoformat(published_at.replace('Z', '+00:00'))
+                formatted_date = dt.strftime('%B %d, %Y')
+            else:
+                formatted_date = 'Unknown date'
+        except:
+            formatted_date = published_at
+        
+        print(f"Adding new release: {name} ({tag}) - {formatted_date}")
+        
+        # Write the release entry
+        f.write(f"# {name}\n")
+        f.write(f"## Released: {formatted_date}\n\n")
+        f.write(f"{body}\n\n")
+        f.write("---\n\n")
+        new_releases_added += 1
+
+print(f"Added {new_releases_added} new releases to changelog")
+
+print("Changelog generation completed")
+PYTHON_END
+        
+        # Set environment variables for Python script
+        export GITHUB_TOKEN="${{ secrets.GITHUB_TOKEN }}"
+        export GITHUB_REPOSITORY="${{ github.repository }}"
+        export MAX_RELEASES="$MAX_RELEASES"
+        
+        # Run the Python script
+        python3 process_releases.py
+        
+        if [ $? -eq 0 ]; then
+          echo "✅ Changelog generated successfully"
         else
-          # Create new changelog header if file doesn't exist
-          cat > changelogs.md << 'CHANGELOG_HEADER'
-        # Skua Release Changelog
-        
-        This file is automatically updated when new releases are published.
-        
-        ---
-        
-        CHANGELOG_HEADER
+          echo "❌ Failed to generate changelog"
+          exit 1
         fi
-        
-        # Create a temporary file for processing
-        cp changelogs.md changelogs_temp.md
-        
-        # Process each release and check for duplicates
-        releases_added=0
-        releases_skipped=0
-        
-        # Create a temp file to collect all new entries
-        rm -f new_entries.txt
-        touch new_entries.txt
-        
-        while IFS='|' read -r tag name published_at body; do
-          if [ -n "$tag" ]; then
-            # Check if this release already exists in the changelog
-            if grep -q "^# $name$" changelogs_temp.md || grep -q "^# Skua $tag$" changelogs_temp.md; then
-              echo "⏭️ Skipping release $tag ($name) - already exists"
-              releases_skipped=$((releases_skipped + 1))
-            else
-              echo "➕ Adding release: $tag ($name)"
-              
-              # Format the date
-              release_date=$(date -d "$published_at" +"%B %d, %Y" 2>/dev/null || echo "$published_at")
-              
-              # Create new entry using heredoc to safely handle special characters
-              cat >> new_entries.txt << 'ENTRY_END'
-        # ${name}
-        ## Released: ${release_date}
-        
-        ${body}
-        
-        ---
-        
-        ENTRY_END
-              
-              # Replace placeholders in the file
-              sed -i "s/\${name}/$name/g" new_entries.txt
-              sed -i "s/\${release_date}/$release_date/g" new_entries.txt
-              # For body, we need to escape it properly
-              escaped_body=$(printf '%s\n' "$body" | sed 's/[[\.*^$()+?{|]/\\&/g')
-              sed -i "s/\${body}/$escaped_body/g" new_entries.txt
-              
-              releases_added=$((releases_added + 1))
-            fi
-          fi
-        done < releases.txt
-        
-        # Insert all new entries at the top (after header) if any were added
-        if [ $releases_added -gt 0 ]; then
-          if grep -q "^---$" changelogs_temp.md; then
-            # Find the first --- line and insert new entries after it
-            awk '
-              BEGIN { found_separator = 0 }
-              /^---$/ && found_separator == 0 {
-                print
-                print ""
-                # Read and print the new entries file
-                while ((getline line < "new_entries.txt") > 0) {
-                  print line
-                }
-                close("new_entries.txt")
-                found_separator = 1
-                next
-              }
-              { print }
-            ' changelogs_temp.md > changelogs_new.md
-            mv changelogs_new.md changelogs_temp.md
-          else
-            # No separator found, prepend new entries to the beginning
-            cat new_entries.txt changelogs_temp.md > changelogs_new.md
-            mv changelogs_new.md changelogs_temp.md
-          fi
-        fi
-        
-        # Clean up temp file
-        rm -f new_entries.txt
-        
-        # Replace the original with the updated version
-        mv changelogs_temp.md changelogs.md
-        
-        echo "✅ Processed releases: $releases_added added, $releases_skipped skipped"
-        echo "📊 Total releases in changelog: $(grep -c '^# ' changelogs.md || echo 0)"
         
     - name: 🔍 Show changelog preview
       run: |
-        echo "📄 Changelog preview (first 50 lines):"
-        head -50 changelogs.md
+        echo "📄 Changelog preview (first 100 lines):"
+        head -100 changelogs.md
         echo ""
         echo "📊 Changelog statistics:"
         echo "- Total lines: $(wc -l < changelogs.md)"
@@ -174,12 +177,12 @@ jobs:
           
           # Also update op-version branch for compatibility
           if git branch -r | grep -q "origin/op-version"; then
-            git checkout -B op-version origin/op-version
-            cp changelogs.md changelogs_op_temp.md
-            if ! git diff --quiet changelogs.md; then
+            git checkout -B op-version origin/op-version || git checkout -b op-version
+            cp changelogs.md changelogs_op_version.md
+            if ! git diff --quiet changelogs.md 2>/dev/null; then
               git add changelogs.md
               git commit -m "Sync populated changelog from master [skip ci]" || true
-              git push origin op-version
+              git push origin op-version || true
               echo "✅ op-version branch also updated"
             fi
           fi
@@ -187,5 +190,5 @@ jobs:
         
     - name: 🗑️ Cleanup
       run: |
-        rm -f releases.txt changelogs.md.backup changelogs_op_temp.md
+        rm -f process_releases.py changelogs.md.backup changelogs_op_version.md
         echo "✅ Cleanup completed"

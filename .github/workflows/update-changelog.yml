@@ -43,106 +43,148 @@ jobs:
         
     - name: 🔄 Update changelogs.md
       run: |
-        # Get release information
-        RELEASE_TAG="${{ steps.release.outputs.RELEASE_TAG }}"
-        RELEASE_NAME="${{ steps.release.outputs.RELEASE_NAME }}"
-        RELEASE_BODY="${{ steps.release.outputs.RELEASE_BODY }}"
-        RELEASE_DATE=$(date -d "${{ steps.release.outputs.RELEASE_PUBLISHED_AT }}" +"%B %d, %Y")
-        
-        # Debug information
-        echo "Processing release:"
-        echo "Tag: $RELEASE_TAG"
-        echo "Name: $RELEASE_NAME"
-        echo "Date: $RELEASE_DATE"
-        echo "Body preview: $(echo "$RELEASE_BODY" | head -c 100)..."
-        
-        # Create new changelog entry using release name as header (same format as populate workflow)
-        NEW_ENTRY="# $RELEASE_NAME
-## Released: $RELEASE_DATE
+        # Create Python script to handle the release update (same approach as populate workflow)
+        cat > update_release.py << 'PYTHON_END'
+import json
+import sys
+import os
+import re
+from datetime import datetime
 
-$RELEASE_BODY
+# Get release information from environment variables
+release_tag = os.environ.get('RELEASE_TAG', '')
+release_name = os.environ.get('RELEASE_NAME', '') or release_tag
+release_body = os.environ.get('RELEASE_BODY', '') or 'No release notes provided.'
+release_published_at = os.environ.get('RELEASE_PUBLISHED_AT', '')
 
----
+print(f"Processing release: {release_name} ({release_tag})")
+print(f"Published at: {release_published_at}")
+print(f"Body preview: {release_body[:100]}..." if len(release_body) > 100 else f"Body: {release_body}")
 
-"
+# Format the date (same logic as populate workflow)
+try:
+    if release_published_at:
+        dt = datetime.fromisoformat(release_published_at.replace('Z', '+00:00'))
+        formatted_date = dt.strftime('%B %d, %Y')
+    else:
+        formatted_date = 'Unknown date'
+except:
+    formatted_date = release_published_at
+
+print(f"Formatted date: {formatted_date}")
+
+# Check if changelogs.md exists
+if not os.path.exists('changelogs.md'):
+    print("🆕 Creating new changelogs.md file...")
+    # Create with header (same as populate workflow)
+    with open('changelogs.md', 'w', encoding='utf-8') as f:
+        f.write("# Skua Release Changelog\n\n")
+        f.write("This file is automatically updated when new releases are published.\n\n")
+        f.write("---\n\n")
+        # Add the new release
+        f.write(f"# {release_name}\n")
+        f.write(f"## Released: {formatted_date}\n\n")
+        f.write(f"{release_body}\n\n")
+        f.write("---\n\n")
+    print("✅ Created new changelog with release")
+else:
+    # Read existing changelog
+    with open('changelogs.md', 'r', encoding='utf-8') as f:
+        content = f.read()
+    
+    # Check if this release already exists
+    existing_headers = re.findall(r'^# (.+)$', content, re.MULTILINE)
+    if release_name in existing_headers:
+        print(f"🔄 Release '{release_name}' already exists in changelog. Updating entry...")
         
-        # Check if changelogs.md exists
-        if [ ! -f "changelogs.md" ]; then
-          echo "🆕 Creating new changelogs.md file..."
-          # Create with header
-          cat > changelogs.md << 'CHANGELOG_HEADER'
-        # Skua Release Changelog
+        # Replace existing entry with updated content
+        lines = content.split('\n')
+        new_lines = []
+        in_target_release = False
+        updated = False
         
-        This file is automatically updated when new releases are published.
+        for line in lines:
+            if line.startswith('# ') and line[2:] == release_name and not updated:
+                # Start of target release - replace it
+                new_lines.append(f"# {release_name}")
+                new_lines.append(f"## Released: {formatted_date}")
+                new_lines.append("")
+                new_lines.append(release_body)
+                new_lines.append("")
+                new_lines.append("---")
+                new_lines.append("")
+                in_target_release = True
+                updated = True
+            elif line.startswith('# ') and in_target_release:
+                # Start of next release - stop skipping
+                in_target_release = False
+                new_lines.append(line)
+            elif line == "---" and in_target_release:
+                # End of current release section - stop skipping
+                in_target_release = False
+                # Don't add this line as we already added the separator above
+            elif not in_target_release:
+                new_lines.append(line)
+            # Skip lines that are part of the old release entry
         
-        ---
+        # Write updated content
+        with open('changelogs.md', 'w', encoding='utf-8') as f:
+            f.write('\n'.join(new_lines))
+        print("✅ Updated existing release entry")
+    else:
+        print(f"➕ Adding new release '{release_name}' to changelog...")
         
-        CHANGELOG_HEADER
-          echo "$NEW_ENTRY" >> changelogs.md
+        # Find the insertion point (after first --- separator)
+        lines = content.split('\n')
+        new_lines = []
+        inserted = False
+        
+        for i, line in enumerate(lines):
+            new_lines.append(line)
+            if line == "---" and not inserted:
+                # Found first separator, insert new release after it
+                new_lines.append("")
+                new_lines.append(f"# {release_name}")
+                new_lines.append(f"## Released: {formatted_date}")
+                new_lines.append("")
+                new_lines.append(release_body)
+                new_lines.append("")
+                new_lines.append("---")
+                new_lines.append("")
+                inserted = True
+        
+        # Write updated content
+        with open('changelogs.md', 'w', encoding='utf-8') as f:
+            f.write('\n'.join(new_lines))
+        print("✅ Added new release entry")
+
+# Count total releases
+with open('changelogs.md', 'r', encoding='utf-8') as f:
+    content = f.read()
+    release_count = len(re.findall(r'^# [^S]', content, re.MULTILINE))  # Exclude "# Skua Release Changelog" header
+    print(f"📊 Changelog now contains {release_count} releases")
+
+print("Release update completed")
+PYTHON_END
+        
+        # Set environment variables for Python script
+        export RELEASE_TAG="${{ steps.release.outputs.RELEASE_TAG }}"
+        export RELEASE_NAME="${{ steps.release.outputs.RELEASE_NAME }}"
+        export RELEASE_BODY="${{ steps.release.outputs.RELEASE_BODY }}"
+        export RELEASE_PUBLISHED_AT="${{ steps.release.outputs.RELEASE_PUBLISHED_AT }}"
+        
+        # Run the Python script
+        python3 update_release.py
+        
+        if [ $? -eq 0 ]; then
+          echo "✅ Changelog updated successfully"
         else
-          # Check if this release is already in the changelog
-          if grep -q "^# $RELEASE_NAME$" changelogs.md || grep -q "^# Skua $RELEASE_TAG$" changelogs.md; then
-            echo "🔄 Release $RELEASE_TAG already exists in changelog. Updating entry..."
-            # Replace existing entry with updated content
-            awk -v name="$RELEASE_NAME" -v tag="$RELEASE_TAG" -v entry="$NEW_ENTRY" '
-              BEGIN { in_release = 0; updated = 0 }
-              /^# / {
-                if (($0 == "# " name || $0 == "# Skua " tag) && !updated) {
-                  printf "%s", entry
-                  updated = 1
-                  in_release = 1
-                  next
-                }
-                if (in_release) {
-                  in_release = 0
-                }
-                print
-                next
-              }
-              /^---$/ && in_release {
-                in_release = 0
-                next
-              }
-              !in_release { print }
-            ' changelogs.md > changelogs_temp.md
-            mv changelogs_temp.md changelogs.md
-            echo "✅ Updated existing release entry"
-          else
-            echo "➕ Adding new release $RELEASE_TAG to changelog..."
-            # Insert new entry after the header (after first ---) - same logic as populate workflow
-            if grep -q "^---$" changelogs.md; then
-              # Create temp file for new entry
-              echo "$NEW_ENTRY" > new_entry.txt
-              
-              # Find the first --- line and insert new entry after it
-              awk '
-                BEGIN { found_separator = 0 }
-                /^---$/ && found_separator == 0 {
-                  print
-                  print ""
-                  # Read and print the new entry file
-                  while ((getline line < "new_entry.txt") > 0) {
-                    print line
-                  }
-                  close("new_entry.txt")
-                  found_separator = 1
-                  next
-                }
-                { print }
-              ' changelogs.md > changelogs_temp.md
-              mv changelogs_temp.md changelogs.md
-              rm -f new_entry.txt
-            else
-              # No separator found, prepend to beginning
-              echo "$NEW_ENTRY" | cat - changelogs.md > changelogs_temp.md
-              mv changelogs_temp.md changelogs.md
-            fi
-            echo "✅ Added new release entry"
-          fi
+          echo "❌ Failed to update changelog"
+          exit 1
         fi
         
-        echo "📊 Changelog now contains $(grep -c '^# Skua ' changelogs.md || echo 0) releases"
-        
+        # Cleanup
+        rm -f update_release.py
     - name: 📝 Commit and push changes
       run: |
         git config --local user.email "action@github.com"
