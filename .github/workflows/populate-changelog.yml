@@ -91,17 +91,16 @@ jobs:
               release_date=$(date -d "$published_at" +"%B %d, %Y" 2>/dev/null || echo "$published_at")
               
               # Create new entry using the release name as header
-              NEW_ENTRY="# $name
+              # Use cat to properly handle multi-line content with special characters
+              cat >> new_entries.txt << ENTRY_DELIMITER
+# $name
 ## Released: $release_date
 
 $body
 
 ---
 
-"
-              
-              # Append to new entries (they're already in reverse chronological order from API)
-              echo "$NEW_ENTRY" >> new_entries.txt
+ENTRY_DELIMITER
               
               releases_added=$((releases_added + 1))
             fi
