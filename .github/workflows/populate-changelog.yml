@@ -46,14 +46,14 @@ jobs:
           echo "📁 Backed up existing changelog"
         else
           # Create new changelog header if file doesn't exist
-          cat > changelogs.md << 'EOF'
+          cat > changelogs.md << 'CHANGELOG_HEADER'
 # Skua Release Changelog
 
 This file is automatically updated when new releases are published.
 
 ---
 
-EOF
+CHANGELOG_HEADER
         fi
         
         # Create a temporary file for processing

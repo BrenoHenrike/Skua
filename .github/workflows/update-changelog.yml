@@ -63,14 +63,14 @@ $RELEASE_BODY
         if [ ! -f "changelogs.md" ]; then
           echo "🆕 Creating new changelogs.md file..."
           # Create with header
-          cat > changelogs.md << 'EOF'
+          cat > changelogs.md << 'CHANGELOG_HEADER'
 # Skua Release Changelog
 
 This file is automatically updated when new releases are published.
 
 ---
 
-EOF
+CHANGELOG_HEADER
           echo "$NEW_ENTRY" >> changelogs.md
         else
           # Check if this release is already in the changelog
