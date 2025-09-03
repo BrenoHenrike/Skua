@@ -53,6 +53,7 @@ import json
 import sys
 import requests
 import os
+import re
 from datetime import datetime
 
 # Get GitHub token and repository info
@@ -91,7 +92,6 @@ if os.path.exists('changelogs.md'):
         with open('changelogs.md', 'r', encoding='utf-8') as f:
             content = f.read()
             # Extract existing release headers
-            import re
             headers = re.findall(r'^# (.+)$', content, re.MULTILINE)
             existing_releases = set(headers)
         print(f"Found {len(existing_releases)} existing releases in changelog")
@@ -133,7 +133,6 @@ with open('changelogs.md', 'a', encoding='utf-8') as f:
         new_releases_added += 1
 
 print(f"Added {new_releases_added} new releases to changelog")
-
 print("Changelog generation completed")
 PYTHON_END
         

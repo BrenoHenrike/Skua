@@ -185,6 +185,7 @@ PYTHON_END
         
         # Cleanup
         rm -f update_release.py
+        
     - name: 📝 Commit and push changes
       run: |
         git config --local user.email "action@github.com"
