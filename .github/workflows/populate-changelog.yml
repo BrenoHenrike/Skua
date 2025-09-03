@@ -90,17 +90,23 @@ jobs:
               # Format the date
               release_date=$(date -d "$published_at" +"%B %d, %Y" 2>/dev/null || echo "$published_at")
               
-              # Create new entry using the release name as header
-              # Use cat to properly handle multi-line content with special characters
-              cat >> new_entries.txt << ENTRY_DELIMITER
-# $name
-## Released: $release_date
-
-$body
-
----
-
-ENTRY_DELIMITER
+              # Create new entry using heredoc to safely handle special characters
+              cat >> new_entries.txt << 'ENTRY_END'
+        # ${name}
+        ## Released: ${release_date}
+        
+        ${body}
+        
+        ---
+        
+        ENTRY_END
+              
+              # Replace placeholders in the file
+              sed -i "s/\${name}/$name/g" new_entries.txt
+              sed -i "s/\${release_date}/$release_date/g" new_entries.txt
+              # For body, we need to escape it properly
+              escaped_body=$(printf '%s\n' "$body" | sed 's/[[\.*^$()+?{|]/\\&/g')
+              sed -i "s/\${body}/$escaped_body/g" new_entries.txt
               
               releases_added=$((releases_added + 1))
             fi
@@ -141,7 +147,7 @@ ENTRY_DELIMITER
         mv changelogs_temp.md changelogs.md
         
         echo "✅ Processed releases: $releases_added added, $releases_skipped skipped"
-        echo "📊 Total releases in changelog: $(grep -c '^# Skua ' changelogs.md || echo 0)"
+        echo "📊 Total releases in changelog: $(grep -c '^# ' changelogs.md || echo 0)"
         
     - name: 🔍 Show changelog preview
       run: |
@@ -150,7 +156,7 @@ ENTRY_DELIMITER
         echo ""
         echo "📊 Changelog statistics:"
         echo "- Total lines: $(wc -l < changelogs.md)"
-        echo "- Number of releases: $(grep -c '^# Skua ' changelogs.md || echo 0)"
+        echo "- Number of releases: $(grep -c '^# ' changelogs.md || echo 0)"
         echo "- File size: $(du -h changelogs.md | cut -f1)"
         
     - name: 📝 Commit and push changes
