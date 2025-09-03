@@ -49,15 +49,17 @@ jobs:
         RELEASE_BODY="${{ steps.release.outputs.RELEASE_BODY }}"
         RELEASE_DATE=$(date -d "${{ steps.release.outputs.RELEASE_PUBLISHED_AT }}" +"%B %d, %Y")
         
-        # Create new changelog entry
-        NEW_ENTRY="# Skua $RELEASE_TAG
+        # Create new changelog entry using cat
+        NEW_ENTRY=$(cat << ENTRY_END
+# Skua $RELEASE_TAG
 ## Released: $RELEASE_DATE
 
 $RELEASE_BODY
 
 ---
 
-"
+ENTRY_END
+)
         
         # Check if changelogs.md exists
         if [ ! -f "changelogs.md" ]; then

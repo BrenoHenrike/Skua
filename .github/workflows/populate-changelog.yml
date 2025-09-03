@@ -47,13 +47,13 @@ jobs:
         else
           # Create new changelog header if file doesn't exist
           cat > changelogs.md << 'CHANGELOG_HEADER'
-# Skua Release Changelog
-
-This file is automatically updated when new releases are published.
-
----
-
-CHANGELOG_HEADER
+        # Skua Release Changelog
+        
+        This file is automatically updated when new releases are published.
+        
+        ---
+        
+        CHANGELOG_HEADER
         fi
         
         # Create a temporary file for processing
@@ -75,15 +75,17 @@ CHANGELOG_HEADER
               # Format the date
               release_date=$(date -d "$published_at" +"%B %d, %Y" 2>/dev/null || echo "$published_at")
               
-              # Create new entry
-              NEW_ENTRY="# Skua $tag
-## Released: $release_date
-
-$body
-
----
-
-"
+              # Create new entry using cat
+              NEW_ENTRY=$(cat << ENTRY_END
+        # Skua $tag
+        ## Released: $release_date
+        
+        $body
+        
+        ---
+        
+        ENTRY_END
+        )
               
               # Insert at the top of the file (after header)
               if grep -q "^---$" changelogs_temp.md; then
