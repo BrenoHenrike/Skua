@@ -49,7 +49,14 @@ jobs:
         RELEASE_BODY="${{ steps.release.outputs.RELEASE_BODY }}"
         RELEASE_DATE=$(date -d "${{ steps.release.outputs.RELEASE_PUBLISHED_AT }}" +"%B %d, %Y")
         
-        # Create new changelog entry using release name as header
+        # Debug information
+        echo "Processing release:"
+        echo "Tag: $RELEASE_TAG"
+        echo "Name: $RELEASE_NAME"
+        echo "Date: $RELEASE_DATE"
+        echo "Body preview: $(echo "$RELEASE_BODY" | head -c 100)..."
+        
+        # Create new changelog entry using release name as header (same format as populate workflow)
         NEW_ENTRY="# $RELEASE_NAME
 ## Released: $RELEASE_DATE
 
@@ -102,22 +109,31 @@ $RELEASE_BODY
             echo "✅ Updated existing release entry"
           else
             echo "➕ Adding new release $RELEASE_TAG to changelog..."
-            # Insert new entry after the header (after first ---)
+            # Insert new entry after the header (after first ---) - same logic as populate workflow
             if grep -q "^---$" changelogs.md; then
-              awk -v entry="$NEW_ENTRY" '
+              # Create temp file for new entry
+              echo "$NEW_ENTRY" > new_entry.txt
+              
+              # Find the first --- line and insert new entry after it
+              awk '
                 BEGIN { found_separator = 0 }
                 /^---$/ && found_separator == 0 {
                   print
                   print ""
-                  printf "%s", entry
+                  # Read and print the new entry file
+                  while ((getline line < "new_entry.txt") > 0) {
+                    print line
+                  }
+                  close("new_entry.txt")
                   found_separator = 1
                   next
                 }
                 { print }
               ' changelogs.md > changelogs_temp.md
               mv changelogs_temp.md changelogs.md
+              rm -f new_entry.txt
             else
-              # No separator found, add to beginning
+              # No separator found, prepend to beginning
               echo "$NEW_ENTRY" | cat - changelogs.md > changelogs_temp.md
               mv changelogs_temp.md changelogs.md
             fi
