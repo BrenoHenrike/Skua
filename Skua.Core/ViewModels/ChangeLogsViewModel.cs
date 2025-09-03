@@ -34,7 +34,7 @@ public class ChangeLogsViewModel : BotControlViewModelBase
             
             try
             {
-                var response = await client.GetAsync("https://raw.githubusercontent.com/BrenoHenrike/Skua/master/changelogs.md").ConfigureAwait(false);
+                var response = await client.GetAsync("https://raw.githubusercontent.com/BrenoHenrike/Skua/refs/heads/master/changelogs.md").ConfigureAwait(false);
                 if (response.IsSuccessStatusCode)
                 {
                     var content = await response.Content.ReadAsStringAsync().ConfigureAwait(false);
