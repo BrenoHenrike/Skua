@@ -623,18 +623,44 @@ package skua
 			return null;
 		}
 		
-		public static function availableMonstersInCell():String
+		public static function getMonsterHealth(param1:String): String
 		{
-			var retMonsters:Array = [];
-			for each (var monster:* in instance.game.world.getMonstersByCell(instance.game.world.strFrame))
-			{
-				if (monster.pMC != null)
-				{
-					retMonsters.push(monster.objData);
-				}
-			}
-			return JSON.stringify(retMonsters);
+			var curMonster:Object = getMonster(param1);
+			return curMonster.dataLeaf.intHP.toString();
 		}
+		
+		public static function getMonsterHealthById(param1:int): String
+		{
+			var curMonster:Object = instance.game.world.getMonster(param1);
+			return curMonster.dataLeaf.intHP.toString();
+		}
+		
+		
+	public static function availableMonstersInCell():String
+	{
+		var retMonsters:Array = [];
+		for each (var monster:* in instance.game.world.getMonstersByCell(instance.game.world.strFrame))
+		{
+			if (monster.pMC != null)
+			{
+				// Merge objData with dataLeaf properties to include HP
+				var monsterData:Object = new Object();
+				for (var prop:String in monster.objData)
+				{
+					monsterData[prop] = monster.objData[prop];
+				}
+				// Add dataLeaf properties if available
+				if (monster.dataLeaf)
+				{
+					monsterData.intHP = monster.dataLeaf.intHP;
+					monsterData.intHPMax = monster.dataLeaf.intHPMax;
+					monsterData.intState = monster.dataLeaf.intState;
+				}
+				retMonsters.push(monsterData);
+			}
+		}
+		return JSON.stringify(retMonsters);
+	}
 		
 		public function requestDoomArenaPVPQueue():void
 		{

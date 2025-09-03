@@ -14,9 +14,10 @@ This document provides instructions for building the Skua project from source, i
 
 ### Required Software
 
-1. **.NET 9.0 SDK or later**
+1. **.NET 6.0 SDK or later**
    - Download from: https://dotnet.microsoft.com/download
    - Verify installation: `dotnet --version`
+   - Project targets: `net6.0-windows` for applications and libraries
 
 2. **Visual Studio 2019/2022** (for MSBuild and WiX support)
    - Community Edition or higher
@@ -25,9 +26,10 @@ This document provides instructions for building the Skua project from source, i
      - Desktop development with C++
    - Or install Build Tools for Visual Studio separately
 
-3. **WiX Toolset v6.0.2** (for installer)
-   - Download from: https://wixtoolset.org/releases/
-   - **Note**: WiX v4 is not compatible with this project
+3. **WiX CLI v6.0+** (for installer)
+   - Install using: `dotnet tool install --global wix`
+   - Verify installation: `wix --version`
+   - Documentation: https://wixtoolset.org/docs/tools/
    - The installer build is optional
 
 4. **PowerShell 5.1 or later**
@@ -166,9 +168,12 @@ dotnet build Skua.App.WPF\Skua.App.WPF.csproj --configuration Release
 
 ### Building the Installer
 
-Requires WiX Toolset and MSBuild:
+Requires WiX CLI and MSBuild:
 
 ```bash
+# First install WiX CLI if not already installed
+dotnet tool install --global wix
+
 # Using MSBuild directly
 msbuild Skua.Installer\Skua.Installer.wixproj /p:Configuration=Release /p:Platform=x64
 
@@ -226,10 +231,11 @@ Test the build process locally before pushing:
 
 ### Common Issues
 
-#### WiX Toolset Not Found
-- **Error**: "The WiX Toolset v3.11 (or newer) build tools must be installed"
-- **Solution**: Install WiX v6.0.2 from https://wixtoolset.org/releases/
-- **Note**: WiX v4 is not compatible
+#### WiX CLI Not Found
+- **Error**: "WiX CLI v6+ not found"
+- **Solution**: Install WiX CLI using: `dotnet tool install --global wix`
+- **Verify**: Run `wix --version` to confirm installation
+- **Documentation**: https://wixtoolset.org/docs/tools/
 
 #### MSBuild Not Found
 - **Error**: "MSBuild not found"

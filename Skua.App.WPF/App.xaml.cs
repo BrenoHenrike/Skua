@@ -130,6 +130,9 @@ public sealed partial class App : Application
         }
 
         Services.GetRequiredService<IPluginManager>().Initialize();
+        
+        // Initialize hotkeys after main window is shown
+        Services.GetRequiredService<IHotKeyService>().Reload();
     }
 
     /// <summary>

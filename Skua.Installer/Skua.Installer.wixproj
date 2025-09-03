@@ -1,32 +1,17 @@
-<?xml version="1.0" encoding="utf-8"?>
-<Project ToolsVersion="4.0" DefaultTargets="Build" InitialTargets="EnsureWixToolsetInstalled" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+<Project>
+  <Import Project="Sdk.props" Sdk="WixToolset.Sdk" Version="6.0.2" />
   <PropertyGroup>
-    <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
-    <Platform Condition=" '$(Platform)' == '' ">x86</Platform>
-    <ProductVersion>3.10</ProductVersion>
-    <ProjectGuid>83ab2857-fe3f-477d-a0f7-f0f4bdbb30ca</ProjectGuid>
-    <SchemaVersion>2.0</SchemaVersion>
+    <EnableDefaultCompileItems>false</EnableDefaultCompileItems>
+  </PropertyGroup>
+  <PropertyGroup>
     <OutputName>Skua-$(Configuration)-$(Platform)</OutputName>
-    <OutputType>Package</OutputType>
     <Cultures>;</Cultures>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|x86' ">
-    <OutputPath>bin\$(Configuration)\</OutputPath>
-    <IntermediateOutputPath>obj\$(Configuration)\</IntermediateOutputPath>
     <DefineConstants>Debug</DefineConstants>
-  </PropertyGroup>
-  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|x86' ">
-    <OutputPath>bin\$(Configuration)\</OutputPath>
-    <IntermediateOutputPath>obj\$(Configuration)\</IntermediateOutputPath>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|x64' ">
-    <OutputPath>bin\$(Configuration)\</OutputPath>
-    <IntermediateOutputPath>obj\$(Configuration)\</IntermediateOutputPath>
     <DefineConstants>Debug</DefineConstants>
-  </PropertyGroup>
-  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|x64' ">
-    <OutputPath>bin\$(Configuration)\</OutputPath>
-    <IntermediateOutputPath>obj\$(Configuration)\</IntermediateOutputPath>
   </PropertyGroup>
   <ItemGroup>
     <Compile Include="ComponentsGenerated.wxs" />
@@ -36,27 +21,15 @@
     <Compile Include="UI.wxs" />
   </ItemGroup>
   <ItemGroup>
-    <EmbeddedResource Include="Common.wxl" />
-  </ItemGroup>
-  <ItemGroup>
-    <WixExtension Include="WixUtilExtension">
-      <HintPath>$(WixExtDir)\WixUtilExtension.dll</HintPath>
-      <Name>WixUtilExtension</Name>
-    </WixExtension>
-    <WixExtension Include="WixUIExtension">
-      <HintPath>$(WixExtDir)\WixUIExtension.dll</HintPath>
-      <Name>WixUIExtension</Name>
-    </WixExtension>
+    <PackageReference Include="WixToolset.Util.wixext" Version="6.0.2" />
+    <PackageReference Include="WixToolset.UI.wixext" Version="6.0.2" />
+    <PackageReference Include="WixToolset.Heat" Version="6.0.2" />
   </ItemGroup>
   <ItemGroup>
     <Content Include="SkuaIcon.ico" />
   </ItemGroup>
-  <Import Project="$(WixTargetsPath)" Condition=" '$(WixTargetsPath)' != '' " />
-  <Import Project="$(MSBuildExtensionsPath32)\Microsoft\WiX\v3.x\Wix.targets" Condition=" '$(WixTargetsPath)' == '' AND Exists('$(MSBuildExtensionsPath32)\Microsoft\WiX\v3.x\Wix.targets') " />
-  <Target Name="EnsureWixToolsetInstalled" Condition=" '$(WixTargetsImported)' != 'true' ">
-    <Error Text="The WiX Toolset v3.11 (or newer) build tools must be installed to build this project. To download the WiX Toolset, see http://wixtoolset.org/releases/" />
-  </Target>
   <!-- Before build -->
+  <Import Project="Sdk.targets" Sdk="WixToolset.Sdk" Version="6.0.2" />
   <Target Name="BeforeBuild">
     <!-- Clean previous build folder -->
     <!-- <Exec Command="rd /s /q ..\Skua.App.WPF\bin\$(Configuration)\net6.0-windows\win-$(Platform)" /> -->
@@ -72,16 +45,15 @@
       <DefineConstants>BuildVersion=%(AssemblyVersion.Version);BasePath=..\Build\$(Platform)\;VSCodePath=..\VSCode-$(Platform)\;FFDecPath=..\FFDec\</DefineConstants>
     </PropertyGroup>
     <!-- Harvest file components from Skua.App.WPF publish folder -->
-    <HeatDirectory RunAsSeparateProcess="true" OutputFile="ComponentsGenerated.wxs" DirectoryRefId="INSTALLFOLDER" ComponentGroupName="SkuaPublishedComponents" SuppressCom="true" Directory="..\Build\$(Platform)\" SuppressFragments="true" SuppressRegistry="true" SuppressRootDirectory="true" AutoGenerateGuids="false" GenerateGuidsNow="true" ToolPath="$(WixToolPath)" PreprocessorVariable="var.BasePath" />
+    <HeatDirectory OutputFile="ComponentsGenerated.wxs" DirectoryRefId="INSTALLFOLDER" ComponentGroupName="SkuaPublishedComponents" SuppressCom="true" Directory="..\Build\$(Platform)\" SuppressFragments="true" SuppressRegistry="true" SuppressRootDirectory="true" AutoGenerateGuids="false" GenerateGuidsNow="true" ToolPath="$(WixToolPath)" PreprocessorVariable="var.BasePath" />
     <!-- <HeatDirectory RunAsSeparateProcess="true" OutputFile="VSCodeComponentsGenerated.wxs" DirectoryRefId="INSTALLFOLDER" ComponentGroupName="VSCodeComponents" SuppressCom="true" Directory="..\VSCode-$(Platform)\" SuppressFragments="true" SuppressRegistry="true" SuppressRootDirectory="true" AutoGenerateGuids="false" GenerateGuidsNow="true" ToolPath="$(WixToolPath)" PreprocessorVariable="var.VSCodePath" /> -->
-    <HeatDirectory RunAsSeparateProcess="true" OutputFile="FFDecComponentsGenerated.wxs" DirectoryRefId="INSTALLFOLDER" ComponentGroupName="FFDecComponents" SuppressCom="true" Directory="..\FFDec\" SuppressFragments="true" SuppressRegistry="true" SuppressRootDirectory="false" AutoGenerateGuids="false" GenerateGuidsNow="true" ToolPath="$(WixToolPath)" PreprocessorVariable="var.FFDecPath" />
+    <HeatDirectory OutputFile="FFDecComponentsGenerated.wxs" DirectoryRefId="INSTALLFOLDER" ComponentGroupName="FFDecComponents" SuppressCom="true" Directory="..\FFDec\" SuppressFragments="true" SuppressRegistry="true" SuppressRootDirectory="false" AutoGenerateGuids="false" GenerateGuidsNow="true" ToolPath="$(WixToolPath)" PreprocessorVariable="var.FFDecPath" />
   </Target>
   <Target Name="AfterBuild">
     <!-- Get assembly version -->
     <GetAssemblyIdentity AssemblyFiles="..\Build\$(Platform)\Skua.App.WPF.dll">
       <Output TaskParameter="Assemblies" ItemName="AssemblyVersion" />
     </GetAssemblyIdentity>
-
     <Exec Command="if not exist ..\Build\Installs mkdir ..\Build\Installs" />
     <Exec Command="move $(OutDir)\$(OutputName).msi ..\Build\Installs\Skua-%(AssemblyVersion.Version)-$(Configuration)-$(Platform).msi" />
   </Target>

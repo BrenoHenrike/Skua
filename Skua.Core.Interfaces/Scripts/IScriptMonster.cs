@@ -17,9 +17,25 @@ public interface IScriptMonster
     /// </summary>
     List<MonsterDataLeaf> MapMonstersDataLeaf { get; }
     /// <summary>
+    /// A list of all monsters in the current map with current HP/State data from dataLeaf.
+    /// </summary>
+    List<Monster> MapMonstersWithCurrentData { get; }
+    /// <summary>
     /// A list of all monsters that the player can attack in the current cell.
     /// </summary>
     List<Monster> CurrentAvailableMonsters { get; }
+
+    /// <summary>
+    /// Gets the current HP of the monster with the specified <paramref name="id"/>.
+    /// </summary>
+    int MonsterHP(int id);
+    /// <summary>
+    /// Gets the current HP of the monster with the specified <paramref name="name"/>.
+    /// </summary>
+    /// <param name="name"></param>
+    /// <returns></returns>
+    int MonsterHP(string name);
+
     /// <summary>
     /// Checks whether the specified <paramref name="name"/> exists in the current cell.
     /// </summary>

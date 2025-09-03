@@ -95,18 +95,19 @@ function Test-Prerequisites {
             $hasErrors = $true
         }
         
-        # Check for WiX Toolset
-        $wixPath = "${env:ProgramFiles(x86)}\WiX Toolset v3.14\bin"
-        if (-not (Test-Path $wixPath)) {
-            $wixPath = "${env:ProgramFiles(x86)}\WiX Toolset v3.11\bin"
+        # Check for WiX v6 CLI
+        try {
+            $wixVersion = wix --version 2>$null
+            if ($LASTEXITCODE -eq 0) {
+                Write-Success "WiX CLI found: v$wixVersion"
+            }
+            else {
+                throw "WiX CLI not found"
+            }
         }
-        
-        if (Test-Path $wixPath) {
-            Write-Success "WiX Toolset found: $wixPath"
-        }
-        else {
-            Write-BuildError "WiX Toolset v3.11+ not found. Please install from https://wixtoolset.org/releases/"
-            Write-Info "Note: WiX v4 is not compatible with this project"
+        catch {
+            Write-BuildError "WiX CLI v6+ not found. Please install using: dotnet tool install --global wix"
+            Write-Info "Documentation: https://wixtoolset.org/docs/tools/"
             $hasErrors = $true
         }
     }
@@ -187,18 +188,20 @@ function Build-Platform {
     try {
         # Restore NuGet packages
         Write-Info "Restoring NuGet packages..."
-        # Check if WiX is installed
+        # Check if WiX CLI is installed
         $wixInstalled = $false
-        $wixPath = "${env:ProgramFiles(x86)}\WiX Toolset v3.14\bin"
-        if (-not (Test-Path $wixPath)) {
-            $wixPath = "${env:ProgramFiles(x86)}\WiX Toolset v3.11\bin"
+        try {
+            $null = wix --version 2>$null
+            if ($LASTEXITCODE -eq 0) {
+                $wixInstalled = $true
+            }
         }
-        if (Test-Path $wixPath) {
-            $wixInstalled = $true
+        catch {
+            $wixInstalled = $false
         }
         
         if (-not $wixInstalled -and (Test-Path "Skua.Installer\Skua.Installer.wixproj")) {
-            Write-Info "WiX not installed - restoring C# projects only..."
+            Write-Info "WiX CLI not installed - restoring C# projects only..."
             # Restore each C# project individually to skip WiX project
             $projects = Get-ChildItem -Path . -Filter "*.csproj" -Recurse
             foreach ($project in $projects) {
@@ -232,9 +235,9 @@ function Build-Platform {
         # Build the solution for the specified platform
         Write-Info "Building solution..."
         
-        # If WiX is not installed, build main projects directly
+        # If WiX CLI is not installed, build main projects directly
         if (-not $wixInstalled -and (Test-Path "Skua.Installer\Skua.Installer.wixproj")) {
-            Write-Info "Building C# projects directly (WiX not installed)..."
+            Write-Info "Building C# projects directly (WiX CLI not installed)..."
             # Build main projects directly
             $mainProjects = @(
                 "Skua.App.WPF\Skua.App.WPF.csproj",
@@ -268,7 +271,7 @@ function Build-Platform {
             }
         }
         else {
-            # Build entire solution if WiX is installed
+            # Build entire solution if WiX CLI is installed
             $buildArgs = @(
                 "build",
                 "Skua.sln",

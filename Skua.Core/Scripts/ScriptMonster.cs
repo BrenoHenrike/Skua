@@ -38,7 +38,49 @@ public partial class ScriptMonster : IScriptMonster
             return string.IsNullOrEmpty(monsters) ? new() : JsonConvert.DeserializeObject<List<Monster>>(monsters) ?? new();
         }
     }
+
+
+    public int MonsterHP(int id)
+    {
+        string? hp = Flash.Call("getMonsterHealthById", id);
+        return string.IsNullOrEmpty(hp) ? 0 : int.Parse(hp);
+    }
+
+    public int MonsterHP(string name)
+    {
+        string? hp = Flash.Call("getMonsterHealth", name);
+        return string.IsNullOrEmpty(hp) ? 0 : int.Parse(hp);
+    }
+
     public List<Monster> CurrentMonsters => MapMonsters?.FindAll(m => m.Cell == Player.Cell) ?? new();
+
+    public List<Monster> MapMonstersWithCurrentData
+    {
+        get
+        {
+            try
+            {
+                var monsters = MapMonsters.ToList();
+                var dataLeafDict = MapMonstersDataLeaf.ToDictionary(dl => dl.MapID, dl => dl);
+                
+                foreach (var monster in monsters)
+                {
+                    if (dataLeafDict.TryGetValue(monster.MapID, out var dataLeaf))
+                    {
+                        monster.HP = dataLeaf.HP;
+                        monster.MaxHP = dataLeaf.MaxHP;
+                        monster.State = dataLeaf.State;
+                    }
+                }
+                
+                return monsters;
+            }
+            catch
+            {
+                return MapMonsters.ToList();
+            }
+        }
+    }
 
     public Dictionary<string, List<Monster>> GetCellMonsters()
     {
