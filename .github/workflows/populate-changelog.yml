@@ -34,122 +34,105 @@ jobs:
           echo "📁 Backed up existing changelog"
         fi
         
-        # Create new changelog with header
-        cat > changelogs.md << 'HEADER_END'
-# Skua Release Changelog
-
-This file is automatically updated when new releases are published.
-
----
-
-HEADER_END
+        # Create Python script to process releases
+        python3 -c "
+        import json
+        import sys
+        import requests
+        import os
+        import re
+        from datetime import datetime
         
-        # Get releases from GitHub API and process them directly
-        echo "Fetching releases from GitHub API..."
+        # Get GitHub token and repository info
+        token = os.environ.get('GITHUB_TOKEN', '${{ secrets.GITHUB_TOKEN }}')
+        repo = os.environ.get('GITHUB_REPOSITORY', '${{ github.repository }}')
+        max_releases = int(os.environ.get('MAX_RELEASES', '10'))
         
-        # Create a Python script to handle the JSON processing properly
-        cat > process_releases.py << 'PYTHON_END'
-import json
-import sys
-import requests
-import os
-import re
-from datetime import datetime
-
-# Get GitHub token and repository info
-token = os.environ.get('GITHUB_TOKEN')
-repo = os.environ.get('GITHUB_REPOSITORY')
-max_releases = int(os.environ.get('MAX_RELEASES', '10'))
-
-if not token or not repo:
-    print("Error: Missing GitHub token or repository info")
-    sys.exit(1)
-
-# Fetch releases from GitHub API
-url = f"https://api.github.com/repos/{repo}/releases"
-headers = {
-    'Authorization': f'token {token}',
-    'Accept': 'application/vnd.github.v3+json'
-}
-
-response = requests.get(url, headers=headers, params={'per_page': max_releases})
-if response.status_code != 200:
-    print(f"Error fetching releases: {response.status_code}")
-    sys.exit(1)
-
-releases = response.json()
-
-# Filter out drafts and prereleases, then sort by published date (newest first)
-filtered_releases = [r for r in releases if not r.get('draft', False) and not r.get('prerelease', False)]
-filtered_releases.sort(key=lambda x: x.get('published_at', ''), reverse=True)
-
-print(f"Found {len(filtered_releases)} published releases")
-
-# Read existing changelog to check for duplicates
-existing_releases = set()
-if os.path.exists('changelogs.md'):
-    try:
-        with open('changelogs.md', 'r', encoding='utf-8') as f:
-            content = f.read()
-            # Extract existing release headers
-            headers = re.findall(r'^# (.+)$', content, re.MULTILINE)
-            existing_releases = set(headers)
-        print(f"Found {len(existing_releases)} existing releases in changelog")
-    except Exception as e:
-        print(f"Error reading existing changelog: {e}")
+        if not token or not repo:
+            print('Error: Missing GitHub token or repository info')
+            sys.exit(1)
+        
+        # Fetch releases from GitHub API
+        url = f'https://api.github.com/repos/{repo}/releases'
+        headers = {
+            'Authorization': f'token {token}',
+            'Accept': 'application/vnd.github.v3+json'
+        }
+        
+        response = requests.get(url, headers=headers, params={'per_page': max_releases})
+        if response.status_code != 200:
+            print(f'Error fetching releases: {response.status_code}')
+            sys.exit(1)
+        
+        releases = response.json()
+        
+        # Filter out drafts and prereleases, then sort by published date (newest first)
+        filtered_releases = [r for r in releases if not r.get('draft', False) and not r.get('prerelease', False)]
+        filtered_releases.sort(key=lambda x: x.get('published_at', ''), reverse=True)
+        
+        print(f'Found {len(filtered_releases)} published releases')
+        
+        # Create or check existing changelog
         existing_releases = set()
-
-# Process each release and append to changelog
-with open('changelogs.md', 'a', encoding='utf-8') as f:
-    new_releases_added = 0
-    for release in filtered_releases:
-        tag = release.get('tag_name', '')
-        name = release.get('name', '') or tag
-        published_at = release.get('published_at', '')
-        body = release.get('body', '') or 'No release notes provided.'
+        if os.path.exists('changelogs.md'):
+            try:
+                with open('changelogs.md', 'r', encoding='utf-8') as f:
+                    content = f.read()
+                    headers = re.findall(r'^# (.+)$', content, re.MULTILINE)
+                    existing_releases = set(headers)
+                print(f'Found {len(existing_releases)} existing releases in changelog')
+            except Exception as e:
+                print(f'Error reading existing changelog: {e}')
+                # Create new file
+                with open('changelogs.md', 'w', encoding='utf-8') as f:
+                    f.write('# Skua Release Changelog\n\n')
+                    f.write('This file is automatically updated when new releases are published.\n\n')
+                    f.write('---\n\n')
+        else:
+            # Create new file with header
+            with open('changelogs.md', 'w', encoding='utf-8') as f:
+                f.write('# Skua Release Changelog\n\n')
+                f.write('This file is automatically updated when new releases are published.\n\n')
+                f.write('---\n\n')
         
-        # Check if this release already exists
-        if name in existing_releases:
-            print(f"Skipping existing release: {name}")
-            continue
+        # Process each release and append to changelog
+        with open('changelogs.md', 'a', encoding='utf-8') as f:
+            new_releases_added = 0
+            for release in filtered_releases:
+                tag = release.get('tag_name', '')
+                name = release.get('name', '') or tag
+                published_at = release.get('published_at', '')
+                body = release.get('body', '') or 'No release notes provided.'
+                
+                # Check if this release already exists
+                if name in existing_releases:
+                    print(f'Skipping existing release: {name}')
+                    continue
+                
+                # Format the date
+                try:
+                    if published_at:
+                        dt = datetime.fromisoformat(published_at.replace('Z', '+00:00'))
+                        formatted_date = dt.strftime('%B %d, %Y')
+                    else:
+                        formatted_date = 'Unknown date'
+                except:
+                    formatted_date = published_at
+                
+                print(f'Adding new release: {name} ({tag}) - {formatted_date}')
+                
+                # Write the release entry
+                f.write(f'# {name}\n')
+                f.write(f'## Released: {formatted_date}\n\n')
+                f.write(f'{body}\n\n')
+                f.write('---\n\n')
+                new_releases_added += 1
         
-        # Format the date
-        try:
-            if published_at:
-                dt = datetime.fromisoformat(published_at.replace('Z', '+00:00'))
-                formatted_date = dt.strftime('%B %d, %Y')
-            else:
-                formatted_date = 'Unknown date'
-        except:
-            formatted_date = published_at
+        print(f'Added {new_releases_added} new releases to changelog')
+        print('Changelog generation completed')
+        " || exit 1
         
-        print(f"Adding new release: {name} ({tag}) - {formatted_date}")
-        
-        # Write the release entry
-        f.write(f"# {name}\n")
-        f.write(f"## Released: {formatted_date}\n\n")
-        f.write(f"{body}\n\n")
-        f.write("---\n\n")
-        new_releases_added += 1
-
-print(f"Added {new_releases_added} new releases to changelog")
-print("Changelog generation completed")
-PYTHON_END
-        
-        # Set environment variables for Python script
-        export GITHUB_TOKEN="${{ secrets.GITHUB_TOKEN }}"
-        export GITHUB_REPOSITORY="${{ github.repository }}"
-        export MAX_RELEASES="$MAX_RELEASES"
-        
-        # Run the Python script
-        python3 process_releases.py
-        
-        if [ $? -eq 0 ]; then
-          echo "✅ Changelog generated successfully"
-        else
-          echo "❌ Failed to generate changelog"
-          exit 1
-        fi
+        echo "✅ Changelog processed successfully"
         
     - name: 🔍 Show changelog preview
       run: |
@@ -189,5 +172,5 @@ PYTHON_END
         
     - name: 🗑️ Cleanup
       run: |
-        rm -f process_releases.py changelogs.md.backup changelogs_op_version.md
+        rm -f changelogs.md.backup changelogs_op_version.md
         echo "✅ Cleanup completed"
