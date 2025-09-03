@@ -29,14 +29,25 @@ jobs:
         MAX_RELEASES="${{ github.event.inputs.max_releases || '10' }}"
         echo "Getting up to $MAX_RELEASES releases..."
         
-        # Get releases from GitHub API
+        # Get releases from GitHub API (sorted by published_at descending to get latest first)
         curl -s -H "Authorization: token ${{ secrets.GITHUB_TOKEN }}" \
           "https://api.github.com/repos/${{ github.repository }}/releases?per_page=$MAX_RELEASES" \
           | jq -r '.[] | select(.draft == false and .prerelease == false) | "\(.tag_name)|\(.name)|\(.published_at)|\(.body)"' \
           > releases.txt
           
         echo "Found $(wc -l < releases.txt) releases"
-        cat releases.txt
+        echo "Release data preview:"
+        head -3 releases.txt
+        echo "..."
+        
+        # Show what we're parsing
+        echo "Parsing release data:"
+        head -1 releases.txt | while IFS='|' read -r tag name published_at body; do
+          echo "Tag: $tag"
+          echo "Name: $name"
+          echo "Published: $published_at"
+          echo "Body preview: $(echo "$body" | head -c 100)..."
+        done
         
     - name: 🔄 Update changelogs.md (avoiding duplicates)
       run: |
@@ -63,54 +74,69 @@ jobs:
         releases_added=0
         releases_skipped=0
         
+        # Create a temp file to collect all new entries
+        rm -f new_entries.txt
+        touch new_entries.txt
+        
         while IFS='|' read -r tag name published_at body; do
           if [ -n "$tag" ]; then
             # Check if this release already exists in the changelog
-            if grep -q "^# Skua $tag" changelogs_temp.md; then
-              echo "⏭️ Skipping release $tag (already exists)"
+            if grep -q "^# $name$" changelogs_temp.md || grep -q "^# Skua $tag$" changelogs_temp.md; then
+              echo "⏭️ Skipping release $tag ($name) - already exists"
               releases_skipped=$((releases_skipped + 1))
             else
-              echo "➕ Adding release: $tag"
+              echo "➕ Adding release: $tag ($name)"
               
               # Format the date
               release_date=$(date -d "$published_at" +"%B %d, %Y" 2>/dev/null || echo "$published_at")
               
-              # Create new entry using cat
-              NEW_ENTRY=$(cat << ENTRY_END
-        # Skua $tag
-        ## Released: $release_date
-        
-        $body
-        
-        ---
-        
-        ENTRY_END
-        )
+              # Create new entry using the release name as header
+              NEW_ENTRY="# $name
+## Released: $release_date
+
+$body
+
+---
+
+"
               
-              # Insert at the top of the file (after header)
-              if grep -q "^---$" changelogs_temp.md; then
-                # Find the first --- line and insert after it
-                awk -v entry="$NEW_ENTRY" '
-                  BEGIN { found_separator = 0 }
-                  /^---$/ && found_separator == 0 {
-                    print
-                    print ""
-                    printf "%s", entry
-                    found_separator = 1
-                    next
-                  }
-                  { print }
-                ' changelogs_temp.md > changelogs_new.md
-                mv changelogs_new.md changelogs_temp.md
-              else
-                # No separator found, append to end
-                echo "$NEW_ENTRY" >> changelogs_temp.md
-              fi
+              # Append to new entries (they're already in reverse chronological order from API)
+              echo "$NEW_ENTRY" >> new_entries.txt
               
               releases_added=$((releases_added + 1))
             fi
           fi
         done < releases.txt
+        
+        # Insert all new entries at the top (after header) if any were added
+        if [ $releases_added -gt 0 ]; then
+          if grep -q "^---$" changelogs_temp.md; then
+            # Find the first --- line and insert new entries after it
+            awk '
+              BEGIN { found_separator = 0 }
+              /^---$/ && found_separator == 0 {
+                print
+                print ""
+                # Read and print the new entries file
+                while ((getline line < "new_entries.txt") > 0) {
+                  print line
+                }
+                close("new_entries.txt")
+                found_separator = 1
+                next
+              }
+              { print }
+            ' changelogs_temp.md > changelogs_new.md
+            mv changelogs_new.md changelogs_temp.md
+          else
+            # No separator found, prepend new entries to the beginning
+            cat new_entries.txt changelogs_temp.md > changelogs_new.md
+            mv changelogs_new.md changelogs_temp.md
+          fi
+        fi
+        
+        # Clean up temp file
+        rm -f new_entries.txt
         
         # Replace the original with the updated version
         mv changelogs_temp.md changelogs.md

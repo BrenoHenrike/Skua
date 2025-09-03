@@ -49,17 +49,15 @@ jobs:
         RELEASE_BODY="${{ steps.release.outputs.RELEASE_BODY }}"
         RELEASE_DATE=$(date -d "${{ steps.release.outputs.RELEASE_PUBLISHED_AT }}" +"%B %d, %Y")
         
-        # Create new changelog entry using cat
-        NEW_ENTRY=$(cat << ENTRY_END
-        # Skua $RELEASE_TAG
-        ## Released: $RELEASE_DATE
-        
-        $RELEASE_BODY
-        
-        ---
-        
-        ENTRY_END
-        )
+        # Create new changelog entry using release name as header
+        NEW_ENTRY="# $RELEASE_NAME
+## Released: $RELEASE_DATE
+
+$RELEASE_BODY
+
+---
+
+"
         
         # Check if changelogs.md exists
         if [ ! -f "changelogs.md" ]; then
@@ -76,13 +74,13 @@ jobs:
           echo "$NEW_ENTRY" >> changelogs.md
         else
           # Check if this release is already in the changelog
-          if grep -q "^# Skua $RELEASE_TAG$" changelogs.md; then
+          if grep -q "^# $RELEASE_NAME$" changelogs.md || grep -q "^# Skua $RELEASE_TAG$" changelogs.md; then
             echo "🔄 Release $RELEASE_TAG already exists in changelog. Updating entry..."
             # Replace existing entry with updated content
-            awk -v tag="$RELEASE_TAG" -v entry="$NEW_ENTRY" '
+            awk -v name="$RELEASE_NAME" -v tag="$RELEASE_TAG" -v entry="$NEW_ENTRY" '
               BEGIN { in_release = 0; updated = 0 }
-              /^# Skua / {
-                if ($0 == "# Skua " tag && !updated) {
+              /^# / {
+                if (($0 == "# " name || $0 == "# Skua " tag) && !updated) {
                   printf "%s", entry
                   updated = 1
                   in_release = 1
