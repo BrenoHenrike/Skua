@@ -3,11 +3,11 @@ name: Update Changelog
 on:
   release:
     types: [published]
-  workflow_dispatch:  # Allow manual triggering for testing
+  workflow_dispatch:  # Allow manual trigger for testing
 
 jobs:
-  update-changelog:
-    name: Update changelogs.md
+  populate-changelog:
+    name: Populate changelogs.md with existing releases
     runs-on: ubuntu-latest
     permissions:
       contents: write
@@ -19,160 +19,99 @@ jobs:
         fetch-depth: 0
         token: ${{ secrets.GITHUB_TOKEN }}
         
-    - name: 📄 Get release information
-      id: release
+    - name: 📄 Regenerate complete changelog
       run: |
-        if [ "${{ github.event_name }}" = "release" ]; then
-          echo "RELEASE_TAG=${{ github.event.release.tag_name }}" >> $GITHUB_OUTPUT
-          echo "RELEASE_NAME=${{ github.event.release.name }}" >> $GITHUB_OUTPUT
-          echo "RELEASE_BODY<<EOF" >> $GITHUB_OUTPUT
-          echo "${{ github.event.release.body }}" >> $GITHUB_OUTPUT
-          echo "EOF" >> $GITHUB_OUTPUT
-          echo "RELEASE_PUBLISHED_AT=${{ github.event.release.published_at }}" >> $GITHUB_OUTPUT
-        else
-          # Manual trigger - get latest release
-          LATEST_RELEASE=$(curl -s -H "Authorization: token ${{ secrets.GITHUB_TOKEN }}" \
-            "https://api.github.com/repos/${{ github.repository }}/releases/latest")
-          echo "RELEASE_TAG=$(echo "$LATEST_RELEASE" | jq -r '.tag_name')" >> $GITHUB_OUTPUT
-          echo "RELEASE_NAME=$(echo "$LATEST_RELEASE" | jq -r '.name')" >> $GITHUB_OUTPUT
-          echo "RELEASE_BODY<<EOF" >> $GITHUB_OUTPUT
-          echo "$LATEST_RELEASE" | jq -r '.body' >> $GITHUB_OUTPUT
-          echo "EOF" >> $GITHUB_OUTPUT
-          echo "RELEASE_PUBLISHED_AT=$(echo "$LATEST_RELEASE" | jq -r '.published_at')" >> $GITHUB_OUTPUT
-        fi
+        echo "Regenerating complete changelog with all releases..."
         
-    - name: 🔄 Update changelogs.md
-      env:
-        RELEASE_TAG: ${{ steps.release.outputs.RELEASE_TAG }}
-        RELEASE_NAME: ${{ steps.release.outputs.RELEASE_NAME }}
-        RELEASE_BODY: ${{ steps.release.outputs.RELEASE_BODY }}
-        RELEASE_PUBLISHED_AT: ${{ steps.release.outputs.RELEASE_PUBLISHED_AT }}
-      run: |
-        # Update changelog using Python script
+        # Delete existing changelog to start fresh
+        rm -f changelogs.md
+        echo "🗑️ Removed old changelog"
+        
+        # Create Python script to process releases
         python3 -c "
+        import json
+        import sys
+        import requests
         import os
         import re
         from datetime import datetime
         
-        # Get release information from environment variables
-        release_tag = os.environ.get('RELEASE_TAG', '')
-        release_name = os.environ.get('RELEASE_NAME', '') or release_tag
-        release_body = os.environ.get('RELEASE_BODY', '') or 'No release notes provided.'
-        release_published_at = os.environ.get('RELEASE_PUBLISHED_AT', '')
+        # Get GitHub token and repository info
+        token = os.environ.get('GITHUB_TOKEN', '${{ secrets.GITHUB_TOKEN }}')
+        repo = os.environ.get('GITHUB_REPOSITORY', '${{ github.repository }}')
+        max_releases = 100  # Get up to 100 releases (GitHub API max per page)
         
-        print(f'Processing release: {release_name} ({release_tag})')
-        print(f'Published at: {release_published_at}')
-        print(f\"Body preview: {release_body[:100]}...\" if len(release_body) > 100 else f'Body: {release_body}')
+        if not token or not repo:
+            print('Error: Missing GitHub token or repository info')
+            sys.exit(1)
         
-        # Format the date
-        try:
-            if release_published_at:
-                dt = datetime.fromisoformat(release_published_at.replace('Z', '+00:00'))
-                formatted_date = dt.strftime('%B %d, %Y')
-            else:
-                formatted_date = 'Unknown date'
-        except:
-            formatted_date = release_published_at
+        # Fetch releases from GitHub API
+        url = f'https://api.github.com/repos/{repo}/releases'
+        headers = {
+            'Authorization': f'token {token}',
+            'Accept': 'application/vnd.github.v3+json'
+        }
         
-        print(f'Formatted date: {formatted_date}')
+        response = requests.get(url, headers=headers, params={'per_page': max_releases})
+        if response.status_code != 200:
+            print(f'Error fetching releases: {response.status_code}')
+            sys.exit(1)
         
-        # Check if changelogs.md exists
-        if not os.path.exists('changelogs.md'):
-            print('🆕 Creating new changelogs.md file...')
-            # Create with header
-            with open('changelogs.md', 'w', encoding='utf-8') as f:
-                f.write('# Skua Release Changelog\\n\\n')
-                f.write('This file is automatically updated when new releases are published.\\n\\n')
-                f.write('---\\n\\n')
-                # Add the new release
-                f.write(f'# {release_name}\\n')
-                f.write(f'## Released: {formatted_date}\\n\\n')
-                f.write(f'{release_body}\\n\\n')
-                f.write('---\\n\\n')
-            print('✅ Created new changelog with release')
-        else:
-            # Read existing changelog
-            with open('changelogs.md', 'r', encoding='utf-8') as f:
-                content = f.read()
-            
-            # Check if this release already exists
-            existing_headers = re.findall(r'^# (.+)$', content, re.MULTILINE)
-            if release_name in existing_headers:
-                print(f\"🔄 Release '{release_name}' already exists in changelog. Updating entry...\")
-                
-                # Replace existing entry with updated content
-                lines = content.split('\\n')
-                new_lines = []
-                in_target_release = False
-                updated = False
-                
-                for line in lines:
-                    if line.startswith('# ') and line[2:] == release_name and not updated:
-                        # Start of target release - replace it
-                        new_lines.append(f'# {release_name}')
-                        new_lines.append(f'## Released: {formatted_date}')
-                        new_lines.append('')
-                        new_lines.append(release_body)
-                        new_lines.append('')
-                        new_lines.append('---')
-                        new_lines.append('')
-                        in_target_release = True
-                        updated = True
-                    elif line.startswith('# ') and in_target_release:
-                        # Start of next release - stop skipping
-                        in_target_release = False
-                        new_lines.append(line)
-                    elif line == '---' and in_target_release:
-                        # End of current release section - stop skipping
-                        in_target_release = False
-                        # Don't add this line as we already added the separator above
-                    elif not in_target_release:
-                        new_lines.append(line)
-                    # Skip lines that are part of the old release entry
-                
-                # Write updated content
-                with open('changelogs.md', 'w', encoding='utf-8') as f:
-                    f.write('\\n'.join(new_lines))
-                print('✅ Updated existing release entry')
-            else:
-                print(f\"➕ Adding new release '{release_name}' to changelog...\")
-                
-                # Find the insertion point (after first --- separator)
-                lines = content.split('\\n')
-                new_lines = []
-                inserted = False
-                
-                for i, line in enumerate(lines):
-                    new_lines.append(line)
-                    if line == '---' and not inserted:
-                        # Found first separator, insert new release after it
-                        new_lines.append('')
-                        new_lines.append(f'# {release_name}')
-                        new_lines.append(f'## Released: {formatted_date}')
-                        new_lines.append('')
-                        new_lines.append(release_body)
-                        new_lines.append('')
-                        new_lines.append('---')
-                        new_lines.append('')
-                        inserted = True
-                
-                # Write updated content
-                with open('changelogs.md', 'w', encoding='utf-8') as f:
-                    f.write('\\n'.join(new_lines))
-                print('✅ Added new release entry')
+        releases = response.json()
         
-        # Count total releases
-        with open('changelogs.md', 'r', encoding='utf-8') as f:
-            content = f.read()
-            # Count headers that are not the main changelog header
-            all_headers = re.findall(r'^# (.+)$', content, re.MULTILINE)
-            release_count = len([h for h in all_headers if h != 'Skua Release Changelog'])
-            print(f'📊 Changelog now contains {release_count} releases')
+        # Filter out drafts and prereleases, then sort by published date (newest first)
+        filtered_releases = [r for r in releases if not r.get('draft', False) and not r.get('prerelease', False)]
+        filtered_releases.sort(key=lambda x: x.get('published_at', ''), reverse=True)
         
-        print('Release update completed')
+        print(f'Found {len(filtered_releases)} published releases')
+        
+        # Create new file with header
+        with open('changelogs.md', 'w', encoding='utf-8') as f:
+            f.write('# Skua Release Changelog\n\n')
+            f.write('This file is automatically updated when new releases are published.\n\n')
+            f.write('---\n\n')
+        
+        # Process all releases and append to changelog
+        with open('changelogs.md', 'a', encoding='utf-8') as f:
+            for release in filtered_releases:
+                tag = release.get('tag_name', '')
+                name = release.get('name', '') or tag
+                published_at = release.get('published_at', '')
+                body = release.get('body', '') or 'No release notes provided.'
+                
+                # Format the date
+                try:
+                    if published_at:
+                        dt = datetime.fromisoformat(published_at.replace('Z', '+00:00'))
+                        formatted_date = dt.strftime('%B %d, %Y')
+                    else:
+                        formatted_date = 'Unknown date'
+                except:
+                    formatted_date = published_at
+                
+                print(f'Adding new release: {name} ({tag}) - {formatted_date}')
+                
+                # Write the release entry
+                f.write(f'# {name}\n')
+                f.write(f'## Released: {formatted_date}\n\n')
+                f.write(f'{body}\n\n')
+                f.write('---\n\n')
+        
+        print(f'Generated changelog with {len(filtered_releases)} releases')
+        print('Changelog generation completed')
         " || exit 1
         
-        echo "✅ Changelog updated successfully"
+        echo "✅ Changelog processed successfully"
+        
+    - name: 🔍 Show changelog preview
+      run: |
+        echo "📄 Changelog preview (first 100 lines):"
+        head -100 changelogs.md
+        echo ""
+        echo "📊 Changelog statistics:"
+        echo "- Total lines: $(wc -l < changelogs.md)"
+        echo "- Number of releases: $(grep -c '^# ' changelogs.md || echo 0)"
+        echo "- File size: $(du -h changelogs.md | cut -f1)"
         
     - name: 📝 Commit and push changes
       run: |
@@ -183,35 +122,35 @@ jobs:
           echo "No changes to commit"
         else
           git add changelogs.md
-          git commit -m "Update changelog for release ${{ steps.release.outputs.RELEASE_TAG }} [skip ci]"
+          git commit -m "Update changelog for release [skip ci]"
           
           # Pull latest changes and rebase to avoid conflicts
           echo "Pulling latest changes from remote..."
-          git pull --rebase origin ${{ github.ref_name }}
+          git fetch origin
           
-          # Push the changes
-          git push origin ${{ github.ref_name }}
-          echo "✅ Changelog updated and committed"
+          # Try to rebase, but if it fails, abort and merge instead
+          if git rebase origin/${{ github.ref_name }}; then
+            echo "Rebase successful"
+          else
+            echo "Rebase failed, attempting merge strategy..."
+            git rebase --abort
+            git pull origin ${{ github.ref_name }} --strategy=ours
+          fi
+          
+          # Push the changes (with force-with-lease for safety)
+          git push origin ${{ github.ref_name }} || git push --force-with-lease origin ${{ github.ref_name }}
+          echo "✅ Changelog populated and committed"
+          
+          # Also update op-version branch for compatibility
+          if git branch -r | grep -q "origin/op-version"; then
+            git checkout -B op-version origin/op-version || git checkout -b op-version
+            cp changelogs.md changelogs_op_version.md
+            if ! git diff --quiet changelogs.md 2>/dev/null; then
+              git add changelogs.md
+              git commit -m "Sync populated changelog from master [skip ci]" || true
+              git push origin op-version || true
+              echo "✅ op-version branch also updated"
+            fi
+          fi
         fi
         
-    - name: 📤 Update op-version branch (for compatibility)
-      run: |
-        # Update the op-version branch with the latest changelog
-        git fetch origin
-        if git branch -r | grep -q "origin/op-version"; then
-          git checkout -B op-version origin/op-version
-          cp changelogs.md changelogs_op.md
-          
-          # Check if op-version branch has differences
-          if git diff --quiet changelogs.md; then
-            echo "op-version branch already up to date"
-          else
-            git add changelogs.md
-            git commit -m "Sync changelog from master for release ${{ steps.release.outputs.RELEASE_TAG }} [skip ci]" || true
-            git push origin op-version
-            echo "✅ op-version branch updated"
-          fi
-        else
-          echo "op-version branch does not exist, skipping compatibility update"
-        fi
-      continue-on-error: true  # Don't fail the entire workflow if this step fails

@@ -1,4 +1,4 @@
-﻿using CommunityToolkit.Mvvm.DependencyInjection;
+using CommunityToolkit.Mvvm.DependencyInjection;
 using CommunityToolkit.Mvvm.Input;
 using Skua.Core.Interfaces;
 
@@ -6,23 +6,19 @@ namespace Skua.Core.ViewModels;
 public class ChangeLogsViewModel : BotControlViewModelBase
 {
     private string _markDownContent = "Loading content...";
+    private bool _hasLoadedOnce = false;
     
     public ChangeLogsViewModel() : base("Change Logs", 460, 500)
     {
         _markDownContent = string.Empty;
-        
-        Task.Run(async () => await GetChangeLogsContent());
 
         OpenDelfinaDonationLink = new RelayCommand(() => Ioc.Default.GetRequiredService<IProcessService>().OpenLink("https://www.paypal.com/donate/?hosted_button_id=DMZFDRYJ5BT96"));
         
         OpenBrenoHenrikeDonationLink = new RelayCommand(() => Ioc.Default.GetRequiredService<IProcessService>().OpenLink("https://www.paypal.com/donate/?hosted_button_id=QVQ4Q7XSH9VBY"));
-        
-        RefreshChangelog = new RelayCommand(async () => await RefreshChangelogContent());
     }
 
     public IRelayCommand OpenDelfinaDonationLink { get; }
     public IRelayCommand OpenBrenoHenrikeDonationLink { get; }
-    public IRelayCommand RefreshChangelog { get; }
 
     public string MarkdownDoc
     {
@@ -64,5 +60,12 @@ public class ChangeLogsViewModel : BotControlViewModelBase
     {
         MarkdownDoc = "Refreshing changelog...";
         await GetChangeLogsContent();
+    }
+    
+    public async void OnActivated()
+    {
+        MarkdownDoc = "Loading changelog...";
+        await GetChangeLogsContent();
+        _hasLoadedOnce = true;
     }
 }

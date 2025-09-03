@@ -1,4 +1,5 @@
-﻿using System.Windows.Controls;
+using System.Windows;
+using System.Windows.Controls;
 using CommunityToolkit.Mvvm.DependencyInjection;
 using MdXaml;
 using Skua.Core.ViewModels;
@@ -9,10 +10,22 @@ namespace Skua.WPF.Views;
 /// </summary>
 public partial class ChangeLogsView : UserControl
 {
+    private readonly ChangeLogsViewModel _viewModel;
+    
     public ChangeLogsView()
     {
         InitializeComponent();
-        DataContext = Ioc.Default.GetRequiredService<ChangeLogsViewModel>();
+        _viewModel = Ioc.Default.GetRequiredService<ChangeLogsViewModel>();
+        DataContext = _viewModel;
         Markdownview.MarkdownStyle = MarkdownStyle.SasabuneStandard;
+        this.IsVisibleChanged += OnVisibilityChanged;
+    }
+    
+    private void OnVisibilityChanged(object sender, DependencyPropertyChangedEventArgs e)
+    {
+        if (e.NewValue is bool isVisible && isVisible && _viewModel != null)
+        {
+            _viewModel.OnActivated();
+        }
     }
 }
