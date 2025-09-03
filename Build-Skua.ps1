@@ -76,11 +76,22 @@ function Test-Prerequisites {
     
     # Check for .NET SDK
     try {
-        $dotnetVersion = dotnet --version
-        Write-Success ".NET SDK found: $dotnetVersion"
+        
+        # Check if .NET 6 is available
+        $dotnetList = dotnet --list-sdks 2>$null
+        $hasNet6 = $dotnetList | Where-Object { $_ -match "^6\." }
+        
+        if (-not $hasNet6) {
+            Write-BuildError ".NET 6 SDK not found. This project requires .NET 6. Please install .NET 6 SDK from https://dotnet.microsoft.com/download/dotnet/6.0"
+            $hasErrors = $true
+        }
+        else {
+            $net6Version = ($hasNet6 | Select-Object -First 1) -split ' ' | Select-Object -First 1
+            Write-Success ".NET 6 SDK found: $net6Version"
+        }
     }
     catch {
-        Write-BuildError ".NET SDK not found. Please install from https://dotnet.microsoft.com/download"
+        Write-BuildError ".NET SDK not found. Please install .NET 6 SDK from https://dotnet.microsoft.com/download/dotnet/6.0"
         $hasErrors = $true
     }
     
