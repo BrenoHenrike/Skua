@@ -184,6 +184,12 @@ jobs:
         else
           git add changelogs.md
           git commit -m "Update changelog for release ${{ steps.release.outputs.RELEASE_TAG }} [skip ci]"
+          
+          # Pull latest changes and rebase to avoid conflicts
+          echo "Pulling latest changes from remote..."
+          git pull --rebase origin ${{ github.ref_name }}
+          
+          # Push the changes
           git push origin ${{ github.ref_name }}
           echo "✅ Changelog updated and committed"
         fi

@@ -154,7 +154,22 @@ jobs:
         else
           git add changelogs.md
           git commit -m "Populate changelog with existing releases [skip ci]"
-          git push origin ${{ github.ref_name }}
+          
+          # Pull latest changes and rebase to avoid conflicts
+          echo "Pulling latest changes from remote..."
+          git fetch origin
+          
+          # Try to rebase, but if it fails, abort and merge instead
+          if git rebase origin/${{ github.ref_name }}; then
+            echo "Rebase successful"
+          else
+            echo "Rebase failed, attempting merge strategy..."
+            git rebase --abort
+            git pull origin ${{ github.ref_name }} --strategy=ours
+          fi
+          
+          # Push the changes (with force-with-lease for safety)
+          git push origin ${{ github.ref_name }} || git push --force-with-lease origin ${{ github.ref_name }}
           echo "✅ Changelog populated and committed"
           
           # Also update op-version branch for compatibility
