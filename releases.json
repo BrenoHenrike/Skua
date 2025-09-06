@@ -68,7 +68,7 @@
         "state": "uploaded",
         "size": 18904453,
         "digest": "sha256:23782feb363f5d105388f44539c76e30dcb328cd8887062f3034376dbab05372",
-        "download_count": 114,
+        "download_count": 157,
         "created_at": "2025-09-03T10:01:45Z",
         "updated_at": "2025-09-03T10:01:50Z",
         "browser_download_url": "https://github.com/BrenoHenrike/Skua/releases/download/1.2.5.1/Skua-1.2.5.1-Release-x64.msi"
@@ -104,7 +104,7 @@
         "state": "uploaded",
         "size": 18883977,
         "digest": "sha256:eaebeb1271544ee4be30c26afc7299d7d2c42632ca5e3c75b2c7d079582c6f66",
-        "download_count": 15,
+        "download_count": 23,
         "created_at": "2025-09-03T10:01:50Z",
         "updated_at": "2025-09-03T10:01:55Z",
         "browser_download_url": "https://github.com/BrenoHenrike/Skua/releases/download/1.2.5.1/Skua-1.2.5.1-Release-x86.msi"
@@ -183,7 +183,7 @@
         "state": "uploaded",
         "size": 20753103,
         "digest": "sha256:00c6eb73da23ebb58c4914fe7d37aea55cef2662d502ac130f69eeb685c0784f",
-        "download_count": 181,
+        "download_count": 230,
         "created_at": "2025-09-02T10:58:20Z",
         "updated_at": "2025-09-02T10:58:35Z",
         "browser_download_url": "https://github.com/BrenoHenrike/Skua/releases/download/1.2.5.0/Skua-1.2.5.0-Release-x64.msi"
@@ -219,7 +219,7 @@
         "state": "uploaded",
         "size": 20724437,
         "digest": "sha256:dff5cc192562f5ea353b6c3f819a18030a892724e972729cd29dd9f3639e2fe7",
-        "download_count": 18,
+        "download_count": 23,
         "created_at": "2025-09-02T10:58:35Z",
         "updated_at": "2025-09-02T10:58:47Z",
         "browser_download_url": "https://github.com/BrenoHenrike/Skua/releases/download/1.2.5.0/Skua-1.2.5.0-Release-x86.msi"
@@ -227,7 +227,19 @@
     ],
     "tarball_url": "https://api.github.com/repos/BrenoHenrike/Skua/tarball/1.2.5.0",
     "zipball_url": "https://api.github.com/repos/BrenoHenrike/Skua/zipball/1.2.5.0",
-    "body": "## What's Changed\r\n\r\n### 1. FlashUtil.cs - Flash Object Disposal Issues\r\n\r\n**Problem**: The Flash object's event handlers were not unsubscribed before disposal, and the object reference wasn't cleared.\r\n\r\n**Fix**:\r\n\r\n- Unsubscribe `FlashCall` event before disposing Flash object in `InitializeFlash()`\r\n- Properly clean up in `Dispose()` method\r\n- Set Flash reference to null after disposal\r\n\r\n### 2. ScriptInterface.cs - Thread and Event Handler Leaks\r\n\r\n**Problem**:\r\n\r\n- FlashCall event never unsubscribed\r\n- ScriptInterfaceThread not properly terminated\r\n- CancellationTokenSources not disposed\r\n- Static instance reference not cleared\r\n\r\n**Fix**:\r\n\r\n- Implemented full IDisposable pattern\r\n- Proper thread termination with timeout\r\n- CancellationTokenSource cleanup\r\n- Event handler unsubscription\r\n- Static reference clearing\r\n\r\n### 3. ListBoxScrollToCaretBehavior.cs - WPF Behavior Memory Leak\r\n\r\n**Problem**: CollectionChanged event subscriptions weren't properly managed, causing collections to hold references to behaviors.\r\n\r\n**Fix**:\r\n\r\n- Store reference to collection source\r\n- Properly unsubscribe using stored reference\r\n- Clear ScrollViewer reference on unload\r\n\r\n### 4. ScriptEvent.cs - Messenger Registration Leak\r\n\r\n**Problem**: Registered with StrongReferenceMessenger but never unregistered, keeping object alive indefinitely.\r\n\r\n**Fix**:\r\n\r\n- Implemented IDisposable\r\n- Unregister all messenger subscriptions in Dispose()\r\n- Clear all event handlers\r\n- Added proper cleanup for all events\r\n\r\n### 5. LogService.cs - TraceListener Memory Leak\r\n\r\n**Problem**: TraceListener added to global Trace.Listeners but never removed, creating permanent reference.\r\n\r\n**Fix**:\r\n\r\n- Store reference to DebugListener\r\n- Implemented IDisposable\r\n- Remove listener from Trace.Listeners in Dispose()\r\n- Clear log collections\r\n- Unregister from messenger\r\n\r\n### 6. CaptureProxy.cs - TcpClient Resource Leaks\r\n\r\n**Problem**: TcpClient instances created in loop without proper disposal on exceptions.\r\n\r\n**Fix**:\r\n\r\n- Use local variables for proper scoping\r\n- Ensure cleanup in catch blocks\r\n- Add finally blocks for connection cleanup\r\n- Properly handle cancellation\r\n\r\n### 7. ScriptManager.cs - Thread Management Issues\r\n\r\n**Problem**: Thread references overwritten without cleanup, no disposal pattern.\r\n\r\n**Fix**: (hopefully didn't break anything)\r\n\r\n- Thread cleanup should be added with proper join/wait\r\n- IDisposable pattern should be implemented\r\n- CancellationTokenSource proper disposal\r\n\r\n### 8. SavedAdvancedSkillsViewModel.cs - ObservableCollection Recreation\r\n\r\n**Problem**: Creates new ObservableCollection on every property access, causing memory churn and binding issues.\r\n\r\n**Fix**:\r\n\r\n- Cache ObservableCollection instance\r\n- Only recreate when data actually changes\r\n- Proper null checking and refresh logic\r\n\r\n### 9. @!HotKeyService.cs - InputBindings Memory Leak\r\n\r\n**Problem**: InputBindings added to MainWindow without proper cleanup, accumulating over time.\r\n\r\n**Fix**:\r\n\r\n- Implemented IDisposable\r\n- Track registered bindings in a list\r\n- Clear bindings before adding new ones\r\n- Proper cleanup in Dispose()\r\n\r\n### 10. DialogService.cs - Event Handler Exception Safety\r\n\r\n**Problem**: Event handler might not be removed if ShowDialog throws exception.\r\n\r\n**Fix**:\r\n\r\n- Added try-catch blocks around ShowDialog\r\n- Ensure event handler removal in all cases\r\n- Handler removal in catch block\r\n\r\n### 11. AutoViewModel.cs - Task.Factory Without Cancellation\r\n\r\n**Problem**: Tasks started without CancellationToken can't be properly cancelled.\r\n\r\n**Fix**:\r\n\r\n- Implemented IDisposable\r\n- Added CancellationTokenSource management\r\n- Proper task cancellation and disposal\r\n- Unregister from messenger in Dispose()\r\n\r\n### 12. AdvancedSkillContainer.cs - Fire-and-Forget Tasks\r\n\r\n**Problem**: Fire-and-forget tasks without error handling or cancellation.\r\n\r\n**Fix**:\r\n\r\n- Implemented IDisposable\r\n- Added CancellationTokenSource for save operations\r\n- Track save tasks for proper cleanup\r\n- Error handling in save operations\r\n\r\n### 13. WindowService.cs - Managed Windows Dictionary\r\n\r\n**Problem**: Windows added to dictionary but never removed when closed.\r\n\r\n**Fix**:\r\n\r\n- Implemented IDisposable\r\n- Add Closed event handler to remove from dictionary\r\n- Clean up DataContext if IDisposable\r\n- Dispose all managed windows on service disposal\r\n\r\n### 14. PropertyGrid.xaml.cs - PropertyChanged Weak Event\r\n\r\n**Problem**: PropertyChanged event subscription without weak references.\r\n\r\n**Fix**:\r\n\r\n- Use WeakEventManager for PropertyChanged subscriptions\r\n- Try-catch for safe unsubscription\r\n- Prevents strong references from keeping objects alive\r\n\r\n# **Full Changelog**: https://github.com/BrenoHenrike/Skua/compare/1.2.4.0...1.2.5.0\r\n\r\n## If you want to help the development of Skua you can donate by clicking on the button below:\r\n\r\n### purple/SharpTheNightmare: [![Donate](https://img.shields.io/badge/Donate-PayPal-green.svg)](https://www.paypal.com/paypalme/sharpiiee?country.x=US&locale.x=en_US)\r\n\r\n### Breno Henrike's PayPal [![Donate](https://img.shields.io/badge/Donate-PayPal-green.svg)](https://www.paypal.com/donate?hosted_button_id=QVQ4Q7XSH9VBY)\r\n\r\n### Lord Exelot's PayPal [![Donate](https://img.shields.io/badge/Donate-PayPal-green.svg)](https://www.paypal.me/LordExelot)"
+    "body": "## What's Changed\r\n\r\n### 1. FlashUtil.cs - Flash Object Disposal Issues\r\n\r\n**Problem**: The Flash object's event handlers were not unsubscribed before disposal, and the object reference wasn't cleared.\r\n\r\n**Fix**:\r\n\r\n- Unsubscribe `FlashCall` event before disposing Flash object in `InitializeFlash()`\r\n- Properly clean up in `Dispose()` method\r\n- Set Flash reference to null after disposal\r\n\r\n### 2. ScriptInterface.cs - Thread and Event Handler Leaks\r\n\r\n**Problem**:\r\n\r\n- FlashCall event never unsubscribed\r\n- ScriptInterfaceThread not properly terminated\r\n- CancellationTokenSources not disposed\r\n- Static instance reference not cleared\r\n\r\n**Fix**:\r\n\r\n- Implemented full IDisposable pattern\r\n- Proper thread termination with timeout\r\n- CancellationTokenSource cleanup\r\n- Event handler unsubscription\r\n- Static reference clearing\r\n\r\n### 3. ListBoxScrollToCaretBehavior.cs - WPF Behavior Memory Leak\r\n\r\n**Problem**: CollectionChanged event subscriptions weren't properly managed, causing collections to hold references to behaviors.\r\n\r\n**Fix**:\r\n\r\n- Store reference to collection source\r\n- Properly unsubscribe using stored reference\r\n- Clear ScrollViewer reference on unload\r\n\r\n### 4. ScriptEvent.cs - Messenger Registration Leak\r\n\r\n**Problem**: Registered with StrongReferenceMessenger but never unregistered, keeping object alive indefinitely.\r\n\r\n**Fix**:\r\n\r\n- Implemented IDisposable\r\n- Unregister all messenger subscriptions in Dispose()\r\n- Clear all event handlers\r\n- Added proper cleanup for all events\r\n\r\n### 5. LogService.cs - TraceListener Memory Leak\r\n\r\n**Problem**: TraceListener added to global Trace.Listeners but never removed, creating permanent reference.\r\n\r\n**Fix**:\r\n\r\n- Store reference to DebugListener\r\n- Implemented IDisposable\r\n- Remove listener from Trace.Listeners in Dispose()\r\n- Clear log collections\r\n- Unregister from messenger\r\n\r\n### 6. CaptureProxy.cs - TcpClient Resource Leaks\r\n\r\n**Problem**: TcpClient instances created in loop without proper disposal on exceptions.\r\n\r\n**Fix**:\r\n\r\n- Use local variables for proper scoping\r\n- Ensure cleanup in catch blocks\r\n- Add finally blocks for connection cleanup\r\n- Properly handle cancellation\r\n\r\n### 7. ScriptManager.cs - Thread Management Issues\r\n\r\n**Problem**: Thread references overwritten without cleanup, no disposal pattern.\r\n\r\n**Fix**: (hopefully didn't break anything)\r\n\r\n- Thread cleanup should be added with proper join/wait\r\n- IDisposable pattern should be implemented\r\n- CancellationTokenSource proper disposal\r\n\r\n### 8. SavedAdvancedSkillsViewModel.cs - ObservableCollection Recreation\r\n\r\n**Problem**: Creates new ObservableCollection on every property access, causing memory churn and binding issues.\r\n\r\n**Fix**:\r\n\r\n- Cache ObservableCollection instance\r\n- Only recreate when data actually changes\r\n- Proper null checking and refresh logic\r\n\r\n### 9. @!HotKeyService.cs - InputBindings Memory Leak\r\n\r\n**Problem**: InputBindings added to MainWindow without proper cleanup, accumulating over time.\r\n\r\n**Fix**:\r\n\r\n- Implemented IDisposable\r\n- Track registered bindings in a list\r\n- Clear bindings before adding new ones\r\n- Proper cleanup in Dispose()\r\n\r\n### 10. DialogService.cs - Event Handler Exception Safety\r\n\r\n**Problem**: Event handler might not be removed if ShowDialog throws exception.\r\n\r\n**Fix**:\r\n\r\n- Added try-catch blocks around ShowDialog\r\n- Ensure event handler removal in all cases\r\n- Handler removal in catch block\r\n\r\n### 11. AutoViewModel.cs - Task.Factory Without Cancellation\r\n\r\n**Problem**: Tasks started without CancellationToken can't be properly cancelled.\r\n\r\n**Fix**:\r\n\r\n- Implemented IDisposable\r\n- Added CancellationTokenSource management\r\n- Proper task cancellation and disposal\r\n- Unregister from messenger in Dispose()\r\n\r\n### 12. AdvancedSkillContainer.cs - Fire-and-Forget Tasks\r\n\r\n**Problem**: Fire-and-forget tasks without error handling or cancellation.\r\n\r\n**Fix**:\r\n\r\n- Implemented IDisposable\r\n- Added CancellationTokenSource for save operations\r\n- Track save tasks for proper cleanup\r\n- Error handling in save operations\r\n\r\n### 13. WindowService.cs - Managed Windows Dictionary\r\n\r\n**Problem**: Windows added to dictionary but never removed when closed.\r\n\r\n**Fix**:\r\n\r\n- Implemented IDisposable\r\n- Add Closed event handler to remove from dictionary\r\n- Clean up DataContext if IDisposable\r\n- Dispose all managed windows on service disposal\r\n\r\n### 14. PropertyGrid.xaml.cs - PropertyChanged Weak Event\r\n\r\n**Problem**: PropertyChanged event subscription without weak references.\r\n\r\n**Fix**:\r\n\r\n- Use WeakEventManager for PropertyChanged subscriptions\r\n- Try-catch for safe unsubscription\r\n- Prevents strong references from keeping objects alive\r\n\r\n# **Full Changelog**: https://github.com/BrenoHenrike/Skua/compare/1.2.4.0...1.2.5.0\r\n\r\n## If you want to help the development of Skua you can donate by clicking on the button below:\r\n\r\n### purple/SharpTheNightmare: [![Donate](https://img.shields.io/badge/Donate-PayPal-green.svg)](https://www.paypal.com/paypalme/sharpiiee?country.x=US&locale.x=en_US)\r\n\r\n### Breno Henrike's PayPal [![Donate](https://img.shields.io/badge/Donate-PayPal-green.svg)](https://www.paypal.com/donate?hosted_button_id=QVQ4Q7XSH9VBY)\r\n\r\n### Lord Exelot's PayPal [![Donate](https://img.shields.io/badge/Donate-PayPal-green.svg)](https://www.paypal.me/LordExelot)",
+    "reactions": {
+      "url": "https://api.github.com/repos/BrenoHenrike/Skua/releases/244076510/reactions",
+      "total_count": 1,
+      "+1": 0,
+      "-1": 0,
+      "laugh": 0,
+      "hooray": 0,
+      "confused": 0,
+      "heart": 1,
+      "rocket": 0,
+      "eyes": 0
+    }
   },
   {
     "url": "https://api.github.com/repos/BrenoHenrike/Skua/releases/149902937",
@@ -298,7 +310,7 @@
         "state": "uploaded",
         "size": 20744911,
         "digest": null,
-        "download_count": 39281,
+        "download_count": 39291,
         "created_at": "2024-04-05T10:45:12Z",
         "updated_at": "2024-04-05T10:45:37Z",
         "browser_download_url": "https://github.com/BrenoHenrike/Skua/releases/download/1.2.4.0/Skua-1.2.4.0-Release-x64.msi"
@@ -334,7 +346,7 @@
         "state": "uploaded",
         "size": 20720341,
         "digest": null,
-        "download_count": 6585,
+        "download_count": 6586,
         "created_at": "2024-04-05T10:45:37Z",
         "updated_at": "2024-04-05T10:46:01Z",
         "browser_download_url": "https://github.com/BrenoHenrike/Skua/releases/download/1.2.4.0/Skua-1.2.4.0-Release-x86.msi"
