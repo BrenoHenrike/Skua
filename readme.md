@@ -47,11 +47,11 @@ in the discord
 
 Skua developers need your support to improve Skua. You can donate or sponsor us by clicking the PayPal link below. Thank you for your support.
 
-### purple/SharpTheNightmare: [![Donate](https://img.shields.io/badge/Donate-PayPal-green.svg)](https://www.paypal.com/ncp/payment/RHG8F84AUXFKY)
+### [purple/SharpTheNightmare](https://www.paypal.com/ncp/payment/RHG8F84AUXFKY)
 
-### Breno Henrike's PayPal [![Donate](https://img.shields.io/badge/Donate-PayPal-green.svg)](https://www.paypal.com/donate?hosted_button_id=QVQ4Q7XSH9VBY)
+### [Breno Henrike's PayPal](https://www.paypal.com/donate?hosted_button_id=QVQ4Q7XSH9VBY)
 
-### Lord Exelot's PayPal [![Donate](https://img.shields.io/badge/Donate-PayPal-green.svg)](https://www.paypal.me/LordExelot)
+### [Lord Exelot's PayPal](www.paypal.me/LordExelot)
 
 ## Cast
 
