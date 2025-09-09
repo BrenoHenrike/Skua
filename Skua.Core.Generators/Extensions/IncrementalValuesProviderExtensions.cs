@@ -1,11 +1,10 @@
-﻿using System;
+﻿using Microsoft.CodeAnalysis;
+using System;
 using System.Collections.Generic;
 using System.Collections.Immutable;
-using System.Text;
-using Microsoft.CodeAnalysis;
-using Skua.Core.Generators.Helpers;
 
 namespace Skua.Core.Generators.Extensions;
+
 internal static class IncrementalValuesProviderExtensions
 {
     /// <summary>

@@ -5,6 +5,7 @@ using Skua.Core.Interfaces;
 using Skua.Core.Models.Servers;
 
 namespace Skua.Core.ViewModels;
+
 public class GameOptionsViewModel : BotControlViewModelBase
 {
     private readonly IScriptServers _servers;
@@ -30,6 +31,7 @@ public class GameOptionsViewModel : BotControlViewModelBase
     public List<DisplayOptionItemViewModelBase> GameOptions { get; }
     public List<string> ServersList => _servers.CachedServers.Select(s => s.Name).ToList();
     private string? _selectedServer;
+
     public string? SelectedServer
     {
         get { return _selectedServer; }
@@ -39,13 +41,14 @@ public class GameOptionsViewModel : BotControlViewModelBase
                 _options.ReloginServer = value;
         }
     }
+
     private int _columns = 2;
+
     public int Columns
     {
         get { return _columns; }
         set { SetProperty(ref _columns, value); }
     }
-
 
     public IRelayCommand ResetOptionsCommand { get; }
     public IRelayCommand ResetDefaultOptionsCommand { get; }

@@ -1,6 +1,6 @@
-﻿using System;
+﻿using Skua.Core.Generators.Helpers;
+using System;
 using System.Collections.Generic;
-using Skua.Core.Generators.Helpers;
 
 namespace Skua.Core.Generators.Models;
 public sealed record ModuleBindingPropertyInfo(

@@ -1,6 +1,7 @@
 ﻿using Skua.Core.Interfaces;
 
 namespace Skua.Core.Scripts;
+
 public class ScriptSend : IScriptSend
 {
     public ScriptSend(Lazy<IFlashUtil> flash, Lazy<IScriptManager> manager)

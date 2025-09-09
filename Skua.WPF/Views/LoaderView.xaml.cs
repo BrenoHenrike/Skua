@@ -1,17 +1,19 @@
-﻿using System.ComponentModel;
-using System.Windows.Controls;
-using System.Windows.Data;
-using CommunityToolkit.Mvvm.DependencyInjection;
+﻿using CommunityToolkit.Mvvm.DependencyInjection;
 using Skua.Core.Models.Quests;
 using Skua.Core.ViewModels;
+using System.ComponentModel;
+using System.Windows.Controls;
+using System.Windows.Data;
 
 namespace Skua.WPF.Views;
+
 /// <summary>
 /// Interaction logic for LoaderUserControl.xaml
 /// </summary>
 public partial class LoaderView : UserControl
 {
     private readonly ICollectionView _collectionView;
+
     public LoaderView()
     {
         InitializeComponent();

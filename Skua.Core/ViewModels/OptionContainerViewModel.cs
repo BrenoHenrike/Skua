@@ -2,13 +2,14 @@
 using Skua.Core.Interfaces;
 
 namespace Skua.Core.ViewModels;
+
 public partial class OptionContainerViewModel : ObservableObject
 {
     public OptionContainerViewModel(IOptionContainer container)
     {
         Container = container;
         Options = new();
-        foreach(IOption option in container.Options)
+        foreach (IOption option in container.Options)
             Options.Add(new(container, option));
 
         if (container.MultipleOptions.Count > 0)
@@ -22,6 +23,7 @@ public partial class OptionContainerViewModel : ObservableObject
     public IOptionContainer Container { get; set; }
 
     public List<OptionContainerItemViewModel> Options { get; }
+
     [ObservableProperty]
     private OptionContainerItemViewModel? _selectedOption;
 }

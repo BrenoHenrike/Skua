@@ -1,16 +1,17 @@
 ﻿using CommunityToolkit.Mvvm.ComponentModel;
-using CommunityToolkit.Mvvm.Messaging;
 using CommunityToolkit.Mvvm.Input;
+using CommunityToolkit.Mvvm.Messaging;
 using Skua.Core.Interfaces;
 using Skua.Core.Messaging;
 using Skua.Core.Models.GitHub;
 using Skua.Core.Utils;
 
 namespace Skua.Core.ViewModels;
+
 public partial class ScriptRepoViewModel : BotControlViewModelBase
 {
     public ScriptRepoViewModel(IGetScriptsService getScripts, IProcessService processService)
-        : base("Get Scripts")
+        : base("Get Scripts", 800, 450)
     {
         _getScriptsService = getScripts;
         _processService = processService;
@@ -44,13 +45,13 @@ public partial class ScriptRepoViewModel : BotControlViewModelBase
     public int ScriptQuantity => _getScriptsService.Total;
     public int BotScriptQuantity => _scripts.Count;
     public IRelayCommand OpenScriptFolderCommand { get; }
-    
+
     [RelayCommand]
     private void OpenScript()
     {
         if (SelectedItem is null || !SelectedItem.Downloaded)
             return;
-        
+
         StrongReferenceMessenger.Default.Send<EditScriptMessage, int>(new(SelectedItem.LocalFile), (int)MessageChannels.ScriptStatus);
     }
 
@@ -69,7 +70,7 @@ public partial class ScriptRepoViewModel : BotControlViewModelBase
         catch { }
         RefreshScriptsList();
     }
-    
+
     private void RefreshScriptsList()
     {
         _scripts.Clear();
@@ -82,11 +83,11 @@ public partial class ScriptRepoViewModel : BotControlViewModelBase
 
                 if (script.Tags.Contains("null") && (script.Tags.Length == 1))
                     script.Tags = new[] { "no-tags" };
-                
+
                 _scripts.Add(new(script));
             }
         }
-            
+
         OnPropertyChanged(nameof(Scripts));
         OnPropertyChanged(nameof(DownloadedQuantity));
         OnPropertyChanged(nameof(OutdatedQuantity));
@@ -94,6 +95,7 @@ public partial class ScriptRepoViewModel : BotControlViewModelBase
         OnPropertyChanged(nameof(BotScriptQuantity));
         IsBusy = false;
     }
+
     public void ProgressHandler(string message)
     {
         ProgressReportMessage = message;

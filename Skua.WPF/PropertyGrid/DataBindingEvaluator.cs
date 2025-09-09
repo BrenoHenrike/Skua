@@ -5,6 +5,7 @@ using System.Globalization;
 using System.Reflection;
 
 namespace Skua.WPF;
+
 /// <summary>
 /// A utility class equivalent to the System.Web.DataBinder class, but that does not require a reference to the System.Web assembly.
 /// </summary>

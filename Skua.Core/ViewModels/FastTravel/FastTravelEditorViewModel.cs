@@ -3,6 +3,7 @@ using CommunityToolkit.Mvvm.Input;
 using Skua.Core.Interfaces;
 
 namespace Skua.Core.ViewModels;
+
 public partial class FastTravelEditorViewModel : ObservableObject
 {
     public FastTravelEditorViewModel(IMapService mapService, IRelayCommand<object> travel)
@@ -10,6 +11,7 @@ public partial class FastTravelEditorViewModel : ObservableObject
         _mapService = mapService;
         _travel = new(travel);
     }
+
     public FastTravelEditorViewModel(IMapService mapService, FastTravelItemViewModel fastTravel)
     {
         _mapService = mapService;
@@ -22,6 +24,7 @@ public partial class FastTravelEditorViewModel : ObservableObject
     }
 
     private readonly IMapService _mapService;
+
     [ObservableProperty]
     private FastTravelItemViewModel _travel;
 

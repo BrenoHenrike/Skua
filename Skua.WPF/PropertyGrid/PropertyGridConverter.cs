@@ -3,6 +3,7 @@ using System.Globalization;
 using System.Windows.Data;
 
 namespace Skua.WPF;
+
 public class PropertyGridConverter : IValueConverter
 {
     private static Type GetParameterAsType(object parameter)

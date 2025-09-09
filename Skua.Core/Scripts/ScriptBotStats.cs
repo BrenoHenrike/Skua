@@ -1,8 +1,9 @@
-﻿using System.Diagnostics;
-using CommunityToolkit.Mvvm.ComponentModel;
+﻿using CommunityToolkit.Mvvm.ComponentModel;
 using Skua.Core.Interfaces;
+using System.Diagnostics;
 
 namespace Skua.Core.Scripts;
+
 public partial class ScriptBotStats : ObservableObject, IScriptBotStats, IAsyncDisposable
 {
     public ScriptBotStats()
@@ -20,16 +21,22 @@ public partial class ScriptBotStats : ObservableObject, IScriptBotStats, IAsyncD
 
     [ObservableProperty]
     private int _kills;
+
     [ObservableProperty]
     private int _questsAccepted;
+
     [ObservableProperty]
     private int _questsCompleted;
+
     [ObservableProperty]
     private int _deaths;
+
     [ObservableProperty]
     private int _relogins;
+
     [ObservableProperty]
     private int _drops;
+
     [ObservableProperty]
     private TimeSpan _time;
 
@@ -62,5 +69,4 @@ public partial class ScriptBotStats : ObservableObject, IScriptBotStats, IAsyncD
         _ctsTimer?.Dispose();
         GC.SuppressFinalize(this);
     }
-    
 }

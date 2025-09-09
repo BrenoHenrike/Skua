@@ -4,11 +4,11 @@ using Skua.Core.Interfaces;
 using Skua.Core.Messaging;
 using Skua.Core.Models.GitHub;
 using Skua.Core.Utils;
-using System.Collections.Specialized;
 using System.Diagnostics;
 using System.IO.Compression;
 
 namespace Skua.Core.Services;
+
 public class ClientUpdateService : IClientUpdateService
 {
     private readonly ISettingsService _settingsService;
@@ -25,7 +25,7 @@ public class ClientUpdateService : IClientUpdateService
     public async Task GetReleasesAsync()
     {
         var releaseSearch = await HttpClients.GetGHClient().GetAsync("https://raw.githubusercontent.com/BrenoHenrike/Skua/master/releases.json");
-        if (!releaseSearch.IsSuccessStatusCode) 
+        if (!releaseSearch.IsSuccessStatusCode)
             return;
 
         var releases = await releaseSearch.Content.ReadAsStringAsync();
@@ -76,7 +76,7 @@ public class ClientUpdateService : IClientUpdateService
                 };
                 Process? proc = Process.Start(startInfo);
                 proc!.WaitForExit();
-                if(proc.ExitCode == 0)
+                if (proc.ExitCode == 0)
                 {
                     _settingsService.Set("ChangeLogActivated", false);
                     string startMenuPath = AppContext.BaseDirectory;
@@ -115,7 +115,7 @@ public class ClientUpdateService : IClientUpdateService
                 }
             }
         }
-        catch(Exception e)
+        catch (Exception e)
         {
             progress?.Report("Error while updating.");
             _dialogService.ShowMessageBox($"Error Message:\r\n{e.Message}", "Update Error");

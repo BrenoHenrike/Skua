@@ -1,4 +1,5 @@
 ﻿namespace Skua.Core.ViewModels;
+
 public class FastTravelEditorDialogViewModel : DialogViewModelBase
 {
     public FastTravelEditorDialogViewModel(FastTravelEditorViewModel fastTravelEditor)
@@ -6,5 +7,6 @@ public class FastTravelEditorDialogViewModel : DialogViewModelBase
     {
         Editor = fastTravelEditor;
     }
+
     public FastTravelEditorViewModel Editor { get; }
 }

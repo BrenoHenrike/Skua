@@ -6,6 +6,7 @@ public static class StringUtils
 {
     public static readonly Regex RemoveLetter = new(@"[^0-9]", RegexOptions.Compiled);
     public static readonly Regex Alphabetical = new(@"^[a-zA-Z]+$", RegexOptions.Compiled);
+
     /// <summary>
     /// Removes all non numeric characters from a string.
     /// </summary>

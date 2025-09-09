@@ -5,6 +5,7 @@ using Skua.Core.Models;
 using System.Text;
 
 namespace Skua.Core.ViewModels;
+
 public partial class CoreBotsViewModel : BotControlViewModelBase
 {
     public CoreBotsViewModel(List<TabItemViewModel> tabs, IScriptPlayer player, IDialogService dialogService)
@@ -23,9 +24,11 @@ public partial class CoreBotsViewModel : BotControlViewModelBase
 
     private readonly IScriptPlayer _player;
     private readonly IDialogService _dialogService;
-    private Dictionary<string, Dictionary<string, string>> _readValues = new(); 
+    private Dictionary<string, Dictionary<string, string>> _readValues = new();
+
     [ObservableProperty]
     private TabItemViewModel _selectedTab;
+
     [ObservableProperty]
     private string _currentPlayer = string.Empty;
 
@@ -42,7 +45,7 @@ public partial class CoreBotsViewModel : BotControlViewModelBase
         }
 
         StringBuilder bob = new();
-        foreach(TabItemViewModel tab in CoreBotsTabs)
+        foreach (TabItemViewModel tab in CoreBotsTabs)
         {
             if (tab.Content is IManageCBOptions cbo)
                 cbo.Save(bob);
@@ -62,7 +65,7 @@ public partial class CoreBotsViewModel : BotControlViewModelBase
             return;
         }
 
-        CurrentPlayer =_player.Username;
+        CurrentPlayer = _player.Username;
         if (_readValues.ContainsKey(_player.Username))
         {
             SetValues(_readValues[_player.Username]);
@@ -106,5 +109,6 @@ public partial class CoreBotsViewModel : BotControlViewModelBase
 internal interface IManageCBOptions
 {
     StringBuilder Save(StringBuilder builder);
+
     void SetValues(Dictionary<string, string> values);
 }

@@ -1,4 +1,5 @@
 ﻿namespace Skua.Core.ViewModels;
+
 public class SkillRuleEditorDialogViewModel : DialogViewModelBase
 {
     public SkillRuleEditorDialogViewModel(SkillRulesViewModel useRules)

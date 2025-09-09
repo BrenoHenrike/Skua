@@ -4,6 +4,7 @@ using System.Windows;
 using System.Windows.Controls;
 
 namespace Skua.WPF.UserControls;
+
 /// <summary>
 /// Interaction logic for BalloonTipUserControl.xaml
 /// </summary>

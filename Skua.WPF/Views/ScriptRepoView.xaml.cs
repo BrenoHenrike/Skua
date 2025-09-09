@@ -1,18 +1,20 @@
-﻿using System;
+﻿using CommunityToolkit.Mvvm.DependencyInjection;
+using Skua.Core.ViewModels;
+using System;
 using System.ComponentModel;
 using System.Threading.Tasks;
 using System.Windows.Controls;
 using System.Windows.Data;
-using CommunityToolkit.Mvvm.DependencyInjection;
-using Skua.Core.ViewModels;
 
 namespace Skua.WPF.Views;
+
 /// <summary>
 /// Interaction logic for ScriptRepoView.xaml
 /// </summary>
 public partial class ScriptRepoView : UserControl
 {
     private readonly ICollectionView _collectionView;
+
     public ScriptRepoView()
     {
         InitializeComponent();

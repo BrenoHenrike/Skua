@@ -125,21 +125,21 @@
                     <DataTemplate x:Key="ScriptFileInfoTemplate">
                         <StackPanel Orientation="Vertical">
                             <DockPanel>
-                                <TextBlock Text="Name:" 
+                                <TextBlock Text="Name:"
                                     Foreground="#919191"
                                     Margin="30,0,5,0" />
-                                <TextBlock Text="{Binding Info.Name}" 
+                                <TextBlock Text="{Binding Info.Name}"
                                     Foreground="#97d2de"
-                                    FontWeight="DemiBold"/>
+                                    FontWeight="DemiBold" />
                             </DockPanel>
                             <DockPanel>
                                 <TextBlock Text="Description:"
                                      Foreground="#919191"
                                      Margin="0,0,5,0" />
                                 <TextBlock
-                                    TextWrapping="Wrap" 
-                                    Text="{Binding Info.Description}" 
-                                     Margin="0,0,0,5"/>
+                                    TextWrapping="Wrap"
+                                    Text="{Binding Info.Description}"
+                                     Margin="0,0,0,5" />
                             </DockPanel>
                             <DockPanel>
                                 <TextBlock Text="Tags:"
@@ -156,7 +156,7 @@
                                             <Border
                                                 BorderBrush="#97d2de"
                                                 BorderThickness="1"
-                                                CornerRadius="5" 
+                                                CornerRadius="5"
                                                 Padding="5,0,5,2"
                                                 Margin="0,1,5,5">
                                                 <TextBlock
@@ -172,7 +172,7 @@
                                      Foreground="#919191"
                                      Margin="9,0,5,5" />
                                 <TextBlock
-                                    TextWrapping="Wrap" 
+                                    TextWrapping="Wrap"
                                     Foreground="#a8a8a8"
                                     Text="{Binding ScriptPath}" />
                             </DockPanel>
@@ -187,24 +187,24 @@
                                 IsEnabled="{Binding Downloaded, FallbackValue=False}" />
                             <Button Content="Load"
                                 Width="70"
-                                Command="{Binding LoadScriptCommand}" 
+                                Command="{Binding LoadScriptCommand}"
                                 CommandParameter="{Binding}"
                                 IsEnabled="{Binding Downloaded, FallbackValue=False}" />
                         </DockPanel>
                     </DataTemplate>
                     <Style x:Key="CenterGridHeaderStyle" TargetType="DataGridColumnHeader">
-                        <Setter Property="HorizontalContentAlignment" Value="Center"/>
-                        <Setter Property="Background" Value="Transparent"/>
+                        <Setter Property="HorizontalContentAlignment" Value="Center" />
+                        <Setter Property="Background" Value="Transparent" />
                     </Style>
                 </DataGrid.Resources>
                 <DataGrid.Columns>
-                    <DataGridTemplateColumn CellTemplate="{StaticResource ScriptFileInfoTemplate}" 
+                    <DataGridTemplateColumn CellTemplate="{StaticResource ScriptFileInfoTemplate}"
                          Header="Script"
-                         Width="600*"/>
-                    <DataGridTemplateColumn CellTemplate="{StaticResource ScriptFileActionTemplate}" 
+                         Width="600*" />
+                    <DataGridTemplateColumn CellTemplate="{StaticResource ScriptFileActionTemplate}"
                          Header="Action"
                          HeaderStyle="{StaticResource CenterGridHeaderStyle}"
-                         Width="180"/>
+                         Width="180" />
                 </DataGrid.Columns>
                 <DataGrid.RowStyle>
                     <Style BasedOn="{StaticResource MaterialDesignDataGridRow}" TargetType="DataGridRow">

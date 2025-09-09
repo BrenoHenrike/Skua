@@ -5,9 +5,11 @@ using CommunityToolkit.Mvvm.Messaging.Messages;
 using Skua.Core.Interfaces;
 
 namespace Skua.Core.ViewModels;
+
 public partial class RegisteredQuestsViewModel : ObservableRecipient
 {
     private readonly char[] _questsSeparator = { '|', ',', ' ' };
+
     public RegisteredQuestsViewModel(IScriptQuest quests)
     {
         _quests = quests;
@@ -20,6 +22,7 @@ public partial class RegisteredQuestsViewModel : ObservableRecipient
     }
 
     private readonly IScriptQuest _quests;
+
     [ObservableProperty]
     private string _addQuestInput = string.Empty;
 

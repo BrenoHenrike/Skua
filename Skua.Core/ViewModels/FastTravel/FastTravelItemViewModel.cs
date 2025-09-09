@@ -11,6 +11,7 @@ public partial class FastTravelItemViewModel : ObservableObject
     {
         TravelCommand = travel;
     }
+
     public FastTravelItemViewModel(string descriptionName, string mapName, string cell, string pad, IRelayCommand<object> travel)
     {
         MapName = mapName;
@@ -22,10 +23,13 @@ public partial class FastTravelItemViewModel : ObservableObject
 
     [ObservableProperty]
     private string _descriptionName = string.Empty;
+
     [ObservableProperty]
     private string _mapName = "battleon";
+
     [ObservableProperty]
     private string _cell = "Enter";
+
     [ObservableProperty]
     private string _pad = "Spawn";
 

@@ -1,11 +1,10 @@
-﻿using System;
+﻿using CommunityToolkit.Mvvm.Input;
+using Skua.Core.ViewModels;
 using System.Windows;
 using System.Windows.Controls;
-using CommunityToolkit.Mvvm.Input;
-using Skua.Core.Models;
-using Skua.Core.ViewModels;
 
 namespace Skua.WPF;
+
 public class OptionDataTemplateSelector : DataTemplateSelector
 {
     public DataTemplate BoolTemplate { get; set; }
@@ -25,11 +24,11 @@ public class OptionDataTemplateSelector : DataTemplateSelector
             selectedTemplate = BoolTemplate;
         else if (vm.DisplayType == typeof(string))
             selectedTemplate = StringTemplate;
-        else if(vm.DisplayType == typeof(int))
+        else if (vm.DisplayType == typeof(int))
             selectedTemplate = IntTemplate;
-        else if(vm.DisplayType.IsEnum)
+        else if (vm.DisplayType.IsEnum)
             selectedTemplate = EnumTemplate;
-        else if(vm.DisplayType == typeof(IRelayCommand))
+        else if (vm.DisplayType == typeof(IRelayCommand))
             selectedTemplate = ActionTemplate;
 
         //switch(item)

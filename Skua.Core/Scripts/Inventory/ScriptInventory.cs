@@ -1,7 +1,7 @@
-﻿using Skua.Core.Interfaces;
+using Skua.Core.Flash;
+using Skua.Core.Interfaces;
 using Skua.Core.Models;
 using Skua.Core.Models.Items;
-using Skua.Core.Flash;
 using System.Dynamic;
 
 namespace Skua.Core.Scripts;
@@ -43,8 +43,10 @@ public partial class ScriptInventory : IScriptInventory
 
     [ObjectBinding("world.myAvatar.items", Default = "new()")]
     private List<InventoryItem> _items;
+
     [ObjectBinding("world.myAvatar.objData.iBagSlots")]
     private int _slots;
+
     [ObjectBinding("world.myAvatar.items.length")]
     private int _usedSlots;
 

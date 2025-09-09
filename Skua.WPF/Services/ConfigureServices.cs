@@ -3,6 +3,7 @@ using Skua.Core.Interfaces;
 using Skua.WPF.Flash;
 
 namespace Skua.WPF.Services;
+
 public static class ConfigureServices
 {
     public static IServiceCollection AddWindowsServices(this IServiceCollection services)

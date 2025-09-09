@@ -1,5 +1,5 @@
-﻿using Skua.Core.Interfaces;
 using Skua.Core.Flash;
+using Skua.Core.Interfaces;
 
 namespace Skua.Core.Scripts;
 
@@ -7,6 +7,7 @@ public partial class ScriptLite : IScriptLite
 {
     private readonly Lazy<IFlashUtil> _lazyFlash;
     private IFlashUtil Flash => _lazyFlash.Value;
+
     public ScriptLite(Lazy<IFlashUtil> flash)
     {
         _lazyFlash = flash;

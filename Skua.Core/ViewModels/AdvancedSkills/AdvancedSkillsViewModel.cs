@@ -3,6 +3,7 @@ using CommunityToolkit.Mvvm.Messaging;
 using Skua.Core.Messaging;
 
 namespace Skua.Core.ViewModels;
+
 public partial class AdvancedSkillsViewModel : BotControlViewModelBase
 {
     public AdvancedSkillsViewModel(AdvancedSkillEditorViewModel editor, SavedAdvancedSkillsViewModel savedViewModel)

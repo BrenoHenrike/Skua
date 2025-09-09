@@ -1,5 +1,5 @@
-﻿using System.ComponentModel;
-using Skua.Core.Models.Items;
+﻿using Skua.Core.Models.Items;
+using System.ComponentModel;
 
 namespace Skua.Core.Interfaces;
 
@@ -9,42 +9,52 @@ public interface IScriptBoost : INotifyPropertyChanged
     /// Whether the boost timer is enabled.
     /// </summary>
     bool Enabled { get; }
+
     /// <summary>
     /// The Class Boost ID to be used. You can get an ID by using <see cref="GetBoostID(BoostType, bool)"/>.
     /// </summary>
     int ClassBoostID { get; set; }
+
     /// <summary>
     /// The XP Boost ID to be used. You can get an ID by using <see cref="GetBoostID(BoostType, bool)"/>.
     /// </summary>
     int ExperienceBoostID { get; set; }
+
     /// <summary>
     /// The Gold Boost ID to be used. You can get an ID by using <see cref="GetBoostID(BoostType, bool)"/>.
     /// </summary>
     int GoldBoostID { get; set; }
+
     /// <summary>
     /// The REP Boost ID to be used. You can get an ID by using <see cref="GetBoostID(BoostType, bool)"/>.
     /// </summary>
     int ReputationBoostID { get; set; }
+
     /// <summary>
     /// Whether to use the Class Boost with defined <see cref="ClassBoostID">ID</see>
     /// </summary>
     bool UseClassBoost { get; set; }
+
     /// <summary>
     /// Whether to use the Experience Boost with defined <see cref="ExperienceBoostID">ID</see>
     /// </summary>
     bool UseExperienceBoost { get; set; }
+
     /// <summary>
     /// Whether to use the Gold Boost with defined <see cref="GoldBoostID">ID</see>
     /// </summary>
     bool UseGoldBoost { get; set; }
+
     /// <summary>
     /// Whether to use the Gold Boost with defined <see cref="ReputationBoostID">ID</see>
     /// </summary>
     bool UseReputationBoost { get; set; }
+
     /// <summary>
     /// Whether it is using any of the boost types.
     /// </summary>
     bool UsingBoosts => UseClassBoost || UseExperienceBoost || UseGoldBoost || UseReputationBoost;
+
     /// <summary>
     /// Return the ID of the first boost found in the player's inventory.
     /// </summary>
@@ -52,12 +62,14 @@ public interface IScriptBoost : INotifyPropertyChanged
     /// <param name="searchBank">Whether to search and move to the inventory if a boost is found.</param>
     /// <returns>The ID of the boost.</returns>
     int GetBoostID(BoostType boostType, bool searchBank = true);
+
     /// <summary>
     /// Checks if the specified <paramref name="boost"/> is active.
     /// </summary>
     /// <param name="boost">Type of boost to check.</param>
     /// <returns><see langword="true"/> if the specified boost is active.</returns>
     bool IsBoostActive(BoostType boost);
+
     /// <summary>
     /// Get and set all four boost types to the first boost found in the inventory.
     /// </summary>
@@ -68,6 +80,7 @@ public interface IScriptBoost : INotifyPropertyChanged
         SetExperienceBoostID();
         SetReputationBoostID();
     }
+
     /// <summary>
     /// Get and set all four boost types to the first boost found in the inventory.
     /// </summary>
@@ -79,6 +92,7 @@ public interface IScriptBoost : INotifyPropertyChanged
         SetExperienceBoostID(searchBank);
         SetReputationBoostID(searchBank);
     }
+
     /// <summary>
     /// Get and set <see cref="ClassBoostID"/> to the first boost found in the inventory.
     /// </summary>
@@ -87,6 +101,7 @@ public interface IScriptBoost : INotifyPropertyChanged
     {
         ClassBoostID = GetBoostID(BoostType.Class, searchBank);
     }
+
     /// <summary>
     /// Get and set <see cref="ExperienceBoostID"/> to the first boost found in the player's inventory.
     /// </summary>
@@ -95,6 +110,7 @@ public interface IScriptBoost : INotifyPropertyChanged
     {
         ExperienceBoostID = GetBoostID(BoostType.Experience, searchBank);
     }
+
     /// <summary>
     /// Get and set <see cref="GoldBoostID"/> to the first boost found in the player's inventory.
     /// </summary>
@@ -103,6 +119,7 @@ public interface IScriptBoost : INotifyPropertyChanged
     {
         GoldBoostID = GetBoostID(BoostType.Gold, searchBank);
     }
+
     /// <summary>
     /// Get and set <see cref="ReputationBoostID"/> to the first boost found in the player's inventory.
     /// </summary>
@@ -111,18 +128,22 @@ public interface IScriptBoost : INotifyPropertyChanged
     {
         ReputationBoostID = GetBoostID(BoostType.Reputation, searchBank);
     }
+
     /// <summary>
     /// Start the boost timer.
     /// </summary>
     void Start();
+
     /// <summary>
     /// Stops the boost timer.
     /// </summary>
     void Stop();
+
     /// <summary>
     /// Stops the boost timer asynchronously. Use for UI elements or when possible to use.
     /// </summary>
     ValueTask StopAsync();
+
     /// <summary>
     /// Uses the boost with specified <paramref name="id"/>.
     /// </summary>

@@ -1,5 +1,4 @@
 ﻿using CommunityToolkit.Mvvm.Messaging;
-using Newtonsoft.Json.Linq;
 using Skua.Core.Interfaces;
 using Skua.Core.Messaging;
 using Skua.Core.Models;
@@ -7,6 +6,7 @@ using Skua.Core.Models.Monsters;
 using Skua.Core.Utils;
 
 namespace Skua.Core.Scripts;
+
 public class ScriptHunt : IScriptHunt
 {
     public ScriptHunt(
@@ -62,21 +62,27 @@ public class ScriptHunt : IScriptHunt
     private int _lastHuntTick;
 
     public void Monster(string name) => _Hunt(name, null);
+
     public void Monster(string name, CancellationToken? token) => _Hunt(name, token);
 
     public void Monster(int id) => _Hunt(id, null);
+
     public void Monster(int id, CancellationToken? token) => _Hunt(id, token);
 
     public void Monster(Monster monster) => _Hunt(monster.ID, null);
+
     public void Monster(Monster monster, CancellationToken? token) => _Hunt(monster.ID, token);
 
     public void WithPriority(string name, HuntPriorities priority) => _HuntWithPriority(name, priority, null);
+
     public void WithPriority(string name, HuntPriorities priority, CancellationToken? token) => _HuntWithPriority(name, priority, token);
 
     public void WithPriority(Monster monster, HuntPriorities priority) => _HuntWithPriority(monster.ID, priority, null);
+
     public void WithPriority(Monster monster, HuntPriorities priority, CancellationToken? token) => _HuntWithPriority(monster.ID, priority, token);
 
     public void WithPriority(int id, HuntPriorities priority) => _HuntWithPriority(id, priority, null);
+
     public void WithPriority(int id, HuntPriorities priority, CancellationToken? token) => _HuntWithPriority(id, priority, token);
 
     private void _Hunt(string name, CancellationToken? token)
@@ -117,6 +123,7 @@ public class ScriptHunt : IScriptHunt
             }
         }
     }
+
     private void _Hunt(int id, CancellationToken? token)
     {
         while ((!token?.IsCancellationRequested ?? true) && !Manager.ShouldExit)
@@ -151,6 +158,7 @@ public class ScriptHunt : IScriptHunt
             }
         }
     }
+
     private void _HuntWithPriority(string name, HuntPriorities priority, CancellationToken? token)
     {
         if (priority == HuntPriorities.None)
@@ -190,6 +198,7 @@ public class ScriptHunt : IScriptHunt
             Thread.Sleep(200);
         }
     }
+
     private void _HuntWithPriority(int id, HuntPriorities priority, CancellationToken? token)
     {
         if (priority == HuntPriorities.None)
@@ -250,7 +259,7 @@ public class ScriptHunt : IScriptHunt
                 if (_ctsHunt.IsCancellationRequested)
                     break;
 
-                for (int i = cells.Count -1; i >= 0; i--)
+                for (int i = cells.Count - 1; i >= 0; i--)
                 {
                     if (Player.Cell != cells[i] && !_ctsHunt.IsCancellationRequested)
                     {
@@ -268,9 +277,9 @@ public class ScriptHunt : IScriptHunt
                         if (_ctsHunt.IsCancellationRequested)
                             break;
 
-                        if(Monsters.Exists(mon) && !_ctsHunt.IsCancellationRequested)
+                        if (Monsters.Exists(mon) && !_ctsHunt.IsCancellationRequested)
                         {
-                            if(!Combat.Attack(mon))
+                            if (!Combat.Attack(mon))
                             {
                                 cells.RemoveAt(i);
                                 continue;

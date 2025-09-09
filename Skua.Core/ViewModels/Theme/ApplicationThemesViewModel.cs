@@ -2,6 +2,7 @@
 using Skua.Core.Interfaces;
 
 namespace Skua.Core.ViewModels;
+
 public class ApplicationThemesViewModel : BotControlViewModelBase
 {
     public ApplicationThemesViewModel(IThemeService themeService, ThemeSettingsViewModel themeSettings, ColorSchemeEditorViewModel colorSchemeEditor)

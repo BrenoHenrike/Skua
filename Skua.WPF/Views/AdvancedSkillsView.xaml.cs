@@ -1,6 +1,7 @@
 ﻿using System.Windows.Controls;
 
 namespace Skua.WPF.Views;
+
 /// <summary>
 /// Interaction logic for AdvancedSkills.xaml
 /// </summary>

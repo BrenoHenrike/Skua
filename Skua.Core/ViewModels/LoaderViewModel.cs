@@ -5,6 +5,7 @@ using Skua.Core.Models.Quests;
 using Skua.Core.Utils;
 
 namespace Skua.Core.ViewModels;
+
 public partial class LoaderViewModel : BotControlViewModelBase, IManagedWindow
 {
     public LoaderViewModel(IScriptShop shops, IScriptQuest quests, IQuestDataLoaderService questLoader, IClipboardService clipboardService)
@@ -21,15 +22,20 @@ public partial class LoaderViewModel : BotControlViewModelBase, IManagedWindow
     private readonly IScriptQuest _quests;
     private readonly IQuestDataLoaderService _questLoader;
     private readonly IClipboardService _clipboardService;
+
     [ObservableProperty]
     private string _progressReport = string.Empty;
+
     [ObservableProperty]
     private bool _isLoading;
+
     [ObservableProperty]
     [NotifyCanExecuteChangedFor(nameof(LoadCommand))]
     private string _inputIDs = string.Empty;
+
     [ObservableProperty]
     private int _selectedIndex;
+
     [ObservableProperty]
     private RangedObservableCollection<QuestData> _questIDs = new();
 
@@ -46,6 +52,7 @@ public partial class LoaderViewModel : BotControlViewModelBase, IManagedWindow
             Task.Factory.StartNew(() => _quests.Load(InputIDs.Split(new char[] { ',', ' ' }, StringSplitOptions.RemoveEmptyEntries).Select(x => int.Parse(x)).ToArray()));
         }
     }
+
     private bool AllDigits()
     {
         return InputIDs.Replace(",", "").Replace(" ", "").All(c => int.TryParse(c + "", out int i));

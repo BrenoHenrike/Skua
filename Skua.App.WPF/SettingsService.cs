@@ -2,6 +2,7 @@
 using Skua.Core.Interfaces;
 
 namespace Skua.App.WPF.Services;
+
 public class SettingsService : ISettingsService
 {
     public T? Get<T>(string key)

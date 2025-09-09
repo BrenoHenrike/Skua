@@ -1,9 +1,10 @@
-﻿using System.Collections.ObjectModel;
-using CommunityToolkit.Mvvm.ComponentModel;
+﻿using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
 using Skua.Core.Interfaces;
+using System.Collections.ObjectModel;
 
 namespace Skua.Core.ViewModels;
+
 public partial class PacketLoggerViewModel : BotControlViewModelBase
 {
     public PacketLoggerViewModel(IEnumerable<PacketLogFilterViewModel> filters, IFlashUtil flash, IFileDialogService fileDialog)
@@ -16,18 +17,21 @@ public partial class PacketLoggerViewModel : BotControlViewModelBase
 
     private readonly IFlashUtil _flash;
     private readonly IFileDialogService _fileDialog;
+
     [ObservableProperty]
     private ObservableCollection<string> _packetLogs = new();
+
     [ObservableProperty]
     private List<PacketLogFilterViewModel> _packetFilters;
 
     private bool _isReceivingPackets;
+
     public bool IsReceivingPackets
     {
         get { return _isReceivingPackets; }
-        set 
+        set
         {
-            if(SetProperty(ref _isReceivingPackets, value))
+            if (SetProperty(ref _isReceivingPackets, value))
                 ToggleLogger();
         }
     }
@@ -72,7 +76,7 @@ public partial class PacketLoggerViewModel : BotControlViewModelBase
         }
 
         string[] packet = args[0].ToString()!.Split(new[] { '%' }, StringSplitOptions.RemoveEmptyEntries);
-        foreach(Predicate<string[]> filter in _packetFilters.Where(f => !f.IsChecked).Select(f => f.Filter))
+        foreach (Predicate<string[]> filter in _packetFilters.Where(f => !f.IsChecked).Select(f => f.Filter))
         {
             if (filter.Invoke(packet))
                 return;

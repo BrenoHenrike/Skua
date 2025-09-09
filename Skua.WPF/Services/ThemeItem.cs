@@ -5,6 +5,7 @@ using System.Text;
 using System.Windows.Media;
 
 namespace Skua.WPF;
+
 public class ThemeItem
 {
     public string Name { get; set; } = string.Empty;
@@ -54,6 +55,7 @@ public class ThemeItem
             Colors = (ColorSelection?)colorSelection ?? ColorSelection.All
         };
         themeItem.ColorAdjustment = colorAdjustment;
+
         return themeItem;
     }
 
@@ -71,7 +73,7 @@ public class ThemeItem
         bob.Append($"{ToHex(SecondaryColor)},");
         bob.Append($"{ToHex(PrimaryForegroundColor)},");
         bob.Append($"{ToHex(SecondaryForegroundColor)},");
-        if(UseColorAdjustment && ColorAdjustment is not null)
+        if (UseColorAdjustment && ColorAdjustment is not null)
         {
             bob.Append($"{UseColorAdjustment},");
             bob.Append($"{ColorAdjustment.DesiredContrastRatio},");

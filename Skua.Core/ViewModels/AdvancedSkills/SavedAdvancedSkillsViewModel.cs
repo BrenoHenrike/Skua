@@ -8,6 +8,7 @@ using Skua.Core.Models.Skills;
 using System.Collections.ObjectModel;
 
 namespace Skua.Core.ViewModels;
+
 public partial class SavedAdvancedSkillsViewModel : ObservableRecipient
 {
     public SavedAdvancedSkillsViewModel(IAdvancedSkillContainer advancedSkillContainer)
@@ -24,10 +25,12 @@ public partial class SavedAdvancedSkillsViewModel : ObservableRecipient
     }
 
     private readonly IAdvancedSkillContainer _advancedSkillContainer;
+
     [ObservableProperty]
     private AdvancedSkill? _selectedSkill;
 
     private ObservableCollection<AdvancedSkill>? _loadedSkills;
+
     public ObservableCollection<AdvancedSkill> LoadedSkills
     {
         get

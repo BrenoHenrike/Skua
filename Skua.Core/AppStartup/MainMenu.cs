@@ -1,10 +1,11 @@
-﻿using Microsoft.Extensions.DependencyInjection;
-using CommunityToolkit.Mvvm.DependencyInjection;
+﻿using CommunityToolkit.Mvvm.DependencyInjection;
 using CommunityToolkit.Mvvm.Input;
+using Microsoft.Extensions.DependencyInjection;
 using Skua.Core.Interfaces;
 using Skua.Core.ViewModels;
 
 namespace Skua.Core.AppStartup;
+
 internal class MainMenu
 {
     internal static MainMenuViewModel CreateViewModel(IServiceProvider s)

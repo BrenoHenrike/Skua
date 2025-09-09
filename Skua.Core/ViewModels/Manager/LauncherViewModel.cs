@@ -1,17 +1,20 @@
-using CommunityToolkit.Mvvm.Messaging;
+using CommunityToolkit.Mvvm.DependencyInjection;
 using CommunityToolkit.Mvvm.Input;
+using CommunityToolkit.Mvvm.Messaging;
 using Skua.Core.Interfaces;
 using Skua.Core.Messaging;
+using Skua.Core.Models;
 using Skua.Core.Utils;
 using System.Diagnostics;
 using Timer = System.Timers.Timer;
 
 namespace Skua.Core.ViewModels.Manager;
+
 public partial class LauncherViewModel : BotControlViewModelBase, IDisposable
 {
     private readonly ISettingsService _settingsService;
     private readonly IDispatcherService _dispatcherService;
-    public RangedObservableCollection<Process> SkuaProcesses { get; } = new();
+    public RangedObservableCollection<ProcessInfo> SkuaProcesses { get; } = new();
     private Timer _timer;
     private bool _disposed;
 
@@ -19,6 +22,7 @@ public partial class LauncherViewModel : BotControlViewModelBase, IDisposable
         : base("Launcher")
     {
         StrongReferenceMessenger.Default.Register<LauncherViewModel, UpdateStartedMessage>(this, TerminateProcesses);
+        StrongReferenceMessenger.Default.Register<LauncherViewModel, AddProcessMessage>(this, AddProcessWithName);
         _settingsService = settingsService;
         _dispatcherService = dispatcherService;
 
@@ -31,12 +35,21 @@ public partial class LauncherViewModel : BotControlViewModelBase, IDisposable
 
     private async void TerminateProcesses(LauncherViewModel recipient, UpdateStartedMessage message)
     {
-        foreach(var proc in recipient.SkuaProcesses.ToList())
+        foreach (var procInfo in recipient.SkuaProcesses.ToList())
         {
-            await StopProcess(proc);
+            await StopProcess(procInfo);
         }
 
         message.Reply(recipient.SkuaProcesses.Count == 0);
+    }
+
+    private void AddProcessWithName(LauncherViewModel recipient, AddProcessMessage message)
+    {
+        if (message.Process != null)
+        {
+            var procInfo = new ProcessInfo(message.Process, message.AccountName ?? $"Skua #{message.Process.Id}");
+            _dispatcherService.Invoke(() => recipient.SkuaProcesses.Add(procInfo));
+        }
     }
 
     [RelayCommand]
@@ -45,22 +58,34 @@ public partial class LauncherViewModel : BotControlViewModelBase, IDisposable
         await Task.Run(() =>
         {
             List<string> args = new();
-            if(_settingsService.Get("SyncThemes", false))
+            if (_settingsService.Get("SyncThemes", false))
             {
                 args.Add("--use-theme");
                 args.Add(_settingsService.Get("CurrentTheme", "no-theme"));
             }
 
             string token = _settingsService.Get("UserGitHubToken", string.Empty);
-            if(!string.IsNullOrEmpty(token))
+            if (!string.IsNullOrEmpty(token))
             {
                 args.Add("--gh-token");
                 args.Add(token);
             }
-            
-            var proc = Process.Start("./Skua.exe", args);
-            if (proc != null)
-                _dispatcherService.Invoke(() => SkuaProcesses.Add(proc));
+
+            try
+            {
+                var proc = Process.Start("./Skua.exe", args);
+                if (proc != null)
+                {
+                    var procInfo = new ProcessInfo(proc, $"Skua #{proc.Id}");
+                    _dispatcherService.Invoke(() => SkuaProcesses.Add(procInfo));
+                }
+            }
+            catch
+            {
+                var dialogService = Ioc.Default.GetService<IDialogService>()!;
+
+                dialogService.ShowMessageBox("Failed to launch Skua. Make sure Skua.exe is in the same folder as Skua.Manager.exe.", "Error");
+            }
         });
     }
 
@@ -68,21 +93,21 @@ public partial class LauncherViewModel : BotControlViewModelBase, IDisposable
     {
         Task.Factory.StartNew(() =>
         {
-            foreach (var proc in SkuaProcesses)
+            foreach (var procInfo in SkuaProcesses)
             {
-                proc.Kill();
-                _dispatcherService.Invoke(() => SkuaProcesses.Remove(proc));
+                procInfo.Process.Kill();
+                _dispatcherService.Invoke(() => SkuaProcesses.Remove(procInfo));
             }
         });
     }
 
     private void RemoveStoppedCurrentProcess(Object source, System.Timers.ElapsedEventArgs e)
     {
-        foreach (var proc in SkuaProcesses)
+        foreach (var procInfo in SkuaProcesses.ToList())
         {
-            if (proc.HasExited)
+            if (procInfo.HasExited)
             {
-                _dispatcherService.Invoke(() => SkuaProcesses.Remove(proc));
+                _dispatcherService.Invoke(() => SkuaProcesses.Remove(procInfo));
             }
         }
     }
@@ -90,13 +115,20 @@ public partial class LauncherViewModel : BotControlViewModelBase, IDisposable
     [RelayCommand]
     public async Task StopProcess(object? proc)
     {
-        if (proc is not Process process)
+        ProcessInfo? procInfo = proc as ProcessInfo;
+        if (procInfo == null && proc is Process process)
+        {
+            // For backwards compatibility, find ProcessInfo by Process
+            procInfo = SkuaProcesses.FirstOrDefault(p => p.Process == process);
+        }
+
+        if (procInfo == null)
             return;
 
         await Task.Run(() =>
         {
-            process.Kill();
-            _dispatcherService.Invoke(() => SkuaProcesses.Remove(process));
+            procInfo.Process.Kill();
+            _dispatcherService.Invoke(() => SkuaProcesses.Remove(procInfo));
         });
     }
 
@@ -119,14 +151,15 @@ public partial class LauncherViewModel : BotControlViewModelBase, IDisposable
 
                 // Unregister from messenger
                 StrongReferenceMessenger.Default.Unregister<UpdateStartedMessage>(this);
+                StrongReferenceMessenger.Default.Unregister<AddProcessMessage>(this);
 
                 // Clear and kill any remaining processes
-                foreach (var proc in SkuaProcesses)
+                foreach (var procInfo in SkuaProcesses)
                 {
                     try
                     {
-                        if (!proc.HasExited)
-                            proc.Kill();
+                        if (!procInfo.HasExited)
+                            procInfo.Process.Kill();
                     }
                     catch { }
                 }

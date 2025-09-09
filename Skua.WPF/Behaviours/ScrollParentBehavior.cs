@@ -1,11 +1,11 @@
-﻿using System.Windows;
+﻿using Microsoft.Xaml.Behaviors;
+using System.Windows;
 using System.Windows.Input;
-using Microsoft.Xaml.Behaviors;
 
 namespace Skua.WPF;
+
 public sealed class ScrollParentBehavior : Behavior<UIElement>
 {
-
     protected override void OnAttached()
     {
         base.OnAttached();
@@ -27,6 +27,5 @@ public sealed class ScrollParentBehavior : Behavior<UIElement>
             RoutedEvent = UIElement.MouseWheelEvent
         };
         AssociatedObject.RaiseEvent(e2);
-
     }
 }

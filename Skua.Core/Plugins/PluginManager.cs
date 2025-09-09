@@ -8,6 +8,7 @@ using System.Diagnostics;
 using System.Reflection;
 
 namespace Skua.Core.Plugins;
+
 public delegate void PluginLoadDelegate(IPluginContainer container);
 
 public class PluginManager : IPluginManager
@@ -31,6 +32,9 @@ public class PluginManager : IPluginManager
 
     public Exception? Load(string path)
     {
+        ISkuaPlugin? plugin = null;
+        PluginContainer? container = null;
+
         try
         {
             Assembly asm = Assembly.LoadFrom(path);
@@ -38,19 +42,49 @@ public class PluginManager : IPluginManager
             if (type is null)
                 return new Exception("Plugin class not found.");
 
-            if (Activator.CreateInstance(type) is not ISkuaPlugin plugin)
+            if (Activator.CreateInstance(type) is not ISkuaPlugin pluginInstance)
                 return new Exception("Failed to create plugin instance.");
 
-            PluginContainer container = new(plugin);
+            plugin = pluginInstance;
+            container = new PluginContainer(plugin);
+
+            // Add to dictionary first to ensure proper tracking
             _plugins.Add(plugin, container);
-            plugin.Load(Ioc.Default, Ioc.Default.GetRequiredService<IPluginHelper>());
-            container.OptionContainer.SetDefaults();
-            container.OptionContainer.Load();
-            StrongReferenceMessenger.Default.Send<PluginLoadedMessage, int>(new(container), (int)MessageChannels.Plugins);
-            return null;
+
+            try
+            {
+                plugin.Load(Ioc.Default, Ioc.Default.GetRequiredService<IPluginHelper>());
+                container.OptionContainer.SetDefaults();
+                container.OptionContainer.Load();
+                StrongReferenceMessenger.Default.Send<PluginLoadedMessage, int>(new(container), (int)MessageChannels.Plugins);
+                return null;
+            }
+            catch (Exception loadException)
+            {
+                // If plugin.Load() fails, remove from dictionary to prevent partial state
+                _plugins.Remove(plugin);
+
+                // Attempt to unload the plugin gracefully
+                try
+                {
+                    plugin.Unload();
+                }
+                catch
+                {
+                    // Ignore unload exceptions since loading already failed
+                }
+
+                throw new Exception($"Failed to initialize plugin: {loadException.Message}", loadException);
+            }
         }
         catch (Exception e)
         {
+            // Ensure cleanup if we have references but something went wrong
+            if (plugin != null && _plugins.ContainsKey(plugin))
+            {
+                _plugins.Remove(plugin);
+            }
+
             return e;
         }
     }
@@ -75,7 +109,6 @@ public class PluginManager : IPluginManager
         ISkuaPlugin? plugin = Containers.Find(x => x.ToString() == pluginName)?.Plugin;
         if (plugin is null)
             return;
-
 
         StrongReferenceMessenger.Default.Send<PluginUnloadedMessage, int>(new(_plugins[plugin]), (int)MessageChannels.Plugins);
         plugin.Unload();
@@ -112,4 +145,3 @@ public class PluginManager : IPluginManager
         return _plugins.FirstOrDefault((KeyValuePair<ISkuaPlugin, IPluginContainer> kvp) => kvp.Key is T).Value;
     }
 }
-

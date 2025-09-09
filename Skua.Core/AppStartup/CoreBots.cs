@@ -3,6 +3,7 @@ using Skua.Core.Interfaces;
 using Skua.Core.ViewModels;
 
 namespace Skua.Core.AppStartup;
+
 internal class CoreBots
 {
     internal static CoreBotsViewModel CreateViewModel(IServiceProvider s)

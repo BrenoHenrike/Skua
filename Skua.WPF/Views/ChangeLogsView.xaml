@@ -20,14 +20,14 @@
             <RowDefinition />
             <RowDefinition Height="auto" />
         </Grid.RowDefinitions>
-        
+
         <mdxam:MarkdownScrollViewer
             x:Name="Markdownview"
             Grid.Row="0"
             Foreground="White"
             FontFamily="Cambria"
             Margin="20,10,0,20"
-            Markdown="{Binding MarkdownDoc, UpdateSourceTrigger=PropertyChanged}"/>
+            Markdown="{Binding MarkdownDoc, UpdateSourceTrigger=PropertyChanged}" />
         <Grid Grid.Row="1">
             <Grid.ColumnDefinitions>
                 <ColumnDefinition />
@@ -48,8 +48,8 @@
                 Grid.Row="1"
                 Grid.Column="0"
                 Margin="6"
-                Command="{Binding OpenDelfinaDonationLink}"
-                Content="Delfina PayPal" />
+                Command="{Binding OpenPurpleDonationLink}"
+                Content="SharpTheNightmare PayPal" />
             <Button
                 Grid.Row="1"
                 Grid.Column="1"

@@ -1,6 +1,7 @@
 ﻿namespace Skua.Core.Utils;
 
 public delegate void Consumer<T>(T arg);
+
 public static class EnumerableExtensions
 {
     public static void ForEach<T>(this IEnumerable<T> enumerable, Consumer<T> func)
@@ -11,7 +12,7 @@ public static class EnumerableExtensions
 
     public static bool Contains<T>(this IEnumerable<T> enumerable, Predicate<T> pred)
     {
-        if(enumerable is null || !enumerable.Any())
+        if (enumerable is null || !enumerable.Any())
             return false;
         foreach (T item in enumerable)
             if (item is not null && pred(item))

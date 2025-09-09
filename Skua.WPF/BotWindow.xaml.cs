@@ -3,12 +3,14 @@ using System.ComponentModel;
 using System.Windows.Data;
 
 namespace Skua.WPF;
+
 /// <summary>
 /// Interaction logic for BotWindow.xaml
 /// </summary>
 public partial class BotWindow : CustomWindow
 {
     private ICollectionView? _collectionView;
+
     public BotWindow()
     {
         InitializeComponent();
@@ -20,7 +22,7 @@ public partial class BotWindow : CustomWindow
         Loaded -= BotWindow_Loaded;
         var cvs = FindResource("BotViewsSource") as CollectionViewSource;
         _collectionView = cvs?.View ?? null;
-        if(_collectionView is not null)
+        if (_collectionView is not null)
             _collectionView.Filter = Search;
     }
 

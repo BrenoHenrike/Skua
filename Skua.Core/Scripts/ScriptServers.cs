@@ -1,11 +1,9 @@
-﻿using System.Diagnostics;
+using CommunityToolkit.Mvvm.ComponentModel;
 using Newtonsoft.Json;
+using Skua.Core.Flash;
 using Skua.Core.Interfaces;
 using Skua.Core.Models.Servers;
 using Skua.Core.Utils;
-using Skua.Core.Flash;
-using CommunityToolkit.Mvvm.ComponentModel;
-using System.Net;
 
 namespace Skua.Core.Scripts;
 
@@ -26,7 +24,7 @@ public partial class ScriptServers : ObservableRecipient, IScriptServers
         _lazyStats = stats;
         _lazyManager = manager;
     }
-    
+
     private readonly Lazy<IFlashUtil> _lazyFlash;
     private readonly Lazy<IScriptPlayer> _lazyPlayer;
     private readonly Lazy<IScriptWait> _lazyWait;
@@ -40,7 +38,7 @@ public partial class ScriptServers : ObservableRecipient, IScriptServers
     private IScriptOption Options => _lazyOptions.Value;
     private IScriptBotStats Stats => _lazyStats.Value;
     private IScriptManager Manager => _lazyManager.Value;
-    
+
     private bool _loginInfoSetted = false;
     private string _username;
     private string _password;
@@ -52,7 +50,7 @@ public partial class ScriptServers : ObservableRecipient, IScriptServers
 
     [ObjectBinding("serialCmd.servers")]
     private List<Server> _serverList = new();
-    
+
     [ObservableProperty]
     [NotifyPropertyChangedRecipients]
     private List<Server> _cachedServers = new();
@@ -60,7 +58,8 @@ public partial class ScriptServers : ObservableRecipient, IScriptServers
     // Flash Methods Binding
 
     [MethodCallBinding("login", GameFunction = true)]
-    private void _login(string username, string password) { }
+    private void _login(string username, string password)
+    { }
 
     [MethodCallBinding("logout", RunMethodPost = true, GameFunction = true)]
     private void _logout()
@@ -81,7 +80,7 @@ public partial class ScriptServers : ObservableRecipient, IScriptServers
         Wait.ForTrue(() => !Manager.ShouldExit && Player.Playing && Flash.IsWorldLoaded, 30);
         return Player.Playing;
     }
-    
+
     [MethodCallBinding("connectToServer", RunMethodPost = true)]
     private bool _connectToServer(string server)
     {
@@ -138,7 +137,7 @@ public partial class ScriptServers : ObservableRecipient, IScriptServers
             else
                 server = CachedServers.First(s => s.Name == Options.ReloginServer) ?? ServerList[0];
         }
-        
+
         return ReloginIP(server.IP);
     }
 
@@ -146,22 +145,22 @@ public partial class ScriptServers : ObservableRecipient, IScriptServers
     {
         bool autoRelogSwitch = Options.AutoRelogin;
         Options.AutoRelogin = false;
-        
+
         Thread.Sleep(2000);
         Logout();
-        
+
         Stats.Relogins++;
-        if(_loginInfoSetted)
+        if (_loginInfoSetted)
             Login(_username, _password);
         else
             Login(Player.Username, Player.Password);
-        
+
         Thread.Sleep(2000);
         ConnectIP(ip);
-        
+
         Wait.ForTrue(() => Player.Playing && Flash.IsWorldLoaded, 30);
         Options.AutoRelogin = autoRelogSwitch;
-        
+
         return Player.Playing;
     }
 
@@ -172,19 +171,19 @@ public partial class ScriptServers : ObservableRecipient, IScriptServers
 
         Logout();
         Stats.Relogins++;
-        
+
         if (_loginInfoSetted)
             Login(_username, _password);
         else
             Login(Player.Username, Player.Password);
-    
-        Server server = ServerList.Find(x => x.Name.Contains(serverName)) 
+
+        Server server = ServerList.Find(x => x.Name.Contains(serverName))
             ?? CachedServers.Find(x => x.Name.Contains(serverName))!;
         ConnectToServer(JsonConvert.SerializeObject(server));
 
         Wait.ForTrue(() => Player.Playing && Flash.IsWorldLoaded, 30);
         Options.AutoRelogin = autoRelogSwitch;
-        
+
         return Player.Playing;
     }
 
@@ -193,7 +192,7 @@ public partial class ScriptServers : ObservableRecipient, IScriptServers
         int tries = 0;
         while (!Relogin(serverName) && !Manager.ShouldExit && !Player.Playing && ++tries < Options.ReloginTries)
             Task.Delay(Options.ReloginTryDelay).Wait();
-        
+
         return Player.Playing;
     }
 
@@ -205,7 +204,7 @@ public partial class ScriptServers : ObservableRecipient, IScriptServers
             server = ServerList.Find(x => x.IP != LastIP)!;
         else
             server = CachedServers.FirstOrDefault(s => s.Name == Options.ReloginServer) ?? ServerList[0];
-        
+
         return await EnsureLogin(server, token);
     }
 

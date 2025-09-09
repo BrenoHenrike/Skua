@@ -6,6 +6,7 @@ using Skua.Core.Messaging;
 using Skua.Core.Utils;
 
 namespace Skua.Core.ViewModels;
+
 public sealed partial class NotifyDropViewModel : BotControlViewModelBase
 {
     private readonly char[] _dropsSeparator = { '|' };
@@ -19,12 +20,16 @@ public sealed partial class NotifyDropViewModel : BotControlViewModelBase
     }
 
     private bool _subscribed = false;
+
     [ObservableProperty]
     private string _addDropInput = string.Empty;
+
     [ObservableProperty]
     private int _soundCount = 5;
+
     [ObservableProperty]
     private int _soundDelay = 200;
+
     public RangedObservableCollection<string> NotifyDropList { get; set; } = new();
     public IRelayCommand RemoveAllDropsCommand { get; }
 

@@ -22,6 +22,7 @@ public partial class ScriptInfoViewModel : ObservableObject
     public string LocalFile => Info.LocalFile;
     public string FilePath => Info.FilePath;
     public string ScriptPath => Path.Combine(ClientFileSources.SkuaScriptsDIR, FilePath.Replace("/", "\\"));
+
     public ObservableCollection<string> InfoTags
     {
         get => new ObservableCollection<string>(Info.Tags);
@@ -30,7 +31,7 @@ public partial class ScriptInfoViewModel : ObservableObject
     [ObservableProperty]
     [NotifyPropertyChangedFor(nameof(Outdated))]
     private bool _downloaded;
-    
+
     public bool Outdated => Downloaded && Info.LocalSize != Info.Size;
 
     [RelayCommand]

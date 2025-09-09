@@ -1,4 +1,5 @@
 ﻿namespace Skua.Core.Models.Skills;
+
 public enum ClassUseMode
 {
     Base,

@@ -1,16 +1,18 @@
-﻿using System.Diagnostics;
-using System.Reflection;
-using System.Text;
-using Microsoft.CodeAnalysis;
-using Microsoft.CodeAnalysis.CSharp;
-using CommunityToolkit.Mvvm.ComponentModel;
+﻿using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.DependencyInjection;
 using CommunityToolkit.Mvvm.Messaging;
+using Microsoft.CodeAnalysis;
+using Microsoft.CodeAnalysis.CSharp;
 using Skua.Core.Interfaces;
+using Skua.Core.Interfaces.Services;
 using Skua.Core.Messaging;
 using Skua.Core.Models;
+using System.Diagnostics;
+using System.Reflection;
+using System.Text;
 
 namespace Skua.Core.Scripts;
+
 public partial class ScriptManager : ObservableObject, IScriptManager
 {
     public ScriptManager(
@@ -19,13 +21,15 @@ public partial class ScriptManager : ObservableObject, IScriptManager
         Lazy<IScriptHandlers> handlers,
         Lazy<IScriptSkill> skills,
         Lazy<IScriptDrop> drops,
-        Lazy<IScriptWait> wait)
+        Lazy<IScriptWait> wait,
+        Lazy<IAuraMonitorService> auraMonitorService)
     {
         _lazyBot = scriptInterface;
         _lazyHandlers = handlers;
         _lazySkills = skills;
         _lazyDrops = drops;
         _lazyWait = wait;
+        _lazyAuraMonitor = auraMonitorService;
         _logger = logger;
     }
 
@@ -34,12 +38,14 @@ public partial class ScriptManager : ObservableObject, IScriptManager
     private readonly Lazy<IScriptSkill> _lazySkills;
     private readonly Lazy<IScriptDrop> _lazyDrops;
     private readonly Lazy<IScriptWait> _lazyWait;
+    private readonly Lazy<IAuraMonitorService> _lazyAuraMonitor;
     private readonly ILogService _logger;
-    
+
     private IScriptHandlers Handlers => _lazyHandlers.Value;
     private IScriptSkill Skills => _lazySkills.Value;
     private IScriptDrop Drops => _lazyDrops.Value;
     private IScriptWait Wait => _lazyWait.Value;
+    private IAuraMonitorService AuraMonitor => _lazyAuraMonitor.Value;
 
     private Thread? _currentScriptThread;
     private bool _stoppedByScript;
@@ -49,11 +55,13 @@ public partial class ScriptManager : ObservableObject, IScriptManager
 
     [ObservableProperty]
     private bool _scriptRunning = false;
+
     [ObservableProperty]
     private string _loadedScript = string.Empty;
+
     [ObservableProperty]
     private string _compiledScript = string.Empty;
-    
+
     public IScriptOptionContainer? Config { get; set; }
 
     public CancellationTokenSource? ScriptCTS { get; private set; }
@@ -73,11 +81,11 @@ public partial class ScriptManager : ObservableObject, IScriptManager
             await _lazyBot.Value.Auto.StopAsync();
 
             object? script = Compile(File.ReadAllText(LoadedScript));
-            
+
             LoadScriptConfig(script);
             if (_configured.TryGetValue(Config!.Storage, out bool b) && !b)
                 Config.Configure();
-            
+
             Handlers.Clear();
             _currentScriptThread = new(async () =>
             {
@@ -93,7 +101,7 @@ public partial class ScriptManager : ObservableObject, IScriptManager
                     {
                         exception = e;
                         Trace.WriteLine($"Error while running script:\r\nMessage: {(e.InnerException is not null ? e.InnerException.Message : e.Message)}\r\nStackTrace: {(e.InnerException is not null ? e.InnerException.StackTrace : e.StackTrace)}");
-                        
+
                         StrongReferenceMessenger.Default.Send<ScriptErrorMessage, int>(new(e), (int)MessageChannels.ScriptStatus);
                         _runScriptStoppingBool = true;
                     }
@@ -111,9 +119,11 @@ public partial class ScriptManager : ObservableObject, IScriptManager
                                 case true:
                                     Trace.WriteLine("Script finished succesfully.");
                                     break;
+
                                 case false:
                                     Trace.WriteLine("Script finished early or with errors.");
                                     break;
+
                                 default:
                                     break;
                             }
@@ -124,19 +134,23 @@ public partial class ScriptManager : ObservableObject, IScriptManager
                     script = null;
                     Skills.Stop();
                     Drops.Stop();
+
+                    // Stop aura monitoring when script ends (cleanup)
+                    AuraMonitor.StopMonitoring();
+
                     ScriptCTS.Dispose();
                     ScriptCTS = null;
                     StrongReferenceMessenger.Default.Send<ScriptStoppedMessage, int>((int)MessageChannels.ScriptStatus);
                     ScriptRunning = false;
                 }
             });
-            
+
             _currentScriptThread.Name = "Script Thread";
             _currentScriptThread.Start();
             ScriptRunning = true;
-            
+
             StrongReferenceMessenger.Default.Send<ScriptStartedMessage, int>((int)MessageChannels.ScriptStatus);
-            
+
             return null;
         }
         catch (Exception e)
@@ -172,7 +186,7 @@ public partial class ScriptManager : ObservableObject, IScriptManager
         _runScriptStoppingBool = runScriptStoppingEvent;
         _stoppedByScript = true;
         ScriptCTS?.Cancel();
-        if(Thread.CurrentThread.Name == "Script Thread")
+        if (Thread.CurrentThread.Name == "Script Thread")
         {
             ScriptCTS?.Token.ThrowIfCancellationRequested();
             return;
@@ -201,10 +215,10 @@ public partial class ScriptManager : ObservableObject, IScriptManager
         var references = GetReferences();
         var final = ProcessSources(source, ref references);
         var tree = CSharpSyntaxTree.ParseText(final, encoding: Encoding.UTF8);
-        
+
         CompiledScript = final = tree.GetRoot().NormalizeWhitespace().ToFullString();
         Compiler compiler = Ioc.Default.GetRequiredService<Compiler>();
-        
+
         if (references.Count > 0)
             compiler.AddAssemblies(references.ToArray());
 
@@ -267,6 +281,7 @@ public partial class ScriptManager : ObservableObject, IScriptManager
                         else if (File.Exists(parts[1]))
                             references.Add(parts[1]);
                         break;
+
                     case "include":
                         var localSource = Path.Combine(ClientFileSources.SkuaDIR, parts[1]);
                         if (File.Exists(localSource))
@@ -301,7 +316,7 @@ public partial class ScriptManager : ObservableObject, IScriptManager
 
         return string.Join(Environment.NewLine, sources);
     }
-    
+
     public void LoadScriptConfig(object? script)
     {
         if (script is null)
@@ -337,7 +352,7 @@ public partial class ScriptManager : ObservableObject, IScriptManager
             _configured[opts.Storage] = (bool)dontPreconfField.GetValue(script)!;
         else if (optsField is not null)
             _configured[opts.Storage] = false;
-        
+
         opts.SetDefaults();
         opts.Load();
     }

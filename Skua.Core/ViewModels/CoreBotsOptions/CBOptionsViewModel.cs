@@ -3,6 +3,7 @@ using Skua.Core.Interfaces;
 using System.Text;
 
 namespace Skua.Core.ViewModels;
+
 public class CBOptionsViewModel : ObservableObject, IManageCBOptions
 {
     private readonly IDialogService _dialogService;
@@ -22,9 +23,9 @@ public class CBOptionsViewModel : ObservableObject, IManageCBOptions
 
     public StringBuilder Save(StringBuilder builder)
     {
-        foreach(DisplayOptionItemViewModelBase option in Options)
+        foreach (DisplayOptionItemViewModelBase option in Options)
         {
-            if(option.Tag == "PrivateRooms" && (bool)option.Value == false && _dialogService.ShowMessageBox("Whilst we do offer the option, we highly recommend staying in private rooms while botting. Bot in public at your own risk.\r\n Confirm the use of Public Rooms?", "Public Room Warning", true) == false)
+            if (option.Tag == "PrivateRooms" && (bool)option.Value == false && _dialogService.ShowMessageBox("Whilst we do offer the option, we highly recommend staying in private rooms while botting. Bot in public at your own risk.\r\n Confirm the use of Public Rooms?", "Public Room Warning", true) == false)
             {
                 builder.AppendLine($"{option.Tag}: {true}");
                 continue;
@@ -37,9 +38,9 @@ public class CBOptionsViewModel : ObservableObject, IManageCBOptions
 
     public void SetValues(Dictionary<string, string> values)
     {
-        foreach(DisplayOptionItemViewModelBase option in Options)
+        foreach (DisplayOptionItemViewModelBase option in Options)
         {
-            if(values.TryGetValue(option.Tag, out string? value) && !string.IsNullOrWhiteSpace(value))
+            if (values.TryGetValue(option.Tag, out string? value) && !string.IsNullOrWhiteSpace(value))
             {
                 option.Value = Convert.ChangeType(value, option.DisplayType);
                 continue;

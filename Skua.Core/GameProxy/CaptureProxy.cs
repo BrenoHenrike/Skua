@@ -1,27 +1,30 @@
-﻿using System.Net;
-using System.Net.Sockets;
-using System.Text;
-using CommunityToolkit.Mvvm.ComponentModel;
+﻿using CommunityToolkit.Mvvm.ComponentModel;
 using Skua.Core.Interfaces;
 using Skua.Core.Models;
 using Skua.Core.Utils;
+using System.Net;
+using System.Net.Sockets;
+using System.Text;
 
 namespace Skua.Core.GameProxy;
+
 public partial class CaptureProxy : ObservableRecipient, ICaptureProxy
 {
     private CancellationTokenSource? _captureProxyCTS;
+
     /// <summary>
     /// The default port for the capture proxy to run on.
     /// </summary>
     public const int DefaultPort = 5588;
+
     public IPEndPoint? Destination { get; set; }
     public List<IInterceptor> Interceptors { get; } = new();
-
 
     private Thread? _thread;
     private readonly TcpListener _listener;
     private TcpClient? _forwarder;
     private TcpClient? _client;
+
     [ObservableProperty]
     [NotifyPropertyChangedRecipients]
     private bool _running;
@@ -82,7 +85,7 @@ public partial class CaptureProxy : ObservableRecipient, ICaptureProxy
 
                 var client = localClient;
                 var forwarder = localForwarder;
-                
+
                 Task.Factory.StartNew(() => _DataInterceptor(client, forwarder, true, token), token);
                 Task.Factory.StartNew(() => _DataInterceptor(forwarder, client, false, token), token);
             }
@@ -95,7 +98,7 @@ public partial class CaptureProxy : ObservableRecipient, ICaptureProxy
                 localForwarder?.Dispose();
             }
         }
-        
+
         // Cleanup when exiting the loop
         _listener.Stop();
     }
@@ -105,7 +108,7 @@ public partial class CaptureProxy : ObservableRecipient, ICaptureProxy
         byte[] msgbuf = new byte[4096];
         int read = 0;
         List<byte> cpacket = new();
-        
+
         try
         {
             while (!token.IsCancellationRequested && target.Connected && destination.Connected)

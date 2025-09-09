@@ -1,9 +1,9 @@
 using CommunityToolkit.Mvvm.Messaging;
 using Skua.Core.Interfaces;
 using Skua.Core.Messaging;
-using Skua.Core.Models;
 
 namespace Skua.Core.Scripts;
+
 public class ScriptEvent : IScriptEvent, IDisposable
 {
     public ScriptEvent()
@@ -44,23 +44,41 @@ public class ScriptEvent : IScriptEvent, IDisposable
     private readonly IMessenger _messenger;
 
     public event LogoutEventHandler? Logout;
+
     public event PlayerDeathEventHandler? PlayerDeath;
+
     public event MonsterKilledEventHandler? MonsterKilled;
+
     public event QuestAcceptedEventHandler? QuestAccepted;
+
     public event QuestTurnInEventHandler? QuestTurnedIn;
+
     public event MapChangedEventHandler? MapChanged;
+
     public event CellChangedEventHandler? CellChanged;
+
     public event ReloginTriggeredEventHandler? ReloginTriggered;
+
     public event ExtensionPacketEventHandler? ExtensionPacketReceived;
+
     public event PacketEventHandler? PacketReceived;
+
     public event AFKEventHandler? PlayerAFK;
+
     public event TryBuyItemHandler? TryBuyItem;
+
     public event CounterAttackHandler? CounterAttack;
+
     public event ItemDroppedHandler? ItemDropped;
+
     public event ItemSoldHandler? ItemSold;
+
     public event ItemBoughtHandler? ItemBought;
+
     public event ItemAddedToBankHandler? ItemAddedToBank;
+
     public event ScriptStoppingHandler? ScriptStopping;
+
     public event RunToAreaHandler? RunToArea;
 
     public void ClearHandlers()
@@ -203,10 +221,10 @@ public class ScriptEvent : IScriptEvent, IDisposable
             {
                 // Unregister from all messenger events
                 _messenger.UnregisterAll(this);
-                
+
                 // Clear all event handlers
                 ClearHandlers();
-                
+
                 // Clear additional handlers that weren't in ClearHandlers
                 Logout = null;
                 PacketReceived = null;

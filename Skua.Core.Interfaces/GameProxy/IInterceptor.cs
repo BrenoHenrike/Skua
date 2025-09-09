@@ -1,6 +1,7 @@
 ﻿using Skua.Core.Models;
 
 namespace Skua.Core.Interfaces;
+
 /// <summary>
 /// Intercepts messages between the game client and server.
 /// </summary>

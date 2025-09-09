@@ -1,14 +1,16 @@
-﻿using System.Collections.Generic;
-using Skua.Core.Interfaces;
-using Microsoft.Win32;
-using System.IO;
+﻿using Microsoft.Win32;
 using Ookii.Dialogs.Wpf;
+using Skua.Core.Interfaces;
 using Skua.Core.Models;
+using System.Collections.Generic;
+using System.IO;
 
 namespace Skua.WPF.Services;
+
 public class FileDialogService : IFileDialogService
 {
     private const string defaultFilter = "Text Files (*.txt)|*.txt";
+
     public string? OpenFile()
     {
         OpenFileDialog opf = new();

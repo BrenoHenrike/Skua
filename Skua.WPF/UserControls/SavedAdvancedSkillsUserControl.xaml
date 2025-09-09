@@ -44,7 +44,7 @@
             ItemsSource="{Binding LoadedSkills, UpdateSourceTrigger=PropertyChanged}"
             SelectedItem="{Binding SelectedSkill}"
             VirtualizingPanel.IsVirtualizing="True"
-            VirtualizingPanel.VirtualizationMode="Recycling">   
+            VirtualizingPanel.VirtualizationMode="Recycling">
             <ListBox.ContextMenu>
                 <ContextMenu>
                     <MenuItem Command="{Binding RemoveSelectedCommand}" Header="Remove Selected" />

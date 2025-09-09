@@ -6,12 +6,14 @@ using System.Text;
 using Westwind.Scripting;
 
 namespace Skua.Core;
+
 /// <summary>
 /// Slightly modified compiler based on Westwind.Scripting (https://github.com/RickStrahl/Westwind.Scripting)
 /// </summary>
 public class Compiler : CSharpScriptExecution
 {
     private const int MaxCachedAssemblies = 50; // Limit cache size to prevent unbounded growth
+
     /// <summary>
     /// This method compiles a class and hands back a
     /// dynamic reference to that class that you can
@@ -123,7 +125,7 @@ public class Compiler : CSharpScriptExecution
             if (!compilationResult.Success)
             {
                 var sb = new StringBuilder();
-                foreach (var diag in 
+                foreach (var diag in
                     compilationResult.Diagnostics
                         .Where(diagnostic => diagnostic.IsWarningAsError || diagnostic.Severity == DiagnosticSeverity.Error))
                 {

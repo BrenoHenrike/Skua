@@ -67,6 +67,11 @@ package skua
 			this.addCallback("auraComparison", Main.auraComparison);
 			this.addCallback("isTrue", Main.isTrue);
 			this.addCallback("getSubjectAuras", Main.getSubjectAuras);
+			this.addCallback("GetAurasValue", Main.GetAurasValue);
+			this.addCallback("GetAuraSecondsRemaining", Main.GetAuraSecondsRemaining);
+			this.addCallback("HasAnyActiveAura", Main.HasAnyActiveAura);
+			this.addCallback("HasAllActiveAuras", Main.HasAllActiveAuras);
+			this.addCallback("GetTotalAuraStacks", Main.GetTotalAuraStacks);
 			this.addCallback("getAvatar",Main.getAvatar);
 			
 			this.addCallback("injectScript", Main.injectScript);

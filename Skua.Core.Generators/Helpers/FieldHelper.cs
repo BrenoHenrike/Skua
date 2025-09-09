@@ -1,17 +1,16 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Collections.Immutable;
-using System.Globalization;
-using System.Text;
-using Microsoft.CodeAnalysis;
+﻿using Microsoft.CodeAnalysis;
 using Skua.Core.Generators.Extensions;
 using Skua.Core.Generators.Models;
+using System;
+using System.Collections.Immutable;
+using System.Globalization;
 
 namespace Skua.Core.Generators.Helpers;
-static internal class FieldHelper
+
+internal static class FieldHelper
 {
     /// <summary>
-    /// Tries to gather the 
+    /// Tries to gather the
     /// </summary>
     /// <param name="fieldSymbol"></param>
     /// <param name="attributeData"></param>
@@ -68,7 +67,7 @@ static internal class FieldHelper
 
     public static string GenerateClass(ClassInfo classInfo)
     {
-        return 
+        return
 $@"// <This file was auto-generated>
 
 namespace {classInfo.Namespace};

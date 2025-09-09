@@ -1,8 +1,9 @@
-﻿using System.Windows.Controls;
-using CommunityToolkit.Mvvm.Input;
+﻿using CommunityToolkit.Mvvm.Input;
 using Microsoft.Xaml.Behaviors;
+using System.Windows.Controls;
 
 namespace Skua.WPF;
+
 public class ListBoxUnselectAllMenuBehavior : Behavior<ListBox>
 {
     protected override void OnAttached()
@@ -13,7 +14,7 @@ public class ListBoxUnselectAllMenuBehavior : Behavior<ListBox>
             Header = "Unselect All",
             Command = new RelayCommand(AssociatedObject.UnselectAll)
         };
-        if(AssociatedObject.ContextMenu is null)
+        if (AssociatedObject.ContextMenu is null)
             AssociatedObject.ContextMenu = new ContextMenu();
         AssociatedObject.ContextMenu.Items.Add(unselectAll);
     }

@@ -5,28 +5,25 @@ using Skua.Core.AppStartup;
 using Skua.Core.Interfaces;
 using Skua.WPF.Services;
 using System;
-using System.Collections.Generic;
-using System.Configuration;
-using System.Data;
 using System.IO;
 using System.Linq;
 using System.Reflection;
-using System.Text;
-using System.Threading;
 using System.Threading.Tasks;
 using System.Windows;
 
 namespace Skua.App.WPF.Sync;
+
 /// <summary>
 /// Interaction logic for App.xaml
 /// </summary>
 public partial class App : Application
 {
-    string username;
-    string password;
-    int id;
+    private string username;
+    private string password;
+    private int id;
 
     private Task _syncTask;
+
     public App()
     {
         AppDomain currentDomain = AppDomain.CurrentDomain;
@@ -42,9 +39,11 @@ public partial class App : Application
                 case "--usr":
                     username = args[++i];
                     break;
+
                 case "--psw":
                     password = args[++i];
                     break;
+
                 case "--id":
                     id = int.Parse(args[++i]);
                     break;
@@ -135,9 +134,10 @@ public partial class App : Application
             case "requestLoadGame":
                 Services.GetRequiredService<IFlashUtil>().Call("loadClient");
                 break;
+
             case "loaded":
                 Services.GetRequiredService<IFlashUtil>().FlashCall -= Flash_FlashCall;
-                if(!string.IsNullOrEmpty(username) && !string.IsNullOrEmpty(password))
+                if (!string.IsNullOrEmpty(username) && !string.IsNullOrEmpty(password))
                     Task.Run(async () =>
                     {
                         await Task.Delay(2500);
@@ -177,7 +177,7 @@ public partial class App : Application
         MessageBox.Show($"Application Crash.\r\nVersion: 0.0.0.0\r\nMessage: {ex.Message}\r\nStackTrace: {ex.StackTrace}", "Application");
     }
 
-    static Assembly? ResolveAssemblies(object? sender, ResolveEventArgs args)
+    private static Assembly? ResolveAssemblies(object? sender, ResolveEventArgs args)
     {
         if (args.Name.Contains(".resources"))
             return null;

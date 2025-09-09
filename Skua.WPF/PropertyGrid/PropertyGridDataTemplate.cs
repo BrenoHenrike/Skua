@@ -4,10 +4,13 @@ using System.Windows;
 using System.Windows.Markup;
 
 namespace Skua.WPF;
+
 [ContentProperty("DataTemplate")]
 public class PropertyGridDataTemplate
 {
-    private class NullableEnum { }
+    private class NullableEnum
+    { }
+
     public static readonly Type NullableEnumType = typeof(NullableEnum);
 
     private List<Type> _resolvedPropertyTypes;

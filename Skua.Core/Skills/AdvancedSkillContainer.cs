@@ -14,13 +14,13 @@ public class AdvancedSkillContainer : ObservableRecipient, IAdvancedSkillContain
     private readonly string _userSkillsSetsPath;
     private CancellationTokenSource? _saveCts;
     private Task? _saveTask;
-    
+
     public List<AdvancedSkill> LoadedSkills
     {
         get { return _loadedSkills; }
         set { SetProperty(ref _loadedSkills, value, true); }
     }
-    
+
     public AdvancedSkillContainer()
     {
         _defaultSkillsSetsPath = ClientFileSources.SkuaAdvancedSkillsFile;
@@ -39,11 +39,13 @@ public class AdvancedSkillContainer : ObservableRecipient, IAdvancedSkillContain
         _loadedSkills.Add(skill);
         Save();
     }
+
     public void Remove(AdvancedSkill skill)
     {
         _loadedSkills.Remove(skill);
         Save();
     }
+
     public void TryOverride(AdvancedSkill skill)
     {
         if (!_loadedSkills.Contains(skill))
@@ -76,7 +78,7 @@ public class AdvancedSkillContainer : ObservableRecipient, IAdvancedSkillContain
         await (_saveTask ?? Task.CompletedTask);
         _saveCts?.Dispose();
         _saveCts = new CancellationTokenSource();
-        
+
         await Task.Factory.StartNew(() =>
         {
             _CopyDefaultSkills();
@@ -105,7 +107,7 @@ public class AdvancedSkillContainer : ObservableRecipient, IAdvancedSkillContain
         OnPropertyChanged(nameof(LoadedSkills));
         Broadcast(new(), _loadedSkills, nameof(LoadedSkills));
     }
-    
+
     public void ResetSkillsSets()
     {
         SyncSkills();
@@ -116,7 +118,7 @@ public class AdvancedSkillContainer : ObservableRecipient, IAdvancedSkillContain
         _saveCts?.Cancel();
         _saveCts?.Dispose();
         _saveCts = new CancellationTokenSource();
-        
+
         _saveTask = Task.Factory.StartNew(() =>
         {
             try
@@ -133,7 +135,7 @@ public class AdvancedSkillContainer : ObservableRecipient, IAdvancedSkillContain
             }
         }, _saveCts.Token);
     }
-    
+
     private bool _disposed = false;
 
     public void Dispose()

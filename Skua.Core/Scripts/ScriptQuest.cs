@@ -1,11 +1,11 @@
-﻿using Skua.Core.Utils;
-using Skua.Core.Models.Quests;
+using CommunityToolkit.Mvvm.ComponentModel;
+using Newtonsoft.Json;
+using Skua.Core.Flash;
 using Skua.Core.Interfaces;
 using Skua.Core.Models;
 using Skua.Core.Models.Items;
-using Skua.Core.Flash;
-using CommunityToolkit.Mvvm.ComponentModel;
-using Newtonsoft.Json;
+using Skua.Core.Models.Quests;
+using Skua.Core.Utils;
 
 namespace Skua.Core.Scripts;
 
@@ -49,8 +49,10 @@ public partial class ScriptQuest : ObservableRecipient, IScriptQuest
     private CancellationTokenSource? _questsCTS;
 
     public int RegisterCompleteInterval { get; set; } = 2000;
+
     [ObjectBinding("world.questTree", Default = "new()")]
     private Dictionary<int, Quest> _quests = new();
+
     public List<Quest> Tree => Quests.Values.ToList() ?? new();
     public List<Quest> Active => Tree.FindAll(x => x.Active);
     public List<Quest> Completed => Tree.FindAll(x => x.Status == "c");
@@ -61,13 +63,13 @@ public partial class ScriptQuest : ObservableRecipient, IScriptQuest
 
     public void Load(params int[] ids)
     {
-        if(ids.Length < 30)
+        if (ids.Length < 30)
         {
             Flash.CallGameFunction("world.showQuests", ids.Select(id => id.ToString()).Join(','), "q");
             return;
         }
 
-        foreach(int[] idchunk in ids.Chunk(30))
+        foreach (int[] idchunk in ids.Chunk(30))
         {
             Flash.CallGameFunction("world.showQuests", idchunk.Select(id => id.ToString()).Join(','), "q");
             Thread.Sleep(Options.ActionDelay);
@@ -97,7 +99,7 @@ public partial class ScriptQuest : ObservableRecipient, IScriptQuest
 
     public void Accept(params int[] ids)
     {
-        for(int i = 0; i < ids.Length; i++)
+        for (int i = 0; i < ids.Length; i++)
         {
             Accept(ids[i]);
             Thread.Sleep(Options.ActionDelay);
@@ -137,7 +139,7 @@ public partial class ScriptQuest : ObservableRecipient, IScriptQuest
 
     public void Complete(params int[] ids)
     {
-        for(int i = 0; i < ids.Length; i++)
+        for (int i = 0; i < ids.Length; i++)
         {
             Complete(ids[i]);
             Thread.Sleep(Options.ActionDelay);
@@ -165,7 +167,7 @@ public partial class ScriptQuest : ObservableRecipient, IScriptQuest
 
     public void EnsureComplete(params int[] ids)
     {
-        for(int i = 0; i < ids.Length; i++)
+        for (int i = 0; i < ids.Length; i++)
         {
             EnsureComplete(ids[i]);
             Thread.Sleep(Options.ActionDelay);
@@ -178,7 +180,7 @@ public partial class ScriptQuest : ObservableRecipient, IScriptQuest
     public bool UpdateQuest(int id)
     {
         Quest? quest = EnsureLoad(id);
-        if(quest is null)
+        if (quest is null)
             return false;
         Send.ClientPacket("{\"t\":\"xt\",\"b\":{\"r\":-1,\"o\":{\"cmd\":\"updateQuest\",\"iValue\":" + quest.Value + ",\"iIndex\":" + quest.Slot + "}}}", "json");
         return true;
@@ -326,11 +328,12 @@ public partial class ScriptQuest : ObservableRecipient, IScriptQuest
     }
 
     private int _lastComplete;
+
     private async Task _CompleteQuest(IEnumerable<int> registered, CancellationToken token)
     {
         foreach (int quest in registered)
         {
-            if(!IsInProgress(quest))
+            if (!IsInProgress(quest))
                 Accept(quest);
             await Task.Delay(Options.ActionDelay, token);
             if (!CanComplete(quest))
@@ -377,7 +380,7 @@ public partial class ScriptQuest : ObservableRecipient, IScriptQuest
             LoadCachedQuests();
 
         List<QuestData> quests = new();
-        foreach(int id in ids)
+        foreach (int id in ids)
         {
             if (CachedDictionary.TryGetValue(id, out QuestData? value))
                 quests.Add(value);

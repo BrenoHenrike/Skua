@@ -6,6 +6,7 @@ using System.ComponentModel;
 using System.Linq;
 
 namespace Skua.WPF;
+
 public class PropertyGridDataProvider : IListSource
 {
     public PropertyGridDataProvider(PropertyGrid grid, object data)

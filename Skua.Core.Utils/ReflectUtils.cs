@@ -1,6 +1,4 @@
-﻿using System.Reflection;
-
-namespace Skua.Core.Utils;
+﻿namespace Skua.Core.Utils;
 
 public static class ReflectUtils
 {

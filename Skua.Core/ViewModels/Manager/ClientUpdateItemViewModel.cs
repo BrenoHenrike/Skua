@@ -5,6 +5,7 @@ using Skua.Core.Messaging;
 using Skua.Core.Models.GitHub;
 
 namespace Skua.Core.ViewModels.Manager;
+
 public partial class ClientUpdateItemViewModel : ObservableObject
 {
     public ClientUpdateItemViewModel(UpdateInfo info)

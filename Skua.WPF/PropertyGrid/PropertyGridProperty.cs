@@ -8,9 +8,11 @@ using System.Windows.Data;
 using System.Windows.Input;
 
 namespace Skua.WPF;
+
 public class PropertyGridProperty : AutoObject, IComparable, IComparable<PropertyGridProperty>
 {
     public event EventHandler<PropertyGridEventArgs> Event;
+
     private string _defaultEditorResourceKey;
     private object _clonedValue;
     private bool _valueCloned;
@@ -119,17 +121,28 @@ public class PropertyGridProperty : AutoObject, IComparable, IComparable<Propert
     public virtual PropertyGridOptionsAttribute Options { get; set; }
     public virtual object Tag { get; set; }
 
-    public virtual Type PropertyType { get { return GetProperty<Type>(); } set { SetProperty(value); } }
-    public virtual string Name { get { return GetProperty<string>(); } set { SetProperty(value); } }
-    public virtual bool IsError { get { return GetProperty<bool>(); } set { SetProperty(value); } }
-    public virtual bool IsEnum { get { return GetProperty<bool>(); } set { SetProperty(value); } }
-    public virtual bool IsFlagsEnum { get { return GetProperty<bool>(); } set { SetProperty(value); } }
-    public virtual string Category { get { return GetProperty<string>(); } set { SetProperty(value); } }
-    public virtual string DisplayName { get { return GetProperty<string>(); } set { SetProperty(value); } }
-    public virtual string Description { get { return GetProperty<string>(); } set { SetProperty(value); } }
-    public virtual bool HasDefaultValue { get { return GetProperty<bool>(); } set { SetProperty(value); } }
-    public virtual PropertyDescriptor Descriptor { get { return GetProperty<PropertyDescriptor>(); } set { SetProperty(value); } }
-    public virtual TypeConverter Converter { get { return GetProperty<TypeConverter>(); } set { SetProperty(value); } }
+    public virtual Type PropertyType
+    { get { return GetProperty<Type>(); } set { SetProperty(value); } }
+    public virtual string Name
+    { get { return GetProperty<string>(); } set { SetProperty(value); } }
+    public virtual bool IsError
+    { get { return GetProperty<bool>(); } set { SetProperty(value); } }
+    public virtual bool IsEnum
+    { get { return GetProperty<bool>(); } set { SetProperty(value); } }
+    public virtual bool IsFlagsEnum
+    { get { return GetProperty<bool>(); } set { SetProperty(value); } }
+    public virtual string Category
+    { get { return GetProperty<string>(); } set { SetProperty(value); } }
+    public virtual string DisplayName
+    { get { return GetProperty<string>(); } set { SetProperty(value); } }
+    public virtual string Description
+    { get { return GetProperty<string>(); } set { SetProperty(value); } }
+    public virtual bool HasDefaultValue
+    { get { return GetProperty<bool>(); } set { SetProperty(value); } }
+    public virtual PropertyDescriptor Descriptor
+    { get { return GetProperty<PropertyDescriptor>(); } set { SetProperty(value); } }
+    public virtual TypeConverter Converter
+    { get { return GetProperty<TypeConverter>(); } set { SetProperty(value); } }
 
     public virtual object DefaultValue
     {

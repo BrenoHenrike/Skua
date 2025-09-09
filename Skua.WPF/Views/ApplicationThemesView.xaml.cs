@@ -3,6 +3,7 @@ using Skua.Core.ViewModels;
 using System.Windows.Controls;
 
 namespace Skua.WPF.Views;
+
 /// <summary>
 /// Interaction logic for ColorToolUserControl.xaml
 /// </summary>

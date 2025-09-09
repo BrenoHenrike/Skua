@@ -1,13 +1,13 @@
-﻿using System.Collections;
-using System.Collections.Generic;
-using Skua.Core.Interfaces;
+﻿using Skua.Core.Interfaces;
+using System.Collections;
 
 namespace Skua.Core.Flash;
 
 public class FlashArray<T> : FlashObject<T[]>, IFlashArray<T>, IEnumerable<FlashObject<T>>
 {
-
-    public FlashArray(int id, IFlashUtil flashUtil) : base(id, flashUtil) { }
+    public FlashArray(int id, IFlashUtil flashUtil) : base(id, flashUtil)
+    {
+    }
 
     public IFlashObject<T> Get(int index)
     {

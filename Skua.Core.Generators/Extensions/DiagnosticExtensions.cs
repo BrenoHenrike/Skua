@@ -1,8 +1,9 @@
-﻿using System.Collections.Immutable;
+﻿using Microsoft.CodeAnalysis;
+using System.Collections.Immutable;
 using System.Linq;
-using Microsoft.CodeAnalysis;
 
 namespace Skua.Core.Generators.Extensions;
+
 /// <summary>
 /// Extension methods specifically for creating diagnostics.
 /// </summary>

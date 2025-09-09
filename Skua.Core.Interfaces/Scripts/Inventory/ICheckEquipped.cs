@@ -13,6 +13,7 @@ public interface ICheckEquipped : ICanBank
     {
         return TryGetItem(name, out InventoryItem? item) && item!.Equipped;
     }
+
     /// <summary>
     /// Checks if the item with specified <paramref name="id"/> is equipped.
     /// </summary>

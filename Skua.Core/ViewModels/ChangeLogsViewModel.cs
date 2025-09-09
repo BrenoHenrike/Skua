@@ -3,21 +3,22 @@ using CommunityToolkit.Mvvm.Input;
 using Skua.Core.Interfaces;
 
 namespace Skua.Core.ViewModels;
+
 public class ChangeLogsViewModel : BotControlViewModelBase
 {
     private string _markDownContent = "Loading content...";
     private bool _hasLoadedOnce = false;
-    
+
     public ChangeLogsViewModel() : base("Change Logs", 460, 500)
     {
         _markDownContent = string.Empty;
 
-        OpenDelfinaDonationLink = new RelayCommand(() => Ioc.Default.GetRequiredService<IProcessService>().OpenLink("https://www.paypal.com/donate/?hosted_button_id=DMZFDRYJ5BT96"));
-        
+        OpenPurpleDonationLink = new RelayCommand(() => Ioc.Default.GetRequiredService<IProcessService>().OpenLink("https://www.paypal.com/paypalme/sharpiiee?country.x=US&locale.x=en_US"));
+
         OpenBrenoHenrikeDonationLink = new RelayCommand(() => Ioc.Default.GetRequiredService<IProcessService>().OpenLink("https://www.paypal.com/donate/?hosted_button_id=QVQ4Q7XSH9VBY"));
     }
 
-    public IRelayCommand OpenDelfinaDonationLink { get; }
+    public IRelayCommand OpenPurpleDonationLink { get; }
     public IRelayCommand OpenBrenoHenrikeDonationLink { get; }
 
     public string MarkdownDoc
@@ -31,7 +32,7 @@ public class ChangeLogsViewModel : BotControlViewModelBase
         using (var client = new HttpClient())
         {
             client.Timeout = TimeSpan.FromSeconds(10);
-            
+
             try
             {
                 var response = await client.GetAsync("https://raw.githubusercontent.com/BrenoHenrike/Skua/refs/heads/master/changelogs.md").ConfigureAwait(false);
@@ -44,7 +45,7 @@ public class ChangeLogsViewModel : BotControlViewModelBase
                         return;
                     }
                 }
-                
+
                 // If response was not successful, show error message
                 MarkdownDoc = $"### Unable to Load Changelog\r\n\r\nFailed to load changelog (HTTP {response.StatusCode}).\r\n\r\nPlease check your internet connection and try again later.\r\n\r\nYou can also view the latest releases at: [Skua Releases](https://github.com/BrenoHenrike/Skua/releases)";
             }
@@ -55,13 +56,13 @@ public class ChangeLogsViewModel : BotControlViewModelBase
             }
         }
     }
-    
+
     private async Task RefreshChangelogContent()
     {
         MarkdownDoc = "Refreshing changelog...";
         await GetChangeLogsContent();
     }
-    
+
     public async void OnActivated()
     {
         MarkdownDoc = "Loading changelog...";

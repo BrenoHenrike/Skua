@@ -2,6 +2,7 @@
 using System.Windows.Controls;
 
 namespace Skua.WPF.UserControls;
+
 /// <summary>
 /// Interaction logic for InputDialog.xaml
 /// </summary>

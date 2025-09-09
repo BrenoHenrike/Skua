@@ -101,7 +101,6 @@
                         Style="{StaticResource MaterialDesignToolButton}"
                         ToolTip="Home" />
                 </StackPanel>
-
             </materialDesign:ColorZone>
             <ContentPresenter Content="{Binding SelectedItem}" />
         </DockPanel>

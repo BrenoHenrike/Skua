@@ -21,6 +21,7 @@ public interface IScriptLite
     bool SmoothBackground { get; set; }
     bool UntargetDead { get; set; }
     bool UntargetSelf { get; set; }
+
     /// <summary>
     /// Gets the current value of an AQLite option (Advanced Options panel).
     /// </summary>
@@ -28,6 +29,7 @@ public interface IScriptLite
     /// <param name="optionName">Name of the option to be retrieved.</param>
     /// <returns>The value <typeparamref name="T"/> of the specified option.</returns>
     T? Get<T>(string optionName);
+
     /// <summary>
     /// Sets the value of an AQLite option (Advanced Options panel) to the specified value.
     /// </summary>

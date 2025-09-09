@@ -1,12 +1,12 @@
-﻿using System;
+﻿using Microsoft.CodeAnalysis;
+using Skua.Core.Generators.Extensions;
+using System;
 using System.Collections.Generic;
 using System.Collections.Immutable;
 using System.Globalization;
-using System.Xml.Linq;
-using Microsoft.CodeAnalysis;
-using Skua.Core.Generators.Extensions;
 
 namespace Skua.Core.Generators;
+
 public partial class GenericFieldAttributeGenerator<TInfo>
 {
     public static class Execute

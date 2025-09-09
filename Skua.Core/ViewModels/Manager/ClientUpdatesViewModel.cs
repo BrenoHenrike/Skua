@@ -1,13 +1,14 @@
 ﻿using CommunityToolkit.Mvvm.ComponentModel;
-using CommunityToolkit.Mvvm.Messaging;
 using CommunityToolkit.Mvvm.Input;
-using Skua.Core.Models.GitHub;
+using CommunityToolkit.Mvvm.Messaging;
 using Skua.Core.Interfaces;
 using Skua.Core.Messaging;
-using Skua.Core.Utils;
 using Skua.Core.Models;
+using Skua.Core.Models.GitHub;
+using Skua.Core.Utils;
 
 namespace Skua.Core.ViewModels.Manager;
+
 public partial class ClientUpdatesViewModel : BotControlViewModelBase
 {
     public ClientUpdatesViewModel(IClientUpdateService updateService, ISettingsService settingsService, IGetScriptsService scriptsService, IDialogService dialogService)
@@ -36,7 +37,7 @@ public partial class ClientUpdatesViewModel : BotControlViewModelBase
 
     private async void ReceiveUpdateScriptsMessage(ClientUpdatesViewModel recipient, UpdateScriptsMessage message)
     {
-        if(message.Reset)
+        if (message.Reset)
         {
             await recipient.ResetScripts(default);
             return;
@@ -70,12 +71,16 @@ public partial class ClientUpdatesViewModel : BotControlViewModelBase
 
     [ObservableProperty]
     private string _status = "Loading...";
+
     [ObservableProperty]
     private string? _progressStatus = null;
+
     [ObservableProperty]
     private bool _isBusy;
+
     [ObservableProperty]
     private bool _updateVisible;
+
     [ObservableProperty]
     private UpdateInfo? _latest;
 
@@ -87,21 +92,21 @@ public partial class ClientUpdatesViewModel : BotControlViewModelBase
         try
         {
             await _updateService.GetReleasesAsync();
-            
+
             bool checkPrereleases = _settingsService.Get("CheckClientPrereleases", false);
             UpdateInfo? latest = _updateService.Releases.FirstOrDefault(r => checkPrereleases || !r.Prerelease);
             UpdateVisible = latest?.ParsedVersion.CompareTo(_appVersion) > 0;
-            
+
             if (UpdateVisible)
                 Latest = latest;
 
             Releases.Clear();
-            foreach(var release in _updateService.Releases)
+            foreach (var release in _updateService.Releases)
             {
                 if (checkPrereleases || !release.Prerelease)
                     Releases.Add(new(release));
             }
-                
+
             Status = UpdateVisible ? "Update available" : "You have the latest version";
         }
         catch
@@ -112,13 +117,12 @@ public partial class ClientUpdatesViewModel : BotControlViewModelBase
         {
             IsBusy = false;
         }
-
     }
 
     [RelayCommand]
     public async Task Update()
     {
-        if(Latest is null)
+        if (Latest is null)
             return;
 
         IsBusy = true;
@@ -136,7 +140,6 @@ public partial class ClientUpdatesViewModel : BotControlViewModelBase
         recipient.ProgressStatus = null;
         recipient.IsBusy = false;
     }
-
 
     [RelayCommand]
     public async Task ResetScripts(CancellationToken token)
@@ -162,7 +165,6 @@ public partial class ClientUpdatesViewModel : BotControlViewModelBase
 
             int count = await Task.Run(async () => await _scriptsService.ManagerDownloadAllWhereAsync(s => !s.Downloaded || s.Outdated));
             ProgressStatus = $"Downloaded {count} scripts.";
-
         }
         catch (OperationCanceledException)
         {

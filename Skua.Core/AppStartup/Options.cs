@@ -1,17 +1,15 @@
-﻿using Microsoft.Extensions.DependencyInjection;
-using CommunityToolkit.Mvvm.ComponentModel;
+﻿using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.DependencyInjection;
 using CommunityToolkit.Mvvm.Input;
+using Microsoft.Extensions.DependencyInjection;
 using Skua.Core.Interfaces;
 using Skua.Core.Scripts;
 using Skua.Core.Utils;
 using Skua.Core.ViewModels;
-using System;
-using System.Collections.Generic;
-using System.IO;
 using System.Reflection;
 
 namespace Skua.Core.AppStartup;
+
 internal class Options
 {
     internal static GameOptionsViewModel CreateGameOptions(IServiceProvider s)
@@ -35,7 +33,9 @@ internal class Options
                 options.Add(CreateOptionItem<string>(s, pi.Name, "2", new RelayCommand<string>(value => pi.SetValue(scriptOpt, value))));
             else if (pi.PropertyType == typeof(int))
             {
-                options.Add(CreateOptionItem<int>(s, pi.Name, "3", new RelayCommand<string>(value =>
+                // Special handling for SetFPS to add "FPS" suffix
+                string? suffixText = pi.Name == nameof(IScriptOption.SetFPS) ? "FPS" : null;
+                options.Add(CreateOptionItemWithSuffix<int>(s, pi.Name, "3", suffixText, new RelayCommand<string>(value =>
                 {
                     if (!int.TryParse(value, out int result))
                         return;
@@ -54,6 +54,12 @@ internal class Options
         {
             return new BindingOptionItemViewModel<T, ScriptOption>(s.GetRequiredService<IDecamelizer>().Decamelize(binding, null), tag, binding, (ScriptOption)s.GetRequiredService<IScriptOption>(), command);
         }
+        static BindingOptionItemViewModel<T, ScriptOption> CreateOptionItemWithSuffix<T>(IServiceProvider s, string binding, string tag, string? suffixText, IRelayCommand command)
+        {
+            var item = new BindingOptionItemViewModel<T, ScriptOption>(s.GetRequiredService<IDecamelizer>().Decamelize(binding, null), tag, binding, (ScriptOption)s.GetRequiredService<IScriptOption>(), command);
+            item.SuffixText = suffixText;
+            return item;
+        }
     }
 
     internal static ApplicationOptionsViewModel CreateAppOptions(IServiceProvider s)
@@ -64,7 +70,7 @@ internal class Options
             CreateSettingOptionItem<bool>("Check for Script Updates", "Whether to check for scripts updates when launching the Manager", "CheckBotScriptsUpdates"),
             CreateSettingOptionItem<bool>("Auto Update AdvanceSkill Sets", "Whether to auto update advance skill sets when launching the Manager, needs \"Check for AdvanceSkill Sets updates\" to be true", "AutoUpdateAdvanceSkillSetsUpdates"),
             CreateSettingOptionItem<bool>("Check for AdvanceSkill Sets Updates", "Whether to check for scripts updates when launching the Manager", "CheckAdvanceSkillSetsUpdates"),
-            new CommandOptionItemViewModel<int>("* Client Animation Framerate", "ClientAnim", new RelayCommand<string>(value =>
+            new CommandOptionItemViewModel<int>("* Client Animation Framerate", "Client side animation framerate setting", "ClientAnim", "FPS", new RelayCommand<string>(value =>
             {
                 if (!int.TryParse(value, out int result) || result < 1)
                     return;

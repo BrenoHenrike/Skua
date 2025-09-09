@@ -2,6 +2,7 @@
 using Skua.Core.Models;
 
 namespace Skua.Core.Services;
+
 public class ClientFilesService : IClientFilesService
 {
     public void CreateDirectories()
@@ -9,7 +10,7 @@ public class ClientFilesService : IClientFilesService
         if (!Directory.Exists(ClientFileSources.SkuaDIR))
         {
             Directory.CreateDirectory(ClientFileSources.SkuaDIR);
-            
+
             if (!Directory.Exists(ClientFileSources.SkuaOptionsDIR))
                 Directory.CreateDirectory(ClientFileSources.SkuaOptionsDIR);
             if (!Directory.Exists(ClientFileSources.SkuaScriptsDIR))

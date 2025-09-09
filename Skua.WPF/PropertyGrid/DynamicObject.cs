@@ -7,6 +7,7 @@ using System.Text;
 using System.Threading;
 
 namespace Skua.WPF;
+
 /// <summary>
 /// Represents a dynamic object whose properties can be added or removed at runtime.
 /// </summary>
@@ -204,7 +205,6 @@ public class DynamicObject : ICustomTypeDescriptor, IFormattable, INotifyPropert
             {
                 if (existing == null)
                     return;
-
             }
             else if (value.Equals(existing))
                 return;

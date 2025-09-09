@@ -1,15 +1,20 @@
-﻿using CommunityToolkit.Mvvm.DependencyInjection;
+using CommunityToolkit.Mvvm.DependencyInjection;
 using CommunityToolkit.Mvvm.Input;
 using CommunityToolkit.Mvvm.Messaging;
 using Skua.Core.Interfaces;
 using Skua.Core.Messaging;
-using System;
-using System.Collections.Generic;
-using System.Windows.Input;
+using System.Runtime.InteropServices;
 
 namespace Skua.Core.AppStartup;
+
 internal class HotKeys
 {
+    [DllImport("user32.dll")]
+    private static extern IntPtr GetForegroundWindow();
+
+    [DllImport("user32.dll")]
+    private static extern uint GetWindowThreadProcessId(IntPtr hWnd, out uint processId);
+
     internal static Dictionary<string, IRelayCommand> CreateHotKeys(IServiceProvider s)
     {
         Dictionary<string, IRelayCommand> hotKeys = new()
@@ -27,7 +32,19 @@ internal class HotKeys
 
     private static bool CanExecuteHotKey()
     {
-        return Ioc.Default.GetRequiredService<IFlashUtil>().GetGameObject("stage.focus") != "null";
+        try
+        {
+            IntPtr foregroundWindow = GetForegroundWindow();
+            if (foregroundWindow == IntPtr.Zero)
+                return false;
+
+            GetWindowThreadProcessId(foregroundWindow, out uint foregroundProcessId);
+            return foregroundProcessId == (uint)Environment.ProcessId;
+        }
+        catch
+        {
+            return false;
+        }
     }
 
     private static void ToggleAutoHunt()

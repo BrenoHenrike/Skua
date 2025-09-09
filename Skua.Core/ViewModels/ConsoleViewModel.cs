@@ -3,6 +3,7 @@ using CommunityToolkit.Mvvm.Input;
 using Skua.Core.Interfaces;
 
 namespace Skua.Core.ViewModels;
+
 public partial class ConsoleViewModel : BotControlViewModelBase
 {
     private const string _source =
@@ -29,6 +30,7 @@ public class Script{ public void ScriptMain(IScriptInterface bot){";
 
     private readonly IDialogService _dialogService;
     private readonly IScriptManager _scriptManager;
+
     [ObservableProperty]
     private string _snippetText = "bot.Log(\"Test\");";
 

@@ -1,17 +1,18 @@
+using CommunityToolkit.Mvvm.ComponentModel;
 using Microsoft.Extensions.DependencyInjection;
-using CommunityToolkit.Mvvm.DependencyInjection;
 using Skua.Core.Interfaces;
 using Skua.Core.ViewModels;
 using System;
 using System.Collections.Generic;
 using System.Linq;
-using CommunityToolkit.Mvvm.ComponentModel;
 using System.Windows;
 
 namespace Skua.WPF.Services;
+
 public class WindowService : IWindowService, IDisposable
 {
     private Dictionary<string, HostWindow> _managedWindows = new();
+
     public WindowService(IServiceProvider services)
     {
         _services = services;
@@ -22,7 +23,7 @@ public class WindowService : IWindowService, IDisposable
     public void ShowWindow<TViewModel>()
         where TViewModel : class
     {
-        if(typeof(TViewModel) == typeof(BotWindowViewModel))
+        if (typeof(TViewModel) == typeof(BotWindowViewModel))
         {
             BotWindow botWindow = new();
             botWindow.DataContext = _services.GetService<TViewModel>();
@@ -64,12 +65,23 @@ public class WindowService : IWindowService, IDisposable
         var window = _managedWindows[key];
         if (window.IsVisible)
         {
+            // Window is already visible, bring it to front
             window.Activate();
+            if (window.WindowState == WindowState.Minimized)
+            {
+                window.WindowState = WindowState.Normal;
+            }
             return;
         }
 
+        // Show the window (whether it was hidden or never shown)
         window.Show();
-        if(window.DataContext is ObservableRecipient recipient)
+        window.Activate(); // Ensure it gets focus
+        if (window.WindowState == WindowState.Minimized)
+        {
+            window.WindowState = WindowState.Normal;
+        }
+        if (window.DataContext is ObservableRecipient recipient)
             recipient.IsActive = true;
     }
 
@@ -81,9 +93,11 @@ public class WindowService : IWindowService, IDisposable
         HostWindow window = new()
         {
             DataContext = viewModel,
+            Width = viewModel.Width,
+            Height = viewModel.Height,
             WindowStartupLocation = System.Windows.WindowStartupLocation.CenterScreen
         };
-        
+
         // Clean up when window is closed
         void windowClosedHandler(object? sender, EventArgs e)
         {
@@ -91,7 +105,7 @@ public class WindowService : IWindowService, IDisposable
             {
                 w.Closed -= windowClosedHandler;
                 _managedWindows.Remove(key);
-                
+
                 // Clean up DataContext
                 if (w.DataContext is IDisposable disposable)
                 {
@@ -100,7 +114,7 @@ public class WindowService : IWindowService, IDisposable
                 w.DataContext = null;
             }
         }
-        
+
         window.Closed += windowClosedHandler;
         _managedWindows.Add(key, window);
     }

@@ -1,10 +1,11 @@
-﻿using CommunityToolkit.Mvvm.Messaging;
-using Skua.Core.Interfaces;
-using Skua.Core.Models.Items;
+using CommunityToolkit.Mvvm.Messaging;
 using Skua.Core.Flash;
+using Skua.Core.Interfaces;
 using Skua.Core.Messaging;
+using Skua.Core.Models.Items;
 
 namespace Skua.Core.Scripts;
+
 public partial class ScriptBank : IScriptBank
 {
     public ScriptBank(
@@ -49,10 +50,13 @@ public partial class ScriptBank : IScriptBank
     private IScriptPlayer Player => _lazyPlayer.Value;
 
     public bool Loaded { get; set; } = false;
+
     [ObjectBinding("world.bankinfo.items", Default = "new()")]
     private List<InventoryItem> _items = new();
+
     [ObjectBinding("world.myAvatar.objData.iBankSlots")]
     private int _slots;
+
     [ObjectBinding("world.myAvatar.iBankCount")]
     private int _usedSlots;
 

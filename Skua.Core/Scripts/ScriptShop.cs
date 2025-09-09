@@ -1,4 +1,4 @@
-﻿using CommunityToolkit.Mvvm.Messaging;
+using CommunityToolkit.Mvvm.Messaging;
 using Skua.Core.Flash;
 using Skua.Core.Interfaces;
 using Skua.Core.Messaging;
@@ -54,9 +54,12 @@ public partial class ScriptShop : IScriptShop
 
     [ObjectBinding("world.shopinfo.items", Default = "new()")]
     private List<ShopItem> _items = new();
+
     public bool IsLoaded => !Flash.IsNull("world.shopinfo");
+
     [ObjectBinding("world.shopinfo.ShopID")]
     private int _ID;
+
     [ObjectBinding("world.shopinfo.sName", Default = "string.Empty")]
     private string _name = string.Empty;
 
@@ -121,5 +124,6 @@ public partial class ScriptShop : IScriptShop
     }
 
     [MethodCallBinding("openArmorCustomize", GameFunction = true)]
-    private void _loadArmourCustomizer() { }
+    private void _loadArmourCustomizer()
+    { }
 }

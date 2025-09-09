@@ -37,14 +37,38 @@
                 ItemsSource="{Binding SkuaProcesses}">
                 <ItemsControl.ItemTemplate>
                     <DataTemplate>
-                        <StackPanel HorizontalAlignment="Stretch" Orientation="Horizontal">
-                            <TextBlock VerticalAlignment="Center" Text="{Binding ProcessName}" />
-                            <Button
-                                Margin="10,3"
-                                Command="{Binding RelativeSource={RelativeSource AncestorType=UserControl}, Path=DataContext.StopProcessCommand}"
-                                CommandParameter="{Binding}"
-                                Content="{materialDesign:PackIcon Kind=Close}" />
-                        </StackPanel>
+                        <Border
+                            Margin="0,2"
+                            Padding="8,4"
+                            BorderBrush="{DynamicResource MaterialDesignDivider}"
+                            BorderThickness="0,0,0,1">
+                            <Grid>
+                                <Grid.ColumnDefinitions>
+                                    <ColumnDefinition Width="*" />
+                                    <ColumnDefinition Width="Auto" />
+                                    <ColumnDefinition Width="Auto" />
+                                </Grid.ColumnDefinitions>
+                                <StackPanel Grid.Column="0" VerticalAlignment="Center">
+                                    <TextBlock
+                                        FontSize="14"
+                                        FontWeight="Medium"
+                                        Text="{Binding AccountName}" />
+                                    <TextBlock
+                                        FontSize="11"
+                                        Foreground="{DynamicResource MaterialDesignBodyLight}"
+                                        Text="{Binding ProcessId, StringFormat='PID: {0}'}" />
+                                </StackPanel>
+                                <Button
+                                    Grid.Column="2"
+                                    Margin="10,0,0,0"
+                                    Style="{StaticResource MaterialDesignFlatButton}"
+                                    ToolTip="Kill Process"
+                                    Command="{Binding RelativeSource={RelativeSource AncestorType=UserControl}, Path=DataContext.StopProcessCommand}"
+                                    CommandParameter="{Binding}"
+                                    Content="{materialDesign:PackIcon Kind=Close, Size=20}"
+                                    Foreground="{DynamicResource MaterialDesignValidationErrorBrush}" />
+                            </Grid>
+                        </Border>
                     </DataTemplate>
                 </ItemsControl.ItemTemplate>
             </ItemsControl>

@@ -24,6 +24,6 @@
             Foreground="White"
             Margin="20,10,0,20"
             DataContextChanged="Markdownview_DataContextChanged"
-            Markdown="{Binding MarkdownDoc, UpdateSourceTrigger=PropertyChanged}"/>
+            Markdown="{Binding MarkdownDoc, UpdateSourceTrigger=PropertyChanged}" />
     </Grid>
 </UserControl>

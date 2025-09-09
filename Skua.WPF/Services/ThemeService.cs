@@ -1,14 +1,16 @@
-﻿using MaterialDesignColors;
-using MaterialDesignThemes.Wpf;
 using CommunityToolkit.Mvvm.ComponentModel;
+using MaterialDesignColors;
+using MaterialDesignThemes.Wpf;
 using Skua.Core.Interfaces;
 using Skua.Core.Models;
 using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Windows.Media;
+using System.Windows.Threading;
 
 namespace Skua.WPF.Services;
+
 public class ThemeService : ObservableObject, IThemeService
 {
     public ThemeService(ThemeUserSettingsService themeSettings)
@@ -78,12 +80,14 @@ public class ThemeService : ObservableObject, IThemeService
     }
 
     public event ThemeChangedEventHandler ThemeChanged;
+
     public event SchemeChangedEventHandler SchemeChanged;
 
     private void OnThemeChanged(object? theme)
     {
         ThemeChanged?.Invoke(theme);
     }
+
     private void OnSchemeChanged(ColorScheme scheme, object? color)
     {
         SchemeChanged?.Invoke(scheme, color);
@@ -95,9 +99,12 @@ public class ThemeService : ObservableObject, IThemeService
     private readonly PaletteHelper _paletteHelper = new();
     private readonly ThemeUserSettingsService _themeSettings;
     private Color? _primaryColor;
+
     //private Color? _secondaryColor;
     private Color? _primaryForegroundColor;
+
     //private Color? _secondaryForegroundColor;
+
 
     private ColorScheme _activeScheme;
 
@@ -108,6 +115,7 @@ public class ThemeService : ObservableObject, IThemeService
     }
 
     private object? _selectedColor;
+
     public object? SelectedColor
     {
         get => _selectedColor;
@@ -134,9 +142,11 @@ public class ThemeService : ObservableObject, IThemeService
             }
         }
     }
+
     public IEnumerable<object> ColorSelectionValues => Enum.GetValues(typeof(ColorSelection)).Cast<object>();
 
     private object _colorSelectionValue = ColorSelection.All;
+
     public object ColorSelectionValue
     {
         get => _colorSelectionValue;
@@ -156,6 +166,7 @@ public class ThemeService : ObservableObject, IThemeService
     public IEnumerable<object> ContrastValues => Enum.GetValues(typeof(Contrast)).Cast<object>();
 
     private object _contrastValue = Contrast.Medium;
+
     public object ContrastValue
     {
         get => _contrastValue;
@@ -173,6 +184,7 @@ public class ThemeService : ObservableObject, IThemeService
     }
 
     private float _desiredContrastRatio = 4.5f;
+
     public float DesiredContrastRatio
     {
         get => _desiredContrastRatio;
@@ -190,6 +202,7 @@ public class ThemeService : ObservableObject, IThemeService
     }
 
     private bool _isColorAdjusted;
+
     public bool IsColorAdjusted
     {
         get => _isColorAdjusted;
@@ -216,15 +229,17 @@ public class ThemeService : ObservableObject, IThemeService
     }
 
     private bool _isDarkTheme;
+
     public bool IsDarkTheme
     {
         get => _isDarkTheme;
         set
         {
             if (SetProperty(ref _isDarkTheme, value))
-                ModifyTheme((theme, val)=> theme.SetBaseTheme(val ? Theme.Dark : Theme.Light), value);
+                ModifyTheme((theme, val) => theme.SetBaseTheme(val ? Theme.Dark : Theme.Light), value);
         }
     }
+
 
     public void ApplyBaseTheme(bool isDark)
     {
@@ -255,10 +270,10 @@ public class ThemeService : ObservableObject, IThemeService
                 SetPrimaryForegroundToSingleColor(theme, color);
                 _primaryForegroundColor = color;
                 return;
-            //case ColorScheme.SecondaryForeground:
-            //    SetSecondaryForegroundToSingleColor(theme, color);
-            //    _secondaryForegroundColor = color;
-            //    return;
+                //case ColorScheme.SecondaryForeground:
+                //    SetSecondaryForegroundToSingleColor(theme, color);
+                //    _secondaryForegroundColor = color;
+                //    return;
         }
 
         _paletteHelper.SetTheme(theme);
@@ -278,9 +293,9 @@ public class ThemeService : ObservableObject, IThemeService
             case ColorScheme.PrimaryForeground:
                 SelectedColor = _primaryForegroundColor;
                 break;
-            //case ColorScheme.SecondaryForeground:
-            //    SelectedColor = _secondaryForegroundColor;
-            //    break;
+                //case ColorScheme.SecondaryForeground:
+                //    SelectedColor = _secondaryForegroundColor;
+                //    break;
         }
 
         OnSchemeChanged(scheme, scheme == ColorScheme.Primary ? _primaryColor : _primaryForegroundColor);
@@ -327,4 +342,5 @@ public class ThemeService : ObservableObject, IThemeService
 
         _paletteHelper.SetTheme(theme);
     }
+
 }

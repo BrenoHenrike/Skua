@@ -6,12 +6,12 @@ using System.Windows.Interop;
 using System.Windows.Shell;
 
 namespace Skua.WPF;
+
 [TemplatePart(Name = "PART_Close", Type = typeof(Button))]
 [TemplatePart(Name = "PART_Maximize", Type = typeof(Button))]
 [TemplatePart(Name = "PART_Minimize", Type = typeof(Button))]
 public partial class CustomWindow : Window
 {
-
     private Button? _btnClose;
     private Button? _btnMaximize;
     private Button? _btnMinimize;
@@ -24,10 +24,11 @@ public partial class CustomWindow : Window
     /// Dependency property to set if the custom window should be of Fixed Size.
     /// </summary>
     public bool FixedSize
-    { 
-        get { return (bool)GetValue(FixedSizeProperty); } 
+    {
+        get { return (bool)GetValue(FixedSizeProperty); }
         set { SetValue(FixedSizeProperty, value); }
     }
+
     public static readonly DependencyProperty FixedSizeProperty =
         DependencyProperty.Register("FixedSize", typeof(bool), typeof(CustomWindow), new PropertyMetadata(false));
 

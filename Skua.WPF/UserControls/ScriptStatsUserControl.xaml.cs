@@ -1,6 +1,7 @@
 ﻿using System.Windows.Controls;
 
 namespace Skua.WPF.UserControls;
+
 /// <summary>
 /// Interaction logic for ScriptStatsUserControl.xaml
 /// </summary>

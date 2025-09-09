@@ -1,8 +1,9 @@
-﻿using System.Windows.Controls;
-using Microsoft.Xaml.Behaviors;
+﻿using Microsoft.Xaml.Behaviors;
 using Skua.Core.Utils;
+using System.Windows.Controls;
 
 namespace Skua.WPF;
+
 public class TextBoxOnlyNumbersBehavior : Behavior<TextBox>
 {
     protected override void OnAttached()

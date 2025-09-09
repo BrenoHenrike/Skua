@@ -3,6 +3,7 @@ using Skua.Core.Interfaces;
 using Skua.Core.ViewModels;
 
 namespace Skua.Core.Options;
+
 public class OptionContainer : ObservableObject, IOptionContainer
 {
     private readonly IDialogService _dialogService;

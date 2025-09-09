@@ -6,15 +6,16 @@ using Skua.Core.Models.GitHub;
 using Skua.Core.Utils;
 
 namespace Skua.Core.Services;
+
 public partial class GetScriptsService : ObservableObject, IGetScriptsService
 {
     private readonly IDialogService _dialogService;
     private const string _rawScriptsJsonUrl = "https://raw.githubusercontent.com/BrenoHenrike/Scripts/Skua/scripts.json";
     private const string _skillsSetsRawUrl = "https://raw.githubusercontent.com/BrenoHenrike/Scripts/Skua/Skills/AdvancedSkills.txt";
-    
+
     [ObservableProperty]
     private RangedObservableCollection<ScriptInfo> _scripts = new();
-    
+
     public GetScriptsService(IDialogService dialogService)
     {
         _dialogService = dialogService;
@@ -24,7 +25,7 @@ public partial class GetScriptsService : ObservableObject, IGetScriptsService
     {
         if (_scripts.Any())
             return _scripts.ToList();
-        
+
         await GetScripts(progress, false, token);
 
         return _scripts.ToList();
@@ -40,13 +41,13 @@ public partial class GetScriptsService : ObservableObject, IGetScriptsService
         try
         {
             Scripts.Clear();
-            
+
             progress?.Report("Fetching scripts...");
             List<ScriptInfo> scripts = await GetScriptsInfo(refresh, token);
 
             progress?.Report($"Found {scripts.Count} scripts.");
             _scripts.AddRange(scripts);
-            
+
             progress?.Report($"Fetched {scripts.Count} scripts.");
             OnPropertyChanged(nameof(Scripts));
         }
@@ -90,7 +91,7 @@ public partial class GetScriptsService : ObservableObject, IGetScriptsService
         DirectoryInfo parent = Directory.GetParent(info.ManagerLocalFile)!;
         if (!parent.Exists)
             parent.Create();
-        
+
         using (HttpResponseMessage response = await HttpClients.Default.GetAsync(info.DownloadUrl))
         {
             string script = await response.Content.ReadAsStringAsync();

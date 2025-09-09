@@ -1,20 +1,20 @@
-﻿using System.Text;
-using System.Xml.Linq;
-using System.Dynamic;
-using AxShockwaveFlashObjects;
-using System.Security;
+﻿using AxShockwaveFlashObjects;
+using CommunityToolkit.Mvvm.DependencyInjection;
+using CommunityToolkit.Mvvm.Messaging;
+using Skua.Core.Flash;
+using Skua.Core.Interfaces;
+using Skua.Core.Messaging;
 using Skua.Core.Utils;
 using System;
 using System.Collections.Generic;
-using System.Linq;
-using Skua.Core.Interfaces;
-using Skua.Core.Flash;
+using System.Dynamic;
 using System.IO;
-using System.Windows.Forms;
-using CommunityToolkit.Mvvm.Messaging;
-using Skua.Core.Messaging;
+using System.Linq;
+using System.Security;
+using System.Text;
 using System.Threading;
-using CommunityToolkit.Mvvm.DependencyInjection;
+using System.Windows.Forms;
+using System.Xml.Linq;
 
 namespace Skua.WPF.Flash;
 
@@ -66,7 +66,6 @@ public class FlashUtil : IFlashUtil
                 writer.Seek(0, SeekOrigin.Begin);
                 flash.OcxState = new AxHost.State(stream, 1, false, null);
             }
-
         }
         catch
         {
@@ -139,18 +138,22 @@ public class FlashUtil : IFlashUtil
         {
             case null:
                 return "<null/>";
+
             case bool _:
                 return $"<{o.ToString()!.ToLower()}/>";
+
             case double _:
             case float _:
             case long _:
             case int _:
                 return $"<number>{o}</number>";
+
             case ExpandoObject _:
                 StringBuilder sb = new StringBuilder().Append("<object>");
                 foreach (KeyValuePair<string, object> kvp in (o as IDictionary<string, object>)!)
                     sb.Append($"<property id=\"{kvp.Key}\">{ToFlashXml(kvp.Value)}</property>");
                 return sb.Append("</object>").ToString();
+
             default:
                 if (o is Array)
                 {
@@ -170,18 +173,24 @@ public class FlashUtil : IFlashUtil
         {
             case "number":
                 return int.TryParse(el.Value, out int i) ? i : float.TryParse(el.Value, out float f) ? f : 0;
+
             case "true":
                 return true;
+
             case "false":
                 return false;
+
             case "null":
                 return null!;
+
             case "array":
                 return el.Elements().Select(e => FromFlashXml(e)).ToArray();
+
             case "object":
                 dynamic d = new ExpandoObject();
                 el.Elements().ForEach(e => d[e.Attribute("id")!.Value] = FromFlashXml(e.Elements().First()));
                 return d;
+
             default:
                 return el.Value;
         }

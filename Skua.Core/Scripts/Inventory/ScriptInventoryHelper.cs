@@ -2,6 +2,7 @@
 using Skua.Core.Models.Items;
 
 namespace Skua.Core.Scripts;
+
 public class ScriptInventoryHelper : IScriptInventoryHelper
 {
     private readonly Lazy<IScriptInventory> _lazyInventory;
@@ -19,7 +20,7 @@ public class ScriptInventoryHelper : IScriptInventoryHelper
         Lazy<IScriptTempInv> tempInv,
         Lazy<IScriptBank> bank)
     {
-        _lazyInventory  = inventory;
+        _lazyInventory = inventory;
         _lazyHouseInv = houseInv;
         _lazyTempInv = tempInv;
         _lazyBank = bank;

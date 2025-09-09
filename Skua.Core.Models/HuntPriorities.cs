@@ -10,14 +10,17 @@ public enum HuntPriorities
     /// No priority.
     /// </summary>
     None = 0,
+
     /// <summary>
     /// Prioritises monsters with the lowest HP.
     /// </summary>
     LowHP = 1,
+
     /// <summary>
     /// Prioritises monsters with the highest HP.
     /// </summary>
     HighHP = 2,
+
     /// <summary>
     /// Prioritises monsters which are in the same cell.
     /// </summary>

@@ -1,19 +1,18 @@
-﻿using CommunityToolkit.Mvvm.ComponentModel;
-using CommunityToolkit.Mvvm.Input;
-using Skua.Core.Utils;
+﻿using CommunityToolkit.Mvvm.Input;
 using System.Diagnostics;
 
 namespace Skua.Core.ViewModels;
+
 public class AboutViewModel : BotControlViewModelBase
 {
     private string _markDownContent = "Loading content...";
-    
+
     public AboutViewModel() : base("About")
     {
         _markDownContent = string.Empty;
-        
+
         Task.Run(async () => await GetAboutContent());
-        
+
         NavigateCommand = new RelayCommand<string>(url => Process.Start(new ProcessStartInfo(url) { UseShellExecute = true }));
     }
 
@@ -27,9 +26,9 @@ public class AboutViewModel : BotControlViewModelBase
 
     private async Task GetAboutContent()
     {
-        using(var client = new HttpClient())
+        using (var client = new HttpClient())
         {
-            var response = await client.GetAsync("https://raw.githubusercontent.com/BrenoHenrike/Skua/op-version/about.md");
+            var response = await client.GetAsync("https://raw.githubusercontent.com/BrenoHenrike/Skua/refs/heads/master/readme.md");
             if (!response.IsSuccessStatusCode)
                 MarkdownDoc = "### No content found. Please check your internet connection.";
 

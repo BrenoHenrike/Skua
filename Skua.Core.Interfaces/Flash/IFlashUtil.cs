@@ -1,10 +1,10 @@
-﻿using System.ComponentModel;
+﻿using Newtonsoft.Json;
 using System.Xml.Linq;
-using Newtonsoft.Json;
 
 namespace Skua.Core.Interfaces;
 
 public delegate void FlashCallHandler(string function, params object[] args);
+
 public interface IFlashUtil : IDisposable
 {
     event FlashCallHandler? FlashCall;
@@ -24,6 +24,7 @@ public interface IFlashUtil : IDisposable
     /// <param name="args">Parameters of the called <paramref name="function"/></param>
     /// <returns>A <see cref="string"/> representation of the return value.</returns>
     string? Call(string function, params object[] args);
+
     /// <summary>
     /// Make a flash call for the specified <paramref name="function"/>.
     /// </summary>
@@ -32,6 +33,7 @@ public interface IFlashUtil : IDisposable
     /// <param name="args">Parameters of the called <paramref name="function"/></param>
     /// <returns>An object of the specified <typeparamref name="T"/> or <see langword="null"/></returns>
     T? Call<T>(string function, params object[] args);
+
     /// <summary>
     /// Make a flash call for the specified <paramref name="function"/>.
     /// </summary>
@@ -40,12 +42,14 @@ public interface IFlashUtil : IDisposable
     /// <param name="args">Parameters of the called <paramref name="function"/></param>
     /// <returns>An <see cref="object"/> of the specified <paramref name="type"/> or <see langword="null"/></returns>
     object? Call(string function, Type type, params object[] args);
+
     /// <summary>
     /// Converts a <see cref="XElement"/> to <see cref="object"/>.
     /// </summary>
     /// <param name="el">Element to parse.</param>
     /// <returns>An <see cref="object"/> representing the converted <see cref="XElement"/>.</returns>
     object FromFlashXml(XElement el);
+
     /// <summary>
     /// Creates a <see cref="IFlashObject{T}"/> from the specified <paramref name="path"/>.
     /// </summary>
@@ -53,6 +57,7 @@ public interface IFlashUtil : IDisposable
     /// <param name="path">Path to get the object from.</param>
     /// <returns></returns>
     IFlashObject<T> CreateFlashObject<T>(string path);
+
     /// <summary>
     /// Checks if the actionscript object at the given path is null.
     /// </summary>

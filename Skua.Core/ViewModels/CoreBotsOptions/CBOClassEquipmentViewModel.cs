@@ -5,6 +5,7 @@ using Skua.Core.Models.Items;
 using System.Text;
 
 namespace Skua.Core.ViewModels;
+
 public partial class CBOClassEquipmentViewModel : ObservableObject, IManageCBOptions
 {
     public CBOClassEquipmentViewModel(IScriptInventory inventory)
@@ -14,36 +15,46 @@ public partial class CBOClassEquipmentViewModel : ObservableObject, IManageCBOpt
 
     private readonly IScriptInventory _inventory;
 
-    public List<string> Helms {get; private set; } = new();
-    public List<string> Armors {get; private set; } = new();
-    public List<string> Capes {get; private set; } = new();
-    public List<string> Weapons {get; private set; } = new();
-    public List<string> Pets {get; private set; } = new();
+    public List<string> Helms { get; private set; } = new();
+    public List<string> Armors { get; private set; } = new();
+    public List<string> Capes { get; private set; } = new();
+    public List<string> Weapons { get; private set; } = new();
+    public List<string> Pets { get; private set; } = new();
     public List<string> GroundItems { get; private set; } = new();
 
     [ObservableProperty]
     private string? _selectedFarmHelm;
+
     [ObservableProperty]
     private string? _selectedFarmArmor;
+
     [ObservableProperty]
     private string? _selectedFarmCape;
+
     [ObservableProperty]
     private string? _selectedFarmWeapon;
+
     [ObservableProperty]
     private string? _selectedFarmPet;
+
     [ObservableProperty]
     private string? _selectedFarmGroundItem;
 
     [ObservableProperty]
     private string? _selectedSoloHelm;
+
     [ObservableProperty]
     private string? _selectedSoloArmor;
+
     [ObservableProperty]
     private string? _selectedSoloCape;
+
     [ObservableProperty]
     private string? _selectedSoloWeapon;
+
     [ObservableProperty]
     private string? _selectedSoloPet;
+
     [ObservableProperty]
     private string? _selectedSoloGroundItem;
 
@@ -88,28 +99,28 @@ public partial class CBOClassEquipmentViewModel : ObservableObject, IManageCBOpt
     {
         if (!string.IsNullOrEmpty(SelectedSoloHelm = GetValue("Helm1Select")))
             Helms.Add(SelectedSoloHelm);
-        if(!string.IsNullOrEmpty(SelectedSoloArmor = GetValue("Armor1Select")))
+        if (!string.IsNullOrEmpty(SelectedSoloArmor = GetValue("Armor1Select")))
             Armors.Add(SelectedSoloArmor);
-        if(!string.IsNullOrEmpty(SelectedSoloCape = GetValue("Cape1Select")))
+        if (!string.IsNullOrEmpty(SelectedSoloCape = GetValue("Cape1Select")))
             Capes.Add(SelectedSoloCape);
-        if(!string.IsNullOrEmpty(SelectedSoloWeapon = GetValue("Weapon1Select")))
+        if (!string.IsNullOrEmpty(SelectedSoloWeapon = GetValue("Weapon1Select")))
             Weapons.Add(SelectedSoloWeapon);
-        if(!string.IsNullOrEmpty(SelectedSoloPet = GetValue("Pet1Select")))
+        if (!string.IsNullOrEmpty(SelectedSoloPet = GetValue("Pet1Select")))
             Pets.Add(SelectedSoloPet);
-        if(!string.IsNullOrEmpty(SelectedSoloGroundItem = GetValue("GroundItem1Select")))
+        if (!string.IsNullOrEmpty(SelectedSoloGroundItem = GetValue("GroundItem1Select")))
             GroundItems.Add(SelectedSoloGroundItem);
 
-        if(!string.IsNullOrEmpty(SelectedFarmHelm = GetValue("Helm2Select")))
+        if (!string.IsNullOrEmpty(SelectedFarmHelm = GetValue("Helm2Select")))
             Helms.Add(SelectedFarmHelm);
-        if(!string.IsNullOrEmpty(SelectedFarmArmor = GetValue("Armor2Select")))
+        if (!string.IsNullOrEmpty(SelectedFarmArmor = GetValue("Armor2Select")))
             Armors.Add(SelectedFarmArmor);
-        if(!string.IsNullOrEmpty(SelectedFarmCape = GetValue("Cape2Select")))
+        if (!string.IsNullOrEmpty(SelectedFarmCape = GetValue("Cape2Select")))
             Capes.Add(SelectedFarmCape);
-        if(!string.IsNullOrEmpty(SelectedFarmWeapon = GetValue("Weapon2Select")))
+        if (!string.IsNullOrEmpty(SelectedFarmWeapon = GetValue("Weapon2Select")))
             Weapons.Add(SelectedFarmWeapon);
-        if(!string.IsNullOrEmpty(SelectedFarmPet = GetValue("Pet2Select")))
+        if (!string.IsNullOrEmpty(SelectedFarmPet = GetValue("Pet2Select")))
             Pets.Add(SelectedFarmPet);
-        if(!string.IsNullOrEmpty(SelectedFarmGroundItem = GetValue("GroundItem2Select")))
+        if (!string.IsNullOrEmpty(SelectedFarmGroundItem = GetValue("GroundItem2Select")))
             GroundItems.Add(SelectedFarmGroundItem);
 
         string GetValue(string key) => values.TryGetValue(key, out string? value) ? value : string.Empty;

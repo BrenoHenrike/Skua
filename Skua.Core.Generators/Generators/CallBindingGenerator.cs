@@ -1,10 +1,10 @@
-﻿using System.Collections.Immutable;
-using System.Text;
-using Microsoft.CodeAnalysis;
+﻿using Microsoft.CodeAnalysis;
 using Skua.Core.Generators.Extensions;
 using Skua.Core.Generators.Models;
-using static Skua.Core.Generators.Diagnostics.DiagnosticDescriptors;
+using System.Collections.Immutable;
+using System.Text;
 using static Skua.Core.Generators.Attributes;
+using static Skua.Core.Generators.Diagnostics.DiagnosticDescriptors;
 
 namespace Skua.Core.Generators;
 
@@ -16,12 +16,14 @@ public class CallBindingGenerator : GenericFieldAttributeGenerator<CallBindingPr
             CallBindingFullName,
             CallBindingName,
             CallBindingSource,
-            CallBindingPropertyInfo.Comparer.Default) { }
+            CallBindingPropertyInfo.Comparer.Default)
+    { }
+
     protected override void GenerateProperties(StringBuilder source, CallBindingPropertyInfo info)
     {
         string defaultValue = info.Values.Default is not null ? info.Values.Default : Default.Get(info.PropertyType);
         source.Append($"public {info.PropertyType} {info.PropertyName}{{get{{");
-        if(info.Values.Get)
+        if (info.Values.Get)
         {
             source.Append("try{");
             source.Append($"{info.PropertyType}{(info.IsNullable ? string.Empty : "?")} returnValue = Flash.Call<{info.PropertyType}>(\"{info.Values.Path}\");");
@@ -33,10 +35,10 @@ public class CallBindingGenerator : GenericFieldAttributeGenerator<CallBindingPr
             source.Append($"return this.{info.FieldName};");
         }
         source.Append("}");
-        if(info.Values.HasSetter)
+        if (info.Values.HasSetter)
         {
             source.Append("set{");
-            if(info.Values.Set)
+            if (info.Values.Set)
             {
                 if (info.Values.UseValue)
                     source.Append($"Flash.Call(\"{info.Values.Path}\", value);");

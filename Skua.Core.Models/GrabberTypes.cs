@@ -1,4 +1,5 @@
 ﻿namespace Skua.Core.Models;
+
 public enum GrabberTypes
 {
     Shop_Items,

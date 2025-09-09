@@ -5,12 +5,14 @@ using System.Windows.Controls;
 using System.Windows.Data;
 
 namespace Skua.WPF.Views;
+
 /// <summary>
 /// Interaction logic for GameOptionsView.xaml
 /// </summary>
 public partial class GameOptionsView : UserControl
 {
     private readonly ICollectionView _collectionView;
+
     public GameOptionsView()
     {
         InitializeComponent();

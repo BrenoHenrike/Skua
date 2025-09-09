@@ -1,11 +1,12 @@
-﻿using System.Diagnostics;
-using CommunityToolkit.Mvvm.ComponentModel;
+﻿using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Messaging;
 using Skua.Core.Interfaces;
 using Skua.Core.Messaging;
 using Skua.Core.Models;
+using System.Diagnostics;
 
 namespace Skua.Core.Services;
+
 public class LogService : ObservableRecipient, ILogService, IDisposable
 {
     private readonly DebugListener _debugListener;
@@ -58,9 +59,11 @@ public class LogService : ObservableRecipient, ILogService, IDisposable
             case LogType.Debug:
                 _debugLogs.Clear();
                 break;
+
             case LogType.Script:
                 _scriptLogs.Clear();
                 break;
+
             case LogType.Flash:
                 _flashLogs.Clear();
                 break;

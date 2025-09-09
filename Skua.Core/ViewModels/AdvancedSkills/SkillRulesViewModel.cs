@@ -2,9 +2,11 @@
 using CommunityToolkit.Mvvm.Input;
 
 namespace Skua.Core.ViewModels;
+
 public partial class SkillRulesViewModel : ObservableRecipient
 {
-    public SkillRulesViewModel() { }
+    public SkillRulesViewModel()
+    { }
 
     public SkillRulesViewModel(SkillRulesViewModel rules)
     {
@@ -22,7 +24,9 @@ public partial class SkillRulesViewModel : ObservableRecipient
 
     [ObservableProperty]
     private bool _healthGreaterThanBool = true;
+
     private int _healthUseValue;
+
     public int HealthUseValue
     {
         get { return _healthUseValue; }
@@ -36,7 +40,9 @@ public partial class SkillRulesViewModel : ObservableRecipient
 
     [ObservableProperty]
     private bool _manaGreaterThanBool = true;
+
     private int _manaUseValue;
+
     public int ManaUseValue
     {
         get { return _manaUseValue; }
@@ -47,8 +53,10 @@ public partial class SkillRulesViewModel : ObservableRecipient
             SetProperty(ref _manaUseValue, value);
         }
     }
+
     [ObservableProperty]
     private int _waitUseValue;
+
     [ObservableProperty]
     private bool _skipUseBool;
 

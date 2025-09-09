@@ -70,7 +70,7 @@
             Visibility="Visible">
             <tb:TaskbarIcon.ContextMenu>
                 <ContextMenu>
-                    <MenuItem 
+                    <MenuItem
                         Click="MenuItem_Click"
                         Header="Show Manager" />
                     <MenuItem

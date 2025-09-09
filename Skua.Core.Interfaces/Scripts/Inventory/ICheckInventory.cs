@@ -2,6 +2,7 @@
 using Skua.Core.Utils;
 
 namespace Skua.Core.Interfaces;
+
 public interface ICheckInventory<T> : IItemContainer<T> where T : ItemBase
 {
     /// <summary>
@@ -14,6 +15,7 @@ public interface ICheckInventory<T> : IItemContainer<T> where T : ItemBase
     {
         return quantity == 0 || Items.Contains(i => i.Name == name && (i.Quantity >= quantity || i.Category == ItemCategory.Class));
     }
+
     /// <summary>
     /// Checks whether the player has the item with specified <paramref name="id"/> in the desired <paramref name="quantity"/>.
     /// </summary>
@@ -24,6 +26,7 @@ public interface ICheckInventory<T> : IItemContainer<T> where T : ItemBase
     {
         return quantity == 0 || Items.Contains(i => i.ID == id && (i.Quantity >= quantity || i.Category == ItemCategory.Class));
     }
+
     /// <summary>
     /// Checks whether the player has all or any the items with specified <paramref name="names"/> in the deisred <paramref name="quantity"/>.
     /// </summary>
@@ -44,6 +47,7 @@ public interface ICheckInventory<T> : IItemContainer<T> where T : ItemBase
         }
         return false;
     }
+
     /// <summary>
     /// Checks whether the player has all or any the items with specified <paramref name="ids"/> in the deisred <paramref name="quantity"/>.
     /// </summary>
@@ -64,6 +68,7 @@ public interface ICheckInventory<T> : IItemContainer<T> where T : ItemBase
         }
         return false;
     }
+
     /// <summary>
     /// Attempts to get the item by the given <paramref name="name"/> and sets the out parameter to its value.
     /// </summary>
@@ -74,6 +79,7 @@ public interface ICheckInventory<T> : IItemContainer<T> where T : ItemBase
     {
         return (item = GetItem(name)) is not null;
     }
+
     /// <summary>
     /// Attempts to get the item by the given <paramref name="id"/> and sets the out parameter to its value.
     /// </summary>
@@ -84,6 +90,7 @@ public interface ICheckInventory<T> : IItemContainer<T> where T : ItemBase
     {
         return (item = GetItem(id)) is not null;
     }
+
     /// <summary>
     /// Get the <see cref="T">item</see> with the specified <paramref name="name"/>.
     /// </summary>
@@ -93,6 +100,7 @@ public interface ICheckInventory<T> : IItemContainer<T> where T : ItemBase
     {
         return Items?.Find(x => x.Name == name);
     }
+
     /// <summary>
     /// Get the <see cref="T">item</see> with the specified <paramref name="id"/>.
     /// </summary>
@@ -102,6 +110,7 @@ public interface ICheckInventory<T> : IItemContainer<T> where T : ItemBase
     {
         return Items?.Find(x => x.ID == id);
     }
+
     /// <summary>
     /// Gets the quantity of the item with specified <paramref name="name"/>.
     /// </summary>
@@ -111,6 +120,7 @@ public interface ICheckInventory<T> : IItemContainer<T> where T : ItemBase
     {
         return TryGetItem(name, out T? item) ? item!.Quantity : 0;
     }
+
     /// <summary>
     /// Gets the quantity of the item with specified <paramref name="id"/>.
     /// </summary>
@@ -120,6 +130,7 @@ public interface ICheckInventory<T> : IItemContainer<T> where T : ItemBase
     {
         return TryGetItem(id, out T? item) ? item!.Quantity : 0;
     }
+
     /// <summary>
     /// Checks if the item with the specified <paramref name="name"/> is max stacked.
     /// </summary>
@@ -129,6 +140,7 @@ public interface ICheckInventory<T> : IItemContainer<T> where T : ItemBase
     {
         return TryGetItem(name, out T? item) && item!.Quantity >= item!.MaxStack;
     }
+
     /// <summary>
     /// Checks if the item with the specified <paramref name="id"/> is max stacked.
     /// </summary>

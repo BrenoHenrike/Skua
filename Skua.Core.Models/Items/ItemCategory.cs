@@ -1,6 +1,6 @@
-﻿using System.Runtime.Serialization;
-using Newtonsoft.Json;
+﻿using Newtonsoft.Json;
 using Newtonsoft.Json.Converters;
+using System.Runtime.Serialization;
 
 namespace Skua.Core.Models.Items;
 
@@ -8,7 +8,6 @@ namespace Skua.Core.Models.Items;
 [JsonConverter(typeof(StringEnumConverter))]
 public enum ItemCategory
 {
-
     Unknown,
     Sword,
     Axe,
@@ -34,14 +33,20 @@ public enum ItemCategory
     Resource,
     Item,
     Misc,
+
     [EnumMember(Value = "Quest Item")]
     QuestItem,
+
     [EnumMember(Value = "Server Use")]
     ServerUse,
+
     House,
+
     [EnumMember(Value = "Wall Item")]
     WallItem,
+
     [EnumMember(Value = "Floor Item")]
     FloorItem,
+
     Enhancement
 }

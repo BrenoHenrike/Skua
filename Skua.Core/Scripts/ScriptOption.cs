@@ -1,21 +1,23 @@
-﻿using Skua.Core.Interfaces;
-using Skua.Core.Flash;
 using CommunityToolkit.Mvvm.ComponentModel;
-using System.Reflection;
-using System.Linq.Expressions;
-using System.Collections.Immutable;
-using Skua.Core.Models;
-using System.Collections.Specialized;
 using CommunityToolkit.Mvvm.Messaging;
+using Skua.Core.Flash;
+using Skua.Core.Interfaces;
 using Skua.Core.Messaging;
+using Skua.Core.Models;
+using System.Collections.Immutable;
+using System.Collections.Specialized;
+using System.Linq.Expressions;
+using System.Reflection;
 
 namespace Skua.Core.Scripts;
+
 public partial class ScriptOption : ObservableRecipient, IScriptOption, IOptionDictionary
 {
     private ScriptOption(Lazy<IFlashUtil> flash)
     {
         _lazyFlash = flash;
     }
+
     public ScriptOption(
         Lazy<IFlashUtil> flash,
         ISettingsService settingsService)
@@ -48,13 +50,17 @@ public partial class ScriptOption : ObservableRecipient, IScriptOption, IOptionD
 
     [ObservableProperty]
     private bool _attackWithoutTarget;
+
     private bool _acceptACDrops;
+
     public bool AcceptACDrops
     {
         get { return _acceptACDrops; }
         set { SetProperty(ref _acceptACDrops, value, true); }
     }
+
     private bool _acceptAllDrops;
+
     public bool AcceptAllDrops
     {
         get { return _acceptAllDrops; }
@@ -64,7 +70,9 @@ public partial class ScriptOption : ObservableRecipient, IScriptOption, IOptionD
                 RejectAllDrops = false;
         }
     }
+
     private bool _rejectAllDrops;
+
     public bool RejectAllDrops
     {
         get { return _rejectAllDrops; }
@@ -74,84 +82,120 @@ public partial class ScriptOption : ObservableRecipient, IScriptOption, IOptionD
                 AcceptAllDrops = false;
         }
     }
+
     [ObservableProperty]
     private bool _restPackets;
+
     [ObservableProperty]
     private bool _safeTimings = true;
+
     [CallBinding("skipCutscenes", UseValue = false, Get = false, HasSetter = true)]
     private bool _skipCutscenes;
+
     [ObservableProperty]
     private bool _privateRooms;
+
     [CallBinding("magnetize", UseValue = false, Get = false, HasSetter = true)]
     private bool _magnetise;
+
     [CallBinding("killLag", Get = false, HasSetter = true)]
     private bool _lagKiller;
+
     [ObjectBinding("stage.frameRate", Get = false, HasSetter = true)]
     private int _setFPS = 30;
+
     [ObjectBinding("ui.mcFPS.visible", HasSetter = true)]
     private bool _showFPS = false;
+
     [ObservableProperty]
     private bool _aggroMonsters;
+
     [ObservableProperty]
     private bool _aggroAllMonsters;
+
     [CallBinding("infiniteRange", UseValue = false, Get = false, HasSetter = true)]
     private bool _infiniteRange;
+
     [ModuleBinding("DisableFX")]
     private bool _disableFX;
+
     [ObservableProperty]
     private bool _autoRelogin;
+
     [ObservableProperty]
     private bool _autoReloginAny;
+
     [ObservableProperty]
     private bool _retryRelogin = true;
+
     [ObservableProperty]
     private bool _safeRelogin;
+
     [ModuleBinding("DisableCollisions")]
     private bool _disableCollisions;
+
     [CallBinding("disableDeathAd", Get = false, HasSetter = true)]
     private bool _disableDeathAds;
+
     [ModuleBinding("HidePlayers")]
     private bool _hidePlayers;
 
     private string? _reloginServer = "Twilly";
+
     public string? ReloginServer
     {
         get { return _reloginServer; }
         set { SetProperty(ref _reloginServer, value, true); }
     }
-    
+
     [ObjectBinding("world.myAvatar.objData.strUsername", "world.rootClass.ui.mcPortrait.strName.text", "world.myAvatar.pMC.pname.ti.text", Get = false, HasSetter = true, Default = "string.Empty")]
     private string _customName = string.Empty;
+
     [ObjectBinding("world.myAvatar.pMC.pname.ti.textColor", Get = false, HasSetter = true, Default = "0xFFFFFF")]
     private int _nameColor = 0xFFFFFF;
+
     [ObjectBinding("world.myAvatar.pMC.pname.tg.text", Get = false, HasSetter = true, Default = "string.Empty")]
     private string _customGuild = string.Empty;
+
     [ObjectBinding("world.myAvatar.pMC.pname.tg.textColor", Get = false, HasSetter = true)]
     public int _guildColor;
+
     [ObjectBinding("world.WALKSPEED", Get = false, HasSetter = true, Default = "8")]
     private int _walkSpeed = 8;
+
     [ObservableProperty]
     private int _loadTimeout = 30000;
+
     [ObservableProperty]
     private int _huntDelay = 1000;
+
     [ObservableProperty]
     private int _huntBuffer = 1;
+
     [ObservableProperty]
     private int _maximumTries = 10;
+
     [ObservableProperty]
     private int _actionDelay = 800;
+
     [ObservableProperty]
     private int _privateNumber = 0;
+
     [ObservableProperty]
     private int _joinMapTries = 3;
+
     [ObservableProperty]
     private int _questAcceptAndCompleteTries = 30;
+
     [ObservableProperty]
     private int _reloginTries = 5;
+
     [ObservableProperty]
     private int _reloginTryDelay = 800;
+
     [ObservableProperty]
     private int _loginTimeout = 30000;
+
     [ObservableProperty]
     private HuntPriorities _HuntPriority = HuntPriorities.None;
 
@@ -204,6 +248,7 @@ public partial class ScriptOption : ObservableRecipient, IScriptOption, IOptionD
             pi.SetValue(this, pi.GetValue(defaults), null);
         }
     }
+
     private void GetOptions()
     {
         var userOptions = _settingsService.Get<StringCollection>("UserOptions");

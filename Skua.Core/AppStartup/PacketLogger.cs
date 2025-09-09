@@ -1,10 +1,9 @@
 ﻿using Microsoft.Extensions.DependencyInjection;
 using Skua.Core.Interfaces;
 using Skua.Core.ViewModels;
-using System;
-using System.Collections.Generic;
 
 namespace Skua.Core.AppStartup;
+
 internal static class PacketLogger
 {
     internal static PacketLoggerViewModel CreateViewModel(IServiceProvider s)

@@ -1,6 +1,7 @@
 ﻿using Skua.Core.Utils;
 
 namespace Skua.WPF;
+
 public static class DecamelizationService
 {
     public static string Decamelize(string text)

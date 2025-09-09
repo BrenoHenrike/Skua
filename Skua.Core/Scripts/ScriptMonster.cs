@@ -1,7 +1,7 @@
-﻿using Skua.Core.Interfaces;
-using Skua.Core.Models.Monsters;
-using Skua.Core.Flash;
 using Newtonsoft.Json;
+using Skua.Core.Flash;
+using Skua.Core.Interfaces;
+using Skua.Core.Models.Monsters;
 
 namespace Skua.Core.Scripts;
 
@@ -30,6 +30,7 @@ public partial class ScriptMonster : IScriptMonster
 
     [ObjectBinding("world.monsters", Select = "dataLeaf", Default = "new()")]
     private List<MonsterDataLeaf> _mapMonstersDataLeaf = new();
+
     public List<Monster> CurrentAvailableMonsters
     {
         get
@@ -38,7 +39,6 @@ public partial class ScriptMonster : IScriptMonster
             return string.IsNullOrEmpty(monsters) ? new() : JsonConvert.DeserializeObject<List<Monster>>(monsters) ?? new();
         }
     }
-
 
     public int MonsterHP(int id)
     {
@@ -52,6 +52,7 @@ public partial class ScriptMonster : IScriptMonster
         return string.IsNullOrEmpty(hp) ? 0 : int.Parse(hp);
     }
 
+
     public List<Monster> CurrentMonsters => MapMonsters?.FindAll(m => m.Cell == Player.Cell) ?? new();
 
     public List<Monster> MapMonstersWithCurrentData
@@ -62,7 +63,7 @@ public partial class ScriptMonster : IScriptMonster
             {
                 var monsters = MapMonsters.ToList();
                 var dataLeafDict = MapMonstersDataLeaf.ToDictionary(dl => dl.MapID, dl => dl);
-                
+
                 foreach (var monster in monsters)
                 {
                     if (dataLeafDict.TryGetValue(monster.MapID, out var dataLeaf))
@@ -70,9 +71,10 @@ public partial class ScriptMonster : IScriptMonster
                         monster.HP = dataLeaf.HP;
                         monster.MaxHP = dataLeaf.MaxHP;
                         monster.State = dataLeaf.State;
+                        monster.Auras = dataLeaf.Auras;
                     }
                 }
-                
+
                 return monsters;
             }
             catch
@@ -90,5 +92,26 @@ public partial class ScriptMonster : IScriptMonster
         foreach (string cell in Map.Cells)
             monsters[cell] = ((IScriptMonster)this).GetMonstersByCell(cell);
         return monsters;
+    }
+
+    /// <summary>
+    /// Gets a summary of auras present on all monsters in the current map.
+    /// </summary>
+    public Dictionary<string, int> GetAuraSummary()
+    {
+        var auraSummary = new Dictionary<string, int>();
+
+        foreach (var monster in MapMonstersWithCurrentData.Where(m => m.Auras?.Any() == true))
+        {
+            foreach (var aura in monster.Auras!)
+            {
+                if (auraSummary.ContainsKey(aura.Name))
+                    auraSummary[aura.Name]++;
+                else
+                    auraSummary[aura.Name] = 1;
+            }
+        }
+
+        return auraSummary;
     }
 }

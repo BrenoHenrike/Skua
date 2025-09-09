@@ -4,6 +4,7 @@ using CommunityToolkit.Mvvm.Input;
 using Skua.Core.Interfaces;
 
 namespace Skua.Core.ViewModels;
+
 public partial class PluginItemViewModel : ObservableObject
 {
     public PluginItemViewModel(IPluginContainer container, bool hasOptions)

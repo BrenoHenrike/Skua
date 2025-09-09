@@ -1,16 +1,18 @@
-﻿using System.ComponentModel;
+﻿using CommunityToolkit.Mvvm.DependencyInjection;
+using Skua.Core.ViewModels;
+using System.ComponentModel;
 using System.Windows.Controls;
 using System.Windows.Data;
-using CommunityToolkit.Mvvm.DependencyInjection;
-using Skua.Core.ViewModels;
 
 namespace Skua.WPF.UserControls;
+
 /// <summary>
 /// Interaction logic for FastTravelUserControl.xaml
 /// </summary>
 public partial class FastTravelUserControl : UserControl
 {
     private readonly ICollectionView _collectionView;
+
     public FastTravelUserControl()
     {
         InitializeComponent();

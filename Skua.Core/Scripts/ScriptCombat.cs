@@ -1,10 +1,11 @@
-﻿using Skua.Core.Interfaces;
-using Skua.Core.Flash;
 using CommunityToolkit.Mvvm.Messaging;
+using Skua.Core.Flash;
+using Skua.Core.Interfaces;
 using Skua.Core.Messaging;
 using Skua.Core.Models.Monsters;
 
 namespace Skua.Core.Scripts;
+
 public partial class ScriptCombat : IScriptCombat
 {
     public ScriptCombat(
@@ -42,10 +43,12 @@ public partial class ScriptCombat : IScriptCombat
     public bool StopAttacking { get; set; }
 
     [MethodCallBinding("world.approachTarget", GameFunction = true)]
-    private void _approachTarget() { }
+    private void _approachTarget()
+    { }
 
     [MethodCallBinding("untargetSelf")]
-    private void _untargetSelf() { }
+    private void _untargetSelf()
+    { }
 
     [MethodCallBinding("world.cancelTarget", RunMethodPost = true, GameFunction = true)]
     private void _cancelTarget()
@@ -55,7 +58,8 @@ public partial class ScriptCombat : IScriptCombat
     }
 
     [MethodCallBinding("world.cancelAutoAttack", GameFunction = true)]
-    private void _cancelAutoAttack() { }
+    private void _cancelAutoAttack()
+    { }
 
     public void Exit()
     {
@@ -106,7 +110,8 @@ public partial class ScriptCombat : IScriptCombat
         recipient.StopAttacking = false;
     }
 
-    Monster? _target;
+    private Monster? _target;
+
     private void CounterAttack(ScriptCombat recipient, CounterAttackMessage message)
     {
         if (message.Faded)

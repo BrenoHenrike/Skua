@@ -470,7 +470,7 @@ public partial class PropertyGrid : UserControl
     private static void SelectedObjectPropertyChanged(DependencyObject source, DependencyPropertyChangedEventArgs e)
     {
         var grid = (PropertyGrid)source;
-        
+
         // Always try to unsubscribe from old value
         var oldPc = e.OldValue as INotifyPropertyChanged;
         if (oldPc != null)

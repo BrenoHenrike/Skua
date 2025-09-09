@@ -4,6 +4,7 @@ using System.Windows.Input;
 using System.Windows.Media;
 
 namespace Skua.WPF.UserControls;
+
 /// <summary>
 /// Interaction logic for OptionContainerUserControl.xaml
 /// </summary>
@@ -29,7 +30,6 @@ public partial class OptionContainerUserControl : UserControl
             return;
         if (cell is null)
             return;
-
 
         while (dep is not null and not DataGridRow)
         {

@@ -7,6 +7,8 @@ public interface IFlashObject<T> : IDisposable
     T? Value { get; set; }
 
     IFlashObject<R> GetChild<R>(string path);
+
     void ClearChild(string path);
+
     IFlashArray<T> ToArray();
 }

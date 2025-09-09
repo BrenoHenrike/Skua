@@ -1,8 +1,9 @@
-﻿using System.Diagnostics;
-using Skua.Core.Interfaces;
+﻿using Skua.Core.Interfaces;
 using Skua.Core.Models;
+using System.Diagnostics;
 
 namespace Skua.Core.Services;
+
 public class ProcessStartService : IProcessService
 {
     public ProcessStartService(ISettingsService settingsService, IDialogService dialogService)
@@ -66,7 +67,6 @@ public class ProcessStartService : IProcessService
         {
             UseShellExecute = true,
             CreateNoWindow = true
-
         };
 
         Process.Start(psi);

@@ -12,6 +12,7 @@ using System.Windows.Media;
 using System.Windows.Media.Media3D;
 
 namespace Skua.WPF;
+
 internal static class Extensions
 {
     private const string _hexaChars = "0123456789ABCDEF";
@@ -554,6 +555,7 @@ internal static class Extensions
 
         return VisualTreeHelper.GetParent(source).GetVisualSelfOrParent<T>();
     }
+
     public static T FindFocusableVisualChild<T>(this DependencyObject obj, string name) where T : FrameworkElement
     {
         foreach (T item in obj.EnumerateVisualChildren(true, true).OfType<T>())

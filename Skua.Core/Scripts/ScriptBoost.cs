@@ -3,6 +3,7 @@ using Skua.Core.Interfaces;
 using Skua.Core.Models.Items;
 
 namespace Skua.Core.Scripts;
+
 public partial class ScriptBoost : ObservableObject, IScriptBoost, IAsyncDisposable
 {
     public ScriptBoost(
@@ -43,27 +44,35 @@ public partial class ScriptBoost : ObservableObject, IScriptBoost, IAsyncDisposa
     private CancellationTokenSource? _ctsBoosts;
 
     public bool Enabled => _taskBoosts is not null;
+
     /// <inheritdoc cref="IScriptBoost.UseClassBoost"/>
     [ObservableProperty]
     private bool _useClassBoost = false;
+
     /// <inheritdoc cref="IScriptBoost.ClassBoostID"/>
     [ObservableProperty]
     private int _classBoostID;
+
     /// <inheritdoc cref="IScriptBoost.UseExperienceBoost"/>
     [ObservableProperty]
     private bool _useExperienceBoost = false;
+
     /// <inheritdoc cref="IScriptBoost.ExperienceBoostID"/>
     [ObservableProperty]
     private int _experienceBoostID;
+
     /// <inheritdoc cref="IScriptBoost.UseGoldBoost"/>
     [ObservableProperty]
     private bool _useGoldBoost = false;
+
     /// <inheritdoc cref="IScriptBoost.GoldBoostID"/>
     [ObservableProperty]
     private int _goldBoostID;
+
     /// <inheritdoc cref="IScriptBoost.UseReputationBoost"/>
     [ObservableProperty]
     private bool _useReputationBoost = false;
+
     /// <inheritdoc cref="IScriptBoost.ReputationBoostID"/>
     [ObservableProperty]
     private int _reputationBoostID;
@@ -100,7 +109,7 @@ public partial class ScriptBoost : ObservableObject, IScriptBoost, IAsyncDisposa
                    .FirstOrDefault())?.ID ?? 0;
         if (id == 0 && searchBank)
         {
-            if(!Bank.Loaded)
+            if (!Bank.Loaded)
                 Bank.Load();
             id = (Bank.Items?
                    .Where(i => i.Category == ItemCategory.ServerUse)
@@ -180,7 +189,7 @@ public partial class ScriptBoost : ObservableObject, IScriptBoost, IAsyncDisposa
 
     public async ValueTask DisposeAsync()
     {
-        if(_taskBoosts is not null)
+        if (_taskBoosts is not null)
         {
             _ctsBoosts?.Cancel();
             await _taskBoosts;

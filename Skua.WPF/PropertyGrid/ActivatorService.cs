@@ -1,7 +1,8 @@
-﻿using System;
-using Skua.Core.Interfaces;
+﻿using Skua.Core.Interfaces;
+using System;
 
 namespace Skua.WPF;
+
 public static class ActivatorService
 {
     public static object CreateInstance(Type type, params object[] args)

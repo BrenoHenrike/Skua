@@ -1,6 +1,7 @@
 ﻿using CommunityToolkit.Mvvm.ComponentModel;
 
 namespace Skua.Core.ViewModels;
+
 public partial class PacketLogFilterViewModel : ObservableObject
 {
     public PacketLogFilterViewModel(string content, Predicate<string[]> filter)

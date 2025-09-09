@@ -1,9 +1,12 @@
 ﻿using System;
 using System.Collections.Generic;
+
 namespace Skua.Core.Generators;
+
 internal class Default
 {
     public static readonly string DefaultString = "default";
+
     public static string Get(string? typeName)
     {
         if (typeName == null)

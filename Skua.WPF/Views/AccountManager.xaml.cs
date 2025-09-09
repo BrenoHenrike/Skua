@@ -6,6 +6,7 @@ using System.Windows;
 using System.Windows.Controls;
 
 namespace Skua.WPF.Views;
+
 /// <summary>
 /// Interaction logic for AccountManager.xaml
 /// </summary>

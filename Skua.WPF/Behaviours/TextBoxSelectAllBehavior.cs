@@ -1,9 +1,9 @@
-﻿using System.Windows;
-using System.Windows.Input;
+﻿using Microsoft.Xaml.Behaviors;
 using System.Windows.Controls;
-using Microsoft.Xaml.Behaviors;
+using System.Windows.Input;
 
 namespace Skua.WPF;
+
 public class TextBoxSelectAllBehavior : Behavior<TextBox>
 {
     protected override void OnAttached()
@@ -25,7 +25,7 @@ public class TextBoxSelectAllBehavior : Behavior<TextBox>
 
     private void AssociatedObject_PreviewMouseLeftButtonDown(object sender, MouseButtonEventArgs e)
     {
-        if(!AssociatedObject.IsKeyboardFocusWithin)
+        if (!AssociatedObject.IsKeyboardFocusWithin)
         {
             AssociatedObject.Focus();
             e.Handled = true;

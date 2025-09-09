@@ -2,7 +2,9 @@
 
 public class AdvancedSkill
 {
-    public AdvancedSkill() { }
+    public AdvancedSkill()
+    { }
+
     public AdvancedSkill(string className, string skills, int skillTimeout = -1, string classUseMode = "Base", string skillUseMode = "UseIfAvailable")
     {
         ClassName = className;
@@ -11,6 +13,7 @@ public class AdvancedSkill
         ClassUseMode = (ClassUseMode)Enum.Parse(typeof(ClassUseMode), classUseMode);
         SkillUseMode = (SkillUseMode)Enum.Parse(typeof(SkillUseMode), skillUseMode);
     }
+
     public AdvancedSkill(string className, string skills, int skillTimeout = -1, int classUseMode = 0, SkillUseMode skillUseMode = SkillUseMode.UseIfAvailable)
     {
         ClassName = className;
@@ -19,6 +22,7 @@ public class AdvancedSkill
         ClassUseMode = (ClassUseMode)classUseMode;
         SkillUseMode = skillUseMode;
     }
+
     public AdvancedSkill(string className, string skills, int skillTimeout, ClassUseMode classUseMode, SkillUseMode skillUseMode)
     {
         ClassName = className;
@@ -27,6 +31,7 @@ public class AdvancedSkill
         ClassUseMode = classUseMode;
         SkillUseMode = skillUseMode;
     }
+
     public AdvancedSkill(string className, string skills, int skillTimeout, string classUseMode, SkillUseMode skillUseMode)
     {
         ClassName = className;
@@ -42,6 +47,7 @@ public class AdvancedSkill
     public ClassUseMode ClassUseMode { get; set; } = ClassUseMode.Base;
     public SkillUseMode SkillUseMode { get; set; } = SkillUseMode.UseIfAvailable;
     public string SaveString => $"{ClassUseMode} = {ClassName} = {Skills} = {(SkillUseMode == SkillUseMode.UseIfAvailable ? "Use if Available" : SkillTimeout)}";
+
     public override string ToString()
     {
         return $"{ClassUseMode} : {ClassName} = {Skills} [{(SkillUseMode == SkillUseMode.UseIfAvailable ? "Use if Available" : "Wait for Cooldown")}]";

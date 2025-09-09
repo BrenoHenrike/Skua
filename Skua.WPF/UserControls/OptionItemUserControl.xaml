@@ -37,7 +37,7 @@
                         materialDesign:TextFieldAssist.CharacterCounterVisibility="Collapsed"
                         materialDesign:TextFieldAssist.DecorationVisibility="Collapsed"
                         materialDesign:TextFieldAssist.HasFilledTextField="True"
-                        materialDesign:TextFieldAssist.SuffixText="FPS"
+                        materialDesign:TextFieldAssist.SuffixText="{Binding SuffixText}"
                         materialDesign:TextFieldAssist.TextBoxViewMargin="10 0 0 0"
                         materialDesign:TextFieldAssist.TextFieldCornerRadius="16 0 0 16"
                         DockPanel.Dock="Left"

@@ -1,8 +1,9 @@
-﻿using Skua.Core.Flash;
+using Skua.Core.Flash;
 using Skua.Core.Interfaces;
 using Skua.Core.Models.Items;
 
 namespace Skua.Core.Scripts;
+
 public partial class ScriptHouseInv : IScriptHouseInv
 {
     private readonly Lazy<IFlashUtil> _lazyFlash;
@@ -40,8 +41,10 @@ public partial class ScriptHouseInv : IScriptHouseInv
 
     [ObjectBinding("world.myAvatar.houseitems", Default = "new()")]
     private List<InventoryItem> _items;
+
     [ObjectBinding("world.myAvatar.objData.iHouseSlots")]
     private int _slots;
+
     [ObjectBinding("world.myAvatar.houseitems.length")]
     private int _usedSlots;
 

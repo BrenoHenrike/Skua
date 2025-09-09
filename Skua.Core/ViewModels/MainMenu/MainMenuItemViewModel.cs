@@ -4,6 +4,7 @@ using CommunityToolkit.Mvvm.Input;
 using Skua.Core.Interfaces;
 
 namespace Skua.Core.ViewModels;
+
 public partial class MainMenuItemViewModel : ObservableObject
 {
     public MainMenuItemViewModel(string header, IEnumerable<MainMenuItemViewModel> subItems)
@@ -27,8 +28,10 @@ public partial class MainMenuItemViewModel : ObservableObject
 
     [ObservableProperty]
     private string _header = "Default Title";
+
     [ObservableProperty]
     private List<MainMenuItemViewModel>? _subItems = null;
+
     public IRelayCommand Command { get; }
 
     private void OpenManagedWindow()

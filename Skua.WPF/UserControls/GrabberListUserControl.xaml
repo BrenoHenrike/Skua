@@ -26,29 +26,32 @@
                 <ColumnDefinition Width="5" />
                 <ColumnDefinition Width="*" />
             </Grid.ColumnDefinitions>
-            <DockPanel
+            <StackPanel
                 Grid.Row="0"
                 Grid.Column="0"
-                Grid.ColumnSpan="3">
-                <CheckBox
-                    Margin="3,0,0,3"
-                    VerticalAlignment="Center"
-                    Content="Select Multiple"
-                    DockPanel.Dock="Right"
-                    IsChecked="{Binding SelectionMode, Converter={StaticResource IntToBooleanConverter}}"
-                    Visibility="{Binding SelectMultiple, Converter={StaticResource BooleanToVisibilityConverter}}" />
-                <TextBox
-                    x:Name="SearchBox"
-                    Margin="0,0,3,3"
-                    materialDesing:HintAssist.Hint="Search"
-                    Style="{StaticResource MaterialDesignFloatingHintTextBox}"
-                    Text="{Binding SearchText}"
-                    TextChanged="SearchBox_TextChanged">
-                    <b:Interaction.Behaviors>
-                        <wpf:TextBoxSelectAllBehavior />
-                    </b:Interaction.Behaviors>
-                </TextBox>
-            </DockPanel>
+                Grid.ColumnSpan="3"
+                Orientation="Vertical">
+                <DockPanel>
+                    <CheckBox
+                        Margin="3,0,0,3"
+                        VerticalAlignment="Center"
+                        Content="Select Multiple"
+                        DockPanel.Dock="Right"
+                        IsChecked="{Binding SelectionMode, Converter={StaticResource IntToBooleanConverter}}"
+                        Visibility="{Binding SelectMultiple, Converter={StaticResource BooleanToVisibilityConverter}}" />
+                    <TextBox
+                        x:Name="SearchBox"
+                        Margin="0,0,3,3"
+                        materialDesing:HintAssist.Hint="Search"
+                        Style="{StaticResource MaterialDesignFloatingHintTextBox}"
+                        Text="{Binding SearchText}"
+                        TextChanged="SearchBox_TextChanged">
+                        <b:Interaction.Behaviors>
+                            <wpf:TextBoxSelectAllBehavior />
+                        </b:Interaction.Behaviors>
+                    </TextBox>
+                </DockPanel>
+            </StackPanel>
             <ListBox
                 x:Name="GrabberListBox"
                 Grid.Row="1"

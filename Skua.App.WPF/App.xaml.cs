@@ -1,18 +1,18 @@
-﻿using System;
+﻿using CommunityToolkit.Mvvm.DependencyInjection;
+using CommunityToolkit.Mvvm.Messaging;
+using Microsoft.Extensions.DependencyInjection;
+using Skua.App.WPF.Properties;
+using Skua.App.WPF.Services;
+using Skua.Core.AppStartup;
+using Skua.Core.Interfaces;
+using Skua.WPF;
+using Skua.WPF.Services;
+using System;
 using System.IO;
 using System.Threading.Tasks;
 using System.Windows;
 using System.Windows.Media.Animation;
-using Microsoft.Extensions.DependencyInjection;
-using CommunityToolkit.Mvvm.DependencyInjection;
-using CommunityToolkit.Mvvm.Messaging;
-using Skua.WPF.Services;
-using Skua.App.WPF.Properties;
-using Skua.App.WPF.Services;
-using Skua.Core.Interfaces;
 using Westwind.Scripting;
-using Skua.Core.AppStartup;
-using Skua.WPF;
 
 namespace Skua.App.WPF;
 
@@ -25,9 +25,10 @@ public sealed partial class App : Application
     /// Gets the current <see cref="App"/> instance in use
     /// </summary>
     public new static App Current => (App)Application.Current;
+
     public IServiceProvider Services { get; }
     private readonly IScriptInterface _bot;
-    
+
     public App()
     {
         InitializeComponent();
@@ -43,17 +44,17 @@ public sealed partial class App : Application
         Services.GetRequiredService<IClientFilesService>().CreateDirectories();
         Services.GetRequiredService<IClientFilesService>().CreateFiles();
         Task.Factory.StartNew(async () => await Services.GetRequiredService<IScriptServers>().GetServers());
-        
+
         _bot = Services.GetRequiredService<IScriptInterface>();
         _ = Services.GetRequiredService<ILogService>();
-        
+
         var args = Environment.GetCommandLineArgs();
         var startup = new SkuaStartupHandler(args, _bot, Services.GetRequiredService<ISettingsService>(), Services.GetRequiredService<IThemeService>());
         startup.Execute();
 
         RoslynLifetimeManager.WarmupRoslyn();
         Timeline.DesiredFrameRateProperty.OverrideMetadata(typeof(Timeline), new FrameworkPropertyMetadata { DefaultValue = Services.GetRequiredService<ISettingsService>().Get<int>("AnimationFrameRate") });
-        
+
         Application.Current.Exit += App_Exit;
     }
 
@@ -86,7 +87,7 @@ public sealed partial class App : Application
         main.WindowStartupLocation = WindowStartupLocation.CenterScreen;
         Application.Current.MainWindow = main;
         main.Show();
-        
+
         IDialogService dialogService = Services.GetRequiredService<IDialogService>();
         var getScripts = Services.GetRequiredService<IGetScriptsService>();
         if (Settings.Default.CheckBotScriptsUpdates)
@@ -111,7 +112,7 @@ public sealed partial class App : Application
             {
                 if ((skillsFileSize < await getScripts.CheckAdvanceSkillSetsUpdates())
                     && (Settings.Default.AutoUpdateAdvanceSkillSetsUpdates || Services.GetRequiredService<IDialogService>().ShowMessageBox("Would you like to update your AdvanceSkill Sets?", "AdvanceSkill Sets Update", true) == true))
-                {                
+                {
                     if (await getScripts.UpdateSkillSetsFile())
                     {
                         if (Settings.Default.AutoUpdateAdvanceSkillSetsUpdates)
@@ -130,7 +131,7 @@ public sealed partial class App : Application
         }
 
         Services.GetRequiredService<IPluginManager>().Initialize();
-        
+
         // Initialize hotkeys after main window is shown
         Services.GetRequiredService<IHotKeyService>().Reload();
     }

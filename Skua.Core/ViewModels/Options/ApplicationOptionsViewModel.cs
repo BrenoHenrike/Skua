@@ -1,4 +1,5 @@
 ﻿namespace Skua.Core.ViewModels;
+
 public class ApplicationOptionsViewModel : BotControlViewModelBase
 {
     public ApplicationOptionsViewModel(List<DisplayOptionItemViewModelBase> appOptions)
@@ -6,5 +7,6 @@ public class ApplicationOptionsViewModel : BotControlViewModelBase
     {
         ApplicationOptions = appOptions;
     }
+
     public List<DisplayOptionItemViewModelBase> ApplicationOptions { get; }
 }

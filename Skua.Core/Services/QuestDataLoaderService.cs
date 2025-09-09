@@ -1,13 +1,14 @@
-﻿using System.Dynamic;
-using CommunityToolkit.Mvvm.Messaging;
+﻿using CommunityToolkit.Mvvm.Messaging;
 using Newtonsoft.Json;
 using Skua.Core.Interfaces;
 using Skua.Core.Messaging;
 using Skua.Core.Models;
 using Skua.Core.Models.Quests;
+using System.Dynamic;
 using static System.Collections.Generic.Dictionary<int, Skua.Core.Models.Quests.Quest>;
 
 namespace Skua.Core.Services;
+
 public class QuestDataLoaderService : IQuestDataLoaderService
 {
     public QuestDataLoaderService(IScriptQuest quests, IScriptPlayer player, IFlashUtil flash)
@@ -27,10 +28,10 @@ public class QuestDataLoaderService : IQuestDataLoaderService
         fileName = Path.Combine(ClientFileSources.SkuaDIR, fileName);
         if (!File.Exists(fileName))
             return new();
-        
+
         if (_cachedQuests.TryGetValue($"CachedQuests_{fileName}", out List<QuestData>? quests))
             return quests ?? new();
-        
+
         string text = await File.ReadAllTextAsync(fileName);
         quests = JsonConvert.DeserializeObject<List<QuestData>>(text);
         _cachedQuests.Add($"CachedQuests_{fileName}", quests);
@@ -43,28 +44,28 @@ public class QuestDataLoaderService : IQuestDataLoaderService
         {
             if (!_player.LoggedIn)
                 return _quests.Cached = await GetFromFileAsync(fileName);
-            
+
             _quests.Cached = await GetFromFileAsync(fileName);
             AutoResetEvent wait = new(false);
-            
+
             int start = 1;
             if (!all && (_quests.Cached.Count > 0))
-                 start = _quests.Cached.Last().ID + 1;
-            
+                start = _quests.Cached.Last().ID + 1;
+
             List<QuestData> quests = new();
             for (int i = start; i < 13000; i += 29)
             {
                 if (token.IsCancellationRequested)
                     break;
-                
+
                 _flash.SetGameObject("world.questTree", new ExpandoObject());
                 progress?.Report($"Loading Quests {i}-{i + 29}...");
-                
+
                 List<Quest> currQuests = new();
                 StrongReferenceMessenger.Default.Register<QuestDataLoaderService, ExtensionPacketMessage, int>(this, (int)MessageChannels.GameEvents, packetListener);
-                
+
                 _quests.Load(Enumerable.Range(i, 29).ToArray());
-                
+
                 wait.WaitOne(10000);
                 StrongReferenceMessenger.Default.Unregister<ExtensionPacketMessage, int>(this, (int)MessageChannels.GameEvents);
                 if (currQuests.Count == 0)
@@ -72,7 +73,7 @@ public class QuestDataLoaderService : IQuestDataLoaderService
                     progress?.Report("No more quests found.");
                     break;
                 }
-                
+
                 quests.AddRange(currQuests.Select(q => ConvertToQuestData(q)));
                 if (!token.IsCancellationRequested)
                     await Task.Delay(1500);
@@ -87,11 +88,11 @@ public class QuestDataLoaderService : IQuestDataLoaderService
                     }
                 }
             }
-            
+
             quests.AddRange(_quests.Cached);
             await File.WriteAllTextAsync(Path.Combine(ClientFileSources.SkuaDIR, fileName), JsonConvert.SerializeObject(quests.Distinct().OrderBy(q => q.ID), Formatting.Indented));
             progress?.Report($"Getting quests from file {fileName}");
-            
+
             return _quests.Cached = await GetFromFileAsync(fileName);
         });
     }

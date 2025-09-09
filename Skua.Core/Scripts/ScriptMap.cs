@@ -1,14 +1,14 @@
-﻿using System.Diagnostics;
 using Newtonsoft.Json;
+using Skua.Core.Flash;
 using Skua.Core.Interfaces;
 using Skua.Core.Models;
 using Skua.Core.Models.Items;
 using Skua.Core.Models.Players;
 using Skua.Core.Utils;
-using Skua.Core.Flash;
-using CommunityToolkit.Mvvm.DependencyInjection;
+using System.Diagnostics;
 
 namespace Skua.Core.Scripts;
+
 public partial class ScriptMap : IScriptMap
 {
     public ScriptMap(
@@ -54,18 +54,25 @@ public partial class ScriptMap : IScriptMap
 
     [ObjectBinding("world.strMapName", RequireNotNull = "world", Default = "string.Empty")]
     private string _name = string.Empty;
+
     [ObjectBinding("world.curRoom")]
     private int _roomID;
+
     [ObjectBinding("world.areaUsers.length")]
     private int _playerCount;
+
     [ObjectBinding("world.areaUsers", Default = "new()")]
     private List<string> _playerNames = new();
+
     [ObjectBinding("world.uoTree", Default = "new()")]
     private readonly Dictionary<string, PlayerInfo> _playersDictionary = new();
+
     public List<PlayerInfo> Players => _playersDictionary.Values.ToList();
     public List<PlayerInfo> CellPlayers => Players.FindAll(p => p.Cell == Player.Cell);
+
     public bool Loaded => !Flash.GetGameObject<bool>("world.mapLoadInProgress")
                           && Flash.IsNull("mcConnDetail.stage");
+
     [ObjectBinding("world.map.currentScene.labels", Select = "name", Default = "new()")]
     private List<string> _cells;
 
@@ -118,7 +125,8 @@ public partial class ScriptMap : IScriptMap
     }
 
     [MethodCallBinding("world.reloadCurrentMap", GameFunction = true)]
-    private void _reload() { }
+    private void _reload()
+    { }
 
     [MethodCallBinding("world.getMapItem", RunMethodPre = true, GameFunction = true)]
     private void _getMapItem(int id)
@@ -195,13 +203,14 @@ public partial class ScriptMap : IScriptMap
                         case true:
                             questID = MainTimelineText.Skip(index - 5 < 0 ? 0 : index - 5).Take(10).Where(l => l.Contains("isquestinprogress")).FirstOrDefault()!;
 
-                            if(questID == null)
+                            if (questID == null)
                                 questID = string.Empty;
                             else
                                 questID = questID.ToLower().Split("isquestinprogress")[1].Split(')')[0].RemoveLetters() ?? "";
-                            
+
                             mapItem = mapItemLine.RemoveLetters();
                             break;
+
                         case false:
                             questID = MainTimelineText.Skip(index - 5 < 0 ? 0 : index - 5).Take(10).Where(l => l.Contains("questnum") || (l.Contains("intquest") && !l.Contains("intquestval"))).FirstOrDefault()!;
 
@@ -209,7 +218,7 @@ public partial class ScriptMap : IScriptMap
                                 questID = string.Empty;
                             else
                                 questID = questID.Split('=')[1].RemoveLetters() ?? "";
-                            
+
                             mapItem = mapItemLine.Split('=')[1].RemoveLetters();
                             break;
                     }

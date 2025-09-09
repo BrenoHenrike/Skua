@@ -2,6 +2,7 @@
 using System.Text;
 
 namespace Skua.Core.ViewModels;
+
 public class CBOOtherOptionsViewModel : ObservableObject, IManageCBOptions
 {
     public CBOOtherOptionsViewModel(List<CBOOptionItemContainerViewModel> options)

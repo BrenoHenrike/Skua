@@ -156,6 +156,5 @@
                     TextWrapping="Wrap" />
             </StackPanel>
         </Border>
-
     </Grid>
 </UserControl>

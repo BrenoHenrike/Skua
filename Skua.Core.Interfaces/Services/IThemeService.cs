@@ -3,11 +3,15 @@
 namespace Skua.Core.Interfaces;
 
 public delegate void ThemeChangedEventHandler(object? theme);
+
 public delegate void SchemeChangedEventHandler(ColorScheme scheme, object? color);
+
 public interface IThemeService
 {
     event ThemeChangedEventHandler ThemeChanged;
+
     event SchemeChangedEventHandler SchemeChanged;
+
     List<object> Presets { get; }
     List<object> UserThemes { get; }
     IEnumerable<object> ColorSelectionValues { get; }
@@ -19,10 +23,16 @@ public interface IThemeService
     bool IsDarkTheme { get; set; }
     object? SelectedColor { get; set; }
     ColorScheme ActiveScheme { get; set; }
+
     void ApplyBaseTheme(bool isDark);
+
     void ChangeCustomColor(object? obj);
+
     void ChangeScheme(ColorScheme scheme);
+
     void SaveTheme(string name);
+
     void SetCurrentTheme(object? theme);
+
     void RemoveTheme(object? theme);
 }

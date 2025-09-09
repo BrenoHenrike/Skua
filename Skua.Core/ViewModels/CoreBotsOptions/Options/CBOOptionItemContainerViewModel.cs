@@ -1,6 +1,7 @@
 ﻿using CommunityToolkit.Mvvm.ComponentModel;
 
 namespace Skua.Core.ViewModels;
+
 public class CBOOptionItemContainerViewModel : ObservableObject
 {
     public CBOOptionItemContainerViewModel(string category, List<DisplayOptionItemViewModelBase> items)
@@ -8,6 +9,7 @@ public class CBOOptionItemContainerViewModel : ObservableObject
         Category = category;
         Items = items;
     }
+
     public CBOOptionItemContainerViewModel(string category, DisplayOptionItemViewModelBase item)
     {
         Category = category;

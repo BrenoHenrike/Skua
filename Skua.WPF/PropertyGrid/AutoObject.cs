@@ -6,6 +6,7 @@ using System.Runtime.CompilerServices;
 using System.Xml.Serialization;
 
 namespace Skua.WPF;
+
 /// <summary>
 /// Defines a utility class to implement objects with typed properties without private fields.
 /// This class supports automatically property change notifications and error validations.

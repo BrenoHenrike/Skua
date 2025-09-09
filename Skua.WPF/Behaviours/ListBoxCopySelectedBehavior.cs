@@ -1,13 +1,15 @@
-﻿using System.Text;
+﻿using Microsoft.Xaml.Behaviors;
+using System.Text;
 using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Input;
-using Microsoft.Xaml.Behaviors;
 
 namespace Skua.WPF;
+
 public class ListBoxCopySelectedBehavior : Behavior<ListBox>
 {
     private readonly CommandBinding CopyCommand;
+
     public ListBoxCopySelectedBehavior()
     {
         static void handler(object sender, ExecutedRoutedEventArgs arg)
@@ -17,7 +19,7 @@ public class ListBoxCopySelectedBehavior : Behavior<ListBox>
             if (listBox.SelectedItems is not null)
             {
                 StringBuilder bob = new();
-                foreach(object item in listBox.SelectedItems)
+                foreach (object item in listBox.SelectedItems)
                 {
                     bob.AppendLine(item.ToString());
                 }
@@ -26,6 +28,7 @@ public class ListBoxCopySelectedBehavior : Behavior<ListBox>
         }
         CopyCommand = new CommandBinding(ApplicationCommands.Copy, handler);
     }
+
     protected override void OnAttached()
     {
         base.OnAttached();

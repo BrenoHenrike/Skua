@@ -1,5 +1,5 @@
-﻿using Microsoft.Extensions.DependencyInjection;
-using CommunityToolkit.Mvvm.DependencyInjection;
+﻿using CommunityToolkit.Mvvm.DependencyInjection;
+using Microsoft.Extensions.DependencyInjection;
 using Skua.Core.Interfaces;
 using Skua.Core.Models;
 using Skua.Core.Models.Items;
@@ -9,6 +9,7 @@ using Skua.Core.Models.Shops;
 using Skua.Core.ViewModels;
 
 namespace Skua.Core.AppStartup;
+
 internal class Grabber
 {
     internal static GrabberViewModel CreateViewModel(IServiceProvider s)
@@ -78,7 +79,7 @@ internal class Grabber
         List<MapItem> mapItems = i.Cast<MapItem>().ToList();
         var map = Ioc.Default.GetService<IScriptMap>()!;
         var dialogService = Ioc.Default.GetService<IDialogService>()!;
-        if(mapItems.Count == 1)
+        if (mapItems.Count == 1)
             p.Report($"Getting Map Item [{mapItems[0].ID}, input quantity...");
         else
             p.Report($"Getting {mapItems.Count} Map Items, input quantity...");
@@ -93,18 +94,18 @@ internal class Grabber
             return;
         try
         {
-            if(mapItems.Count == 1)
+            if (mapItems.Count == 1)
             {
                 await Task.Run(() => map.GetMapItem(mapItems[0].ID, result), t);
                 p.Report("Map item acquired.");
                 return;
             }
 
-            for(int index = 0; index < mapItems.Count; index++)
+            for (int index = 0; index < mapItems.Count; index++)
             {
                 p.Report($"Getting {mapItems[index].ID} x{result}");
                 await Task.Run(() => map.GetMapItem(mapItems[index].ID, result), t);
-                if(index != mapItems.Count - 1)
+                if (index != mapItems.Count - 1)
                     await Task.Delay(1000, t);
             }
             p.Report("Map items acquired");
@@ -115,6 +116,7 @@ internal class Grabber
                 p.Report("Task cancelled.");
         }
     }
+
     private static async Task TeleportToMonster(IList<object>? i, IProgress<string> p, CancellationToken t)
     {
         if (i is null || i.Count == 0)
@@ -219,6 +221,7 @@ internal class Grabber
             case Quest:
                 questIds = i.Cast<Quest>().Select(q => q.ID);
                 break;
+
             case MapItem:
                 questIds = i.Cast<MapItem>().Select(m => m.QuestID);
                 break;
@@ -272,10 +275,10 @@ internal class Grabber
         var player = Ioc.Default.GetService<IScriptPlayer>()!;
 
         List<ShopItem> items = i.Cast<ShopItem>().ToList();
-        if(items.Count == 1)
+        if (items.Count == 1)
         {
             ShopItem item = items[0];
-            if(item.Coins && item.Cost > 0)
+            if (item.Coins && item.Cost > 0)
             {
                 ACWarning(p, dialogService);
                 return;
@@ -294,7 +297,7 @@ internal class Grabber
             if (result > item.MaxStack)
                 result = item.MaxStack;
             int totalCost = item.Cost * result;
-            if(!item.Coins && totalCost > player.Gold)
+            if (!item.Coins && totalCost > player.Gold)
             {
                 p.Report($"Not enough gold. Total: {totalCost:#,0}");
                 dialogService.ShowMessageBox($"Not enough gold to buy {result} {item.Name}.\r\nTotal: {totalCost:#,0}\r\nNeeded: {totalCost - player.Gold:#,0}", "Not enough gold");
@@ -316,13 +319,13 @@ internal class Grabber
         List<ShopItem> coinItems = items.Where(i => i.Coins).ToList();
         List<ShopItem> goldItems = items.Where(i => !i.Coins).ToList();
 
-        if(coinItems.Count > 0 && coinItems.Sum(i => i.Cost) > 0)
+        if (coinItems.Count > 0 && coinItems.Sum(i => i.Cost) > 0)
         {
             ACWarning(p, dialogService);
             return;
         }
         int totalGoldCost = 0;
-        if(goldItems.Count > 0 && (totalGoldCost = goldItems.Sum(i => i.Cost)) > player.Gold)
+        if (goldItems.Count > 0 && (totalGoldCost = goldItems.Sum(i => i.Cost)) > player.Gold)
         {
             p.Report($"Not enough gold. Total: {totalGoldCost}");
             dialogService.ShowMessageBox($"Not enough gold to buy the {items.Count} items.\r\nTotal: {totalGoldCost:#,0}\r\nNeeded: {totalGoldCost - player.Gold:#,0}", "Not enough gold");
@@ -330,14 +333,13 @@ internal class Grabber
         }
         try
         {
-            for(int index = 0; index < items.Count; index++)
+            for (int index = 0; index < items.Count; index++)
             {
                 await Task.Run(() => shop.BuyItem(items[index].ID), t);
                 p.Report($"Bought {items[index].Name}");
                 if (index != items.Count - 1)
                     await Task.Delay(1000, t);
             }
-
         }
         catch
         {
@@ -378,14 +380,14 @@ internal class Grabber
         {
             InputDialogViewModel diag = new($"Selling {item.Name}", $"Sell quantity (Currently has: {(item.Category == ItemCategory.Class ? 1 : item.Quantity)})");
             if (dialogService.ShowDialog(diag) != true)
-            { 
+            {
                 p.Report("Cancelled.");
                 return;
             }
 
             if (!int.TryParse(diag.DialogTextInput, out int result))
                 return;
-            if(result == 1)
+            if (result == 1)
             {
                 await Task.Run(() => shop.SellItem(item.ID), t);
                 p.Report($"Sold {result} {item.Name}");
@@ -396,7 +398,7 @@ internal class Grabber
             {
                 await Task.Run(() => shop.SellItem(item.ID), t);
                 p.Report($"Sold {index + 1}");
-                if(index != result - 1)
+                if (index != result - 1)
                     await Task.Delay(1000, t);
             }
             p.Report($"Sold {result} {item.Name}");
@@ -440,7 +442,7 @@ internal class Grabber
             {
                 p.Report($"{identifier} {items[index].Name}.");
                 await Task.Run(() => action(items[index].ID), token);
-                if(index != items.Count - 1)
+                if (index != items.Count - 1)
                     await Task.Delay(1000, token);
             }
         }

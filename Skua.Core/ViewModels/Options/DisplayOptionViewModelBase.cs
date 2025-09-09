@@ -1,6 +1,7 @@
 ﻿using CommunityToolkit.Mvvm.ComponentModel;
 
 namespace Skua.Core.ViewModels;
+
 public class DisplayOptionItemViewModel<TDisplay> : DisplayOptionItemViewModelBase
 {
     public DisplayOptionItemViewModel(string content, TDisplay? defaultValue = default)
@@ -48,10 +49,22 @@ public partial class DisplayOptionItemViewModelBase : ObservableObject
         DisplayType = displayType;
     }
 
+    public DisplayOptionItemViewModelBase(string content, string description, string tag, string? suffixText, Type displayType)
+    {
+        Content = content;
+        Description = description;
+        Tag = tag;
+        SuffixText = suffixText;
+        DisplayType = displayType;
+    }
+
     public string Content { get; }
     public string Description { get; }
     public string Tag { get; }
+    public string? SuffixText { get; set; }
+
     [ObservableProperty]
     private object? _value;
+
     public Type DisplayType { get; }
 }

@@ -1,4 +1,5 @@
 ﻿namespace Skua.Core.ViewModels;
+
 public partial class CBOChoiceOptionItemViewModel : DisplayOptionItemViewModel<int>
 {
     public CBOChoiceOptionItemViewModel(string optionTitle, string description, string tag, List<string> options)

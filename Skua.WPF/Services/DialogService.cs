@@ -1,12 +1,11 @@
-﻿using System;
-using System.Windows;
-using CommunityToolkit.Mvvm.DependencyInjection;
-using Skua.Core.AppStartup;
-using Skua.Core.Interfaces;
+﻿using Skua.Core.Interfaces;
 using Skua.Core.Models;
 using Skua.Core.ViewModels;
+using System;
+using System.Windows;
 
 namespace Skua.WPF.Services;
+
 public class DialogService : IDialogService
 {
     public bool? ShowDialog<TViewModel>(TViewModel viewModel) where TViewModel : class
@@ -20,6 +19,7 @@ public class DialogService : IDialogService
             return dialog.ShowDialog();
         });
     }
+
     public bool? ShowDialog<TViewModel>(TViewModel viewModel, string title) where TViewModel : class
     {
         return Application.Current.Dispatcher.Invoke(() =>
@@ -54,7 +54,7 @@ public class DialogService : IDialogService
                     // Ensure handler is removed even if callback throws
                 }
             }
-            
+
             dialog.Closed += closeHandler;
 
             try

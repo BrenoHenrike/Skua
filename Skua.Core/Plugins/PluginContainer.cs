@@ -1,9 +1,9 @@
-﻿using Skua.Core.Options;
+﻿using CommunityToolkit.Mvvm.DependencyInjection;
 using Skua.Core.Interfaces;
-using CommunityToolkit.Mvvm.DependencyInjection;
 using Skua.Core.Models;
 
 namespace Skua.Core.Plugins;
+
 public class PluginContainer : IPluginContainer
 {
     public IOptionContainer OptionContainer { get; }
@@ -14,7 +14,7 @@ public class PluginContainer : IPluginContainer
     {
         OptionContainer = Ioc.Default.GetRequiredService<IOptionContainer>();
         Plugin = plugin;
-        if(plugin.Options is not null)
+        if (plugin.Options is not null)
             OptionContainer.Options.AddRange(plugin.Options);
         OptionContainer.OptionsFile = OptionsFile;
     }

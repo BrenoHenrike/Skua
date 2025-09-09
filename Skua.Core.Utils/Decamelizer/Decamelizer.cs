@@ -2,9 +2,11 @@
 using System.Text;
 
 namespace Skua.Core.Utils;
+
 public class Decamelizer : IDecamelizer
 {
     private readonly DecamelizeOptions _options = new();
+
     // input: a string like loadByWhateverStuff
     // output: a string like Load By Whatever Stuff
     // BBKing -> BBKing

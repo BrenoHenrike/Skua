@@ -5,13 +5,13 @@ using System;
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.Linq;
-using System.Threading.Tasks;
 using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Documents;
 using System.Windows.Threading;
 
 namespace Skua.WPF.Views;
+
 /// <summary>
 /// Interaction logic for AboutView.xaml
 /// </summary>
@@ -32,14 +32,14 @@ public partial class AboutView : UserControl
         }), DispatcherPriority.Loaded);
     }
 
-    void SubscribeToAllHyperlinks(FlowDocument flowDocument)
+    private void SubscribeToAllHyperlinks(FlowDocument flowDocument)
     {
         var hyperlinks = GetVisuals(flowDocument).OfType<Hyperlink>();
         foreach (var link in hyperlinks)
             link.Command = ((AboutViewModel)DataContext).NavigateCommand;
     }
 
-    IEnumerable<DependencyObject> GetVisuals(DependencyObject root)
+    private IEnumerable<DependencyObject> GetVisuals(DependencyObject root)
     {
         foreach (var child in LogicalTreeHelper.GetChildren(root).OfType<DependencyObject>())
         {
@@ -49,7 +49,7 @@ public partial class AboutView : UserControl
         }
     }
 
-    void link_RequestNavigate(object sender, System.Windows.Navigation.RequestNavigateEventArgs e)
+    private void link_RequestNavigate(object sender, System.Windows.Navigation.RequestNavigateEventArgs e)
     {
         Process.Start(new ProcessStartInfo(e.Uri.AbsoluteUri));
         e.Handled = true;

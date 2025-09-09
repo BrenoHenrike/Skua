@@ -4,26 +4,22 @@ using Skua.Core.AppStartup;
 using Skua.Core.Interfaces;
 using Skua.WPF.Services;
 using System;
-using System.Collections.Generic;
-using System.Configuration;
-using System.Data;
-using System.Diagnostics;
 using System.IO;
 using System.Linq;
 using System.Reflection;
 using System.Text;
-using System.Threading;
-using System.Threading.Tasks;
 using System.Windows;
 
 namespace Skua.App.WPF.Follower;
+
 /// <summary>
 /// Interaction logic for App.xaml
 /// </summary>
 public partial class App : Application
 {
-    string username;
-    string password;
+    private string username;
+    private string password;
+
     public App()
     {
         AppDomain currentDomain = AppDomain.CurrentDomain;
@@ -34,11 +30,12 @@ public partial class App : Application
 
         for (int i = 0; i < args.Length; i++)
         {
-            switch(args[i])
+            switch (args[i])
             {
                 case "--usr":
                     username = args[++i];
                     break;
+
                 case "--psw":
                     password = args[++i];
                     break;
@@ -80,6 +77,7 @@ public partial class App : Application
             case "requestLoadGame":
                 Services.GetRequiredService<IFlashUtil>().Call("loadClient");
                 break;
+
             case "loaded":
                 Services.GetRequiredService<IFlashUtil>().FlashCall -= Flash_FlashCall;
                 break;
@@ -114,7 +112,7 @@ public partial class App : Application
         MessageBox.Show($"Application Crash.\r\nVersion: 0.0.0.0\r\nMessage: {ex.Message}\r\nStackTrace: {ex.StackTrace}", "Application");
     }
 
-    static Assembly? ResolveAssemblies(object? sender, ResolveEventArgs args)
+    private static Assembly? ResolveAssemblies(object? sender, ResolveEventArgs args)
     {
         if (args.Name.Contains(".resources"))
             return null;

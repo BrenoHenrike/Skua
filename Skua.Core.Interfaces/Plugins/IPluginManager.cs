@@ -1,4 +1,5 @@
 ﻿namespace Skua.Core.Interfaces;
+
 public interface IPluginManager
 {
     /// <summary>

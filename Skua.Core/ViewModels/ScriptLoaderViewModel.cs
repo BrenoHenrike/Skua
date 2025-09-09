@@ -1,22 +1,23 @@
 ﻿using CommunityToolkit.Mvvm.ComponentModel;
-using CommunityToolkit.Mvvm.Messaging;
 using CommunityToolkit.Mvvm.Input;
+using CommunityToolkit.Mvvm.Messaging;
 using Skua.Core.Interfaces;
 using Skua.Core.Messaging;
 using Skua.Core.Models;
-using System.Diagnostics;
 
 namespace Skua.Core.ViewModels;
+
 public partial class ScriptLoaderViewModel : BotControlViewModelBase
 {
     private readonly string _scriptPath;
+
     public ScriptLoaderViewModel(
         IProcessService processService,
         IFileDialogService fileDialog,
         IScriptManager scriptManager,
         IWindowService windowService,
         IDialogService dialogService,
-        IEnumerable<LogTabViewModel> logs) 
+        IEnumerable<LogTabViewModel> logs)
         : base("Load Script", 350, 450)
     {
         StrongReferenceMessenger.Default.Register<ScriptLoaderViewModel, LoadScriptMessage, int>(this, (int)MessageChannels.ScriptStatus, LoadScript);
@@ -46,10 +47,13 @@ public partial class ScriptLoaderViewModel : BotControlViewModelBase
 
     [ObservableProperty]
     private string _scriptErrorToolTip = string.Empty;
+
     [ObservableProperty]
     private bool _toggleScriptEnabled = true;
+
     [ObservableProperty]
     private string _scriptStatus = "[No Script Loaded]";
+
     [ObservableProperty]
     private string _loadedScript = string.Empty;
 
@@ -153,7 +157,7 @@ public partial class ScriptLoaderViewModel : BotControlViewModelBase
             _dialogService.ShowMessageBox("No script is currently loaded. Please load a script to edit its options.", "No Script Loaded");
             return;
         }
-        
+
         if (ScriptManager.ScriptRunning)
         {
             _dialogService.ShowMessageBox("Script currently running. Stop the script to change its options.", "Script Running");

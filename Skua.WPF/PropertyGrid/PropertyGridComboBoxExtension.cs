@@ -11,6 +11,7 @@ using System.Windows.Data;
 using System.Windows.Markup;
 
 namespace Skua.WPF;
+
 public class PropertyGridComboBoxExtension : MarkupExtension
 {
     private readonly Binding _binding;

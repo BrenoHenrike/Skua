@@ -144,7 +144,8 @@
         <Grid Grid.Row="5" Margin="0,6,0,0">
             <Grid.ColumnDefinitions>
                 <ColumnDefinition Width="2*" />
-                <ColumnDefinition />
+                <ColumnDefinition Width="Auto" />
+                <ColumnDefinition Width="Auto" />
             </Grid.ColumnDefinitions>
             <DockPanel>
                 <Button
@@ -161,7 +162,7 @@
                     BorderBrush="{DynamicResource PrimaryHueMidBrush}"
                     BorderThickness="1,1,0,1"
                     CornerRadius="2 0 0 2"
-                    ToolTip="Paht to a script which will be loaded and started after launching an account.">
+                    ToolTip="Path to a script which will be loaded and started after launching an account.">
                     <TextBlock
                         Margin="16,0,0,0"
                         VerticalAlignment="Center"
@@ -175,6 +176,13 @@
                 Content="Start with Script"
                 IsChecked="{Binding StartWithScript}"
                 ToolTip="After launching and loging in the accounts, starts the specified script." />
+            <Button
+                Grid.Column="2"
+                Margin="6,0,0,0"
+                VerticalAlignment="Center"
+                Command="{Binding OpenGetScriptsCommand}"
+                Content="Get Scripts"
+                ToolTip="Open Get Scripts menu to browse and download scripts" />
         </Grid>
     </Grid>
 </UserControl>

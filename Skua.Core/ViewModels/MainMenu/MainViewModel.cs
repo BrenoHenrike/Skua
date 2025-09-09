@@ -1,5 +1,4 @@
-﻿
-using CommunityToolkit.Mvvm.ComponentModel;
+﻿using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.DependencyInjection;
 using CommunityToolkit.Mvvm.Input;
 using CommunityToolkit.Mvvm.Messaging;
@@ -7,6 +6,7 @@ using Skua.Core.Interfaces;
 using Skua.Core.Messaging;
 
 namespace Skua.Core.ViewModels;
+
 public sealed partial class MainViewModel : ObservableObject
 {
     [ObservableProperty]

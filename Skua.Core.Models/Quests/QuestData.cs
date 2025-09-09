@@ -1,8 +1,9 @@
-﻿using System.Diagnostics.CodeAnalysis;
-using Newtonsoft.Json;
+﻿using Newtonsoft.Json;
 using Skua.Core.Models.Items;
+using System.Diagnostics.CodeAnalysis;
 
 namespace Skua.Core.Models.Quests;
+
 public class QuestData : IEqualityComparer<QuestData>
 {
     /// <summary>
@@ -128,6 +129,7 @@ public class QuestData : IEqualityComparer<QuestData>
     {
         return obj is not null && obj is QuestData quest && quest.ID == ID;
     }
+
     public override int GetHashCode()
     {
         return HashCode.Combine(ID, Name);

@@ -2,6 +2,7 @@
 using Skua.Core.Models;
 
 namespace Skua.Core.Services;
+
 public class GrabberService : IGrabberService
 {
     public GrabberService(
@@ -41,33 +42,43 @@ public class GrabberService : IGrabberService
             case GrabberTypes.Shop_Items:
                 items.AddRange(_shops.Items);
                 break;
+
             case GrabberTypes.Shop_IDs:
                 items.AddRange(_shops.LoadedCache);
                 break;
+
             case GrabberTypes.Quests:
                 items.AddRange(_quests.Tree);
                 break;
+
             case GrabberTypes.Inventory_Items:
                 items.AddRange(_inventory.Items);
                 break;
+
             case GrabberTypes.House_Inventory_Items:
                 items.AddRange(_house.Items);
                 break;
+
             case GrabberTypes.Temp_Inventory_Items:
                 items.AddRange(_tempInv.Items);
                 break;
+
             case GrabberTypes.Bank_Items:
                 items.AddRange(_bank.Items);
                 break;
+
             case GrabberTypes.Cell_Monsters:
                 items.AddRange(_monsters.CurrentAvailableMonsters);
                 break;
+
             case GrabberTypes.Map_Monsters:
                 items.AddRange(_monsters.MapMonstersWithCurrentData);
                 break;
+
             case GrabberTypes.GetMap_Item_IDs:
                 items.AddRange(_map.FindMapItems() ?? new());
                 break;
+
             default:
                 return new();
         }

@@ -4,5 +4,4 @@ namespace Skua.Core.Interfaces;
 
 public interface IScriptTempInv : ICheckInventory<ItemBase>
 {
-    
 }

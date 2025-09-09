@@ -7,6 +7,7 @@ using Skua.Core.Models.Items;
 using Skua.Core.Models.Skills;
 
 namespace Skua.Core.ViewModels;
+
 public partial class AutoViewModel : BotControlViewModelBase, IDisposable
 {
     private CancellationTokenSource? _autoCts;
@@ -26,8 +27,10 @@ public partial class AutoViewModel : BotControlViewModelBase, IDisposable
 
     private readonly IScriptInventory _inventory;
     private readonly IAdvancedSkillContainer _advancedSkills;
+
     [ObservableProperty]
     private ClassUseMode? _selectedClassMode;
+
     [ObservableProperty]
     private bool _useSelectedClass;
 
@@ -35,12 +38,13 @@ public partial class AutoViewModel : BotControlViewModelBase, IDisposable
     public List<string>? PlayerClasses => _inventory.Items?.Where(i => i.Category == ItemCategory.Class).Select(i => i.Name).ToList();
 
     private string? _selectedClass;
+
     public string? SelectedClass
     {
         get { return _selectedClass; }
         set
         {
-            if(SetProperty(ref _selectedClass, value) && value is not null)
+            if (SetProperty(ref _selectedClass, value) && value is not null)
             {
                 CurrentClassModes = new();
                 CurrentClassModes.AddRange(_advancedSkills.LoadedSkills.Where(s => s.ClassName == _selectedClass).Select(s => s.ClassUseMode));
@@ -69,11 +73,11 @@ public partial class AutoViewModel : BotControlViewModelBase, IDisposable
         _autoCts?.Cancel();
         _autoCts?.Dispose();
         _autoCts = new CancellationTokenSource();
-        
+
         if (UseSelectedClass && _selectedClass is not null && _selectedClassMode is not null)
         {
             await Task.Factory.StartNew(
-                () => Auto.StartAutoHunt(_selectedClass, (ClassUseMode)_selectedClassMode), 
+                () => Auto.StartAutoHunt(_selectedClass, (ClassUseMode)_selectedClassMode),
                 _autoCts.Token,
                 TaskCreationOptions.LongRunning,
                 TaskScheduler.Default);
@@ -94,7 +98,7 @@ public partial class AutoViewModel : BotControlViewModelBase, IDisposable
         _autoCts?.Cancel();
         _autoCts?.Dispose();
         _autoCts = new CancellationTokenSource();
-        
+
         if (UseSelectedClass && _selectedClass is not null && _selectedClassMode is not null)
         {
             await Task.Factory.StartNew(
@@ -119,7 +123,7 @@ public partial class AutoViewModel : BotControlViewModelBase, IDisposable
         _autoCts?.Dispose();
         _autoCts = null;
     }
-    
+
     private bool _disposed = false;
 
     public void Dispose()

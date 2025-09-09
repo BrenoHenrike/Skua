@@ -1,4 +1,5 @@
 ﻿namespace Skua.Core.Models;
+
 public class HotKey
 {
     public HotKey(string key, bool ctrl, bool alt, bool shift)

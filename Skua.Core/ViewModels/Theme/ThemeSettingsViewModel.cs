@@ -3,6 +3,7 @@ using CommunityToolkit.Mvvm.Input;
 using Skua.Core.Interfaces;
 
 namespace Skua.Core.ViewModels;
+
 public partial class ThemeSettingsViewModel : ObservableObject
 {
     public ThemeSettingsViewModel(IThemeService themeService)
@@ -12,6 +13,7 @@ public partial class ThemeSettingsViewModel : ObservableObject
 
     [ObservableProperty]
     private string _themeName = string.Empty;
+
     public IThemeService ThemeService { get; }
 
     [RelayCommand]
@@ -19,5 +21,4 @@ public partial class ThemeSettingsViewModel : ObservableObject
     {
         ThemeService.SaveTheme(ThemeName);
     }
-
 }

@@ -1,12 +1,13 @@
 ﻿using CommunityToolkit.Mvvm.ComponentModel;
-using CommunityToolkit.Mvvm.Messaging;
 using CommunityToolkit.Mvvm.Input;
+using CommunityToolkit.Mvvm.Messaging;
 using Skua.Core.Interfaces;
+using Skua.Core.Messaging;
 using Skua.Core.Models.Skills;
 using Skua.Core.Utils;
-using Skua.Core.Messaging;
 
 namespace Skua.Core.ViewModels;
+
 public partial class AdvancedSkillEditorViewModel : ObservableRecipient
 {
     public AdvancedSkillEditorViewModel(IDialogService dialogService)
@@ -31,18 +32,25 @@ public partial class AdvancedSkillEditorViewModel : ObservableRecipient
     }
 
     private readonly IDialogService _dialogService;
+
     [ObservableProperty]
     private int _currentSkillTimeout = 250;
+
     [ObservableProperty]
     private bool _useWaitModeBool;
+
     [ObservableProperty]
     private RangedObservableCollection<SkillItemViewModel> _currentSkillsList = new();
+
     [ObservableProperty]
     private SkillItemViewModel? _selectedSkill;
+
     [ObservableProperty]
     private int _selectedSkillIndex;
+
     [ObservableProperty]
     private int _selectedClassUseMode;
+
     [ObservableProperty]
     private string _currentClassName = string.Empty;
 
@@ -85,11 +93,13 @@ public partial class AdvancedSkillEditorViewModel : ObservableRecipient
     {
         MoveSkill(1);
     }
+
     [RelayCommand]
     private void MoveSkillUp()
     {
         MoveSkill(-1);
     }
+
     private void MoveSkill(int direction)
     {
         if (SelectedSkill is null)
@@ -112,11 +122,13 @@ public partial class AdvancedSkillEditorViewModel : ObservableRecipient
     {
         SelectSkill(1);
     }
+
     [RelayCommand]
     private void SelectSkillUp()
     {
         SelectSkill(-1);
     }
+
     private void SelectSkill(int direction)
     {
         if (SelectedSkill is null)

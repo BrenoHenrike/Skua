@@ -1,9 +1,10 @@
-﻿using System;
-using System.Collections.Concurrent;
-using Skua.Core.Interfaces;
+﻿using Skua.Core.Interfaces;
 using Skua.Core.Utils;
+using System;
+using System.Collections.Concurrent;
 
 namespace Skua.WPF;
+
 public class PropertyGridServiceProvider : IServiceProvider
 {
     private readonly ConcurrentDictionary<Type, object> _services = new ConcurrentDictionary<Type, object>();

@@ -128,11 +128,13 @@ public class Quest
     [JsonConverter(typeof(DictionaryListConverter<int, ItemBase>))]
     public List<ItemBase> AcceptRequirements { get; set; } = new List<ItemBase>();
 
-    [JsonProperty("oItems")] [JsonConverter(typeof(DictionaryListConverter<int, ItemBase>))]
+    [JsonProperty("oItems")]
+    [JsonConverter(typeof(DictionaryListConverter<int, ItemBase>))]
     private List<ItemBase> _reqs = new();
 
     [JsonProperty("turnin")]
     private List<SimpleRequirement> _turnin = new();
+
     private List<ItemBase> _reqCache;
 
     /// <summary>

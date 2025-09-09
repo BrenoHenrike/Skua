@@ -1,4 +1,5 @@
 ﻿namespace Skua.WPF;
+
 /// <summary>
 /// Interaction logic for HostDialog.xaml
 /// </summary>

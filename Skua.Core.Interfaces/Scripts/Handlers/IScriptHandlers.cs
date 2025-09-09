@@ -1,4 +1,5 @@
 ﻿namespace Skua.Core.Interfaces;
+
 public interface IScriptHandlers
 {
     /// <summary>
@@ -14,6 +15,7 @@ public interface IScriptHandlers
     /// <param name="name">Name of this handler (must be unique). Passing null will assign it a unique name.</param>
     /// <returns>The <see cref="IHandler"/> registered.</returns>
     IHandler RegisterHandler(int ticks, Func<IScriptInterface, bool> function, string name = null!);
+
     /// <summary>
     /// Register an <paramref name="function"/> to be executed every time the specified number of <paramref name="ticks"/> has passed. A tick is 20ms.
     /// </summary>
@@ -29,6 +31,7 @@ public interface IScriptHandlers
             return true;
         }, name);
     }
+
     /// <summary>
     /// Register an <paramref name="function"/> to be executed every time the specified number of <paramref name="ticks"/> has passed. A tick is 20ms.
     /// </summary>
@@ -44,24 +47,28 @@ public interface IScriptHandlers
             return false;
         }, name);
     }
+
     /// <summary>
     /// Removes the handler with specified name.
     /// </summary>
     /// <param name="name">Name of the handler to remove.</param>
     /// <returns><see langword="true"/> if the handler was removed.</returns>
     bool Remove(string name);
+
     /// <summary>
     /// Removes the specified handler.
     /// </summary>
     /// <param name="handler">Handler to remove.</param>
     /// <returns><see langword="true"/> if the handler was removed.</returns>
     bool Remove(IHandler handler);
+
     /// <summary>
     /// Removes all the specified handlers.
     /// </summary>
     /// <param name="handlers">Handlers to remove</param>
     /// <returns><see langword="true"/> if all the handlers where removed.</returns>
     bool Remove(List<IHandler> handlers);
+
     /// <summary>
     /// Clear the list of handlers.
     /// </summary>

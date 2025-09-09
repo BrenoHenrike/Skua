@@ -24,4 +24,3 @@ public class MessageInfo
         Content = content;
     }
 }
-

@@ -7,12 +7,14 @@ using System.Windows;
 using System.Windows.Controls;
 
 namespace Skua.WPF.UserControls;
+
 /// <summary>
 /// Interaction logic for GameContainerUserControl.xaml
 /// </summary>
 public partial class GameContainerUserControl : UserControl
 {
     private IScriptInterface _bot;
+
     public GameContainerUserControl()
     {
         InitializeComponent();

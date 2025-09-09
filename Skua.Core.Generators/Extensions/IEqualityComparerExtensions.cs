@@ -2,9 +2,9 @@
 using System.Collections.Generic;
 using System.Collections.Immutable;
 using System.Linq;
-using System.Text;
 
 namespace Skua.Core.Generators.Extensions;
+
 /// <summary>
 /// Extension methods for <see cref="IEqualityComparer{T}"/>.
 /// </summary>

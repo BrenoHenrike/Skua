@@ -1,7 +1,7 @@
 ﻿using Skua.Core.Interfaces;
-using System.Diagnostics;
 
 namespace Skua.Core.Skills;
+
 public class AdvancedSkillCommand
 {
     public Dictionary<int, int> Skills { get; set; } = new();
@@ -18,12 +18,11 @@ public class AdvancedSkillCommand
         return (index, skill);
     }
 
-    
     public bool? ShouldUse(IScriptPlayer player, int skillIndex, bool canUse)
     {
         if (UseRules.Count == 0 || UseRules[skillIndex].First().Rule == SkillRule.None)
-            return true; 
-        
+            return true;
+
         bool shouldUse = true;
         foreach (UseRule useRule in UseRules[skillIndex])
         {
@@ -35,12 +34,14 @@ public class AdvancedSkillCommand
                 case SkillRule.Health:
                     shouldUse = HealthUseRule(player, useRule.Greater, useRule.Value);
                     break;
+
                 case SkillRule.Mana:
                     shouldUse = ManaUseRule(player, useRule.Greater, useRule.Value);
                     break;
+
                 case SkillRule.Wait:
                     if (useRule.ShouldSkip && !canUse)
-                        return null; 
+                        return null;
                     Task.Delay(useRule.Value).Wait();
                     break;
             }
@@ -87,7 +88,7 @@ public struct UseRule
     {
         Rule = rule;
     }
-    
+
     public UseRule(SkillRule rule, bool greater, int value, bool shouldSkip)
     {
         Rule = rule;
@@ -95,7 +96,7 @@ public struct UseRule
         Value = value;
         ShouldSkip = shouldSkip;
     }
-    
+
     /// <summary>
     /// <list type="bullet">
     /// <item><see langword="null"/> = Wait</item>
@@ -104,7 +105,7 @@ public struct UseRule
     /// </list>
     /// </summary>
     public readonly SkillRule Rule = SkillRule.None;
-    
+
     /// <summary>
     /// <list type="bullet">
     /// <item><see langword="true"/> = Great than</item>
@@ -112,6 +113,7 @@ public struct UseRule
     /// </list>
     /// </summary>
     public readonly bool Greater = default;
+
     public readonly int Value = default;
     public readonly bool ShouldSkip = default;
 }

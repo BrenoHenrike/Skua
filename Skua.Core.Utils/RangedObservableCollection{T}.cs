@@ -3,6 +3,7 @@ using System.Collections.Specialized;
 using System.ComponentModel;
 
 namespace Skua.Core.Utils;
+
 /// <summary>
 /// Implementation of a dynamic data collection based on generic <see cref="ObservableCollection{T}"/>,
 /// implementing <see cref="INotifyCollectionChanged"/> to notify listeners

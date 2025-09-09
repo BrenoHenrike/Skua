@@ -3,9 +3,11 @@ using System.Runtime.InteropServices;
 using System.Windows;
 
 namespace Skua.WPF;
+
 public static class WindowChromePatch
 {
     #region WindowChrome Fix
+
     public static IntPtr WindowProc(IntPtr hwnd, int msg, IntPtr wParam, IntPtr lParam, ref bool handled)
     {
         switch (msg)
@@ -42,8 +44,10 @@ public static class WindowChromePatch
     {
         /// <summary>x coordinate of point.</summary>
         public int x;
+
         /// <summary>y coordinate of point.</summary>
         public int y;
+
         /// <summary>Construct a point of coordinates (x,y).</summary>
         public POINT(int x, int y)
         {
@@ -81,6 +85,7 @@ public static class WindowChromePatch
         public static readonly RECT Empty = new();
         public int Width => Math.Abs(right - left);
         public int Height => bottom - top;
+
         public RECT(int left, int top, int right, int bottom)
         {
             this.left = left;
@@ -88,6 +93,7 @@ public static class WindowChromePatch
             this.right = right;
             this.bottom = bottom;
         }
+
         public RECT(RECT rcSrc)
         {
             left = rcSrc.left;
@@ -95,16 +101,20 @@ public static class WindowChromePatch
             right = rcSrc.right;
             bottom = rcSrc.bottom;
         }
+
         public bool IsEmpty { get { return left >= right || top >= bottom; } }
+
         public override string ToString()
         {
             if (this == Empty) { return "RECT {Empty}"; }
             return "RECT { left : " + left + " / top : " + top + " / right : " + right + " / bottom : " + bottom + " }";
         }
+
         public override bool Equals(object obj)
         {
             return obj is not Rect ? false : this == (RECT)obj;
         }
+
         /// <summary>Return the HashCode for this struct (not garanteed to be unique)</summary>
         public override int GetHashCode()
         {
@@ -112,9 +122,12 @@ public static class WindowChromePatch
         }
 
         /// <summary> Determine if 2 RECT are equal (deep compare)</summary>
-        public static bool operator ==(RECT rect1, RECT rect2) { return (rect1.left == rect2.left && rect1.top == rect2.top && rect1.right == rect2.right && rect1.bottom == rect2.bottom); }
+        public static bool operator ==(RECT rect1, RECT rect2)
+        { return (rect1.left == rect2.left && rect1.top == rect2.top && rect1.right == rect2.right && rect1.bottom == rect2.bottom); }
+
         /// <summary> Determine if 2 RECT are different(deep compare)</summary>
-        public static bool operator !=(RECT rect1, RECT rect2) { return !(rect1 == rect2); }
+        public static bool operator !=(RECT rect1, RECT rect2)
+        { return !(rect1 == rect2); }
     }
 
     [DllImport("user32")]
@@ -123,6 +136,5 @@ public static class WindowChromePatch
     [DllImport("User32")]
     internal static extern IntPtr MonitorFromWindow(IntPtr handle, int flags);
 
-    #endregion
-
+    #endregion WindowChrome Fix
 }

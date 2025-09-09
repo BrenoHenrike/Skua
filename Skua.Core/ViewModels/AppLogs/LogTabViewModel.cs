@@ -8,6 +8,7 @@ using Skua.Core.Models;
 using Skua.Core.Utils;
 
 namespace Skua.Core.ViewModels;
+
 public partial class LogTabViewModel : ObservableRecipient
 {
     public LogTabViewModel(string title, ILogService logService, IDispatcherService dispatcherService, LogType logType)

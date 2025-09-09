@@ -3,6 +3,7 @@ using System.Windows;
 using System.Windows.Controls;
 
 namespace Skua.WPF;
+
 public class PropertyGridOptionsAttribute : Attribute
 {
     public PropertyGridOptionsAttribute()

@@ -1,6 +1,7 @@
 ﻿using Skua.Core.Interfaces;
 
 namespace Skua.Core.Options;
+
 public class Option<T> : IOption where T : IConvertible
 {
     public string Category { get; set; } = "Options";
@@ -9,6 +10,7 @@ public class Option<T> : IOption where T : IConvertible
     public string Description { get; set; }
     public object? DefaultValue { get; set; }
     public bool Transient { get; set; }
+
     public Type Type
     {
         get

@@ -7,6 +7,7 @@ public class ScriptHandlers : IScriptHandlers
     private List<IHandler> _currentHandlers = new();
     public IEnumerable<IHandler> CurrentHandlers => _currentHandlers;
     private volatile int _iHandler;
+
     public IHandler RegisterHandler(int ticks, Func<IScriptInterface, bool> function, string name = null!)
     {
         string hName = name ?? _iHandler++.ToString();

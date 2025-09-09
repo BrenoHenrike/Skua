@@ -5,6 +5,7 @@ using Skua.Core.Models;
 using System.Collections.Specialized;
 
 namespace Skua.Core.ViewModels;
+
 public partial class HotKeysViewModel : BotControlViewModelBase, IManagedWindow
 {
     public HotKeysViewModel(IHotKeyService hotKeyService, ISettingsService settingsService, IDialogService dialogService)

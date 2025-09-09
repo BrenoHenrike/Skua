@@ -3,6 +3,7 @@ using Skua.Core.Interfaces;
 using Skua.Core.Models;
 
 namespace Skua.Core.ViewModels;
+
 public class ColorSchemeEditorViewModel : BotControlViewModelBase
 {
     public ColorSchemeEditorViewModel(IThemeService themeService, ThemeSettingsViewModel themeSettings)

@@ -1,10 +1,10 @@
-﻿using Skua.Core.Models.Auras;
-using Skua.Core.Flash;
-using Skua.Core.Interfaces.Auras;
+﻿using Newtonsoft.Json;
 using Skua.Core.Interfaces;
-using Newtonsoft.Json;
+using Skua.Core.Interfaces.Auras;
+using Skua.Core.Models.Auras;
 
 namespace Skua.Core.Scripts.Auras;
+
 public partial class ScriptTargetAuras : IScriptTargetAuras
 {
     private readonly Lazy<IFlashUtil> _lazyFlash;
@@ -15,11 +15,12 @@ public partial class ScriptTargetAuras : IScriptTargetAuras
         _lazyFlash = lazyFlash;
     }
 
-    public List<Aura>? Auras
+    public List<Aura> Auras
     {
         get
         {
-            return JsonConvert.DeserializeObject<List<Aura>>(Flash.Call("getSubjectAuras", SubjectType.Target.ToString())) ?? new();
+            var auraData = Flash.Call("getSubjectAuras", SubjectType.Target.ToString());
+            return JsonConvert.DeserializeObject<List<Aura>>(auraData) ?? new List<Aura>();
         }
     }
 
@@ -42,5 +43,35 @@ public partial class ScriptTargetAuras : IScriptTargetAuras
         }
         aura = null;
         return false;
+    }
+
+    public int GetAuraValue(string auraName)
+    {
+        return Flash.Call<int>("GetAurasValue", SubjectType.Target.ToString(), auraName);
+    }
+
+    public bool HasAuraWithMinStacks(string auraName, int minStacks)
+    {
+        return GetAuraValue(auraName) >= minStacks;
+    }
+
+    public int GetAuraSecondsRemaining(string auraName)
+    {
+        return Flash.Call<int>("GetAuraSecondsRemaining", SubjectType.Target.ToString(), auraName);
+    }
+
+    public bool HasAnyActiveAura(params string[] auraNames)
+    {
+        return Flash.Call<bool>("HasAnyActiveAura", SubjectType.Target.ToString(), string.Join(",", auraNames));
+    }
+
+    public bool HasAllActiveAuras(params string[] auraNames)
+    {
+        return Flash.Call<bool>("HasAllActiveAuras", SubjectType.Target.ToString(), string.Join(",", auraNames));
+    }
+
+    public int GetTotalAuraStacks(string auraNamePattern)
+    {
+        return Flash.Call<int>("GetTotalAuraStacks", SubjectType.Target.ToString(), auraNamePattern);
     }
 }

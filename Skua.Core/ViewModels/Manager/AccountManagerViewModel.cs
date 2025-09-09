@@ -1,16 +1,19 @@
-﻿using CommunityToolkit.Mvvm.ComponentModel;
-using CommunityToolkit.Mvvm.Messaging;
+using CommunityToolkit.Mvvm.ComponentModel;
+using CommunityToolkit.Mvvm.DependencyInjection;
 using CommunityToolkit.Mvvm.Input;
+using CommunityToolkit.Mvvm.Messaging;
+using Newtonsoft.Json;
+using Skua.Core.AppStartup;
 using Skua.Core.Interfaces;
 using Skua.Core.Messaging;
-using Skua.Core.Utils;
-using System.Diagnostics;
-using System.Collections.Specialized;
-using Newtonsoft.Json;
-using Skua.Core.Models.Servers;
 using Skua.Core.Models;
+using Skua.Core.Models.Servers;
+using Skua.Core.Utils;
+using System.Collections.Specialized;
+using System.Diagnostics;
 
 namespace Skua.Core.ViewModels.Manager;
+
 public sealed partial class AccountManagerViewModel : BotControlViewModelBase
 {
     public AccountManagerViewModel(ISettingsService settingsService, IDialogService dialogService, IFileDialogService fileService)
@@ -18,6 +21,9 @@ public sealed partial class AccountManagerViewModel : BotControlViewModelBase
     {
         Messenger.Register<AccountManagerViewModel, RemoveAccountMessage>(this, (r, m) => r._RemoveAccount(m.Account));
         Messenger.Register<AccountManagerViewModel, AccountSelectedMessage>(this, AccountSelected);
+        // Register to receive LoadScriptMessage from ScriptRepoManagerViewModel
+        StrongReferenceMessenger.Default.Register<AccountManagerViewModel, LoadScriptMessage, int>(this,
+            (int)MessageChannels.ScriptStatus, (r, m) => r.HandleLoadScript(m));
         _settingsService = settingsService;
         _dialogService = dialogService;
         _fileService = fileService;
@@ -41,23 +47,33 @@ public sealed partial class AccountManagerViewModel : BotControlViewModelBase
 
     [ObservableProperty]
     private string _scriptPath = string.Empty;
+
     [ObservableProperty]
     private bool _startWithScript;
+
     [ObservableProperty]
     private int _columns = 1;
+
     [ObservableProperty]
     private int _selectedAccountQuant;
+
     [ObservableProperty]
     private string _usernameInput;
+
     [ObservableProperty]
     private string _displayNameInput;
+
     [ObservableProperty]
     private Server _selectedServer;
+
     [ObservableProperty]
     private bool _useNameAsDisplay;
+
     private List<Server> _cachedServers = new();
+
     [ObservableProperty]
     private RangedObservableCollection<Server> _serverList;
+
     private bool _syncThemes;
 
     public string PasswordInput { private get; set; }
@@ -74,7 +90,7 @@ public sealed partial class AccountManagerViewModel : BotControlViewModelBase
     [RelayCommand]
     public void AddAccount()
     {
-        if(string.IsNullOrEmpty(UsernameInput) || string.IsNullOrEmpty(PasswordInput))
+        if (string.IsNullOrEmpty(UsernameInput) || string.IsNullOrEmpty(PasswordInput))
         {
             _dialogService.ShowMessageBox("Username and/or password must not be empty", "Missing Input");
             return;
@@ -105,7 +121,7 @@ public sealed partial class AccountManagerViewModel : BotControlViewModelBase
         _syncThemes = _settingsService.Get("SyncThemes", false);
         foreach (var acc in Accounts.Where(a => a.UseCheck))
         {
-            _LaunchAcc(acc.Username, acc.Password);
+            _LaunchAcc(acc.Username, acc.Password, acc.DisplayName);
             await Task.Delay(1000);
         }
     }
@@ -116,7 +132,7 @@ public sealed partial class AccountManagerViewModel : BotControlViewModelBase
         _syncThemes = _settingsService.Get("SyncThemes", false);
         foreach (var acc in Accounts)
         {
-            _LaunchAcc(acc.Username, acc.Password);
+            _LaunchAcc(acc.Username, acc.Password, acc.DisplayName);
             await Task.Delay(1000);
         }
     }
@@ -128,6 +144,24 @@ public sealed partial class AccountManagerViewModel : BotControlViewModelBase
             _RemoveAccount(acc);
 
         _SaveAccounts();
+    }
+
+    [RelayCommand]
+    public void OpenGetScripts()
+    {
+        // Ensure managed windows are registered before using them
+        var services = Ioc.Default.GetService<IServiceProvider>();
+        if (services != null)
+        {
+            ManagedWindows.RegisterForManager(services);
+        }
+
+        // Open Get Scripts using managed window to reuse existing window
+        var windowService = Ioc.Default.GetService<IWindowService>();
+        if (windowService != null)
+        {
+            windowService.ShowManagedWindow("Script Repo Manager");
+        }
     }
 
     private void _RemoveAccount(AccountItemViewModel account)
@@ -146,8 +180,8 @@ public sealed partial class AccountManagerViewModel : BotControlViewModelBase
 
         _settingsService.Set("ManagedAccounts", accs);
     }
-    
-    private void _LaunchAcc(string username, string password)
+
+    private void _LaunchAcc(string username, string password, string displayName = null)
     {
         try
         {
@@ -165,19 +199,25 @@ public sealed partial class AccountManagerViewModel : BotControlViewModelBase
                 WorkingDirectory = AppContext.BaseDirectory
             };
 
-            if(_syncThemes)
+            if (_syncThemes)
             {
                 psi.ArgumentList.Add("--use-theme");
                 psi.ArgumentList.Add(_settingsService.Get("CurrentTheme", "no-theme"));
             }
 
-            if(StartWithScript)
+            if (StartWithScript)
             {
                 psi.ArgumentList.Add("--run-script");
                 psi.ArgumentList.Add(ScriptPath);
             }
 
-            Process.Start(psi);
+            var process = Process.Start(psi);
+            if (process != null)
+            {
+                // Send message to LauncherViewModel to add this process with the account display name
+                string accountName = !string.IsNullOrEmpty(displayName) ? displayName : username;
+                StrongReferenceMessenger.Default.Send(new AddProcessMessage(process, accountName));
+            }
         }
         catch (Exception ex)
         {
@@ -225,5 +265,17 @@ public sealed partial class AccountManagerViewModel : BotControlViewModelBase
             recipient.SelectedAccountQuant++;
         else
             recipient.SelectedAccountQuant--;
+    }
+
+    private void HandleLoadScript(LoadScriptMessage message)
+    {
+        if (string.IsNullOrEmpty(message.Path))
+            return;
+
+        // Set the script path to the loaded script
+        ScriptPath = message.Path;
+
+        // Optionally show a confirmation message
+        _dialogService.ShowMessageBox($"Script loaded: {Path.GetFileName(message.Path)}", "Script Loaded");
     }
 }

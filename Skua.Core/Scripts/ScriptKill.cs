@@ -5,6 +5,7 @@ using Skua.Core.Models.Monsters;
 using Skua.Core.Utils;
 
 namespace Skua.Core.Scripts;
+
 public class ScriptKill : IScriptKill
 {
     public ScriptKill(Lazy<IScriptWait> wait,
@@ -56,26 +57,30 @@ public class ScriptKill : IScriptKill
     private IScriptManager Manager => _lazyManager.Value;
     private IScriptMonster Monsters => _lazyMonsters.Value;
 
-
     public void Player(string name)
     {
         Combat.AttackPlayer(name);
         if (Options.SafeTimings)
             Wait.ForMonsterDeath();
     }
+
     public void Monster(string name) => _Kill(name, null);
+
     public void Monster(string name, CancellationToken? token) => _Kill(name, token);
 
     public void Monster(Monster monster) => _Kill(monster.MapID, null);
+
     public void Monster(Monster monster, CancellationToken? token) => _Kill(monster.MapID, token);
 
     public void Monster(int id) => _Kill(id, null);
+
     public void Monster(int id, CancellationToken? token) => _Kill(id, token);
+
     private void _Kill(string name, CancellationToken? token)
     {
         if (Options.SafeTimings)
             Wait.ForMonsterSpawn(name);
-        if(Combat.Attack(name))
+        if (Combat.Attack(name))
         {
             Thread.Sleep(Options.ActionDelay);
             if (token is null)
@@ -91,7 +96,7 @@ public class ScriptKill : IScriptKill
     {
         if (Options.SafeTimings)
             Wait.ForMonsterSpawn(id);
-        if(Combat.Attack(id))
+        if (Combat.Attack(id))
         {
             Thread.Sleep(Options.ActionDelay);
             if (token is null)
@@ -161,7 +166,7 @@ public class ScriptKill : IScriptKill
 
         void CellChanged(ScriptKill recipient, CellChangedMessage message)
         {
-            if(message.Cell != recipient._saveCell)
+            if (message.Cell != recipient._saveCell)
                 recipient.Map.Jump(recipient._saveCell, recipient._savePad);
         }
     }

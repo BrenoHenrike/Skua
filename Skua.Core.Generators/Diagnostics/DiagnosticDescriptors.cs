@@ -1,6 +1,7 @@
 ﻿using Microsoft.CodeAnalysis;
 
 namespace Skua.Core.Generators.Diagnostics;
+
 /// <summary>
 /// A container for all <see cref="DiagnosticDescriptor"/> instances for errors reported by analyzers in this project.
 /// </summary>
@@ -12,7 +13,7 @@ internal static class DiagnosticDescriptors
     /// Format: <c>The field {0}.{1} cannot be used to generate a call binding property, as its name would collide with the field name (instance fields should use the \"lowerCamel\", \"_lowerCamel\" or \"m_lowerCamel\" pattern)</c>.
     /// </para>
     /// </summary>
-    public static DiagnosticDescriptor CallBindingPropertyNameCollision = new (
+    public static DiagnosticDescriptor CallBindingPropertyNameCollision = new(
         id: "SkuaGen_001",
         title: "Name collision for generated property",
         messageFormat: "The field {0}.{1} cannot be used to generate a call binding property, as its name would collide with the field name (instance fields should use the \"lowerCamel\", \"_lowerCamel\" or \"m_lowerCamel\" pattern)",

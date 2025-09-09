@@ -1,4 +1,5 @@
 ﻿namespace Skua.Core.Utils;
+
 public class DecamelizeOptions
 {
     public DecamelizeOptions()

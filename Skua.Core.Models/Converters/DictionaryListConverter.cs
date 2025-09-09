@@ -1,6 +1,4 @@
 ﻿using Newtonsoft.Json;
-using Newtonsoft.Json.Linq;
-using Skua.Core.Models.Quests;
 
 namespace Skua.Core.Models.Converters;
 

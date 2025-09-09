@@ -1,4 +1,4 @@
-﻿using Skua.Core.Models.Monsters;
+using Skua.Core.Models.Monsters;
 
 namespace Skua.Core.Interfaces;
 
@@ -8,18 +8,22 @@ public interface IScriptMonster
     /// A list of monsters in the current cell.
     /// </summary>
     List<Monster> CurrentMonsters { get; }
+
     /// <summary>
     /// A list of all monsters in the current map.
     /// </summary>
     List<Monster> MapMonsters { get; }
+
     /// <summary>
     /// A list of all monsters dataLeaf object in the current map.
     /// </summary>
     List<MonsterDataLeaf> MapMonstersDataLeaf { get; }
+
     /// <summary>
     /// A list of all monsters in the current map with dataLeaf object merged.
     /// </summary>
     List<Monster> MapMonstersWithCurrentData { get; }
+
     /// <summary>
     /// A list of all monsters that the player can attack in the current cell.
     /// </summary>
@@ -29,6 +33,7 @@ public interface IScriptMonster
     /// Gets the current HP of the monster with the specified <paramref name="id"/>.
     /// </summary>
     int MonsterHP(int id);
+
     /// <summary>
     /// Gets the current HP of the monster with the specified <paramref name="name"/>.
     /// </summary>
@@ -45,6 +50,7 @@ public interface IScriptMonster
     {
         return CurrentAvailableMonsters.Any(m => name == "*" || (m.Name.Trim() == name.Trim()));
     }
+
     /// <summary>
     /// Checks whether the specified <paramref name="id"/> exists in the current cell.
     /// </summary>
@@ -54,11 +60,17 @@ public interface IScriptMonster
     {
         return CurrentAvailableMonsters.Any(m => m.ID == id || m.MapID == id);
     }
+
     /// <summary>
     /// Gets a dictionary which maps cell names of the current map to all monsters in that cell.
     /// </summary>
     Dictionary<string, List<Monster>> GetCellMonsters();
+
     /// <summary>
+    /// Gets a summary of auras present on all monsters in the current map.
+    /// </summary>
+    Dictionary<string, int> GetAuraSummary();
+
     /// Gets all of the cells with a living monster of the specified <paramref name="name"/>.
     /// </summary>
     List<string> GetLivingMonsterCells(string name)
@@ -72,6 +84,7 @@ public interface IScriptMonster
             return new();
         }
     }
+
     /// <summary>
     /// Gets all of the cells with a living monster of the specified <paramref name="id"/>.
     /// </summary>
@@ -84,6 +97,7 @@ public interface IScriptMonster
         catch { }
         return new();
     }
+
     /// <summary>
     /// Gets all of the cells with a living monster of the spacified <paramref name="name"/>
     /// This uses the dataLeaf of the monster to prevent outdated data.
@@ -104,6 +118,7 @@ public interface IScriptMonster
 
         return new();
     }
+
     /// <summary>
     /// Gets all of the cells with a living monster of the spacified <paramref name="id"/>
     /// This uses the dataLeaf of the monster to prevent outdated data.
@@ -117,6 +132,7 @@ public interface IScriptMonster
         catch { }
         return new();
     }
+
     /// <summary>
     /// Gets all of the cells with the desired monster in.
     /// </summary>
@@ -130,6 +146,7 @@ public interface IScriptMonster
         catch { }
         return new();
     }
+
     /// <summary>
     /// Gets all of the cells with the desired monster in.
     /// </summary>
@@ -143,6 +160,7 @@ public interface IScriptMonster
         catch { }
         return new();
     }
+
     /// <summary>
     /// Gets all of the monsters in the specified <paramref name="cell"/>.
     /// </summary>
@@ -151,6 +169,7 @@ public interface IScriptMonster
     {
         return MapMonstersWithCurrentData.FindAll(x => x.Cell == cell);
     }
+
     /// <summary>
     /// Attempts to get the monster by the given <paramref name="name"/> and sets the out parameter to its value.
     /// </summary>
@@ -161,6 +180,7 @@ public interface IScriptMonster
     {
         return (monster = MapMonstersWithCurrentData.Find(m => name == "*" || m.Name.Trim() == name.Trim())) is not null;
     }
+
     /// <summary>
     /// Attempts to get the monster by the given <paramref name="id"/> and sets the out parameter to its value.
     /// </summary>

@@ -1,4 +1,5 @@
 ﻿namespace Skua.Core.ViewModels;
+
 public class InputDialogViewModel : DialogViewModelBase
 {
     public InputDialogViewModel(string title)
@@ -47,11 +48,13 @@ public class InputDialogViewModel : DialogViewModelBase
 
     public bool NumberOnly { get; }
     private string _dialogTextInput = string.Empty;
+
     public string DialogTextInput
     {
         get { return _dialogTextInput; }
         set { SetProperty(ref _dialogTextInput, value); }
     }
+
     public string DialogHint { get; } = string.Empty;
     public string TextBoxHint { get; } = string.Empty;
 }

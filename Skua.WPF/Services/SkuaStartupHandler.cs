@@ -80,14 +80,19 @@ public sealed class SkuaOptions
 {
     [Option('u', "user", HelpText = "Username of the account to login when starting the app.")]
     public string Username { get; set; }
+
     [Option('p', "password", HelpText = "Password of the account to login when starting the app.")]
     public string Password { get; set; }
+
     [Option('s', "server", HelpText = "Server to login, will default to 'Twilly'", Default = "Twilly")]
     public string Server { get; set; }
+
     [Option("run-script", HelpText = "File path of a script to be started up after starting the app.")]
     public string Script { get; set; }
+
     [Option("use-theme")]
     public string UseTheme { get; set; }
+
     [Option("gh-token")]
     public string GitHubToken { get; set; }
 }

@@ -2,6 +2,7 @@
 using Skua.Core.Models;
 
 namespace Skua.Core.Options;
+
 public class ScriptOptionContainer : OptionContainer, IScriptOptionContainer
 {
     public ScriptOptionContainer(IDialogService dialogService)

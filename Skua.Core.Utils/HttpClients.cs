@@ -1,4 +1,5 @@
 ﻿namespace Skua.Core.Utils;
+
 /// <summary>
 /// HttpClient
 /// </summary>
@@ -6,7 +7,6 @@ public class WebClient : HttpClient
 {
     //private readonly string _authString1 = Convert.ToBase64String(System.Text.Encoding.UTF8.GetBytes("726820423be5c752df62:63b2a5b1a55fbeade88deab3b6c8914808bad7a6"));
     private readonly string _authString2 = Convert.ToBase64String(System.Text.Encoding.UTF8.GetBytes("449f889db3d655d2ef4a:27863d426bc5bb46c410daf7ed6b479ba4a9f7eb"));
-
 
     /// <param name="accJson"></param>
     public WebClient(bool accJson)
@@ -45,6 +45,7 @@ public static class HttpClients
     /// Gets the Map Client
     /// </summary>
     public static WebClient GetMapClient { get; set; } = new(false);
+
     /// <summary>
     /// Default HttpClient
     /// </summary>
@@ -59,4 +60,3 @@ public static class HttpClients
         return UserGitHubClient is not null ? UserGitHubClient : (HttpClient)GitHubClient;
     }
 }
-
