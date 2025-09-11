@@ -97,4 +97,9 @@ public class Monster
     /// Gets all active aura names as a comma-separated string.
     /// </summary>
     public string AuraNames => string.Join(", ", Auras.Select(a => a.Name));
+
+    public override string ToString()
+    {
+        return $"{Name} [{ID}] [{MapID}, {Cell}]";
+    }
 }
