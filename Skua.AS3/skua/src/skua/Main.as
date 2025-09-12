@@ -999,48 +999,62 @@ package skua
 		
 		public static function buyItemByName(name:String, quantity:int = -1):void
 		{
-			for each (var item:* in instance.game.world.shopinfo.items)
+			var item:* = getShopItem(name);
+			if (item != null)
 			{
-				if (item.sName.toLowerCase() == name.toLowerCase())
+				if (quantity == -1)
+					instance.game.world.sendBuyItemRequest(item);
+				else
 				{
-					if (quantity == -1)
-						instance.game.world.sendBuyItemRequest(item);
-					else
-					{
-						var buyItem:* = new Object();
-						buyItem = item;
-						buyItem.iSel = item;
-						buyItem.iQty = quantity;
-						buyItem.iSel.iQty = quantity;
-						buyItem.accept = 1;
-						instance.game.world.sendBuyItemRequestWithQuantity(buyItem);
-					}
-					break;
+					var buyItem:* = new Object();
+					buyItem.accept = 1;
+					buyItem.iQty = quantity;
+					buyItem.iSel = item;
+					instance.game.world.sendBuyItemRequestWithQuantity(buyItem);
 				}
 			}
 		}
 		
 		public static function buyItemByID(id:int, shopItemID:int, quantity:int = -1):void
 		{
-			for each (var item:* in instance.game.world.shopinfo.items)
+			var item:* = getShopItemByID(id, shopItemID);
+			if (item != null)
 			{
-				if (item.ItemID == id && (shopItemID == 0 || item.ShopItemID == shopItemID))
+				if (quantity == -1)
+					instance.game.world.sendBuyItemRequest(item);
+				else
 				{
-					if (quantity == -1)
-						instance.game.world.sendBuyItemRequest(item);
-					else
-					{
-						var buyItem:* = new Object();
-						buyItem = item;
-						buyItem.iSel = item;
-						buyItem.iQty = quantity;
-						buyItem.iSel.iQty = quantity;
-						buyItem.accept = 1;
-						instance.game.world.sendBuyItemRequestWithQuantity(buyItem);
-					}
-					break;
+					var buyItem:* = new Object();
+					buyItem.accept = 1;
+					buyItem.iQty = quantity;
+					buyItem.iSel = item;
+					instance.game.world.sendBuyItemRequestWithQuantity(buyItem);
 				}
 			}
+		}
+		
+		public static function getShopItem(name:String):*
+		{
+			for each (var item:* in instance.game.world.shopinfo.items)
+			{
+				if (item.sName.toLowerCase() == name.toLowerCase())
+				{
+					return item;
+				}
+			}
+			return null;
+		}
+		
+		public static function getShopItemByID(itemID:int, shopItemID:int):*
+		{
+			for each (var item:* in instance.game.world.shopinfo.items)
+			{
+				if (item.ItemID == itemID && (shopItemID == 0 || item.ShopItemID == shopItemID))
+				{
+					return item;
+				}
+			}
+			return null;
 		}
 		
 		private static function parseDrop(name:*):*

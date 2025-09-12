@@ -52,6 +52,8 @@ package skua
 			
 			this.addCallback("buyItemByName", Main.buyItemByName);
 			this.addCallback("buyItemByID", Main.buyItemByID);
+			this.addCallback("getShopItem", Main.getShopItem);
+			this.addCallback("getShopItemByID", Main.getShopItemByID);
 			
 			this.addCallback("sendClientPacket", Main.sendClientPacket);
 			this.addCallback("catchPackets", Main.catchPackets);
