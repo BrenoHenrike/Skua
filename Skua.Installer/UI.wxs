@@ -25,8 +25,8 @@
             <!--<DialogRef Id="LicenseAgreementDlg_HK"/>
             <DialogRef Id="ServerDlg" />-->
 
-            <Publish Dialog="BrowseDlg" Control="OK" Event="DoAction" Value="WixUIValidatePath_$(sys.BUILDARCHSHORT)" Order="3" />
-            <Publish Dialog="BrowseDlg" Control="OK" Event="SpawnDialog" Value="InvalidDirDlg" Order="4" Condition="WIXUI_INSTALLDIR_VALID&lt;&gt;&quot;1&quot;" />
+            <!-- Path validation removed - WixUIValidatePath custom action not available -->
+            <Publish Dialog="BrowseDlg" Control="OK" Event="EndDialog" Value="Return" Order="1" />
 
             <Publish Dialog="ExitDialog" Control="Finish" Event="EndDialog" Value="Return" Order="999" />
 
@@ -38,10 +38,8 @@
 
             <Publish Dialog="InstallDirDlg" Control="Back" Event="NewDialog" Value="WelcomeDlg" />
             <Publish Dialog="InstallDirDlg" Control="Next" Event="SetTargetPath" Value="[WIXUI_INSTALLDIR]" Order="1" />
-            <Publish Dialog="InstallDirDlg" Control="Next" Event="DoAction" Value="WixUIValidatePath_$(sys.BUILDARCHSHORT)" Order="2" Condition="NOT WIXUI_DONTVALIDATEPATH" />
-            <Publish Dialog="InstallDirDlg" Control="Next" Event="SpawnDialog" Value="InvalidDirDlg" Order="3" Condition="NOT WIXUI_DONTVALIDATEPATH AND WIXUI_INSTALLDIR_VALID&lt;&gt;&quot;1&quot;" />
-
-            <Publish Dialog="InstallDirDlg" Control="Next" Event="NewDialog" Value="CustomizeDlg" Order="4" Condition="WIXUI_DONTVALIDATEPATH OR WIXUI_INSTALLDIR_VALID=&quot;1&quot;" />
+            <!-- Removed WixUIValidatePath custom action reference - not defined in project -->
+            <Publish Dialog="InstallDirDlg" Control="Next" Event="NewDialog" Value="CustomizeDlg" Order="2" />
             <Publish Dialog="InstallDirDlg" Control="ChangeFolder" Property="_BrowseProperty" Value="[WIXUI_INSTALLDIR]" Order="1" />
             <Publish Dialog="InstallDirDlg" Control="ChangeFolder" Event="SpawnDialog" Value="BrowseDlg" Order="2" />
 

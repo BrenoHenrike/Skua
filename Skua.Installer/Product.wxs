@@ -25,7 +25,7 @@
         <!-- Include .cab file into .msi file -->
         <MediaTemplate EmbedCab="yes" />
 
-        <Property Id="WIXUI_INSTALLDIR" Value="TARGETDIR" />    
+        <Property Id="WIXUI_INSTALLDIR" Value="INSTALLFOLDER" />
         <UIRef Id="WixUI_Skua" />
         <UIRef Id="WixUI_ErrorProgressText" />
 
