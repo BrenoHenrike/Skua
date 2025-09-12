@@ -2,140 +2,140 @@
     <Fragment>
         <DirectoryRef Id="INSTALLFOLDER">
             <Directory Id="diru3oj2HTbW97V9VDzczVDKNLNfnc" Name="FFDec">
-                <Component Id="cmpr_sSTwcMTdN.NNXr0M7ipNyQPMQ" Guid="{0ECB22AE-D016-4AF3-9E35-560D364D5BA4}">
+                <Component Id="cmpr_sSTwcMTdN.NNXr0M7ipNyQPMQ" Guid="{D79AFF45-D50C-404C-8933-F7185F5042A3}">
                     <File Id="filtmjwO7pvmEaHcMfuosByqLMISCc" KeyPath="yes" Source="$(var.FFDecPath)\ffdec.bat" />
                 </Component>
-                <Component Id="cmp_ZBPTtOl8wyVcmSVMQ4s_yzJAO4" Guid="{38E68199-77FA-460C-848F-3511E4759823}">
+                <Component Id="cmp_ZBPTtOl8wyVcmSVMQ4s_yzJAO4" Guid="{9BEE4202-57B2-46EC-B3A6-3F8482417D88}">
                     <File Id="filZKIttsQw733Tb6j.4cm2IBoX2dM" KeyPath="yes" Source="$(var.FFDecPath)\ffdec.jar" />
                 </Component>
                 <Directory Id="dirBrmGz_Asm13aDUe8F.VpUy2lZaI" Name="lib">
-                    <Component Id="cmp4.ZiXk.vZsDfG5b0yC.MqcB9oXI" Guid="{A870994C-D731-49DA-A41A-8652F9F9DAD4}">
+                    <Component Id="cmp4.ZiXk.vZsDfG5b0yC.MqcB9oXI" Guid="{E03B1B55-432D-4429-82FD-6AA907CC2E75}">
                         <File Id="film.GQlSuwVCaK7v2UzIvtr6byQhw" KeyPath="yes" Source="$(var.FFDecPath)\lib\avi.jar" />
                     </Component>
-                    <Component Id="cmplYBZbL.9LSJtaKzKxM4T7PpyWbU" Guid="{69E04949-5DB8-4222-918C-9DF88060E0F5}">
+                    <Component Id="cmplYBZbL.9LSJtaKzKxM4T7PpyWbU" Guid="{20C8D105-1795-4770-8928-79A8403FDBD4}">
                         <File Id="fil0vY1e_fBQ4a53wOYaPS7Th8.ZZg" KeyPath="yes" Source="$(var.FFDecPath)\lib\avi.montemedia.license.txt" />
                     </Component>
-                    <Component Id="cmpUCkkQLUJGawPxUR5GI8SI4zFZE0" Guid="{EBE7FAB4-D321-48E9-853B-7ADA1517EC07}">
+                    <Component Id="cmpUCkkQLUJGawPxUR5GI8SI4zFZE0" Guid="{59C28CF5-D248-4A8F-8043-CC89EB16B835}">
                         <File Id="filoB3Pr4CxynCLUo0IKvb_CFX9u8w" KeyPath="yes" Source="$(var.FFDecPath)\lib\cmykjpeg.jar" />
                     </Component>
-                    <Component Id="cmpIDPIJsoxUjIJA17k7sBGyuli.38" Guid="{499AB74D-5DE6-4212-BE34-5913D0CD1E0A}">
+                    <Component Id="cmpIDPIJsoxUjIJA17k7sBGyuli.38" Guid="{C87EDF17-FF6B-4745-89F6-E496719B2B3A}">
                         <File Id="filoUHdRMYvdXCsRkLjnIuLVxRSfGM" KeyPath="yes" Source="$(var.FFDecPath)\lib\ddsreader.jar" />
                     </Component>
-                    <Component Id="cmp0ph6dYQmF1_X.2qIHCmAxeR8ltw" Guid="{97C09C5F-1DD8-4DD5-B4EA-B6E8B75A4DE0}">
+                    <Component Id="cmp0ph6dYQmF1_X.2qIHCmAxeR8ltw" Guid="{09BFD700-FD57-4208-8345-61F3F40538B9}">
                         <File Id="filTUvqoTGzM5sNPAaMgjSTxWMjfnw" KeyPath="yes" Source="$(var.FFDecPath)\lib\ffdec_lib.jar" />
                     </Component>
-                    <Component Id="cmpRHnjCsEmlUt_dSsC25ahyIviYd0" Guid="{4E69B031-6E71-4475-B7C4-267C4ACE64F0}">
+                    <Component Id="cmpRHnjCsEmlUt_dSsC25ahyIviYd0" Guid="{2B786E56-15E5-4936-AB03-91FEDDB74C4F}">
                         <File Id="filTCUcDxcyG._kSKmuy7l0LDIb0Uo" KeyPath="yes" Source="$(var.FFDecPath)\lib\ffdec_lib.license.txt" />
                     </Component>
-                    <Component Id="cmp_cVmQXo.jFJWbKnbOGSnZh4bII4" Guid="{9DD31547-12FC-4989-8A36-A8708FAC1B80}">
+                    <Component Id="cmp_cVmQXo.jFJWbKnbOGSnZh4bII4" Guid="{8FE9E87A-8561-41A9-A88F-298888FD65C7}">
                         <File Id="fil87VHM.SBTS6VRW9vGCluSEN2o50" KeyPath="yes" Source="$(var.FFDecPath)\lib\flamingo-6.2.jar" />
                     </Component>
-                    <Component Id="cmpdD0ItAJbgwSWLVNM64V6QYzewz4" Guid="{A1F8D135-F2F8-4556-92F3-BAADEA22E260}">
+                    <Component Id="cmpdD0ItAJbgwSWLVNM64V6QYzewz4" Guid="{0DC12883-7239-4B9B-B4B5-F7A1D1B614EB}">
                         <File Id="fildwB.ItyEO7aDHQIsh00IRb2Y8x4" KeyPath="yes" Source="$(var.FFDecPath)\lib\flamingo.license.txt" />
                     </Component>
-                    <Component Id="cmpiEZaH9irBP_4MFM3FKlaXDFQTUw" Guid="{627FE57C-40B4-4775-A439-DB740768501C}">
+                    <Component Id="cmpiEZaH9irBP_4MFM3FKlaXDFQTUw" Guid="{C04A3DB6-EFA7-44BF-8969-B3FE140F1F39}">
                         <File Id="filKL9NpCOsSitbP6h.Aa1sfg6RzC8" KeyPath="yes" Source="$(var.FFDecPath)\lib\flashdebugger.jar" />
                     </Component>
-                    <Component Id="cmpF_lSldPhLA7zBy40H9N8KlqNkBA" Guid="{7B5A106F-1BB2-4AC4-AB18-1DDAFD32F51F}">
+                    <Component Id="cmpF_lSldPhLA7zBy40H9N8KlqNkBA" Guid="{42913D1E-4663-4085-9A84-0FE242C31AF9}">
                         <File Id="fil3kFCJmNcdHQSYVP1SWftnqFt6gM" KeyPath="yes" Source="$(var.FFDecPath)\lib\gif.jar" />
                     </Component>
-                    <Component Id="cmpINwlsp7Flj0eRVIoAcJ0.bDrQSU" Guid="{E63B903E-9C1A-4DFB-A097-41F783513288}">
+                    <Component Id="cmpINwlsp7Flj0eRVIoAcJ0.bDrQSU" Guid="{AD21571E-6955-45AC-9F16-3D2BAC2D1422}">
                         <File Id="fil312.Ae6cuOe8vYc_dfpiHOByu.E" KeyPath="yes" Source="$(var.FFDecPath)\lib\gif.license.txt" />
                     </Component>
-                    <Component Id="cmp4preofDY6e82cX1MkhzXlMpqNXM" Guid="{FD708791-20C0-4AC4-847C-1F8CC7B678E8}">
+                    <Component Id="cmp4preofDY6e82cX1MkhzXlMpqNXM" Guid="{B39D385B-33B5-4BB7-B6FF-1E7C38161F27}">
                         <File Id="filZGBNUEIH8NPAySCcmSZ0LpP27bQ" KeyPath="yes" Source="$(var.FFDecPath)\lib\gnujpdf.jar" />
                     </Component>
-                    <Component Id="cmpe_FMRLStMkAps.b4l4WycjXCQRc" Guid="{A542D0AE-FD8A-48BC-ACDA-7D811D5DCDAD}">
+                    <Component Id="cmpe_FMRLStMkAps.b4l4WycjXCQRc" Guid="{126E3215-D7A3-4084-9164-7239579C8180}">
                         <File Id="fil9zrUzf8cXmacwQvfB5pwoQST5iQ" KeyPath="yes" Source="$(var.FFDecPath)\lib\graphs.jar" />
                     </Component>
-                    <Component Id="cmpo_VzdNzM6XiIBy8jOgmScvX9dMw" Guid="{5D1C81E2-7381-469A-BE2B-9768F78DE0C0}">
+                    <Component Id="cmpo_VzdNzM6XiIBy8jOgmScvX9dMw" Guid="{D00D14E3-14C6-445F-B165-2E6DAE1D65E9}">
                         <File Id="fil8qguEv_omIjbkPJrgjR7Vcsz2xM" KeyPath="yes" Source="$(var.FFDecPath)\lib\jargs.jar" />
                     </Component>
-                    <Component Id="cmprlx5Vc9hry5N2vNic9LGB7QhePg" Guid="{CB8A5FBC-9543-47D4-9710-FB0CD898B704}">
+                    <Component Id="cmprlx5Vc9hry5N2vNic9LGB7QhePg" Guid="{231674CB-9BE0-4971-A996-48EB34BF52DE}">
                         <File Id="filA1.1YQGc0.Xz1i_ypFfQjOfNY6U" KeyPath="yes" Source="$(var.FFDecPath)\lib\JavactiveX.jar" />
                     </Component>
-                    <Component Id="cmpFJBRYSGnMc4LHlPCTB1pv_8R4T0" Guid="{B170467D-5459-4930-AE6A-C8554C984874}">
+                    <Component Id="cmpFJBRYSGnMc4LHlPCTB1pv_8R4T0" Guid="{30F1EDF3-66D8-4580-8269-3BBBE674CDF8}">
                         <File Id="filk5C8yBLGw23H1MGueiSJtCbVq_0" KeyPath="yes" Source="$(var.FFDecPath)\lib\jl.license.txt" />
                     </Component>
-                    <Component Id="cmpdGGmRiAMrYW.KBQ_dxI_I_rUHn8" Guid="{B520FEB5-AB89-4061-B042-C74A2B45300C}">
+                    <Component Id="cmpdGGmRiAMrYW.KBQ_dxI_I_rUHn8" Guid="{3540593D-19EE-40AD-B217-FD74A8B4CEE2}">
                         <File Id="filFVB8_KOUfflBiGN1.8QiR_OKQNI" KeyPath="yes" Source="$(var.FFDecPath)\lib\jl1.0.1.jar" />
                     </Component>
-                    <Component Id="cmp2OXsbCJvKsn0mJ6SaE10J2a6mhU" Guid="{E1869949-F64D-4A47-BC48-556E88E455A0}">
+                    <Component Id="cmp2OXsbCJvKsn0mJ6SaE10J2a6mhU" Guid="{653BBD83-B215-4A12-872E-BD18D1A8CB57}">
                         <File Id="filts.2i3jYENeChAQ.mWwINYrGfOY" KeyPath="yes" Source="$(var.FFDecPath)\lib\jna-3.5.1.jar" />
                     </Component>
-                    <Component Id="cmp65fbT18KII3tsJAg2GvLvUOTkTU" Guid="{505AC4F7-0BA7-42AD-B26D-00B1FF137C4B}">
+                    <Component Id="cmp65fbT18KII3tsJAg2GvLvUOTkTU" Guid="{73C1F0A8-1F93-4458-98E5-CBF014839F4A}">
                         <File Id="filJjewoUSvmiOfQ6ijpsUGOyc7jFY" KeyPath="yes" Source="$(var.FFDecPath)\lib\jna.license.txt" />
                     </Component>
-                    <Component Id="cmps.vuX.ex8dKf4wPmqXKUQiCdkYw" Guid="{3FF60D1D-B856-453D-B9D6-F6379AE1B229}">
+                    <Component Id="cmps.vuX.ex8dKf4wPmqXKUQiCdkYw" Guid="{E975B6B4-81D7-4401-9D8C-A44225E80574}">
                         <File Id="fil_CcS8zngxw9_rsNCwM.lm80j.jc" KeyPath="yes" Source="$(var.FFDecPath)\lib\jpacker.jar" />
                     </Component>
-                    <Component Id="cmpSO5a12IRkbqRXEPboPUrvFYvLo4" Guid="{33D1865A-3BF4-4114-85FC-D85053C0887E}">
+                    <Component Id="cmpSO5a12IRkbqRXEPboPUrvFYvLo4" Guid="{2D57D32B-808B-40BD-9579-42DD326E5C01}">
                         <File Id="filwvaIXf1a0bO_vHpBI_a_vvZtqRE" KeyPath="yes" Source="$(var.FFDecPath)\lib\jpacker.license.txt" />
                     </Component>
-                    <Component Id="cmpCzbq3BMmGyyVlTEQ.Si_ZWxjUaM" Guid="{671E6A36-B3B4-4C66-9788-8CBC82032B3D}">
+                    <Component Id="cmpCzbq3BMmGyyVlTEQ.Si_ZWxjUaM" Guid="{35970E7E-9EFF-4333-92B7-02C8DBDF6ACC}">
                         <File Id="filHSCnUpmQLgDBxY62vQH2PoSXy_w" KeyPath="yes" Source="$(var.FFDecPath)\lib\jpproxy.jar" />
                     </Component>
-                    <Component Id="cmpqe.RFAUERSNNfWUvHaSMWOYR9Dk" Guid="{1B8198FB-81FE-44EC-A0DD-5D14783B4ADC}">
+                    <Component Id="cmpqe.RFAUERSNNfWUvHaSMWOYR9Dk" Guid="{602F20C7-C4F0-44E2-9DCB-311AF280C9EC}">
                         <File Id="fil8VYzvTvH0yDahkjaaSGyqDwmIK0" KeyPath="yes" Source="$(var.FFDecPath)\lib\jpproxy.muffin.license.txt" />
                     </Component>
-                    <Component Id="cmpSBi7h21RwjYNCdjiRZ6KTXwE61g" Guid="{D12918E8-9658-493A-9558-E3EAB3ED4024}">
+                    <Component Id="cmpSBi7h21RwjYNCdjiRZ6KTXwE61g" Guid="{EB479A11-EEB3-452B-AA66-16186582FB09}">
                         <File Id="filLLuPnbJRvhYhpkOcZ4VIrz8H6OE" KeyPath="yes" Source="$(var.FFDecPath)\lib\jsyntaxpane-0.9.5.jar" />
                     </Component>
-                    <Component Id="cmpghUUKeqHAXWBrdhTaPDbi9om7rs" Guid="{DF0B23C4-D346-48FF-B048-3CFD5CC05592}">
+                    <Component Id="cmpghUUKeqHAXWBrdhTaPDbi9om7rs" Guid="{10BF12C1-2352-4F32-95A6-E1E9AA2F9C3C}">
                         <File Id="filS0hO.zzBmrAAvUOxSh4g1CC.q5k" KeyPath="yes" Source="$(var.FFDecPath)\lib\jsyntaxpane.license.txt" />
                     </Component>
-                    <Component Id="cmpbAjHLPOWTP4pG5WK2G1OcAEX3xw" Guid="{3B6D9C3D-DC9A-44E4-B65B-C4AF87C01020}">
+                    <Component Id="cmpbAjHLPOWTP4pG5WK2G1OcAEX3xw" Guid="{3C92493F-C1D7-4B83-811E-132CBEF2C29B}">
                         <File Id="filiYbb2aGv6V2x30BZ7dPnQgb4cc0" KeyPath="yes" Source="$(var.FFDecPath)\lib\LZMA.jar" />
                     </Component>
-                    <Component Id="cmpb_kav3_piyfhmFTFlLNdGtzOTnU" Guid="{823840B9-A442-4A97-B5E4-A16F226432E6}">
+                    <Component Id="cmpb_kav3_piyfhmFTFlLNdGtzOTnU" Guid="{23D90418-E377-496A-BEE1-0DB38483C963}">
                         <File Id="filWGfAugLkRZvIaTQwtXjegsleQSw" KeyPath="yes" Source="$(var.FFDecPath)\lib\minimal-json-0.9.5.jar" />
                     </Component>
-                    <Component Id="cmprM5U.gwBiCB7_f19jOkbeBDBJZg" Guid="{DF84C08B-3B98-44A2-B340-E8BFC0D5B441}">
+                    <Component Id="cmprM5U.gwBiCB7_f19jOkbeBDBJZg" Guid="{6A4FA82A-2D54-4029-A6FC-BEAD45758A4E}">
                         <File Id="filyO6KnQsYGTB.MnKwbo8irBe9ghQ" KeyPath="yes" Source="$(var.FFDecPath)\lib\minimal-json.license.txt" />
                     </Component>
-                    <Component Id="cmpdzEHy61qFaerAkAlvc9LMKKZbug" Guid="{06FF7EEA-FB1B-43C3-AFDD-12CABEC4EDED}">
+                    <Component Id="cmpdzEHy61qFaerAkAlvc9LMKKZbug" Guid="{273A0412-4AA6-4DC5-85F2-8F9BC577692E}">
                         <File Id="filGBXGsxV7cStgrDCf7Z2fBpIXJcM" KeyPath="yes" Source="$(var.FFDecPath)\lib\nellymoser.jar" />
                     </Component>
-                    <Component Id="cmpXH5eLGSUxLNEtjZq1gVGgLGiWTM" Guid="{E57EBDC3-B05B-408C-B146-33392B79BA7E}">
+                    <Component Id="cmpXH5eLGSUxLNEtjZq1gVGgLGiWTM" Guid="{20D78BB6-C013-4E49-A65F-7454ACC811DE}">
                         <File Id="fil1po7NBbzHwdZFcPKYhsaAvWS1gI" KeyPath="yes" Source="$(var.FFDecPath)\lib\nellymoser.license.txt" />
                     </Component>
-                    <Component Id="cmpyMsgFQr.yJowvU1DW83NoEATJyU" Guid="{72CA0114-3462-455B-9D88-6AAD60CD68EC}">
+                    <Component Id="cmpyMsgFQr.yJowvU1DW83NoEATJyU" Guid="{780BBCB2-8739-4CED-BF09-6EE62DE32C41}">
                         <File Id="filY.tPkEmRkWYHyfsgRija.tR8J0U" KeyPath="yes" Source="$(var.FFDecPath)\lib\sfntly.jar" />
                     </Component>
-                    <Component Id="cmp9aKcG3Lf0yTkpIX9_Urabd_YnYs" Guid="{15054EF8-D596-4E57-83B2-A4B4E65BF011}">
+                    <Component Id="cmp9aKcG3Lf0yTkpIX9_Urabd_YnYs" Guid="{A34313E9-700B-493D-86A8-95393A650628}">
                         <File Id="filjjhnOPev.rkWtpPdN864nqq21FI" KeyPath="yes" Source="$(var.FFDecPath)\lib\sfntly.license.txt" />
                     </Component>
-                    <Component Id="cmpxvzeCC58OE5lq8kQQNDMqu3ExIs" Guid="{163397F1-4C70-4C56-BCB3-1F8B83E04610}">
+                    <Component Id="cmpxvzeCC58OE5lq8kQQNDMqu3ExIs" Guid="{58C8F9E8-7B56-4F8E-ABDB-C3301A6D6CA2}">
                         <File Id="filPDQDmrPCsafAKC.VmdcmC4A8WMU" KeyPath="yes" Source="$(var.FFDecPath)\lib\substance-6.2.jar" />
                     </Component>
-                    <Component Id="cmpxhWz9GPrQKd.2pR_2N0P2mX1sDg" Guid="{D584711B-0700-4C09-847A-D5B276A73D1D}">
+                    <Component Id="cmpxhWz9GPrQKd.2pR_2N0P2mX1sDg" Guid="{993BCDF8-57A4-4155-8A4C-7B92BBA4A7F0}">
                         <File Id="filqWgueIjXduUta6aPqgzxzMEp1Gg" KeyPath="yes" Source="$(var.FFDecPath)\lib\substance-flamingo-6.2.jar" />
                     </Component>
-                    <Component Id="cmpyrNIDSRQHoly8mZFByyRApq0SD8" Guid="{DA465AC3-BACA-49AF-A02E-FC60C8BA359C}">
+                    <Component Id="cmpyrNIDSRQHoly8mZFByyRApq0SD8" Guid="{7426B5A4-B9BA-46D2-8727-5F83B06E608F}">
                         <File Id="filppSRGlwY5HlnbisXoaB6ahhXevw" KeyPath="yes" Source="$(var.FFDecPath)\lib\substance-flamingo.license.txt" />
                     </Component>
-                    <Component Id="cmpjW5wgPMTRtJ7By4xukJ39CAxW94" Guid="{13495A19-CF2B-45B1-A2B2-050DC4902524}">
+                    <Component Id="cmpjW5wgPMTRtJ7By4xukJ39CAxW94" Guid="{9A2949BF-AADC-4E68-9BD9-B45A96810D57}">
                         <File Id="filrpuaTigKZ_WbmSjXvcXt7ZC3YQY" KeyPath="yes" Source="$(var.FFDecPath)\lib\substance.license.txt" />
                     </Component>
-                    <Component Id="cmphITlhSa05.sWEuDBV6jET_ClcB0" Guid="{1F0B0A7E-BA0B-42FD-A40E-3D698FDB572F}">
+                    <Component Id="cmphITlhSa05.sWEuDBV6jET_ClcB0" Guid="{01E37F46-55E1-434D-9B20-7DB44F1485A0}">
                         <File Id="filzbF5YW_OV_NdiTr9W87.ysjVKTc" KeyPath="yes" Source="$(var.FFDecPath)\lib\tablelayout.jar" />
                     </Component>
-                    <Component Id="cmpDh0ju9qqK2iqO_I8UWn5Qo7Un2g" Guid="{ADED0C0E-EF4B-46C6-A8CE-93D2D3C4B09C}">
+                    <Component Id="cmpDh0ju9qqK2iqO_I8UWn5Qo7Un2g" Guid="{C0CE6C78-F787-4849-90F3-721CE85D5A59}">
                         <File Id="filjzZMQ4uBGDD5byiEJUbyhU3_UmU" KeyPath="yes" Source="$(var.FFDecPath)\lib\treetable.jar" />
                     </Component>
-                    <Component Id="cmp92.m6M.XhgJWEmzcfCnJ9OrXHHg" Guid="{0CEB673D-C0D4-486A-9E69-F80187FCFD0B}">
+                    <Component Id="cmp92.m6M.XhgJWEmzcfCnJ9OrXHHg" Guid="{7EE6D929-26F4-4E2D-BE34-D22D597FBA9D}">
                         <File Id="filHYMAX_xuOy3szEpmaZrcmkHlm9g" KeyPath="yes" Source="$(var.FFDecPath)\lib\trident-6.2.jar" />
                     </Component>
-                    <Component Id="cmpIt5LQb1g2vTnR91GlHsbyaKt.vM" Guid="{3D992EE9-FF29-4144-A4C0-6CDDD90FE557}">
+                    <Component Id="cmpIt5LQb1g2vTnR91GlHsbyaKt.vM" Guid="{BD22FA3D-D96E-4A65-A43A-72122173D43D}">
                         <File Id="filtenBrTSWLTbKzJNcUvksFacAPLM" KeyPath="yes" Source="$(var.FFDecPath)\lib\trident.license.txt" />
                     </Component>
-                    <Component Id="cmpzRjXVinOz.D7wzA4zBe0LQY7588" Guid="{222CBA72-82BE-4AE4-A116-0565AE990063}">
+                    <Component Id="cmpzRjXVinOz.D7wzA4zBe0LQY7588" Guid="{AF7B81B5-0A5B-4C5A-8FA2-625801076E9E}">
                         <File Id="fil5.kCsbFGA.aPuyYuWDAl2Z9pNVY" KeyPath="yes" Source="$(var.FFDecPath)\lib\ttf.doubletype.license.txt" />
                     </Component>
-                    <Component Id="cmpqV8NHMcQokui8O4ngUbXhOS6hfw" Guid="{C61B8BFC-6DDB-4AA4-84C8-FB41F98FFF8B}">
+                    <Component Id="cmpqV8NHMcQokui8O4ngUbXhOS6hfw" Guid="{5CC57825-A212-48E4-9E7C-FDFEAC59C16A}">
                         <File Id="fil.9IitYFIo9FXHUycTBFahcSIUQI" KeyPath="yes" Source="$(var.FFDecPath)\lib\ttf.fontastic.license.txt" />
                     </Component>
-                    <Component Id="cmpR6ZAW._Gpy_kkzz6Q8roZth08CM" Guid="{969F25E0-0BA3-42DD-859C-8583EDB2E82A}">
+                    <Component Id="cmpR6ZAW._Gpy_kkzz6Q8roZth08CM" Guid="{05B8CF11-1D76-459A-8DEA-8A42C7AC2A0F}">
                         <File Id="filQaBGIuF7DTXgixf4Ct2rugFUWvg" KeyPath="yes" Source="$(var.FFDecPath)\lib\ttf.jar" />
                     </Component>
                 </Directory>
