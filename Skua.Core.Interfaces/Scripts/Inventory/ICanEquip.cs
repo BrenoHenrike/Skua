@@ -11,6 +11,16 @@ public interface ICanEquip : ICheckEquipped
     void EquipItem(int id);
 
     /// <summary>
+    /// Equips items that are usable (slot 6) with specified <paramref name="id"/>. This will do nothing if the item is not in the player's inventory.
+    /// </summary>
+    /// <param name="id">ID of the item to equip</param>
+    void EquipUsableItem(int id)
+    {
+        if (TryGetItem(id, out InventoryItem? item))
+            EquipUsableItem(item);
+    }
+
+    /// <summary>
     /// Equips the item with specified <paramref name="name"/>. This will do nothing if the item is not in the player's inventory.
     /// </summary>
     /// <param name="name">Name of the item to equip.</param>
@@ -19,6 +29,22 @@ public interface ICanEquip : ICheckEquipped
         if (TryGetItem(name, out InventoryItem? item))
             EquipItem(item!.ID);
     }
+
+    /// <summary>
+    /// Equips items that are usable (slot 6) with specified <paramref name="name"/>. This will do nothing if the item is not in the player's inventory.
+    /// </summary>
+    /// <param name="name">Name of the item to equip</param>
+    void EquipUsableItem(string name)
+    {
+        if (TryGetItem(name, out InventoryItem? item))
+            EquipUsableItem(item);
+    }
+
+    /// <summary>
+    /// Equips items that are usable (slot 6) with specified <paramref name="item"/>. This will do nothing if the item is not in the player's inventory.
+    /// </summary>
+    /// <param name="item">InventoryItem</param>
+    void EquipUsableItem(InventoryItem item);
 
     /// <summary>
     /// Equips the items with specified <paramref name="names"/>. This will do nothing if the item is not in the player's inventory.
