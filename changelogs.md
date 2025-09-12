@@ -1,3 +1,36 @@
+# Skua Release Changelog
+
+This file is automatically updated when new releases are published.
+
+---
+
+# Skua 1.2.5.2
+## Released: September 12, 2025
+
+## HOTFIX FOR ARCHMAGE
+
+**Full Changelog**: https://github.com/BrenoHenrike/Skua/compare/1.2.5.1...1.2.5.2
+
+---
+
+# Skua 1.2.5.1
+## Released: September 03, 2025
+
+## What's Changed
+
+## NET 9 WAS BAD FOR SKUA SO I REVERTED BACK TO NET 6 (also I actually didn't even change to net 9 for all projects that was my bad)
+### Health Check
+- anytime we pull from map ScriptMonsters we pulled from MapMonsters which didn't have the dataleaf connected to it
+- added MapMonstersWithCurrentData which pulls the dataleaf from the monsters then merges it
+
+### Fixed Keybinds
+- I broke keybinds while fixing mem leaks (*still broken D:* )
+- Keybinds should only work when focus into the game now
+
+## **Full Changelog**: https://github.com/BrenoHenrike/Skua/compare/1.2.5.0...1.2.5.1
+
+---
+
 # Skua 1.2.5
 ## Released: September 02, 2025
 
@@ -359,6 +392,169 @@ If you want to help the developer to make skua better just click the buttons.
 
 [Developer] Yor Delfina
 [![Donate](https://img.shields.io/badge/Donate-PayPal-green.svg)](https://www.paypal.com/donate/?hosted_button_id=DMZFDRYJ5BT96)
+
+---
+
+# Skua 1.1.3
+## Released: December 31, 2022
+
+# Major Fixes:
+
+### Fixed issue:
+- Path of options and scripts files 📂
+- On save user defined skill sets are now dynamic 🛠
+
+### What's new?
+- Auto update skill sets but need to refresh in the skill tab to be able to update the lists skills in the user interface;
+   (but behind data skill sets process is dynamic)
+- Reset Skill Sets to default;
+
+If you want to help the developer to make skua better click the buttons.
+[Artist of Skua] Breno Henrike
+[![Donate](https://img.shields.io/badge/Donate-PayPal-green.svg)](https://www.paypal.com/donate?hosted_button_id=QVQ4Q7XSH9VBY).
+
+[Developer] Yor Delfina
+[![Donate](https://img.shields.io/badge/Donate-PayPal-green.svg)](https://www.paypal.com/donate/?hosted_button_id=DMZFDRYJ5BT96)
+
+---
+
+# Skua 1.1.2.2
+## Released: December 31, 2022
+
+
+# Major fixes:
+ ### Fixed large delays of the following:
+   - On Auto attack/hunt ⚔️
+   - On Stop auto attack/hunt 🛑
+   - On Equip Item 🛠️
+   - On Use skill set 🪄
+
+## *File structure was changed based on the survey result:*
+![Skua survey](https://img001.prntscr.com/file/img001/eMmSYj3QTQOOJQVrws-ZIg.png)
+
+---
+
+# Skua 1.1.2.1
+## Released: December 28, 2022
+
+This is hot fix for the current issue that has been made an error from game action on start script. 
+
+Fixes: 
+- Game action type changed from non nullable to nullable to make the crash will not happen again.
+
+
+[![Donate](https://img.shields.io/badge/Donate-PayPal-green.svg)](https://www.paypal.com/donate?hosted_button_id=QVQ4Q7XSH9VBY)
+
+---
+
+# Skua 1.1.2
+## Released: December 28, 2022
+
+Quite some time I don't do this, the update fixes (I hope) some small but troublesome bugs:
+
+- Hide to tray should not crash the app;
+- "GitHub API limit reached" can still happen, but all you need to do is to authenticate one time and launch Skua using the launcher tab from the Manager, after that the auth token should be saved as it was supposed to;
+- For some reason starting Auto Attack/Hunt froze the app, it will not happen anymore but it does take quite some time to start/stop, will keep that in mind for possible future updates;
+
+That's not much I would say, there is some work done that I can't publish yet that lacks testing and proper implementation, with time they will come.
+
+Also, @slypy been looking foward to help with Skua development, and before his interest in doing so, I never knew the pain in the ass it was to set up the source code to start working on it. So I uploaded the whole (even the WIP things I had going on) of it in the repo, hope that helps anyone that would like to contribute.
+
+If you want to help the development of Skua you can donate clicking in the button below:
+
+[![Donate](https://img.shields.io/badge/Donate-PayPal-green.svg)](https://www.paypal.com/donate?hosted_button_id=QVQ4Q7XSH9VBY)
+
+---
+
+# Skua 1.1.1
+## Released: September 08, 2022
+
+Release to address some small problems:
+
+- Enums that make use of "_"(underscore) to generate spaces in the UI should not crash the script compilation anymore;
+- Fixed the size of script options. For some reason the cells where not taking the full width, making the fields too small to even see;
+- Map Item ID grabber take into consideration swf files that might not have the ".swf" extension, this fix a conflict with how FFDec takes arguments;
+- Options for _"Auto Update Scripts"_ and _"Check for Script Updates"_ back to the main client;
+- `IScriptServer` Relogin methods now click the server instead of sending a command straight to connect to said server, this way the "Server" in the game options will show the right server name instead of the first server you logged in.
+
+If you want to help the development of Skua you can donate clicking in the button below. To select any of the goal options (you can check then in the _"Goals"_ tab in the **Skua Manager**), put a message in the donation or message me in the Skua chat in [Discord](https://discord.io/AQWBots):
+
+[![Donate](https://img.shields.io/badge/Donate-PayPal-green.svg)](https://www.paypal.com/donate?hosted_button_id=QVQ4Q7XSH9VBY)
+
+---
+
+# Skua 1.1
+## Released: September 03, 2022
+
+Thsi release comes with the Skua.Manager.exe, with it you will be able to set up your GitHub Authentication a single time, that can be persisted between client versions. To do so, you complete the authentication in the Manager and then launch Skua using the "Launchers" tab, atleast one time. The Manager will also able to notify, download and configure future updates.
+
+Fixes, additions and subtractions:
+
+- Fixed bug with Auto Relogin when using Safe Relogin;
+- Using the Interceptor doesn't trigger Auto Relogin anymore;
+- Removed options from CoreBots > Other, they were added as Script Options;
+- Added options in CoreBots > Other for Boost usage inside scripts;
+- Added ability to hide to tray for both clients;
+- Manager can Update and Reset (delete and redownload) Scripts in the Updates tab or right clicking the tray icon;
+- Goals can be tracked in the Manager;
+- Themes can be propagated from the Manager to other Launchers;
+
+If you want to help the development of Skua you can donate clicking in the button below, to select any of the options, put a message in the donation or message me in the Skua chat in [Discord](https://discord.io/AQWBots):
+
+[![Donate](https://img.shields.io/badge/Donate-PayPal-green.svg)](https://www.paypal.com/donate?hosted_button_id=QVQ4Q7XSH9VBY)
+
+---
+
+# Skua 1.0.2
+## Released: August 25, 2022
+
+Did an oopsie in the last release. While trying to reduce server spam, it made the return value notc so certain, so the change to `IScriptQuest.EnsureLoad` was reverted.
+
+About the goals:
+
+25/200$ - Follower/Synchronize Clients so you can use multiple accounts;
+0/100$ - Manager so you can boot up multiple accounts with the click of a button;
+25/100$ - Script making assistant, something between Scratch (programming language) and formulary filling;
+?$ - Give me any idea, we can discuss about it and make it real.
+
+If you want to help the development of Skua you can donate clicking in the button below, to select any of the options, put a message in the donation or message me in the Skua chat in [Discord](https://discord.io/AQWBots):
+
+[![Donate](https://img.shields.io/badge/Donate-PayPal-green.svg)](https://www.paypal.com/donate?hosted_button_id=QVQ4Q7XSH9VBY)
+
+---
+
+# Skua 1.0.1
+## Released: August 24, 2022
+
+Fixes:
+
+- Auto update would only update if there were scripts missing from the folder;
+- `IScriptQuest.IsDailyComplete` method returns the proper value;
+- Private Rooms option would be wrongly setted in CoreBots;
+- ScriptStoppingEvent now is properly fired when the script crashes;
+- `IScriptSend.PacketSpam` and `IScriptSend.ClientPacketSpam` now stop if you stop the script too;
+- `IScriptServer.EnsureRelogin` uses the right method to try to login again;
+- Scripts are shown when opening the "Get Scripts" window for the first time.
+
+---
+
+# Skua 1.0
+## Released: August 20, 2022
+
+The birb is out.
+
+Everything should work as intended, next release should be mainly documentation if no bug shows up.
+
+There are some out of scope goals, they aren't planned for the normal development of Skua, but reaching them not only would help me keep motivated but also the community that I am sure would benefit from those tools.
+
+25/200$ - Follower/Synchronize Clients so you can use multiple accounts;
+0/100$ - Manager so you can boot up multiple accounts with the click of a button;
+25/100$ - Script making assistant, something between Scratch (programming language) and formulary filling;
+?$ - Give me any idea, we can discuss about it and make it real.
+
+If you want to help the development of Skua you can donate clicking in the button below, to select any of the options, put a message in the donation or message me in the Skua chat in [Discord](https://discord.io/AQWBots):
+
+[![Donate](https://img.shields.io/badge/Donate-PayPal-green.svg)](https://www.paypal.com/donate?hosted_button_id=QVQ4Q7XSH9VBY)
 
 ---
 
