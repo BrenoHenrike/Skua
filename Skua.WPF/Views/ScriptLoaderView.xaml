@@ -104,6 +104,6 @@
             Grid.Row="3"
             Margin="0,3,0,0"
             Command="{Binding OpenBrowserFormCommand}"
-            Content="Report/Request Script" />
+            Content="Report Issues to @Tato2/@bogalj" />
     </Grid>
 </UserControl>

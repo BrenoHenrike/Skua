@@ -60,7 +60,7 @@ public partial class ScriptLoaderViewModel : BotControlViewModelBase
     [RelayCommand]
     private void OpenBrowserForm()
     {
-        _processService.OpenLink(@"https://forms.gle/sbp57LBQP5WvCH2B9");
+        _processService.OpenLink(@"https://discord.gg/Xz5bF6q2CX");
     }
 
     [RelayCommand]
