@@ -1,3 +1,24 @@
+# Skua 1.2.5.4
+## Released: September 12, 2025
+
+## HOTFIX FOR GET SCRIPTS
+
+
+
+**Full Changelog**: https://github.com/BrenoHenrike/Skua/compare/1.2.5.3...1.2.5.4
+
+---
+
+# Skua 1.2.5.3
+## Released: September 12, 2025
+
+## HOTFIX FOR INSTALLER
+
+
+**Full Changelog**: https://github.com/BrenoHenrike/Skua/compare/1.2.5.2...1.2.5.3
+
+---
+
 # Skua 1.2.5.2
 ## Released: September 12, 2025
 
