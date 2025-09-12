@@ -178,7 +178,7 @@ namespace Skua.App.WPF.Properties {
         
         [global::System.Configuration.ApplicationScopedSettingAttribute()]
         [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
-        [global::System.Configuration.DefaultSettingValueAttribute("1.2.5.3")]
+        [global::System.Configuration.DefaultSettingValueAttribute("1.2.5.4")]
         public string ApplicationVersion {
             get {
                 return ((string)(this["ApplicationVersion"]));

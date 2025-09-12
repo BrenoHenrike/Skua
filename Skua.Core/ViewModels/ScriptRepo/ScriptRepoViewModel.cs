@@ -1,16 +1,17 @@
 ﻿using CommunityToolkit.Mvvm.ComponentModel;
-using CommunityToolkit.Mvvm.Messaging;
 using CommunityToolkit.Mvvm.Input;
+using CommunityToolkit.Mvvm.Messaging;
 using Skua.Core.Interfaces;
 using Skua.Core.Messaging;
 using Skua.Core.Models.GitHub;
 using Skua.Core.Utils;
 
 namespace Skua.Core.ViewModels;
+
 public partial class ScriptRepoViewModel : BotControlViewModelBase
 {
     public ScriptRepoViewModel(IGetScriptsService getScripts, IProcessService processService)
-        : base("Get Scripts")
+        : base("Get Scripts", 800, 450)
     {
         _getScriptsService = getScripts;
         _processService = processService;
@@ -39,18 +40,18 @@ public partial class ScriptRepoViewModel : BotControlViewModelBase
     [ObservableProperty]
     private string _progressReportMessage = string.Empty;
 
-    public int DownloadedQuantity => _getScriptsService.Downloaded;
-    public int OutdatedQuantity => _getScriptsService.Outdated;
-    public int ScriptQuantity => _getScriptsService.Total;
+    public int DownloadedQuantity => _getScriptsService?.Downloaded ?? 0;
+    public int OutdatedQuantity => _getScriptsService?.Outdated ?? 0;
+    public int ScriptQuantity => _getScriptsService?.Total ?? 0;
     public int BotScriptQuantity => _scripts.Count;
     public IRelayCommand OpenScriptFolderCommand { get; }
-    
+
     [RelayCommand]
     private void OpenScript()
     {
         if (SelectedItem is null || !SelectedItem.Downloaded)
             return;
-        
+
         StrongReferenceMessenger.Default.Send<EditScriptMessage, int>(new(SelectedItem.LocalFile), (int)MessageChannels.ScriptStatus);
     }
 
@@ -69,24 +70,29 @@ public partial class ScriptRepoViewModel : BotControlViewModelBase
         catch { }
         RefreshScriptsList();
     }
-    
+
     private void RefreshScriptsList()
     {
         _scripts.Clear();
-        foreach (ScriptInfo script in _getScriptsService.Scripts)
+        if (_getScriptsService?.Scripts != null)
         {
-            if (!script.Name.Equals("null"))
+            foreach (ScriptInfo script in _getScriptsService.Scripts)
             {
-                if (script.Description.Equals("null"))
-                    script.Description = "No description provided.";
+                if (script?.Name != null && !script.Name.Equals("null"))
+                {
+                    if (script.Description?.Equals("null") == true)
+                        script.Description = "No description provided.";
 
-                if (script.Tags.Contains("null") && (script.Tags.Length == 1))
-                    script.Tags = new[] { "no-tags" };
-                
-                _scripts.Add(new(script));
+                    if (script.Tags?.Contains("null") == true && (script.Tags.Length == 1))
+                        script.Tags = new[] { "no-tags" };
+                    else if (script.Tags == null)
+                        script.Tags = new[] { "no-tags" };
+
+                    _scripts.Add(new(script));
+                }
             }
         }
-            
+
         OnPropertyChanged(nameof(Scripts));
         OnPropertyChanged(nameof(DownloadedQuantity));
         OnPropertyChanged(nameof(OutdatedQuantity));
@@ -94,6 +100,7 @@ public partial class ScriptRepoViewModel : BotControlViewModelBase
         OnPropertyChanged(nameof(BotScriptQuantity));
         IsBusy = false;
     }
+
     public void ProgressHandler(string message)
     {
         ProgressReportMessage = message;

@@ -2,7 +2,7 @@
 <Project>
   <!-- Centralized version management -->
   <PropertyGroup>
-    <SkuaVersion>1.2.5.3</SkuaVersion>
+    <SkuaVersion>1.2.5.4</SkuaVersion>
   </PropertyGroup>
   
   <!-- Apply version to all projects -->
