@@ -39,21 +39,15 @@ param(
     
     [bool]$Clean = $true,
     
-    [string]$OutputPath = ".\build"
+    [string]$OutputPath = ".\build",
+    
+    [switch]$SkipInstaller
+    
 )
 
 # Script configuration
 $ProgressPreference = "SilentlyContinue"
 
-# Read version from skuaVersion file
-$SkuaVersionFile = Join-Path $PSScriptRoot "skuaVersion"
-if (Test-Path $SkuaVersionFile) {
-    $SkuaVersion = (Get-Content $SkuaVersionFile -Raw).Trim()
-    Write-Host "Using version from skuaVersion file: $SkuaVersion" -ForegroundColor Green
-} else {
-    $SkuaVersion = "1.0.0.0"
-    Write-Host "skuaVersion file not found, using default: $SkuaVersion" -ForegroundColor Yellow
-}
 
 # Colors for output
 function Write-Header {
@@ -78,51 +72,6 @@ function Write-Info {
     Write-Host "ℹ $Message" -ForegroundColor Yellow
 }
 
-function Update-VersionInFiles {
-    param([string]$Version)
-    
-    Write-Info "Updating version to $Version in settings files..."
-    
-    # Update Settings.settings files
-    $settingsFiles = Get-ChildItem -Path . -Recurse -Name "Settings.settings" | Where-Object { $_ -like "*Properties*Settings.settings" }
-    foreach ($file in $settingsFiles) {
-        if (Test-Path $file) {
-            $content = Get-Content $file -Raw
-            $updatedContent = $content -replace '<Value Profile="\\(Default\\)">\\d+\\.\\d+\\.\\d+\\.\\d+</Value>', "<Value Profile=`"(Default)`">$Version</Value>"
-            if ($content -ne $updatedContent) {
-                Set-Content $file -Value $updatedContent -NoNewline
-                Write-Success "Updated version in $file"
-            }
-        }
-    }
-    
-    # Update Settings.Designer.cs files
-    $designerFiles = Get-ChildItem -Path . -Recurse -Name "Settings.Designer.cs" | Where-Object { $_ -like "*Properties*Settings.Designer.cs" }
-    foreach ($file in $designerFiles) {
-        if (Test-Path $file) {
-            $content = Get-Content $file -Raw
-            $updatedContent = $content -replace '\\[global::System\\.Configuration\\.DefaultSettingValueAttribute\\("\\d+\\.\\d+\\.\\d+\\.\\d+"\\)\\]', "[global::System.Configuration.DefaultSettingValueAttribute(`"$Version`")]"
-            if ($content -ne $updatedContent) {
-                Set-Content $file -Value $updatedContent -NoNewline
-                Write-Success "Updated version in $file"
-            }
-        }
-    }
-    
-    # Update App.config files
-    $appConfigFiles = Get-ChildItem -Path . -Recurse -Name "App.config"
-    foreach ($file in $appConfigFiles) {
-        if (Test-Path $file) {
-            $content = Get-Content $file -Raw
-            # Look for ApplicationVersion setting specifically
-            $updatedContent = $content -replace '(<setting name="ApplicationVersion"[^>]*>[^<]*<value>)\\d+\\.\\d+\\.\\d+\\.\\d+(<\\/value>)', "`${1}$Version`${2}"
-            if ($content -ne $updatedContent) {
-                Set-Content $file -Value $updatedContent -NoNewline
-                Write-Success "Updated version in $file"
-            }
-        }
-    }
-}
 
 # Check prerequisites
 function Test-Prerequisites {
@@ -215,7 +164,7 @@ function Get-MSBuildPath {
     return $null
 }
 
-function Clean-Solution {
+function CleanSolution {
     Write-Header "Cleaning Previous Builds"
     
     # Clean output directories
@@ -319,7 +268,6 @@ function Build-Platform {
                         $proj,
                         "--configuration", $Config,
                         "-p:Platform=$Platform",
-                        "-p:SkuaVersion=$SkuaVersion",
                         "--no-restore",
                         "--verbosity", "minimal",
                         "-p:WarningLevel=0"
@@ -345,7 +293,7 @@ function Build-Platform {
                 "Skua.sln",
                 "--configuration", $Config,
                 "-p:Platform=$Platform",
-                "-p:SkuaVersion=$SkuaVersion",
+                "-p:Platforms=$Platform",
                 "--no-restore",
                 "--verbosity", "minimal",
                 "-p:WarningLevel=0"  # Suppress warnings for cleaner output
@@ -537,6 +485,11 @@ function Main {
     $success = $false
     $exitCode = 0
     
+    # Handle SkipInstaller parameter
+    if ($SkipInstaller) {
+        $script:BuildInstaller = $false
+    }
+    
     # Set error action preference here to ensure functions are loaded first
     $ErrorActionPreference = "Stop"
     
@@ -553,12 +506,10 @@ function Main {
         # Check prerequisites
         Test-Prerequisites
         
-        # Update version in all settings files
-        Update-VersionInFiles -Version $SkuaVersion
         
         # Clean if requested
         if ($Clean) {
-            Clean-Solution
+            CleanSolution
         }
         
         # Build each platform
