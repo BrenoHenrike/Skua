@@ -16,15 +16,15 @@
     Build configuration (Debug or Release). Default is Release.
 .PARAMETER Platforms
     Array of platforms to build. Default is @("x64", "x86")
-.PARAMETER BuildInstaller
-    Whether to build the WiX installer. Default is $true.
+.PARAMETER SkipInstaller
+    Skip building the WiX installer.
 .PARAMETER Clean
     Whether to clean before building. Default is $true.
 .EXAMPLE
     .\Build-Skua.ps1
     Builds all platforms in Release mode with installer
 .EXAMPLE
-    .\Build-Skua.ps1 -Configuration Debug -Platforms @("x64") -BuildInstaller $false
+    .\Build-Skua.ps1 -Configuration Debug -Platforms "x64" -SkipInstaller
     Builds only x64 in Debug mode without installer
 #>
 
@@ -34,8 +34,6 @@ param(
     
     [ValidateSet("x64", "x86")]
     [string[]]$Platforms = @("x64", "x86"),
-    
-    [bool]$BuildInstaller = $true,
     
     [bool]$Clean = $true,
     
@@ -101,7 +99,7 @@ function Test-Prerequisites {
     }
     
     # Check for MSBuild (for WiX)
-    if ($BuildInstaller) {
+    if (-not $SkipInstaller) {
         $msbuildPath = Get-MSBuildPath
         if ($msbuildPath) {
             Write-Success "MSBuild found: $msbuildPath"
@@ -374,8 +372,8 @@ function Build-Installer {
         [string]$Platform
     )
     
-    if (-not $BuildInstaller) {
-        Write-Info "Skipping installer build (disabled)"
+    if ($SkipInstaller) {
+        Write-Info "Skipping installer build"
         return
     }
     
@@ -462,7 +460,7 @@ function Show-Summary {
     
     Write-Info "Configuration: $Configuration"
     Write-Info "Platforms: $($Platforms -join ', ')"
-    Write-Info "Installer: $(if ($BuildInstaller) { 'Yes' } else { 'No' })"
+    Write-Info "Installer: $(if (-not $SkipInstaller) { 'Yes' } else { 'No' })"
     Write-Info "Total time: $($TotalTime.TotalSeconds.ToString('F2')) seconds"
     
     if ($Success -and (Test-Path $OutputPath)) {
@@ -485,10 +483,7 @@ function Main {
     $success = $false
     $exitCode = 0
     
-    # Handle SkipInstaller parameter
-    if ($SkipInstaller) {
-        $script:BuildInstaller = $false
-    }
+    # SkipInstaller is now handled directly in the logic
     
     # Set error action preference here to ensure functions are loaded first
     $ErrorActionPreference = "Stop"
@@ -517,7 +512,7 @@ function Main {
             Build-Platform -Platform $platform -Config $Configuration
             
             # Build installer for this platform
-            if ($BuildInstaller) {
+            if (-not $SkipInstaller) {
                 Build-Installer -Platform $platform
             }
         }
@@ -577,7 +572,7 @@ Usage: Build-Skua.ps1 [options]
 Parameters:
   -Configuration <String>   Build configuration (Debug or Release). Default: Release
   -Platforms <String[]>     Platforms to build. Default: @("x64", "x86")
-  -BuildInstaller <Boolean> Whether to build WiX installer. Default: `$true
+  -SkipInstaller            Skip building WiX installer. Default: `$false
   -Clean <Boolean>          Whether to clean before building. Default: `$true
   -OutputPath <String>      Output directory path. Default: .\build
 
@@ -588,7 +583,7 @@ Examples:
   .\Build-Skua.ps1 -Configuration Debug
       Builds all platforms in Debug mode with installer
   
-  .\Build-Skua.ps1 -Platforms @("x64") -BuildInstaller `$false
+  .\Build-Skua.ps1 -Platforms @("x64") -SkipInstaller
       Builds only x64 without installer
   
   .\Build-Skua.ps1 -Clean `$false
