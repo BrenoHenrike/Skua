@@ -59,7 +59,7 @@ public class AuraEventData
             TimeStarted = aura.TimeStamp ?? DateTime.Now,
             DurationSeconds = aura.Duration,
             IsPassive = aura.Passive ?? false,
-            Category = aura.Cat,
+            Category = aura.Category,
             PotionType = aura.PotionType,
             Subject = subject
         };

@@ -74,10 +74,30 @@ public class Aura
     public DateTime? TimeStamp => Timestamp > 0 ? DateTimeOffset.FromUnixTimeMilliseconds(Timestamp).DateTime : null;
 
     /// <summary>
-    /// Legacy category property for backward compatibility.
+    /// The debuff type of aura. eg. stun, stone, disable or etc.
     /// </summary>
-    [JsonIgnore]
-    public string? Cat => string.IsNullOrEmpty(T) ? null : T;
+    [JsonProperty("cat")]
+    public string? Category { get; set; }
+
+    [JsonProperty("fx")]
+    public string? Fx { get; set; }
+
+    [JsonProperty("msgOn")]
+    public string? MsgOn { get; set; }
+
+    [JsonProperty("animOn")]
+    public string? AnimationOn { get; set; }
+
+    [JsonProperty("animOff")]
+    public string? AnimationOff { get; set; }
+
+    public override string ToString()
+    {
+        return JsonConvert.SerializeObject(this, Formatting.Indented);
+    }
+
+    public int SecondsRemaining()
+        => (this == null || ExpiresAt == null) ? 0 : (int)(((DateTime)ExpiresAt) - DateTime.Now).TotalSeconds;
 
     /// <summary>
     /// The expiration time of the aura.

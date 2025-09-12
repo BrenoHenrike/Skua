@@ -135,7 +135,6 @@ public partial class ScriptManager : ObservableObject, IScriptManager
                     Skills.Stop();
                     Drops.Stop();
 
-                    // Stop aura monitoring when script ends (cleanup)
                     AuraMonitor.StopMonitoring();
 
                     ScriptCTS.Dispose();

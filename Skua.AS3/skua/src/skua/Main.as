@@ -746,14 +746,14 @@ package skua
 		
 		public static function attackMonsterByID(id:int):String
 		{
-			var monster:* = instance.game.world.getMonster(id);
-			return attackTarget(monster);
+			var bestTarget:* = getBestMonsterTargetByID(id);
+			return attackTarget(bestTarget);
 		}
-		
+			
 		public static function attackMonsterByName(name:String):String
 		{
-			var monster:* = getMonster(name);
-			return attackTarget(monster);
+			var bestTarget:* = getBestMonsterTarget(name);
+			return attackTarget(bestTarget);
 		}
 		
 		public static function attackPlayer(name:String):String
@@ -772,46 +772,128 @@ package skua
 					return monster;
 				}
 			}
-			return null;
+		return null;
+		}
+	
+		public static function getBestMonsterTarget(name:String):*
+		{
+			var targetCandidates:Array = [];
+			
+			for each (var monster:* in instance.game.world.getMonstersByCell(instance.game.world.strFrame))
+			{
+				var monName:String = monster.objData.strMonName.toLowerCase();
+				if ((monName.indexOf(name.toLowerCase()) > -1 || name == '*') && monster.pMC != null)
+				{
+					targetCandidates.push(monster);
+				}
+			}
+			
+			if (targetCandidates.length == 0)
+				return null;
+			
+			targetCandidates.sort(function(a:*, b:*):Number {
+				var aHP:int = (a.dataLeaf && a.dataLeaf.intHP) ? a.dataLeaf.intHP : 0;
+				var bHP:int = (b.dataLeaf && b.dataLeaf.intHP) ? b.dataLeaf.intHP : 0;
+				
+				var aAlive:Boolean = aHP > 0;
+				var bAlive:Boolean = bHP > 0;
+				
+				if (aAlive != bAlive) {
+					return aAlive ? -1 : 1;
+				}
+				
+				if (aHP != bHP) {
+					return aHP - bHP; 
+				}
+				
+				var aMapID:int = a.objData ? a.objData.MonMapID : 0;
+				var bMapID:int = b.objData ? b.objData.MonMapID : 0;
+				return aMapID - bMapID;
+			});
+			return targetCandidates[0];
+		}
+	
+		public static function getBestMonsterTargetByID(id:int):*
+		{
+			var targetCandidates:Array = [];
+			
+			for each (var monster:* in instance.game.world.getMonstersByCell(instance.game.world.strFrame))
+			{
+				if (monster.pMC != null && monster.objData && (monster.objData.MonMapID == id || monster.objData.MonID == id))
+				{
+					targetCandidates.push(monster);
+				}
+			}
+			
+			if (targetCandidates.length == 0)
+				return null;
+			
+			targetCandidates.sort(function(a:*, b:*):Number {
+				var aHP:int = (a.dataLeaf && a.dataLeaf.intHP) ? a.dataLeaf.intHP : 0;
+				var bHP:int = (b.dataLeaf && b.dataLeaf.intHP) ? b.dataLeaf.intHP : 0;
+				
+				var aAlive:Boolean = aHP > 0;
+				var bAlive:Boolean = bHP > 0;
+				
+				if (aAlive != bAlive) {
+					return aAlive ? -1 : 1;
+				}
+				
+				if (aHP != bHP) {
+					return aHP - bHP;
+				}
+				
+				var aMapID:int = a.objData ? a.objData.MonMapID : 0;
+				var bMapID:int = b.objData ? b.objData.MonMapID : 0;
+				return aMapID - bMapID;
+			});
+			return targetCandidates[0];
 		}
 		
 		public static function getMonsterHealth(param1:String): String
 		{
 			var curMonster:Object = getMonster(param1);
-			return curMonster.dataLeaf.intHP.toString();
+			if (curMonster && curMonster.dataLeaf)
+			{
+				return curMonster.dataLeaf.intHP.toString();
+			}
+			return "0";
 		}
 		
 		public static function getMonsterHealthById(param1:int): String
 		{
 			var curMonster:Object = instance.game.world.getMonster(param1);
-			return curMonster.dataLeaf.intHP.toString();
-		}
-		
-		
-	public static function availableMonstersInCell():String
-	{
-		var retMonsters:Array = [];
-		for each (var monster:* in instance.game.world.getMonstersByCell(instance.game.world.strFrame))
-		{
-			if (monster.pMC != null)
+			if (curMonster && curMonster.dataLeaf)
 			{
-				var monsterData:Object = new Object();
-				for (var prop:String in monster.objData)
-				{
-					monsterData[prop] = monster.objData[prop];
-				}
-				if (monster.dataLeaf)
-				{
-					monsterData.intHP = monster.dataLeaf.intHP;
-					monsterData.intHPMax = monster.dataLeaf.intHPMax;
-					monsterData.intState = monster.dataLeaf.intState;
-					monsterData.auras = monster.dataLeaf.auras
-				}
-				retMonsters.push(monsterData);
+				return curMonster.dataLeaf.intHP.toString();
 			}
+			return "0";
 		}
-		return JSON.stringify(retMonsters);
-	}
+		
+		public static function availableMonstersInCell():String
+		{
+			var retMonsters:Array = [];
+			for each (var monster:* in instance.game.world.getMonstersByCell(instance.game.world.strFrame))
+			{
+				if (monster.pMC != null)
+				{
+					var monsterData:Object = new Object();
+					for (var prop:String in monster.objData)
+					{
+						monsterData[prop] = monster.objData[prop];
+					}
+					if (monster.dataLeaf)
+					{
+						monsterData.intHP = monster.dataLeaf.intHP;
+						monsterData.intHPMax = monster.dataLeaf.intHPMax;
+						monsterData.intState = monster.dataLeaf.intState;
+						monsterData.auras = monster.dataLeaf.auras
+					}
+					retMonsters.push(monsterData);
+				}
+			}
+			return JSON.stringify(retMonsters);
+		}
 		
 		public function requestDoomArenaPVPQueue():void
 		{

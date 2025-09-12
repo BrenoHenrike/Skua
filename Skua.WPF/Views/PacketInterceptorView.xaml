@@ -17,6 +17,7 @@
         <Grid.RowDefinitions>
             <RowDefinition Height="auto" />
             <RowDefinition Height="auto" />
+            <RowDefinition Height="auto" />
             <RowDefinition />
         </Grid.RowDefinitions>
         <Grid
@@ -126,8 +127,15 @@
                 Content="Clear"
                 Style="{StaticResource MaterialDesignPaperButton}" />
         </Grid>
-        <ListBox
+        <TextBox
+            x:Name="SearchBox"
             Grid.Row="2"
+            Margin="6,0,6,3"
+            materialDesign:HintAssist.Hint="Search packets..."
+            Style="{StaticResource MaterialDesignOutlinedTextBox}"
+            TextChanged="TextBox_TextChanged" />
+        <ListBox
+            Grid.Row="3"
             Margin="6,3,6,6"
             ItemsSource="{Binding Packets, UpdateSourceTrigger=PropertyChanged}"
             ScrollViewer.HorizontalScrollBarVisibility="Disabled"
