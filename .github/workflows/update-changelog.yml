@@ -65,11 +65,6 @@ jobs:
         
         print(f'Found {len(filtered_releases)} published releases')
         
-        # Create new file with header
-        with open('changelogs.md', 'w', encoding='utf-8') as f:
-            f.write('# Skua Release Changelog\n\n')
-            f.write('---\n\n')
-        
         # Process all releases and append to changelog
         with open('changelogs.md', 'a', encoding='utf-8') as f:
             for release in filtered_releases:
