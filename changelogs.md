@@ -1,9 +1,3 @@
-# Skua Release Changelog
-
-This file is automatically updated when new releases are published.
-
----
-
 # Skua 1.2.5.2
 ## Released: September 12, 2025
 
