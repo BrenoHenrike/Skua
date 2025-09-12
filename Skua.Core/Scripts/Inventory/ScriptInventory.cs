@@ -79,6 +79,7 @@ public partial class ScriptInventory : IScriptInventory
         if (Options.SafeTimings)
             Wait.ForItemEquip(item.ID);
     }
+
     public bool ToBank(InventoryItem item)
     {
         Send.Packet($"%xt%zm%bankFromInv%{Map.RoomID}%{item.ID}%{item.CharItemID}%");
