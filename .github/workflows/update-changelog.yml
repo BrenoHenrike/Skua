@@ -68,7 +68,6 @@ jobs:
         # Create new file with header
         with open('changelogs.md', 'w', encoding='utf-8') as f:
             f.write('# Skua Release Changelog\n\n')
-            f.write('This file is automatically updated when new releases are published.\n\n')
             f.write('---\n\n')
         
         # Process all releases and append to changelog
