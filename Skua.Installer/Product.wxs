@@ -11,9 +11,9 @@
 		
 		<Upgrade Id="$(var.UpgradeCode)">
 			<!-- Downgrade Protection -->
-			<UpgradeVersion Minimum="$(var.BuildVersion)" OnlyDetect="yes" IncludeMinimum="yes" Property="DOWNGRADE_DETECTED" />
+			<UpgradeVersion Minimum="$(var.BuildVersion)" OnlyDetect="yes" IncludeMinimum="no" Property="DOWNGRADE_DETECTED" />
 			<!-- Major Upgrade Configuration -->
-			<UpgradeVersion IncludeMinimum="no" Maximum="$(var.BuildVersion)" IncludeMaximum="no" MigrateFeatures="yes" Property="UPGRADE_DETECTED" />
+			<UpgradeVersion IncludeMinimum="no" Maximum="$(var.BuildVersion)" IncludeMaximum="yes" MigrateFeatures="yes" Property="UPGRADE_DETECTED" />
     </Upgrade>
 
         <InstallExecuteSequence>
