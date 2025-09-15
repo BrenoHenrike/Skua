@@ -80,7 +80,6 @@ public class PlayerInfo
     /// <summary>
     /// List of auras currently active.
     /// </summary>
-    [JsonProperty("auras")]
     public List<Aura> Auras { get; set; }
 
     /// <summary>
