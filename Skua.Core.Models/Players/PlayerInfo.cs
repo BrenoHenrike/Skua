@@ -80,7 +80,7 @@ public class PlayerInfo
     /// <summary>
     /// List of auras currently active.
     /// </summary>
-    public List<Aura> Auras { get; set; }
+    public List<Aura> Auras { get; set; } = new();
 
     /// <summary>
     /// Checks if the monster has a specific aura active.

@@ -65,7 +65,7 @@ public class Monster
     /// <summary>
     /// List of auras currently active on this monster.
     /// </summary>
-    public List<Aura> Auras { get; set; }
+    public List<Aura> Auras { get; set; } = new();
 
     /// <summary>
     /// Indicates if this monster is alive.
