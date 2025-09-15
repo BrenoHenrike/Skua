@@ -850,26 +850,6 @@ package skua
 			return targetCandidates[0];
 		}
 		
-		public static function getMonsterHealth(param1:String): String
-		{
-			var curMonster:Object = getMonster(param1);
-			if (curMonster && curMonster.dataLeaf)
-			{
-				return curMonster.dataLeaf.intHP.toString();
-			}
-			return "0";
-		}
-		
-		public static function getMonsterHealthById(param1:int): String
-		{
-			var curMonster:Object = instance.game.world.getMonster(param1);
-			if (curMonster && curMonster.dataLeaf)
-			{
-				return curMonster.dataLeaf.intHP.toString();
-			}
-			return "0";
-		}
-		
 		public static function availableMonstersInCell():String
 		{
 			var retMonsters:Array = [];
@@ -887,10 +867,50 @@ package skua
 						monsterData.intHP = monster.dataLeaf.intHP;
 						monsterData.intHPMax = monster.dataLeaf.intHPMax;
 						monsterData.intState = monster.dataLeaf.intState;
-						monsterData.auras = monster.dataLeaf.auras
+						monsterData.auras = monster.dataLeaf.auras;
 					}
 					retMonsters.push(monsterData);
 				}
+			}
+			return JSON.stringify(retMonsters);
+		}
+		
+		public static function getTargetMonster(): String
+		{
+			var monster:* = instance.game.world.myAvatar.target
+			var monsterData:Object = new Object();
+			for (var prop:String in monster.objData)
+			{
+				monsterData[prop] = monster.objData[prop];
+			}
+			if (monster.dataLeaf)
+			{
+				monsterData.intHP = monster.dataLeaf.intHP;
+				monsterData.intHPMax = monster.dataLeaf.intHPMax;
+				monsterData.intState = monster.dataLeaf.intState;
+				monsterData.auras = monster.dataLeaf.auras;
+			}
+			return JSON.stringify(monsterData);
+		}
+		
+		public static function getMonsters(): String
+		{
+			var retMonsters:Array = [];
+			for each (var monster:* in instance.game.world.monsters)
+			{
+				var monsterData:Object = new Object();
+				for (var prop:String in monster.objData)
+				{
+					monsterData[prop] = monster.objData[prop];
+				}
+				if (monster.dataLeaf)
+				{
+					monsterData.intHP = monster.dataLeaf.intHP;
+					monsterData.intHPMax = monster.dataLeaf.intHPMax;
+					monsterData.intState = monster.dataLeaf.intState;
+					monsterData.auras = monster.dataLeaf.auras;
+				}
+				retMonsters.push(monsterData);
 			}
 			return JSON.stringify(retMonsters);
 		}

@@ -1,4 +1,4 @@
-﻿using Newtonsoft.Json;
+using Newtonsoft.Json;
 using Skua.Core.Models.Auras;
 
 namespace Skua.Core.Models.Monsters;
@@ -65,7 +65,8 @@ public class Monster
     /// <summary>
     /// List of auras currently active on this monster.
     /// </summary>
-    public List<Aura> Auras { get; set; } = new();
+    [JsonProperty("auras")]
+    public List<Aura> Auras { get; set; }
 
     /// <summary>
     /// Indicates if this monster is alive.
@@ -74,15 +75,9 @@ public class Monster
     {
         get
         {
-            return isKilled ? HP > 0 : true;
-        }
-        set
-        {
-            isKilled = true;
+            return HP > 0 && State > 0;
         }
     }
-
-    private bool isKilled = false;
 
     /// <summary>
     /// Checks if the monster has a specific aura active.
@@ -92,6 +87,16 @@ public class Monster
     public bool HasAura(string auraName)
     {
         return Auras.Any(a => a.Name.Equals(auraName, StringComparison.OrdinalIgnoreCase));
+    }
+
+    /// <summary>
+    /// Gets a specific aura by name.
+    /// </summary>
+    /// <param name="auraName">Name of the aura to get.</param>
+    /// <returns>The aura if found, or null if not found.</returns>
+    public Aura? GetAura(string auraName)
+    {
+        return Auras.FirstOrDefault(a => a.Name.Equals(auraName, StringComparison.OrdinalIgnoreCase));
     }
 
     /// <summary>

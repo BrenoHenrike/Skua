@@ -52,6 +52,11 @@ public interface IScriptInterface
     IAuraMonitorService AuraMonitor { get; }
 
     /// <summary>
+    /// Helper for managing ultra boss mechanics including counter attacks and aura monitoring.
+    /// </summary>
+    IUltraBossHelper UltraBossHelper { get; }
+
+    /// <summary>
     /// Class to control combat mechanics.
     /// </summary>
     IScriptCombat Combat { get; }

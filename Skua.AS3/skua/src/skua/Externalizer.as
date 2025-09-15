@@ -43,12 +43,12 @@ package skua
 			this.addCallback("jumpCorrectRoom", Main.jumpCorrectRoom);
 			
 			this.addCallback("availableMonsters", Main.availableMonstersInCell);
+			this.addCallback("getMonsters", Main.getMonsters);
+			this.addCallback("getTargetMonster", Main.getTargetMonster);
 			this.addCallback("attackMonsterName", Main.attackMonsterByName);
 			this.addCallback("attackMonsterID", Main.attackMonsterByID);
 			this.addCallback("untargetSelf", Main.untargetSelf);
 			this.addCallback("attackPlayer", Main.attackPlayer);
-			this.addCallback("getMonsterHealth", Main.getMonsterHealth);
-			this.addCallback("getMonsterHealthById", Main.getMonsterHealthById);
 			
 			this.addCallback("buyItemByName", Main.buyItemByName);
 			this.addCallback("buyItemByID", Main.buyItemByID);

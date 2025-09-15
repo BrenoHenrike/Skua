@@ -1,4 +1,5 @@
 ﻿using Newtonsoft.Json;
+using Skua.Core.Models.Auras;
 
 namespace Skua.Core.Models.Players;
 
@@ -75,6 +76,43 @@ public class PlayerInfo
     /// </summary>
     [JsonProperty("ty")]
     public float Y { get; set; }
+
+    /// <summary>
+    /// List of auras currently active.
+    /// </summary>
+    [JsonProperty("auras")]
+    public List<Aura> Auras { get; set; }
+
+    /// <summary>
+    /// Checks if the monster has a specific aura active.
+    /// </summary>
+    /// <param name="auraName">Name of the aura to check for.</param>
+    /// <returns>True if the monster has the specified aura active.</returns>
+    public bool HasAura(string auraName)
+    {
+        return Auras.Any(a => a.Name.Equals(auraName, StringComparison.OrdinalIgnoreCase));
+    }
+
+    /// <summary>
+    /// Gets a specific aura by name.
+    /// </summary>
+    /// <param name="auraName">Name of the aura to get.</param>
+    /// <returns>The aura if found, or null if not found.</returns>
+    public Aura? GetAura(string auraName)
+    {
+        return Auras.FirstOrDefault(a => a.Name.Equals(auraName, StringComparison.OrdinalIgnoreCase));
+    }
+
+    /// <summary>
+    /// Gets the value/stacks of a specific aura.
+    /// </summary>
+    /// <param name="auraName">Name of the aura to get the value for.</param>
+    /// <returns>The aura value/stacks, or 0 if not found.</returns>
+    public int GetAuraValue(string auraName)
+    {
+        var aura = Auras.FirstOrDefault(a => a.Name.Equals(auraName, StringComparison.OrdinalIgnoreCase));
+        return aura?.Value ?? 0;
+    }
 
     /// <summary>
     /// The player's state.

@@ -128,7 +128,7 @@ public partial class ScriptPlayer : IScriptPlayer
     [ObjectBinding("world.SCALE", HasSetter = true)]
     private int _scale;
 
-    [ObjectBinding("world.myAvatar.target.objData", RequireNotNull = "world.myAvatar.target")]
+    [JsonCallBinding("getTargetMonster", Default = "new()")]
     private Monster? _target;
 
     [ObjectBinding("world.myAvatar.dataLeaf.sta")]
@@ -153,10 +153,8 @@ public partial class ScriptPlayer : IScriptPlayer
     }
 
     [MethodCallBinding("world.setSpawnPoint", GameFunction = true)]
-    private void _setSpawnPoint(string cell, string pad)
-    { }
+    private void _setSpawnPoint(string cell, string pad) { }
 
     [MethodCallBinding("world.goto", GameFunction = true)]
-    private void _goto(string name)
-    { }
+    private void _goto(string name) { }
 }

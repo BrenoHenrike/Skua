@@ -5,7 +5,7 @@ namespace Skua.Core.Interfaces;
 public interface IScriptAuras
 {
     /// <summary>
-    /// The list of auras (unified format supporting both legacy and MonsterAura JSON properties).
+    /// The list of auras.
     /// </summary>
     List<Aura> Auras { get; }
 

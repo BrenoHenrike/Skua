@@ -72,7 +72,7 @@ public class GrabberService : IGrabberService
                 break;
 
             case GrabberTypes.Map_Monsters:
-                items.AddRange(_monsters.MapMonstersWithCurrentData);
+                items.AddRange(_monsters.MapMonsters);
                 break;
 
             case GrabberTypes.GetMap_Item_IDs:
