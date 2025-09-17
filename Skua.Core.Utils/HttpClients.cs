@@ -1,4 +1,6 @@
-﻿namespace Skua.Core.Utils;
+﻿using System.Net;
+
+namespace Skua.Core.Utils;
 
 /// <summary>
 /// HttpClient
@@ -31,6 +33,12 @@ public class WebClient : HttpClient
 /// </summary>
 public static class HttpClients
 {
+
+    static HttpClients()
+    {
+        ServicePointManager.SecurityProtocol |= SecurityProtocolType.Tls12 | SecurityProtocolType.Tls11 | SecurityProtocolType.Tls;
+    }
+
     /// <summary>
     /// Gets the GitHub Client
     /// </summary>

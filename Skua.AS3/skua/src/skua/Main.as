@@ -47,12 +47,16 @@ package skua
 		private var loginURL:String = (sURL + 'api/login/now');
 		
 		private var sFile:String;
-		private var sBG:String = 'Generic2.swf';
+		//private var sBG:String = 'Kezeroth.swf';
+		//private var sBG:String = 'Mirror.swf';
+		//private var sBG:String = 'DageScorn.swf';
+		//private var sBG:String = 'ravenloss2.swf';
+		private var sBG:String = 'Skyguard.swf';
 		private var isEU:Boolean;
 		private var urlLoader:URLLoader;
 		private var loader:Loader;
 		private var vars:Object;
-		private var sTitle:String = '<font color="#FDAF2D">Better Performance</font>';
+		private var sTitle:String = '<font color="#FDAF2D">AURAS!!!</font>';
 		
 		private var stg:Stage;
 		private var gameDomain:ApplicationDomain;
@@ -888,7 +892,6 @@ package skua
 				monsterData.intHP = monster.dataLeaf.intHP;
 				monsterData.intHPMax = monster.dataLeaf.intHPMax;
 				monsterData.intState = monster.dataLeaf.intState;
-				monsterData.auras = monster.dataLeaf.auras;
 			}
 			return JSON.stringify(monsterData);
 		}
@@ -908,7 +911,6 @@ package skua
 					monsterData.intHP = monster.dataLeaf.intHP;
 					monsterData.intHPMax = monster.dataLeaf.intHPMax;
 					monsterData.intState = monster.dataLeaf.intState;
-					monsterData.auras = monster.dataLeaf.auras;
 				}
 				retMonsters.push(monsterData);
 			}

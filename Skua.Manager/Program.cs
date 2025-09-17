@@ -2,6 +2,7 @@ using Skua.Manager.Properties;
 using System;
 using System.IO;
 using System.Linq;
+using System.Net;
 using System.Reflection;
 using System.Windows;
 
@@ -12,6 +13,7 @@ public class Program
     [STAThread]
     public static void Main(string[] args)
     {
+        ServicePointManager.SecurityProtocol |= SecurityProtocolType.Tls12 | SecurityProtocolType.Tls11 | SecurityProtocolType.Tls;
         AppDomain currentDomain = AppDomain.CurrentDomain;
         currentDomain.AssemblyResolve += new ResolveEventHandler(ResolveAssemblies);
         currentDomain.UnhandledException += CurrentDomain_UnhandledException;
