@@ -15,6 +15,7 @@ package skua
 	import flash.events.Event;
 	import flash.events.MouseEvent;
 	import flash.events.ProgressEvent;
+	import flash.events.IOErrorEvent;
 	import flash.net.URLLoader;
 	import flash.net.URLRequest;
 	import flash.system.ApplicationDomain;
@@ -51,15 +52,17 @@ package skua
 		//private var sBG:String = 'Mirror.swf';
 		//private var sBG:String = 'DageScorn.swf';
 		//private var sBG:String = 'ravenloss2.swf';
-		private var sBG:String = 'Skyguard.swf';
+		private var sBG:String = 'hideme.swf';
+		private var customBackgroundURL:String = 'file:///C:/Users/koent/OneDrive/Documents/Skua/themes/Sasuke.swf';
 		private var isEU:Boolean;
 		private var urlLoader:URLLoader;
-		private var loader:Loader;
 		private var vars:Object;
+		private var loader:Loader;
 		private var sTitle:String = '<font color="#FDAF2D">AURAS!!!</font>';
-		
 		private var stg:Stage;
 		private var gameDomain:ApplicationDomain;
+		private var customBGLoader:Loader;
+		private var customBGReady:MovieClip = null;
 		
 		public function Main()
 		{
@@ -125,9 +128,10 @@ package skua
 			}
 			
 			this.game.params.vars = this.vars;
+			
 			this.game.params.sURL = this.sURL;
-			this.game.params.sTitle = this.sTitle;
 			this.game.params.sBG = this.sBG;
+			this.game.params.sTitle = this.sTitle;
 			this.game.params.isEU = this.isEU;
 			this.game.params.loginURL = this.loginURL;
 			
@@ -139,12 +143,50 @@ package skua
 			
 			this.game.stage.addEventListener(KeyboardEvent.KEY_DOWN, this.key_StageGame);
 			
+			this.initCustomBackground();
+			
 			this.external.call('loaded');
 		}
 		
 		public function onExtensionResponse(packet:*):void
 		{
 			this.external.call('pext', JSON.stringify(packet));
+		}
+		
+		private function initCustomBackground():void
+		{
+			if (!this.customBackgroundURL) return;
+			
+			this.customBGLoader = new Loader();
+			this.customBGLoader.contentLoaderInfo.addEventListener(Event.COMPLETE, function(e:Event):void {
+				customBGReady = MovieClip(customBGLoader.content);
+				tryApplyCustomBG();
+			});
+			this.customBGLoader.contentLoaderInfo.addEventListener(IOErrorEvent.IO_ERROR, function(e:IOErrorEvent):void {
+				external.debug('Custom background load error: ' + e.text);
+			});
+			this.customBGLoader.load(new URLRequest(this.customBackgroundURL));
+			
+			this.stg.addEventListener(Event.ENTER_FRAME, function(e:Event):void {
+				if (game && game.mcLogin && game.mcLogin.mcTitle && game.mcLogin.mcTitle.numChildren > 0) {
+					stg.removeEventListener(Event.ENTER_FRAME, arguments.callee);
+					tryApplyCustomBG();
+				}
+			});
+		}
+		
+		private function tryApplyCustomBG():void
+		{
+			if (this.customBGReady && this.game && this.game.mcLogin && this.game.mcLogin.mcTitle) {
+				try {
+					if (this.game.mcLogin.mcTitle.numChildren > 0) {
+						this.game.mcLogin.mcTitle.removeChildAt(0);
+					}
+					this.game.mcLogin.mcTitle.addChild(this.customBGReady);
+				} catch (e:Error) {
+					this.external.debug('Apply error: ' + e.message);
+				}
+			}
 		}
 		
 		public function key_StageGame(kbArgs:KeyboardEvent):void
@@ -686,9 +728,9 @@ package skua
 				{
 					var currentTime:Number = new Date().getTime();
 					var auraTime:Number = parseFloat(aura.ts);
-					var duration:Number = parseFloat(aura.dur) * 1000; // Convert to milliseconds
+					var duration:Number = parseFloat(aura.dur) * 1000;
 					var expiresAt:Number = auraTime + duration;
-					var remaining:Number = Math.max(0, (expiresAt - currentTime) / 1000); // Convert to seconds
+					var remaining:Number = Math.max(0, (expiresAt - currentTime) / 1000);
 					return Math.floor(remaining).toString();
 				}
 			}
