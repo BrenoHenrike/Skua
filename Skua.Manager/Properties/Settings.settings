@@ -63,5 +63,11 @@
     <Setting Name="UpgradeRequired" Type="System.Boolean" Scope="User">
       <Value Profile="(Default)">True</Value>
     </Setting>
+    <Setting Name="CustomBackgroundPath" Type="System.String" Scope="User">
+      <Value Profile="(Default)" />
+    </Setting>
+    <Setting Name="DefaultBackground" Type="System.String" Scope="User">
+      <Value Profile="(Default)">Generic2.swf</Value>
+    </Setting>>
   </Settings>
 </SettingsFile>

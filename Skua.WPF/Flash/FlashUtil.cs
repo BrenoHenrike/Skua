@@ -1,4 +1,4 @@
-﻿using AxShockwaveFlashObjects;
+using AxShockwaveFlashObjects;
 using CommunityToolkit.Mvvm.DependencyInjection;
 using CommunityToolkit.Mvvm.Messaging;
 using Skua.Core.Flash;
@@ -52,6 +52,7 @@ public class FlashUtil : IFlashUtil
             flash.Dock = DockStyle.Fill;
             flash.TabIndex = 0;
             flash.FlashCall += CallHandler;
+            
             _messenger.Send<FlashChangedMessage<AxShockwaveFlash>>(new(flash));
             flash.EndInit();
             Flash = flash;
@@ -78,6 +79,7 @@ public class FlashUtil : IFlashUtil
             EoLHook.Unhook();
         }
     }
+
 
     private void CallHandler(object sender, _IShockwaveFlashEvents_FlashCallEvent e)
     {

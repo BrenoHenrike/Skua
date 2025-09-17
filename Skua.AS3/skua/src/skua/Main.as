@@ -21,6 +21,8 @@ package skua
 	import flash.system.ApplicationDomain;
 	import flash.system.LoaderContext;
 	import flash.system.Security;
+	import flash.system.System;
+	import flash.system.Capabilities;
 	import flash.utils.getQualifiedClassName;
 	import flash.utils.setTimeout;
 	import flash.utils.clearTimeout;
@@ -42,18 +44,11 @@ package skua
 		
 		private var game:*;
 		private var external:skua.Externalizer;
-		
 		private var sURL:String = 'https://game.aq.com/game/';
 		private var versionUrl:String = (sURL + 'api/data/gameversion');
 		private var loginURL:String = (sURL + 'api/login/now');
-		
 		private var sFile:String;
-		//private var sBG:String = 'Kezeroth.swf';
-		//private var sBG:String = 'Mirror.swf';
-		//private var sBG:String = 'DageScorn.swf';
-		//private var sBG:String = 'ravenloss2.swf';
 		private var sBG:String = 'hideme.swf';
-		private var customBackgroundURL:String = 'file:///C:/Users/koent/OneDrive/Documents/Skua/themes/Sasuke.swf';
 		private var isEU:Boolean;
 		private var urlLoader:URLLoader;
 		private var vars:Object;
@@ -63,6 +58,9 @@ package skua
 		private var gameDomain:ApplicationDomain;
 		private var customBGLoader:Loader;
 		private var customBGReady:MovieClip = null;
+		private var customBackgroundURL:String;
+		private var backgroundConfig:Object;
+		public var bgConfigPath:String;
 		
 		public function Main()
 		{
@@ -72,7 +70,7 @@ package skua
 			};
 			
 			Main.instance = this;
-			
+
 			if (stage) this.init();
 			else addEventListener(Event.ADDED_TO_STAGE, this.init);
 		}
@@ -80,6 +78,7 @@ package skua
 		public static function loadGame():void
 		{
 			Main.instance.onAddedToStage();
+			Main.instance.external.call('pre-load');
 		}
 		
 		private function init(e:Event = null):void
@@ -122,13 +121,13 @@ package skua
 			this.stg.scaleMode = StageScaleMode.SHOW_ALL;
 			this.stg.align = StageAlign.TOP;
 			
-			for (var param:String in root.loaderInfo.parameters)
-			{
-				this.game.params[param] = root.loaderInfo.parameters[param];
-			}
-			
+		for (var param:String in root.loaderInfo.parameters)
+		{
+			this.game.params[param] = root.loaderInfo.parameters[param];
+		}
+		
+			this.loadBackgroundConfig();
 			this.game.params.vars = this.vars;
-			
 			this.game.params.sURL = this.sURL;
 			this.game.params.sBG = this.sBG;
 			this.game.params.sTitle = this.sTitle;
@@ -142,8 +141,6 @@ package skua
 			this.stg.addEventListener(Event.ENTER_FRAME, Modules.handleFrame);
 			
 			this.game.stage.addEventListener(KeyboardEvent.KEY_DOWN, this.key_StageGame);
-			
-			this.initCustomBackground();
 			
 			this.external.call('loaded');
 		}
@@ -187,6 +184,64 @@ package skua
 					this.external.debug('Apply error: ' + e.message);
 				}
 			}
+		}
+		
+		private function loadBackgroundConfig():void
+		{
+			try {
+				var configLoader:URLLoader = new URLLoader();
+				configLoader.addEventListener(Event.COMPLETE, onConfigLoaded);
+				configLoader.addEventListener(IOErrorEvent.IO_ERROR, onConfigError);
+				
+			var configPath:String = instance.bgConfigPath;
+			if (!configPath) {
+				setTimeout(loadBackgroundConfig, 500);
+				return;
+			}
+			
+			if (!configPath) {
+				this.external.debug('No background config path available, using default background');
+				this.setDefaultBackground();
+				return;
+			}
+				configLoader.load(new URLRequest(configPath));
+			} catch (e:Error) {
+				this.external.debug('Background config load error: ' + e.message);
+				this.setDefaultBackground();
+			}
+		}
+		
+		private function onConfigLoaded(event:Event):void
+		{
+			try {
+				var configLoader:URLLoader = event.target as URLLoader;
+				this.backgroundConfig = JSON.parse(configLoader.data);
+				
+				if (this.backgroundConfig && this.backgroundConfig.sBG) {
+					this.sBG = this.backgroundConfig.sBG;
+					this.game.params.sBG = this.backgroundConfig.sBG;
+				}
+				
+				if (this.backgroundConfig && this.backgroundConfig.customBackground) {
+					this.customBackgroundURL = this.backgroundConfig.customBackground;
+				}
+				this.initCustomBackground();
+				
+			} catch (e:Error) {
+				this.external.debug('Background config parse error: ' + e.message);
+				this.setDefaultBackground();
+			}
+		}
+		
+		private function onConfigError(event:IOErrorEvent):void
+		{
+			this.setDefaultBackground();
+		}
+		
+		private function setDefaultBackground():void
+		{
+			this.sBG = 'Generic2.swf';
+			this.customBackgroundURL = null;
 		}
 		
 		public function key_StageGame(kbArgs:KeyboardEvent):void
@@ -1268,5 +1323,11 @@ package skua
 		{
 			return '"' + instance.game.world.myAvatar.objData.strGender.toUpperCase() + '"';
 		}
+		
+		public static function setBgConfigPath(path:String):void
+		{
+			instance.bgConfigPath = path;
+		}
+		
 	}
 }

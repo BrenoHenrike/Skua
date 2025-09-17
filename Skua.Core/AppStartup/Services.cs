@@ -98,6 +98,7 @@ public static class Services
         services.AddSingleton<IGrabberService, GrabberService>();
         services.AddSingleton<IClientFilesService, ClientFilesService>();
         services.AddSingleton<IAuraMonitorService, AuraMonitorService>();
+        services.AddSingleton<BackgroundThemeService>();
 
         return services;
     }
@@ -196,6 +197,7 @@ public static class Services
         services.AddSingleton<ApplicationThemesViewModel>();
         services.AddSingleton<ThemeSettingsViewModel>();
         services.AddSingleton<ColorSchemeEditorViewModel>();
+        services.AddSingleton<BackgroundThemeViewModel>();
 
         return services;
     }

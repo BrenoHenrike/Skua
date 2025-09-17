@@ -101,6 +101,9 @@ package skua
 			this.addCallback("modEnable", Modules.enable);
 			this.addCallback("modDisable", Modules.disable);
 			
+			// Background config path setter
+			this.addCallback("setBgConfigPath", Main.setBgConfigPath);
+			
 			this.debug("Externalizer::init done.");
 			this.call("requestLoadGame");
 		}

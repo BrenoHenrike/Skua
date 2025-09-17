@@ -343,6 +343,21 @@ public class ScriptInterface : IScriptInterface, IScriptInterfaceManager, IDispo
     {
         switch (name)
         {
+            case "pre-load":
+                Schedule(1000, _ =>
+                {
+                    var configPath = Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.MyDocuments), "Skua", "background-config.json");
+                    try
+                    {
+                        Flash.Call("setBgConfigPath", "file:///" + configPath.Replace('\\', '/'));
+                        Log($"Set background config path to: {configPath}");
+                    }
+                    catch (Exception ex)
+                    {
+                        Log($"Could not set background config path: {ex.Message}");
+                    }
+                });
+                break;
             case "loaded":
                 Initialize();
                 break;

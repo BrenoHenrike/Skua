@@ -54,6 +54,51 @@
                     </ItemsControl>
                 </StackPanel>
             </Expander>
+            <Expander Margin="6,3,6,6" Header="Backgrounds">
+                <Grid DataContext="{Binding BackgroundTheme}">
+                    <Grid.RowDefinitions>
+                        <RowDefinition Height="Auto" />
+                        <RowDefinition Height="Auto" />
+                    </Grid.RowDefinitions>
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition Width="*" />
+                        <ColumnDefinition Width="Auto" />
+                        <ColumnDefinition Width="Auto" />
+                    </Grid.ColumnDefinitions>
+
+                    <!-- Background Selection -->
+                    <ComboBox Grid.Row="0" Grid.Column="0"
+                              Margin="3"
+                              ItemsSource="{Binding AvailableBackgrounds}"
+                              SelectedItem="{Binding SelectedBackground}"
+                              materialDesign:HintAssist.Hint="Select Background" />
+
+                    <Button Grid.Row="0" Grid.Column="1"
+                            Margin="3"
+                            Command="{Binding BrowseBackgroundCommand}"
+                            Content="Browse"
+                            ToolTip="Browse for local SWF file" />
+
+                    <Button Grid.Row="0" Grid.Column="2"
+                            Margin="3"
+                            Command="{Binding RefreshBackgroundsCommand}"
+                            Content="Refresh"
+                            ToolTip="Refresh background list" />
+
+                    <!-- Quick Actions -->
+                    <Button Grid.Row="1" Grid.Column="0"
+                            Margin="3"
+                            Command="{Binding OpenThemesFolderCommand}"
+                            Content="Open Themes Folder"
+                            ToolTip="Open the themes folder in Explorer" />
+
+                    <Button Grid.Row="1" Grid.Column="1"
+                            Margin="3,3,3,3"
+                            Command="{Binding GetBackgroundsCommand}"
+                            Content="Get Backgrounds"
+                            ToolTip="Open GitHub repository with more backgrounds" Grid.ColumnSpan="2" />
+                </Grid>
+            </Expander>
         </StackPanel>
     </ScrollViewer>
 </UserControl>
