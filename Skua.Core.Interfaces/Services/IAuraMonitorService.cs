@@ -21,7 +21,7 @@ public interface IAuraMonitorService : IDisposable
     /// Event fired when an aura is activated.
     /// Parameters: auraName, timeStarted, duration, stackValue, subject
     /// </summary>
-    event Action<string, DateTime, int, int, SubjectType>? AuraActivated;
+    event Action<string, DateTime, int, object, SubjectType>? AuraActivated;
 
     /// <summary>
     /// Event fired when an aura is deactivated.
@@ -33,7 +33,7 @@ public interface IAuraMonitorService : IDisposable
     /// Event fired when an aura's stack value changes.
     /// Parameters: auraName, oldValue, newValue, subject
     /// </summary>
-    event Action<string, int, int, SubjectType>? AuraStackChanged;
+    event Action<string, object, object, SubjectType>? AuraStackChanged;
 
     /// <summary>
     /// Ensures monitoring is active if there are any event subscribers.

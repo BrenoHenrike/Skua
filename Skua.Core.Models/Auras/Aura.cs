@@ -9,7 +9,7 @@ public class Aura
     /// The aura's stack value/count.
     /// </summary>
     [JsonProperty("value")]
-    public int Value { get; set; } = 1;
+    public object? Value { get; set; }
 
     /// <summary>
     /// The icon file name for the aura.
@@ -27,7 +27,7 @@ public class Aura
     /// The type of the aura.
     /// </summary>
     [JsonProperty("t")]
-    public string T { get; set; } = string.Empty;
+    public string Type { get; set; } = string.Empty;
 
     /// <summary>
     /// The duration of the aura in seconds.
@@ -45,7 +45,7 @@ public class Aura
     /// The timestamp when the aura was applied - Unix timestamp in milliseconds.
     /// </summary>
     [JsonProperty("timeStamp")]
-    public long Timestamp { get; set; }
+    public long _timeStamp { get; set; }
 
     /// <summary>
     /// Internal flag to track if this aura should reset its timestamp.
@@ -65,13 +65,16 @@ public class Aura
     [JsonProperty("potionType")]
     public string? PotionType { get; set; }
 
-    // Additional computed properties
-
     /// <summary>
     /// DateTime timestamp (computed from Unix timestamp).
     /// </summary>
     [JsonIgnore]
-    public DateTime? TimeStamp => Timestamp > 0 ? DateTimeOffset.FromUnixTimeMilliseconds(Timestamp).DateTime : null;
+    public DateTime? TimeStamp => _timeStamp > 0 ? DateTimeOffset.FromUnixTimeMilliseconds(_timeStamp).DateTime : null;
+
+    /// <summary>
+    /// Gets the remaining time of the aura.
+    /// </summary>
+    public TimeSpan RemainingTime => ExpiresAt.HasValue ? ExpiresAt.Value - DateTimeOffset.Now : TimeSpan.Zero;
 
     /// <summary>
     /// The debuff type of aura. eg. stun, stone, disable or etc.

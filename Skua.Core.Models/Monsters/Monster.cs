@@ -103,7 +103,7 @@ public class Monster
     /// </summary>
     /// <param name="auraName">Name of the aura to get the value for.</param>
     /// <returns>The aura value/stacks, or 0 if not found.</returns>
-    public int GetAuraValue(string auraName)
+    public object GetAuraValue(string auraName)
     {
         var aura = Auras.FirstOrDefault(a => a.Name.Equals(auraName, StringComparison.OrdinalIgnoreCase));
         return aura?.Value ?? 0;

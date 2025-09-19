@@ -39,8 +39,8 @@ public sealed record AuraStackChangedMessage(
 /// </summary>
 public class AuraEventData
 {
-    public string Name { get; set; } = string.Empty;
-    public int StackValue { get; set; }
+    public string Name { get; set; } = string.Empty; 
+    public object StackValue { get; set; }
     public DateTime TimeStarted { get; set; }
     public int DurationSeconds { get; set; }
     public DateTime ExpiresAt => TimeStarted.AddSeconds(DurationSeconds);

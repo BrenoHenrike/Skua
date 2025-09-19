@@ -22,7 +22,7 @@ public class AuraMonitorService : IAuraMonitorService
     /// <summary>
     /// Event fired when an aura is activated.
     /// </summary>
-    public event Action<string, DateTime, int, int, SubjectType>? AuraActivated;
+    public event Action<string, DateTime, int, object, SubjectType>? AuraActivated;
 
     /// <summary>
     /// Event fired when an aura is deactivated.
@@ -32,7 +32,7 @@ public class AuraMonitorService : IAuraMonitorService
     /// <summary>
     /// Event fired when an aura's stack value changes.
     /// </summary>
-    public event Action<string, int, int, SubjectType>? AuraStackChanged;
+    public event Action<string, object, object, SubjectType>? AuraStackChanged;
 
     /// <summary>
     /// Gets a value indicating whether the service is currently monitoring aura changes.
@@ -55,7 +55,7 @@ public class AuraMonitorService : IAuraMonitorService
     private class AuraState
     {
         public string Name { get; set; } = string.Empty;
-        public int StackValue { get; set; }
+        public object StackValue { get; set; }
         public DateTime TimeStarted { get; set; }
         public int DurationSeconds { get; set; }
         public bool IsActive { get; set; }
