@@ -68,6 +68,6 @@
     </Setting>
     <Setting Name="DefaultBackground" Type="System.String" Scope="User">
       <Value Profile="(Default)">Generic2.swf</Value>
-    </Setting>>
+    </Setting>
   </Settings>
 </SettingsFile>

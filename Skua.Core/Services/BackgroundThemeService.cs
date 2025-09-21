@@ -11,9 +11,9 @@ public class BackgroundThemeService : ObservableObject
     private readonly ISettingsService _settingsService;
     private string _themesFolder = Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.MyDocuments), "Skua", "themes");
     private string _configFilePath = Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.MyDocuments), "Skua", "background-config.json");
-    public string[] defaultBackgrounds = new[]
+    private string[] defaultBackgrounds = new[]
     {
-        "Generic2.swf", "Skyguard.swf", "Kezeroth.swf", "Mirror.swf", "DageScorn.swf", "ravenloss2.swf"
+        "Black", "Generic2.swf", "Skyguard.swf", "Kezeroth.swf", "Mirror.swf", "DageScorn.swf", "ravenloss2.swf"
     };
 
     public BackgroundThemeService(ISettingsService settingsService)
@@ -51,7 +51,7 @@ public class BackgroundThemeService : ObservableObject
 
     public string CurrentBackground
     {
-        get => _settingsService.Get<string>("DefaultBackground") ?? "Generic2.swf";
+        get => _settingsService.Get<string>("DefaultBackground", "Generic2.swf");
         set
         {
             _settingsService.Set("DefaultBackground", value);

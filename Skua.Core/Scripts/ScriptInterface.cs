@@ -350,7 +350,6 @@ public class ScriptInterface : IScriptInterface, IScriptInterfaceManager, IDispo
                     try
                     {
                         Flash.Call("setBgConfigPath", "file:///" + configPath.Replace('\\', '/'));
-                        Log($"Set background config path to: {configPath}");
                     }
                     catch (Exception ex)
                     {
@@ -358,6 +357,7 @@ public class ScriptInterface : IScriptInterface, IScriptInterfaceManager, IDispo
                     }
                 });
                 break;
+
             case "loaded":
                 Initialize();
                 break;
