@@ -35,7 +35,7 @@ public class ChangeLogsViewModel : BotControlViewModelBase
 
             try
             {
-                var response = await client.GetAsync("https://raw.githubusercontent.com/BrenoHenrike/Skua/refs/heads/master/changelogs.md").ConfigureAwait(false);
+                var response = await client.GetAsync("https://raw.githubusercontent.com/auqw/Skua/refs/heads/master/changelogs.md").ConfigureAwait(false);
                 if (response.IsSuccessStatusCode)
                 {
                     var content = await response.Content.ReadAsStringAsync().ConfigureAwait(false);
@@ -47,12 +47,12 @@ public class ChangeLogsViewModel : BotControlViewModelBase
                 }
 
                 // If response was not successful, show error message
-                MarkdownDoc = $"### Unable to Load Changelog\r\n\r\nFailed to load changelog (HTTP {response.StatusCode}).\r\n\r\nPlease check your internet connection and try again later.\r\n\r\nYou can also view the latest releases at: [Skua Releases](https://github.com/BrenoHenrike/Skua/releases)";
+                MarkdownDoc = $"### Unable to Load Changelog\r\n\r\nFailed to load changelog (HTTP {response.StatusCode}).\r\n\r\nPlease check your internet connection and try again later.\r\n\r\nYou can also view the latest releases at: [Skua Releases](https://github.com/auqw/Skua/releases)";
             }
             catch (Exception ex)
             {
                 // Show error message with exception details for debugging
-                MarkdownDoc = $"### Unable to Load Changelog\r\n\r\nError: {ex.Message}\r\n\r\nThis might be due to:\r\n- No internet connection\r\n- GitHub service issues\r\n- Repository access problems\r\n\r\nPlease check your internet connection and try again later.\r\n\r\nYou can also view the latest releases at: [Skua Releases](https://github.com/BrenoHenrike/Skua/releases)";
+                MarkdownDoc = $"### Unable to Load Changelog\r\n\r\nError: {ex.Message}\r\n\r\nThis might be due to:\r\n- No internet connection\r\n- GitHub service issues\r\n- Repository access problems\r\n\r\nPlease check your internet connection and try again later.\r\n\r\nYou can also view the latest releases at: [Skua Releases](https://github.com/auqw/Skua/releases)";
             }
         }
     }

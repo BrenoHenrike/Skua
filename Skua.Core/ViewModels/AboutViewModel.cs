@@ -28,7 +28,7 @@ public class AboutViewModel : BotControlViewModelBase
     {
         using (var client = new HttpClient())
         {
-            var response = await client.GetAsync("https://raw.githubusercontent.com/BrenoHenrike/Skua/refs/heads/master/readme.md");
+            var response = await client.GetAsync("https://raw.githubusercontent.com/auqw/Skua/refs/heads/master/readme.md");
             if (!response.IsSuccessStatusCode)
                 MarkdownDoc = "### No content found. Please check your internet connection.";
 

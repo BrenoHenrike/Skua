@@ -88,7 +88,7 @@ public class BackgroundThemeViewModel : ObservableObject
     {
         try
         {
-            Link.OpenBrowser("https://github.com/SharpTheNightmare/SkuaBackgrounds");
+            Link.OpenBrowser("https://github.com/auqw/SkuaBackgrounds");
         }
         catch (Exception)
         {

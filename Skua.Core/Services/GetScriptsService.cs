@@ -10,8 +10,8 @@ namespace Skua.Core.Services;
 public partial class GetScriptsService : ObservableObject, IGetScriptsService
 {
     private readonly IDialogService _dialogService;
-    private const string _rawScriptsJsonUrl = "https://raw.githubusercontent.com/BrenoHenrike/Scripts/Skua/scripts.json";
-    private const string _skillsSetsRawUrl = "https://raw.githubusercontent.com/BrenoHenrike/Scripts/Skua/Skills/AdvancedSkills.txt";
+    private const string _rawScriptsJsonUrl = "https://raw.githubusercontent.com/auqw/Scripts/Skua/scripts.json";
+    private const string _skillsSetsRawUrl = "https://raw.githubusercontent.com/auqw/Scripts/Skua/Skills/AdvancedSkills.txt";
 
     [ObservableProperty]
     private RangedObservableCollection<ScriptInfo> _scripts = new();
