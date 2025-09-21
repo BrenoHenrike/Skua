@@ -47,7 +47,10 @@ in the discord
 
 Skua developers need your support to improve Skua. You can donate or sponsor us by clicking the PayPal link below. Thank you for your support.
 
-### [purple/SharpTheNightmare](https://www.paypal.com/ncp/payment/RHG8F84AUXFKY)
+### purple/SharpTheNightmare
+ - [PayPal](https://www.paypal.com/ncp/payment/RHG8F84AUXFKY)
+ - [Ko-Fi](https://ko-fi.com/sharpthenightmare)
+ - ETH: `0xd66fb89f503c9c14093479178d817c9e87d7c0de`
 
 ### [Breno Henrike's PayPal](https://www.paypal.com/donate?hosted_button_id=QVQ4Q7XSH9VBY)
 
