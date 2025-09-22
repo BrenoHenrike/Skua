@@ -171,7 +171,6 @@ public partial class ScriptMap : IScriptMap
         var sw = Stopwatch.StartNew();
         if (files.Count > 0 && files.Contains(Path.Combine(_cachePath, FileName)))
             return !DecompileSWF(FileName) ? null : ParseMapSWFData();
-
         return !DownloadMapSWF(FileName) ? null : !DecompileSWF(FileName) ? null : ParseMapSWFData();
 
         void SaveMapItemInfo(List<MapItem> info)
@@ -182,15 +181,28 @@ public partial class ScriptMap : IScriptMap
 
         List<MapItem>? ParseMapSWFData()
         {
-            if (!Directory.Exists($"{_cachePath}\\tmp\\scripts\\town_fla"))
-                return null;
             sw.Restart();
             List<MapItem> items = new();
             List<string> MainTimelineText = new();
             string[] files = Array.Empty<string>();
+
             try
             {
-                MainTimelineText = File.ReadAllLines($"{_cachePath}\\tmp\\scripts\\town_fla\\MainTimeline.as").ToList();
+                var scriptsPath = $"{_cachePath}\\tmp\\scripts";
+                if (!Directory.Exists(scriptsPath))
+                    return null;
+
+                var flaDirectories = Directory.GetDirectories(scriptsPath, "*_fla", SearchOption.TopDirectoryOnly);
+                if (flaDirectories.Length == 0)
+                    return null;
+
+                var flaDirectory = flaDirectories[0];
+                var mainTimelinePath = Path.Combine(flaDirectory, "MainTimeline.as");
+
+                if (!File.Exists(mainTimelinePath))
+                    return null;
+
+                MainTimelineText = File.ReadAllLines(mainTimelinePath).ToList();
                 files = Directory.GetFiles($"{_cachePath}\\tmp\\scripts", "*APOP*", SearchOption.TopDirectoryOnly) ?? Array.Empty<string>();
 
                 var mapItemLines = MainTimelineText.Select((l, i) => new Tuple<string, int>(l, i)).Where(l => l.Item1.Contains("mapitem", StringComparison.OrdinalIgnoreCase) || l.Item1.Contains("itemdrop", StringComparison.OrdinalIgnoreCase));
@@ -271,7 +283,7 @@ public partial class ScriptMap : IScriptMap
                 if (ex is FileNotFoundException || ex is DirectoryNotFoundException)
                     _dialogService.ShowMessageBox("Could not find one or more files to read.", "Get Map Item");
                 else if (ex is PathTooLongException)
-                    _dialogService.ShowMessageBox($"The path for the file is too long.\r\n{_cachePath}\\tmp\\scripts\\town_fla\\MainTimeline.as", "Get Map Item");
+                    _dialogService.ShowMessageBox($"The path for the file is too long.\r\n{_cachePath}\\tmp\\scripts\\*_fla\\MainTimeline.as", "Get Map Item");
                 else if (ex is UnauthorizedAccessException)
                     _dialogService.ShowMessageBox("The program don't have permission to access the file", "Get Map Item");
                 else
