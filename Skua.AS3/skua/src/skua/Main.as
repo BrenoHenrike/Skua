@@ -61,6 +61,8 @@ package skua
 		private var customBackgroundURL:String;
 		private var backgroundConfig:Object;
 		public var bgConfigPath:String;
+		private var lastLoginChildCount:int = -1;
+		private var lastLoginVisible:Boolean = false;
 		
 		public function Main()
 		{
@@ -121,11 +123,11 @@ package skua
 			this.stg.scaleMode = StageScaleMode.SHOW_ALL;
 			this.stg.align = StageAlign.TOP;
 			
-		for (var param:String in root.loaderInfo.parameters)
-		{
-			this.game.params[param] = root.loaderInfo.parameters[param];
-		}
-		
+			for (var param:String in root.loaderInfo.parameters)
+			{
+				this.game.params[param] = root.loaderInfo.parameters[param];
+			}
+
 			this.loadBackgroundConfig();
 			this.game.params.vars = this.vars;
 			this.game.params.sURL = this.sURL;
@@ -139,25 +141,76 @@ package skua
 			
 			Modules.init();
 			this.stg.addEventListener(Event.ENTER_FRAME, Modules.handleFrame);
+			this.stg.addEventListener(Event.ENTER_FRAME, this.monitorLoginScreen);
 			
 			this.game.stage.addEventListener(KeyboardEvent.KEY_DOWN, this.key_StageGame);
 			
 			this.external.call('loaded');
 		}
-		
 		public function onExtensionResponse(packet:*):void
 		{
 			this.external.call('pext', JSON.stringify(packet));
 		}
 		
+		private function monitorLoginScreen():void
+		{
+			if (this.customBGReady && this.game && this.game.mcLogin) {
+				
+				var currentlyVisible:Boolean = this.game.mcLogin.visible;
+				if (currentlyVisible != this.lastLoginVisible) {
+					if (currentlyVisible) {
+						this.external.debug('Login screen became visible - applying background immediately');
+						this.tryApplyCustomBG();
+					}
+					this.lastLoginVisible = currentlyVisible;
+				}
+				
+				if (this.game.mcLogin.visible && this.game.mcLogin.mcTitle) {
+					
+					var currentChildCount:int = this.game.mcLogin.mcTitle.numChildren;
+					
+					if (currentChildCount != this.lastLoginChildCount) {
+						this.external.debug('Login screen child count changed: ' + this.lastLoginChildCount + ' -> ' + currentChildCount + ' - applying background immediately');
+						this.lastLoginChildCount = currentChildCount;
+						this.tryApplyCustomBG();
+					}
+					
+					if (currentChildCount > 0) {
+						var hasCustomBG:Boolean = false;
+						for (var i:int = 0; i < currentChildCount; i++) {
+							if (this.game.mcLogin.mcTitle.getChildAt(i) == this.customBGReady) {
+								hasCustomBG = true;
+								break;
+							}
+						}
+						
+						if (!hasCustomBG) {
+							this.tryApplyCustomBG();
+						}
+					}
+				}
+			}
+		}
+		
 		private function initCustomBackground():void
 		{
-			if (!this.customBackgroundURL) return;
+			if (!this.customBackgroundURL) {
+				this.external.debug('No custom background URL provided');
+				return;
+			}
 			
 			this.customBGLoader = new Loader();
 			this.customBGLoader.contentLoaderInfo.addEventListener(Event.COMPLETE, function(e:Event):void {
 				customBGReady = MovieClip(customBGLoader.content);
 				tryApplyCustomBG();
+				
+				var bgTimer:Timer = new Timer(500);
+				bgTimer.addEventListener(TimerEvent.TIMER, function(timerEvent:TimerEvent):void {
+					if (customBGReady && game && game.mcLogin && game.mcLogin.visible) {
+						tryApplyCustomBG();
+					}
+				});
+				bgTimer.start();
 			});
 			this.customBGLoader.contentLoaderInfo.addEventListener(IOErrorEvent.IO_ERROR, function(e:IOErrorEvent):void {
 				external.debug('Custom background load error: ' + e.text);
@@ -174,15 +227,31 @@ package skua
 		
 		private function tryApplyCustomBG():void
 		{
-			if (this.customBGReady && this.game && this.game.mcLogin && this.game.mcLogin.mcTitle) {
-				try {
-					if (this.game.mcLogin.mcTitle.numChildren > 0) {
-						this.game.mcLogin.mcTitle.removeChildAt(0);
+			if (!this.customBGReady) {
+				return;
+			}
+			
+			if (!this.game || !this.game.mcLogin || !this.game.mcLogin.mcTitle) {
+				return;
+			}
+			
+			try {
+				var numChildren:int = this.game.mcLogin.mcTitle.numChildren;
+				if (numChildren > 0) {
+					var topChild:* = this.game.mcLogin.mcTitle.getChildAt(numChildren - 1);
+					if (topChild == this.customBGReady) {
+						return;
 					}
-					this.game.mcLogin.mcTitle.addChild(this.customBGReady);
-				} catch (e:Error) {
-					this.external.debug('Apply error: ' + e.message);
 				}
+				
+				while (this.game.mcLogin.mcTitle.numChildren > 0) {
+					this.game.mcLogin.mcTitle.removeChildAt(0);
+				}
+				
+				this.game.mcLogin.mcTitle.addChild(this.customBGReady);
+				
+			} catch (e:Error) {
+				this.external.debug('Custom background apply error: ' + e.message);
 			}
 		}
 		
