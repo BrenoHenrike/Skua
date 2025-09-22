@@ -57,7 +57,14 @@
                 </Button.Style>
             </Button>
         </Grid>
-        <Grid Grid.Row="1" Margin="6,3">
+        <TextBox
+            x:Name="SearchBox"
+            Grid.Row="1"
+            Margin="6,0,6,3"
+            materialDesign:HintAssist.Hint="Search packets..."
+            Style="{StaticResource MaterialDesignOutlinedTextBox}"
+            TextChanged="TextBox_TextChanged" />
+        <Grid Grid.Row="2" Margin="6,3">
             <Grid.ColumnDefinitions>
                 <ColumnDefinition Width="auto" />
                 <ColumnDefinition />
@@ -127,13 +134,6 @@
                 Content="Clear"
                 Style="{StaticResource MaterialDesignPaperButton}" />
         </Grid>
-        <TextBox
-            x:Name="SearchBox"
-            Grid.Row="2"
-            Margin="6,0,6,3"
-            materialDesign:HintAssist.Hint="Search packets..."
-            Style="{StaticResource MaterialDesignOutlinedTextBox}"
-            TextChanged="TextBox_TextChanged" />
         <ListBox
             Grid.Row="3"
             Margin="6,3,6,6"
