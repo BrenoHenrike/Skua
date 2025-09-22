@@ -32,7 +32,7 @@ if ($mxmlcPath) {
     
     # Compile using mxmlc
     Write-Host "🔧 Compiling with mxmlc..." -ForegroundColor Yellow
-    & mxmlc -source-path "skua\src" -output $outputPath "skua\src\skua\Main.as" -target-player 28.0 -optimize
+    & mxmlc -source-path "skua\src" -default-size 958 550 -output $outputPath "skua\src\skua\Main.as" -target-player 28.0 -optimize
     
     if ($LASTEXITCODE -eq 0 -and (Test-Path $outputPath)) {
         Write-Host "✅ Compilation successful! Output: $outputPath" -ForegroundColor Green
