@@ -50,6 +50,8 @@ public partial class ScriptMap : IScriptMap
     public string LastMap { get; set; } = string.Empty;
     public string FilePath { get; set; } = string.Empty;
     public string FileName => string.IsNullOrEmpty(FilePath) ? string.Empty : FilePath.Split(new char[] { '/', '\\' }, StringSplitOptions.RemoveEmptyEntries).Last();
+    public string FlaName => string.IsNullOrEmpty(FileName) ? string.Empty : Path.GetFileNameWithoutExtension(FileName).Replace("-", "_") + "_fla";
+
     public string FullName => Loaded ? Flash.GetGameObject("ui.mcInterface.areaList.title.t1.text")?.Split(' ').Last().Replace("\"", string.Empty) ?? string.Empty : string.Empty;
 
     [ObjectBinding("world.strMapName", RequireNotNull = "world", Default = "string.Empty")]
@@ -189,14 +191,10 @@ public partial class ScriptMap : IScriptMap
             try
             {
                 var scriptsPath = $"{_cachePath}\\tmp\\scripts";
-                if (!Directory.Exists(scriptsPath))
-                    return null;
+                var flaDirectory = Directory.Exists($"{Path.Combine(scriptsPath, FlaName)}") ? Path.Combine(scriptsPath, FlaName) : Path.Combine(scriptsPath, "town_fla");
 
-                var flaDirectories = Directory.GetDirectories(scriptsPath, "*_fla", SearchOption.TopDirectoryOnly);
-                if (flaDirectories.Length == 0)
+                if (!Directory.Exists(flaDirectory))
                     return null;
-
-                var flaDirectory = flaDirectories[0];
                 var mainTimelinePath = Path.Combine(flaDirectory, "MainTimeline.as");
 
                 if (!File.Exists(mainTimelinePath))
