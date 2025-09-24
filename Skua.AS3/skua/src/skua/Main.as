@@ -1195,9 +1195,9 @@ package skua
 				else
 				{
 					var buyItem:* = new Object();
-					buyItem.accept = 1;
-					buyItem.iQty = quantity;
 					buyItem.iSel = item;
+					buyItem.iQty = quantity;
+					buyItem.accept = 1;
 					instance.game.world.sendBuyItemRequestWithQuantity(buyItem);
 				}
 			}
@@ -1213,9 +1213,9 @@ package skua
 				else
 				{
 					var buyItem:* = new Object();
-					buyItem.accept = 1;
-					buyItem.iQty = quantity;
 					buyItem.iSel = item;
+					buyItem.iQty = quantity;
+					buyItem.accept = 1;
 					instance.game.world.sendBuyItemRequestWithQuantity(buyItem);
 				}
 			}
@@ -1225,19 +1225,19 @@ package skua
 		{
 			for each (var item:* in instance.game.world.shopinfo.items)
 			{
-				if (item.sName.toLowerCase() == name.toLowerCase())
+				if (item.sName.toLowerCase() == name.toLowerCase() && item != null)
 				{
-					return item;
+					return getShopItemByID(item.ID, item.ShopItemID);
 				}
 			}
 			return null;
 		}
-		
+
 		public static function getShopItemByID(itemID:int, shopItemID:int):*
 		{
 			for each (var item:* in instance.game.world.shopinfo.items)
 			{
-				if (item.ItemID == itemID && (shopItemID == 0 || item.ShopItemID == shopItemID))
+				if (item.ItemID == itemID && (shopItemID == -1 || item.ShopItemID == shopItemID) && item != null)
 				{
 					return item;
 				}

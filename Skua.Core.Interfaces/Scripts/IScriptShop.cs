@@ -42,7 +42,7 @@ public interface IScriptShop
     /// <param name="id">ID of the item to buy.</param>
     /// <param name="shopItemId">ID of the item inside the shop.</param>
     /// <param name="quantity">Quantity to buy of the item, if -1 it will buy the default quantity.</param>
-    void BuyItem(int id, int shopItemId = 0, int quantity = -1);
+    void BuyItem(int id, int shopItemId = -1, int quantity = -1);
 
     /// <summary>
     /// Buys the item with specified <paramref name="name"/> from the specified <paramref name="shopId"/>.
@@ -62,13 +62,35 @@ public interface IScriptShop
     /// </summary>
     /// <param name="shopId">ID of the shop to buy the item from.</param>
     /// <param name="itemId">ID of the item to buy.</param>
+    /// <param name="shopItemId">Shop Id of the item to buy.</param>
     /// <param name="quantity">Quantity to buy of the item, if -1 it will buy the default quantity.</param>
     /// <remarks>This loads the shop, waits until it is fully loaded, and then sends the buy item request.</remarks>
-    void LoadAndBuyItem(int shopId, int itemId, int shopItemId = 0, int quantity = -1)
+    void LoadAndBuyItem(int shopId, int itemId, int shopItemId = -1, int quantity = -1)
     {
         Load(shopId);
         BuyItem(itemId, shopItemId, quantity);
     }
+
+    /// <summary>
+    /// Buys the item with specified <paramref name="itemName"/> from the specified <paramref name="shopId"/>.
+    /// This works the same as the <see cref="LoadAndBuyItem(int, string, int)">LoadAndBuyItem function</see> but bypasses safe timing.
+    /// </summary>
+    /// <param name="shopId">Shop to buy the item from.</param>
+    /// <param name="itemName">Name of the item to buy.</param>
+    /// <param name="quantity">Quantity to buy of the item, if -1 it will buy the default quantity.</param>
+    /// <remarks>This loads the shop, waits until it is fully loaded, and then sends the buy item request.</remarks>
+    void EnsureLoadAndBuyItem(int shopId, string itemName, int quantity = -1);
+
+    /// <summary>
+    /// Buys the item with specified <paramref name="itemId"/> and <paramref name="shopItemId"/> from the specified <paramref name="shopId"/>.
+    /// This works the same as the <see cref="LoadAndBuyItem(int, int, int, int)">LoadAndBuyItem function</see> but bypasses safe timing.
+    /// </summary>
+    /// <param name="shopId">ID of the shop to buy the item from.</param>
+    /// <param name="itemId">ID of the item to buy.</param>
+    /// <param name="shopItemId">Shop Id of the item to buy.</param>
+    /// <param name="quantity">Quantity to buy of the item, if -1 it will buy the default quantity.</param>
+    /// <remarks>This loads the shop, waits until it is fully loaded, and then sends the buy item request.</remarks>
+    void EnsureLoadAndBuyItem(int shopId, int itemId, int shopItemId = -1, int quantity = -1);
 
     /// <summary>
     /// Loads the shop with specified <paramref name="id"/>.
