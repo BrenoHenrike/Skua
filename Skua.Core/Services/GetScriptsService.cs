@@ -10,8 +10,8 @@ namespace Skua.Core.Services;
 public partial class GetScriptsService : ObservableObject, IGetScriptsService
 {
     private readonly IDialogService _dialogService;
-    private const string _rawScriptsJsonUrl = "https://raw.githubusercontent.com/auqw/Scripts/refs/heads/Skua/scripts.json";
-    private const string _skillsSetsRawUrl = "https://raw.githubusercontent.com/auqw/Scripts/refs/heads/Skua/Skills/AdvancedSkills.txt";
+    private const string _rawScriptsJsonUrl = "auqw/Scripts/refs/heads/Skua/scripts.json";
+    private const string _skillsSetsRawUrl = "auqw/Scripts/refs/heads/Skua/Skills/AdvancedSkills.txt";
 
     [ObservableProperty]
     private RangedObservableCollection<ScriptInfo> _scripts = new();
@@ -66,7 +66,7 @@ public partial class GetScriptsService : ObservableObject, IGetScriptsService
         if (_scripts.Count != 0 && !refresh)
             return _scripts.ToList();
 
-        using (HttpResponseMessage response = await HttpClients.Default.GetAsync(_rawScriptsJsonUrl, token))
+        using (HttpResponseMessage response = await HttpClients.GitHubRaw.GetAsync(_rawScriptsJsonUrl, token))
         {
             var content = await response.Content.ReadAsStringAsync(token);
             return JsonConvert.DeserializeObject<List<ScriptInfo>>(content)!;
@@ -147,29 +147,23 @@ public partial class GetScriptsService : ObservableObject, IGetScriptsService
 
     public async Task<long> CheckAdvanceSkillSetsUpdates()
     {
-        using (var client = new HttpClient())
-        {
-            var response = await client.GetAsync(_skillsSetsRawUrl);
-            var content = await response.Content.ReadAsStringAsync();
-            return content.Length;
-        }
+        var response = await HttpClients.GitHubRaw.GetAsync(_skillsSetsRawUrl);
+        var content = await response.Content.ReadAsStringAsync();
+        return content.Length;
     }
 
     public async Task<bool> UpdateSkillSetsFile()
     {
-        using (var client = new HttpClient())
+        var response = await HttpClients.GitHubRaw.GetAsync(_skillsSetsRawUrl);
+        var content = await response.Content.ReadAsStringAsync();
+        try
         {
-            var response = await client.GetAsync(_skillsSetsRawUrl);
-            var content = await response.Content.ReadAsStringAsync();
-            try
-            {
-                await File.WriteAllTextAsync(ClientFileSources.SkuaAdvancedSkillsFile, content);
-                return true;
-            }
-            catch
-            {
-                return false;
-            }
+            await File.WriteAllTextAsync(ClientFileSources.SkuaAdvancedSkillsFile, content);
+            return true;
+        }
+        catch
+        {
+            return false;
         }
     }
 }

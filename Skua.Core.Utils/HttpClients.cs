@@ -1,9 +1,10 @@
 ﻿using System.Net;
+using System.Net.Http.Headers;
 
 namespace Skua.Core.Utils;
 
 /// <summary>
-/// HttpClient
+/// HttpClient with connection pooling
 /// </summary>
 public class WebClient : HttpClient
 {
@@ -11,20 +12,31 @@ public class WebClient : HttpClient
     private readonly string _authString2 = Convert.ToBase64String(System.Text.Encoding.UTF8.GetBytes("449f889db3d655d2ef4a:27863d426bc5bb46c410daf7ed6b479ba4a9f7eb"));
 
     /// <param name="accJson"></param>
-    public WebClient(bool accJson)
+    public WebClient(bool accJson) : base(CreateHttpClientHandler())
     {
-        DefaultRequestHeaders.Authorization = new System.Net.Http.Headers.AuthenticationHeaderValue("Basic", _authString2);
+        DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Basic", _authString2);
         if (accJson)
-            DefaultRequestHeaders.Accept.Add(new System.Net.Http.Headers.MediaTypeWithQualityHeaderValue("application/json"));
+            DefaultRequestHeaders.Accept.Add(new MediaTypeWithQualityHeaderValue("application/json"));
         DefaultRequestHeaders.UserAgent.ParseAdd("Skua");
+        Timeout = TimeSpan.FromSeconds(30);
     }
 
     /// <param name="token"></param>
-    public WebClient(string token)
+    public WebClient(string token) : base(CreateHttpClientHandler())
     {
-        DefaultRequestHeaders.Authorization = new System.Net.Http.Headers.AuthenticationHeaderValue("bearer", token);
-        DefaultRequestHeaders.Accept.Add(new System.Net.Http.Headers.MediaTypeWithQualityHeaderValue("application/json"));
+        DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("bearer", token);
+        DefaultRequestHeaders.Accept.Add(new MediaTypeWithQualityHeaderValue("application/json"));
         DefaultRequestHeaders.UserAgent.ParseAdd("Skua/ScriptsUser");
+        Timeout = TimeSpan.FromSeconds(30);
+    }
+
+    private static HttpClientHandler CreateHttpClientHandler()
+    {
+        return new HttpClientHandler()
+        {
+            MaxConnectionsPerServer = 10,
+            UseCookies = false
+        };
     }
 }
 
@@ -33,6 +45,9 @@ public class WebClient : HttpClient
 /// </summary>
 public static class HttpClients
 {
+    private static readonly SemaphoreSlim _githubApiSemaphore = new(5, 5); // Limit concurrent GitHub API requests
+    private static DateTime _lastGitHubApiCall = DateTime.MinValue;
+    private static readonly TimeSpan _minDelayBetweenCalls = TimeSpan.FromMilliseconds(100); // 100ms between calls
 
     static HttpClients()
     {
@@ -55,9 +70,85 @@ public static class HttpClients
     public static WebClient GetMapClient { get; set; } = new(false);
 
     /// <summary>
-    /// Default HttpClient
+    /// Default HttpClient - Improved with connection pooling
     /// </summary>
-    public static HttpClient Default { get; private set; } = new();
+    public static HttpClient Default { get; private set; } = CreateImprovedHttpClient("Skua/1.0", TimeSpan.FromSeconds(30));
+
+    /// <summary>
+    /// GitHub Raw Content Client - for raw.githubusercontent.com requests
+    /// </summary>
+    public static HttpClient GitHubRaw { get; private set; } = CreateGitHubRawClient();
+
+    /// <summary>
+    /// Creates a new HttpClient that won't cause socket exhaustion - use this instead of 'new HttpClient()'
+    /// </summary>
+    /// <returns>A properly configured HttpClient</returns>
+    public static HttpClient CreateSafeHttpClient()
+    {
+        return CreateImprovedHttpClient("Skua/1.0", TimeSpan.FromSeconds(30));
+    }
+
+    /// <summary>
+    /// Makes a GitHub API request with automatic rate limiting
+    /// </summary>
+    public static async Task<HttpResponseMessage> MakeGitHubApiRequestAsync(string url)
+    {
+        await _githubApiSemaphore.WaitAsync();
+        try
+        {
+            var timeSinceLastCall = DateTime.UtcNow - _lastGitHubApiCall;
+            if (timeSinceLastCall < _minDelayBetweenCalls)
+            {
+                await Task.Delay(_minDelayBetweenCalls - timeSinceLastCall);
+            }
+            _lastGitHubApiCall = DateTime.UtcNow;
+            var client = GetGHClient();
+            var response = await client.GetAsync(url);
+            if (response.Headers.TryGetValues("X-RateLimit-Remaining", out var remainingValues))
+            {
+                if (int.TryParse(remainingValues.FirstOrDefault(), out var remaining) && remaining < 10)
+                {
+                    await Task.Delay(TimeSpan.FromSeconds(1));
+                }
+            }
+            return response;
+        }
+        finally
+        {
+            _githubApiSemaphore.Release();
+        }
+    }
+
+    private static HttpClient CreateImprovedHttpClient(string userAgent, TimeSpan timeout)
+    {
+        var handler = new HttpClientHandler()
+        {
+            MaxConnectionsPerServer = 10,
+            UseCookies = false
+        };
+        var client = new HttpClient(handler)
+        {
+            Timeout = timeout
+        };
+        client.DefaultRequestHeaders.UserAgent.ParseAdd(userAgent);
+        return client;
+    }
+
+    private static HttpClient CreateGitHubRawClient()
+    {
+        var handler = new HttpClientHandler()
+        {
+            MaxConnectionsPerServer = 10,
+            UseCookies = false
+        };
+        var client = new HttpClient(handler)
+        {
+            BaseAddress = new Uri("https://raw.githubusercontent.com/"),
+            Timeout = TimeSpan.FromSeconds(30)
+        };
+        client.DefaultRequestHeaders.UserAgent.ParseAdd("Skua/1.0");
+        return client;
+    }
 
     /// <summary>
     /// Gets either the GitHub or Github User Client

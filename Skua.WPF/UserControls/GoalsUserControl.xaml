@@ -52,20 +52,20 @@
                 Grid.ColumnSpan="2"
                 Margin="6,0"
                 FontSize="16"
-                Text="Donations can be made via PayPal or Ko-Fi."
+                Text="Donations can be made via Ko-Fi (Preferred) or PayPal."
                 TextWrapping="Wrap" />
             <Button
                 Grid.Row="1"
                 Grid.Column="0"
-                Margin="6"
-                Command="{Binding OpenPaypalLink}"
-                Content="Paypal" />
+                Margin="0,6,6,6"
+                Command="{Binding OpenKofiLink}"
+                Content="Kofi (Preferred)" />
             <Button
                 Grid.Row="1"
                 Grid.Column="1"
-                Margin="0,6,6,6"
-                Command="{Binding OpenKofiLink}"
-                Content="Kofi" />
+                Margin="6"
+                Command="{Binding OpenPaypalLink}"
+                Content="Paypal" />
         </Grid>
     </Grid>
 </UserControl>

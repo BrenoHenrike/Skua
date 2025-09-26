@@ -42,20 +42,14 @@
                 Grid.ColumnSpan="2"
                 Margin="6,0"
                 FontSize="16"
-                Text="Donations can be made via PayPal you can click the buttons below."
+                Text="Donations can be made via Kofi you can click the button below."
                 TextWrapping="Wrap" />
             <Button
                 Grid.Row="1"
-                Grid.Column="0"
+                Grid.ColumnSpan="2"
                 Margin="6"
-                Command="{Binding OpenPurpleDonationLink}"
-                Content="SharpTheNightmare PayPal" />
-            <Button
-                Grid.Row="1"
-                Grid.Column="1"
-                Margin="0,6,6,6"
-                Command="{Binding OpenBrenoHenrikeDonationLink}"
-                Content="BrenoHenrike PayPal" />
+                Command="{Binding OpenDonationLink}"
+                Content="SharpTheNightmare Kofi" />
         </Grid>
     </Grid>
 </UserControl>

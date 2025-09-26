@@ -27,7 +27,7 @@ public class GoalsViewModel : BotControlViewModelBase
 
     private async Task GetGoals()
     {
-        var response = await HttpClients.Default.GetAsync("https://raw.githubusercontent.com/auqw/skua/master/goals");
+        var response = await HttpClients.GitHubRaw.GetAsync("auqw/Skua/refs/heads/master/goals");
         if (!response.IsSuccessStatusCode)
         {
             Status = "Failed to fetch data.";

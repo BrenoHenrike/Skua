@@ -1,6 +1,7 @@
 using CommunityToolkit.Mvvm.DependencyInjection;
 using CommunityToolkit.Mvvm.Input;
 using Skua.Core.Interfaces;
+using Skua.Core.Utils;
 
 namespace Skua.Core.ViewModels;
 
@@ -13,13 +14,10 @@ public class ChangeLogsViewModel : BotControlViewModelBase
     {
         _markDownContent = string.Empty;
 
-        OpenPurpleDonationLink = new RelayCommand(() => Ioc.Default.GetRequiredService<IProcessService>().OpenLink("https://www.paypal.com/paypalme/sharpiiee?country.x=US&locale.x=en_US"));
-
-        OpenBrenoHenrikeDonationLink = new RelayCommand(() => Ioc.Default.GetRequiredService<IProcessService>().OpenLink("https://www.paypal.com/donate/?hosted_button_id=QVQ4Q7XSH9VBY"));
+        OpenDonationLink = new RelayCommand(() => Ioc.Default.GetRequiredService<IProcessService>().OpenLink("https://ko-fi.com/sharpthenightmare"));
     }
 
-    public IRelayCommand OpenPurpleDonationLink { get; }
-    public IRelayCommand OpenBrenoHenrikeDonationLink { get; }
+    public IRelayCommand OpenDonationLink { get; }
 
     public string MarkdownDoc
     {
@@ -29,13 +27,9 @@ public class ChangeLogsViewModel : BotControlViewModelBase
 
     private async Task GetChangeLogsContent()
     {
-        using (var client = new HttpClient())
+        try
         {
-            client.Timeout = TimeSpan.FromSeconds(10);
-
-            try
-            {
-                var response = await client.GetAsync("https://raw.githubusercontent.com/auqw/Skua/refs/heads/master/changelogs.md").ConfigureAwait(false);
+            var response = await HttpClients.GitHubRaw.GetAsync("auqw/Skua/refs/heads/master/changelogs.md").ConfigureAwait(false);
                 if (response.IsSuccessStatusCode)
                 {
                     var content = await response.Content.ReadAsStringAsync().ConfigureAwait(false);
@@ -54,7 +48,6 @@ public class ChangeLogsViewModel : BotControlViewModelBase
                 // Show error message with exception details for debugging
                 MarkdownDoc = $"### Unable to Load Changelog\r\n\r\nError: {ex.Message}\r\n\r\nThis might be due to:\r\n- No internet connection\r\n- GitHub service issues\r\n- Repository access problems\r\n\r\nPlease check your internet connection and try again later.\r\n\r\nYou can also view the latest releases at: [Skua Releases](https://github.com/auqw/Skua/releases)";
             }
-        }
     }
 
     private async Task RefreshChangelogContent()

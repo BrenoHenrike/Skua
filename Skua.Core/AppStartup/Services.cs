@@ -16,7 +16,6 @@ using Skua.Core.Utils;
 using Skua.Core.ViewModels;
 using Skua.Core.ViewModels.Manager;
 using System.Reflection;
-
 namespace Skua.Core.AppStartup;
 
 public static class Services
