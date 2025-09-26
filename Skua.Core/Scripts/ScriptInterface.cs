@@ -346,10 +346,9 @@ public class ScriptInterface : IScriptInterface, IScriptInterfaceManager, IDispo
             case "pre-load":
                 Schedule(1000, _ =>
                 {
-                    var configPath = Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.MyDocuments), "Skua", "background-config.json");
                     try
                     {
-                        Flash.Call("setBgConfigPath", "file:///" + configPath.Replace('\\', '/'));
+                        Flash.Call("setBgConfigPath", "file:///" + ClientFileSources.SkuaBGConfigFile.Replace('\\', '/'));
                     }
                     catch (Exception ex)
                     {

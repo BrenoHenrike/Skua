@@ -7,6 +7,7 @@ public static class ClientFileSources
     public static string SkuaThemesDIR { get; } = Path.Combine(SkuaDIR, "themes");
     public static string SkuaOptionsDIR { get; } = Path.Combine(SkuaDIR, "options");
     public static string SkuaPluginsDIR { get; } = Path.Combine(SkuaDIR, "plugins");
+    public static string SkuaBGConfigFile { get; } = Path.Combine(SkuaDIR, "background-config.json");
     public static string SkuaAdvancedSkillsFile { get; } = Path.Combine(SkuaDIR, "AdvancedSkills.txt");
     public static string SkuaQuestsFile { get; } = Path.Combine(SkuaDIR, "Quests.txt");
 }

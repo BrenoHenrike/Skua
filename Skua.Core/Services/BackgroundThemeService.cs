@@ -9,8 +9,6 @@ namespace Skua.Core.Services;
 public class BackgroundThemeService : ObservableObject
 {
     private readonly ISettingsService _settingsService;
-    private string _themesFolder = Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.MyDocuments), "Skua", "themes");
-    private string _configFilePath = Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.MyDocuments), "Skua", "background-config.json");
     private string[] defaultBackgrounds = new[]
     {
         "Black", "Generic2.swf", "Skyguard.swf", "Kezeroth.swf", "Mirror.swf", "DageScorn.swf", "ravenloss2.swf"
@@ -25,9 +23,9 @@ public class BackgroundThemeService : ObservableObject
 
     private void EnsureThemesFolderExists()
     {
-        if (!Directory.Exists(_themesFolder))
+        if (!Directory.Exists(ClientFileSources.SkuaThemesDIR))
         {
-            Directory.CreateDirectory(_themesFolder);
+            Directory.CreateDirectory(ClientFileSources.SkuaThemesDIR);
         }
     }
 
@@ -35,9 +33,9 @@ public class BackgroundThemeService : ObservableObject
     {
         var backgrounds = defaultBackgrounds.ToList();
 
-        if (Directory.Exists(_themesFolder))
+        if (Directory.Exists(ClientFileSources.SkuaThemesDIR))
         {
-            var swfFiles = Directory.GetFiles(_themesFolder, "*.swf")
+            var swfFiles = Directory.GetFiles(ClientFileSources.SkuaThemesDIR, "*.swf")
                 .Select(Path.GetFileName)
                 .Where(f => f != null)
                 .Cast<string>()
@@ -62,11 +60,9 @@ public class BackgroundThemeService : ObservableObject
 
     public bool IsLocalBackgroundFile(string backgroundName)
     {
-        var localPath = Path.Combine(_themesFolder, backgroundName);
+        var localPath = Path.Combine(ClientFileSources.SkuaThemesDIR, backgroundName);
         return File.Exists(localPath);
     }
-
-    public string ThemesFolder => _themesFolder;
 
     private bool IsDefaultAQWBackground(string background)
     {
@@ -82,7 +78,7 @@ public class BackgroundThemeService : ObservableObject
             if (IsLocalBackgroundFile(currentBg) && !IsDefaultAQWBackground(currentBg))
             {
                 config.sBG = "hideme.swf";
-                var localPath = Path.Combine(_themesFolder, currentBg);
+                var localPath = Path.Combine(ClientFileSources.SkuaThemesDIR, currentBg);
                 config.customBackground = $"file:///{localPath.Replace('\\', '/')}"; 
             }
             else
@@ -92,7 +88,7 @@ public class BackgroundThemeService : ObservableObject
             }
 
             var json = JsonConvert.SerializeObject(config, Formatting.Indented);
-            File.WriteAllText(_configFilePath, json);
+            File.WriteAllText(ClientFileSources.SkuaBGConfigFile, json);
         }
         catch (Exception)
         {

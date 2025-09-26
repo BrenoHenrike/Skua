@@ -1,6 +1,7 @@
 using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
 using Skua.Core.Interfaces;
+using Skua.Core.Models;
 using Skua.Core.Services;
 using Skua.Core.Utils;
 using System.IO;
@@ -47,13 +48,13 @@ public class BackgroundThemeViewModel : ObservableObject
     private async Task BrowseBackgroundAsync()
     {
         var selectedFilePath = _fileDialogService.OpenFile(
-            _backgroundService.ThemesFolder,
+            ClientFileSources.SkuaThemesDIR,
             "SWF files (*.swf)|*.swf|All files (*.*)|*.*");
 
         if (!string.IsNullOrEmpty(selectedFilePath))
         {
             var fileName = Path.GetFileName(selectedFilePath);
-            var destinationPath = Path.Combine(_backgroundService.ThemesFolder, fileName);
+            var destinationPath = Path.Combine(ClientFileSources.SkuaThemesDIR, fileName);
 
             if (selectedFilePath != destinationPath)
             {
@@ -77,7 +78,7 @@ public class BackgroundThemeViewModel : ObservableObject
     {
         try
         {
-            System.Diagnostics.Process.Start("explorer.exe", _backgroundService.ThemesFolder);
+            System.Diagnostics.Process.Start("explorer.exe", ClientFileSources.SkuaThemesDIR);
         }
         catch (Exception)
         {
