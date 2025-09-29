@@ -31,10 +31,18 @@ public class InventoryItem : ItemBase
     public virtual int EnhancementLevel { get; set; }
 
     /// <summary>
-    /// The enhancement pattern ID of the item, this identifies the current  enhancement type of the item. </br>
-    /// 1: Adventurer </br> 2: Fighter </br> 3: Thief </br> 4: Armsman </br> 5: Hybrid </br> 6: Wizard </br> 7: Healer </br> 8: Spellbreaker </br> 9: Lucky
+    /// The enhancement pattern ID of the item, this identifies the current  enhancement type of the item.
+    /// <br> 1: Adventurer </br>
+    /// <br> 2: Fighter </br>
+    /// <br> 3: Thief </br>
+    /// <br> 4: Armsman </br>
+    /// <br> 5: Hybrid </br>
+    /// <br> 6: Wizard </br>
+    /// <br> 7: Healer </br>
+    /// <br> 8: Spellbreaker </br>
+    /// <br> 9: Lucky </br>
     /// </summary>
-    [JsonProperty("InvEnhPatternID")]
+    [JsonProperty("EnhPatternID")]
     public int EnhancementPatternID { get; set; }
 
     public override bool Equals(object? obj)
