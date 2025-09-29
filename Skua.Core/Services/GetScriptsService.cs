@@ -57,7 +57,7 @@ public partial class GetScriptsService : ObservableObject, IGetScriptsService
         }
         catch (Exception ex)
         {
-            _dialogService.ShowMessageBox($"Something went wrong when retrieving scripts.\r\nPlease, try again later.\r\n Error: {ex}", "Get Scripts Error");
+            _dialogService.ShowMessageBox($"Something went wrong when retrieving scripts.\r\nPlease, try again later.\r\n Error: {ex}", "Search Scripts Error");
         }
     }
 

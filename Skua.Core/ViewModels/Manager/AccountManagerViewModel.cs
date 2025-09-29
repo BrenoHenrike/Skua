@@ -149,14 +149,12 @@ public sealed partial class AccountManagerViewModel : BotControlViewModelBase
     [RelayCommand]
     public void OpenGetScripts()
     {
-        // Ensure managed windows are registered before using them
         var services = Ioc.Default.GetService<IServiceProvider>();
         if (services != null)
         {
             ManagedWindows.RegisterForManager(services);
         }
 
-        // Open Get Scripts using managed window to reuse existing window
         var windowService = Ioc.Default.GetService<IWindowService>();
         if (windowService != null)
         {

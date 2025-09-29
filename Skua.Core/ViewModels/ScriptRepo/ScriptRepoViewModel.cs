@@ -11,7 +11,7 @@ namespace Skua.Core.ViewModels;
 public partial class ScriptRepoViewModel : BotControlViewModelBase
 {
     public ScriptRepoViewModel(IGetScriptsService getScripts, IProcessService processService)
-        : base("Get Scripts", 800, 450)
+        : base("Search Scripts", 800, 450)
     {
         _getScriptsService = getScripts;
         _processService = processService;

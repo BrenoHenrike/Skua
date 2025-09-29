@@ -175,14 +175,14 @@
                 materialDesign:CheckBoxAssist.CheckBoxSize="24"
                 Content="Start with Script"
                 IsChecked="{Binding StartWithScript}"
-                ToolTip="After launching and loging in the accounts, starts the specified script." />
+                ToolTip="After launching and logging in to the accounts, starts the specified script." />
             <Button
                 Grid.Column="2"
                 Margin="6,0,0,0"
                 VerticalAlignment="Center"
                 Command="{Binding OpenGetScriptsCommand}"
-                Content="Get Scripts"
-                ToolTip="Open Get Scripts menu to browse and download scripts" />
+                Content="Search Scripts"
+                ToolTip="Open Search Scripts menu to browse and download scripts" />
         </Grid>
     </Grid>
 </UserControl>

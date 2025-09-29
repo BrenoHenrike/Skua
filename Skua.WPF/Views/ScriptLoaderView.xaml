@@ -68,7 +68,7 @@
                 Grid.Column="1"
                 Margin="3,3,0,3"
                 Command="{Binding OpenScriptRepoCommand}"
-                Content="Get Scripts" />
+                Content="Search Scripts" />
             <Button
                 Grid.Row="2"
                 Grid.Column="0"
