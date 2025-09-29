@@ -895,7 +895,7 @@ package skua
 		public static function canUseSkill(index:int):String
 		{
 			var skill:* = instance.game.world.actions.active[index];
-			return (instance.game.world.myAvatar.target != null && instance.game.world.myAvatar.target.dataLeaf.intHP > 0 && skua.ExtractedFuncs.actionTimeCheck(skill) && skill.isOK && (!skill.skillLock || !skill.lock)).toString();
+			return (instance.game.world.myAvatar.target != null && instance.game.world.myAvatar.target.dataLeaf.intHP > 0 && skua.ExtractedFuncs.actionTimeCheck(skill) && skill.isOK && !skill.skillLock && !skill.lock).toString();
 		}
 		
 		public static function walkTo(xPos:int, yPos:int, walkSpeed:int):void
