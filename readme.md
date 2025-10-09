@@ -49,9 +49,9 @@ Skua developers need your support to improve Skua. You can donate or sponsor us 
 
 ### [purple/SharpTheNightmare](https://www.paypal.com/ncp/payment/RHG8F84AUXFKY)
 
-### [Breno Henrike's PayPal](https://www.paypal.com/donate?hosted_button_id=QVQ4Q7XSH9VBY)
+### [Breno Henrike's PayPal](https://www.paypal.com/donate?hosted_button_id=QVQ4Q7XSH9VBY) (Inactive)
 
-### [Lord Exelot's PayPal](www.paypal.me/LordExelot)
+### [Lord Exelot's PayPal](www.paypal.me/LordExelot) (Inactive)
 
 ## Cast
 
