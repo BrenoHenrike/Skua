@@ -1,6 +1,6 @@
 # About Skua
 
-Skua is the successor to RBot (originally made by "[rodit](https://github.com/rodit/RBot)"), now remade and rebranded by Breno_Henrike, with the help of Lord Exelot, and a handful of scripters. It is a Third Party Client made by the people mentioned above. It also has many "features" and quirks. Overall, it will make this glorified flash game on steroids a piece of cake.
+Skua is the successor to RBot (originally made by "[rodit](https://github.com/rodit/RBot)"), now remade and rebranded by Breno_Henrike, with the help of Lord Exelot, and a handful of scripters. It is a third-party client made by the people mentioned above. It also has many "features" and quirks. Overall, it will make this glorified flash game on steroids a piece of cake.
 
 ## How to use
 
@@ -35,11 +35,11 @@ To keep track of what bots are run, how often, how long, and just how popular so
 - **Core Script Files** are not meant to be run.
 - **0ScriptName.cs** are basically "Do everything required for this script."
 - If you wanted to have a new farming script that doesn't exist, though, please request it
-in the discord
+in the Discord
 
 ### [Skua Discord](https://discord.com/invite/CKKbk2zr3p) Join the community and get help with Skua
 
-### For questions or help go to the [#skua-help](https://discord.com/channels/1090693457586176013/1090741396970938399) channel
+### For questions or help, go to the [#skua-help](https://discord.com/channels/1090693457586176013/1090741396970938399) channel
 
 
 
@@ -47,17 +47,19 @@ in the discord
 
 Skua developers need your support to improve Skua. You can donate or sponsor us by clicking the PayPal link below. Thank you for your support.
 
-### [purple/SharpTheNightmare](https://www.paypal.com/ncp/payment/RHG8F84AUXFKY)
+### purple/SharpTheNightmare (Current Dev)
+ - [Ko-Fi](https://ko-fi.com/sharpthenightmare)
+ - ETH: `0xd66fb89f503c9c14093479178d817c9e87d7c0de`
 
-### [Breno Henrike's PayPal](https://www.paypal.com/donate?hosted_button_id=QVQ4Q7XSH9VBY) (Inactive)
+### [Breno Henrike's PayPal (Inactive) (Creator)](https://www.paypal.com/donate?hosted_button_id=QVQ4Q7XSH9VBY)
 
-### [Lord Exelot's PayPal](www.paypal.me/LordExelot) (Inactive)
+### [Lord Exelot's PayPal (Inactive) (Brief work on Skua Ex Scripts Manager)](www.paypal.me/LordExelot)
 
 ## Cast
 
 - **Breno Henrike**, the artist of Skua.
 - **Lord Exelot**, the scripts manager and Skua Discord owner.
-- **Tato** the script writer, is also the writer of this about content.
+- **Tato**, the script writer, is also the writer of this about content.
 - **Skua Heroes*,* the script makers and helpers.
 - **Boaters** are the ones who sail overnight using Skua and help the Skua team to improve, thanks to their feedback and suggestions **which is you**.
 
