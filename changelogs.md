@@ -1,3 +1,10 @@
+# Skua 1.3.0.0
+## Released: November 10, 2025
+
+### We've moved to a [new git](https://github.com/auqw/Skua/)
+
+---
+
 # Skua 1.2.5.4
 ## Released: September 12, 2025
 
@@ -35,7 +42,7 @@
 
 ## NET 9 WAS BAD FOR SKUA SO I REVERTED BACK TO NET 6 (also I actually didn't even change to net 9 for all projects that was my bad)
 ### Health Check
-- anytime we pull from map ScriptMonsters we pulled from MapMonsters which didn't have the dataleaf connected to it
+- anytime we pull from ScriptMonsters we pulled from MapMonsters which didn't have the dataleaf connected to it
 - added MapMonstersWithCurrentData which pulls the dataleaf from the monsters then merges it
 
 ### Fixed Keybinds
