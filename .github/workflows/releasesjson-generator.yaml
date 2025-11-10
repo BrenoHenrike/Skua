@@ -1,0 +1,56 @@
+name: Update Releases JSON
+
+on:
+  push:
+    branches:
+      - master
+      - main
+      - dev
+  pull_request:
+    types: [closed]
+    branches:
+      - master
+      - main
+  release:
+    types: [published, edited, deleted]
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+
+    steps:
+    - name: Checkout repository
+      uses: actions/checkout@v4
+      with:
+        ref: ${{ github.ref }}
+        token: ${{ secrets.GITHUB_TOKEN }}
+
+    - name: Get Releases
+      id: get_releases
+      run: |
+        curl -H "Authorization: Bearer ${{ secrets.GITHUB_TOKEN }}" \
+             -H "Accept: application/vnd.github+json" \
+             -H "X-GitHub-Api-Version: 2022-11-28" \
+             https://api.github.com/repos/${{ github.repository }}/releases \
+             > releases.json
+
+    - name: Upload Artifact
+      uses: actions/upload-artifact@v4
+      with:
+        name: releases.json
+        path: releases.json
+
+    - name: Commit and push changes
+      if: github.ref_type == 'branch'
+      uses: stefanzweifel/git-auto-commit-action@v4
+      with:
+        branch: ${{ github.ref_name }}
+        commit_message: 'Update releases.json [skip ci]'
+        file_pattern: 'releases.json'
+        commit_user_name: 'github-actions[bot]'
+        commit_user_email: 'github-actions[bot]@users.noreply.github.com'
+
+    - name: Delete artifact
+      uses: geekyeggo/delete-artifact@v5
+      with:
+        name: releases.json
